@@ -25,3 +25,5 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-18 | heartbeat hook needs the lesson version id (`lv-N-M`) from the loaded lesson; contract may lack a source | NL-64 | see NL-64 devlog | open |
 | S-19 | Web container: `model_client` still unbuilt and `MODEL_PROVIDER_MODE=real` throws "NOT BUILT" (web only needs it for NL-116 suggestions); db/ids/clock were unbuilt stubs until NL-90 exposed it (fixed on main 2026-10-25) | NL-116 / NL-102 wiring | web cannot start in real mode yet | open |
 | S-18 | CON-20 heartbeat needs `version_id` but `Lesson` carries none; SCR-9 sends `lv-<version_number>` (only once the lesson has loaded) | NL-64 / CHG on CON-11 or CON-20 | add `version_id` to `Lesson` (or relax the heartbeat field) | open |
+| S-20 | SCR-9 jump-to-span lands on the section wrapper in the editor (no `data-text-region`); no unit/e2e test jumps against the editor DOM | S-17 follow-up | jump focuses the section, not the exact span | open |
+| S-21 | `clientState` is not reset to "connecting" when the editor remounts after a role/state flip (action bar can show the old state briefly) | S-17 follow-up | cosmetic | open |
