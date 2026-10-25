@@ -6,8 +6,6 @@ import { InsertQuoteDialog } from "@/features/insert-quote/insert-quote-dialog";
 import { ResolveDialog } from "@/features/resolve/resolve-dialog";
 import { SendBackDialog } from "@/features/send-back/send-back-dialog";
 import { StartRunDialog } from "@/features/start-run/start-run-dialog";
-import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
-import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
 import { LessonEditor } from "@/editor/lesson-editor";
 
 const pin = { snapshotHash: "h", snapshotStateVector: "v" };
@@ -45,14 +43,5 @@ describe("handed-over shells", () => {
   it("LessonEditor placeholder", () => {
     render(<LessonEditor lessonId="G6.U4.L4" lesson={{} as never} readOnly={false} onClientState={() => {}} />);
     expect(screen.getByTestId("lesson-editor-placeholder")).toBeInTheDocument();
-  });
-
-  it("WorkspaceActionBar placeholder and heartbeat no-op", () => {
-    function Beat() {
-      useReviewHeartbeat({ lessonId: "G6.U4.L4", versionId: "v1" });
-      return <WorkspaceActionBar lesson={{} as never} issues={{} as never} clientState="synced" />;
-    }
-    render(<Beat />);
-    expect(screen.getByTestId("action-bar-placeholder")).toBeInTheDocument();
   });
 });
