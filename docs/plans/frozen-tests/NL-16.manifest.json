@@ -1,0 +1,24 @@
+{
+  "ticket": "NL-16",
+  "risk": "security",
+  "frozen": {
+    "packages/core/src/intake/normalize.instruction-shaped.test.ts": "15d96138475c1cf42a8a5bf5f044c8c54af3950cc04bb942fbf80b30427b0d43",
+    "packages/core/src/intake/parse-grid.refusals.test.ts": "142bf16dcaedcf6f3792f5633223a6cc5324d75c3a5ee31e75e1fb0200b8d6ae",
+    "packages/core/src/intake/testing/frozen-fixtures.ts": "fa29e42842c3f54e7a48e8f751e21b7bff7900be0beeaed2c988bdafd85a2208"
+  },
+  "criteria": {
+    "AC-2": [
+      "packages/core/src/intake/parse-grid.refusals.test.ts",
+      "packages/core/src/intake/testing/frozen-fixtures.ts"
+    ],
+    "AC-7": [
+      "packages/core/src/intake/normalize.instruction-shaped.test.ts",
+      "packages/core/src/intake/testing/frozen-fixtures.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/core/src/intake/parse-grid.test.ts",
+    "packages/core/src/intake/normalize.test.ts"
+  ],
+  "note": "Frozen tests live in separate files (*.refusals.test.ts, *.instruction-shaped.test.ts) so the implementer may create parse-grid.test.ts and normalize.test.ts for the other ACs without touching frozen files."
+}
