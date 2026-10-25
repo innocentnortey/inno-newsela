@@ -485,6 +485,20 @@
         "rights": "unset",
         "source_ref": null
       }
+    },
+    {
+      "type": "quote",
+      "attrs": {
+        "slot_id": "x-2",
+        "source_ref": "{\"title\":\"Synthetic Book\",\"chapter\":\"1\"}",
+        "rights": "public-domain"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "An invented line of plain text."
+        }
+      ]
     }
   ]
 }

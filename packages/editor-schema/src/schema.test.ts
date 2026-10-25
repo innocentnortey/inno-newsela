@@ -23,6 +23,7 @@ const NODES = [
   "teacher_tip",
   "quote_placeholder",
   "excerpt_slot",
+  "quote",
   "text",
   "hard_break",
 ];
