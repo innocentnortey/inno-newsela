@@ -173,7 +173,7 @@ export class PgRunRepo implements RunRepo {
       // A run cancelled meanwhile stays cancelled; the plan is still kept.
       await tx.query(
         `UPDATE run SET plan_stored_at = $2::timestamptz, state = 'running', paused_check = NULL
-         WHERE id = $1 AND state IN ('planning','paused')`,
+         WHERE id = $1 AND state IN ('planning','paused','running')`,
         [run_id, now],
       );
       return res.rows[0] as Row;

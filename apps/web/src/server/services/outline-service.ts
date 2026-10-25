@@ -48,6 +48,11 @@ export interface ReportReader {
   runs_from_version(id: string): Promise<{ run_id: string; started_at: string; choices_hash: string }[]>;
 }
 
+// Choices carry user ids (run pins parse them as UserId); display surfaces swap in the name through this read.
+export interface UserNameReader {
+  user_names(ids: readonly string[]): Promise<Map<string, string>>;
+}
+
 const FILE_MESSAGE = "That file is not a CSV or XLSX outline within the size limit.";
 const COLUMNS_LOOKED_FOR = [
   "filename", "lesson", "lesson #", "type of lesson", "days", "text dependent question", "lesson description",
@@ -116,7 +121,7 @@ const lesson_hashes = (rows: readonly NormalizedRow[]): Record<string, string> =
 
 export class OutlineService {
   constructor(
-    private readonly outlines: OutlineRepo & UnitOverviewReader & ReportReader,
+    private readonly outlines: OutlineRepo & UnitOverviewReader & ReportReader & UserNameReader,
     private readonly standards: StandardRepo,
     private readonly sheets: SheetFetcher,
     private readonly audit: AuditLog,
@@ -154,12 +159,19 @@ export class OutlineService {
     return { strand_of: (code) => strands.get(code) ?? null };
   }
 
+  /** Display copy of the choices: `confirmed_by` user id -> name (id kept when unknown). Never pin or hash these. */
+  private async named(choices: IntakeChoiceRow[]): Promise<IntakeChoiceRow[]> {
+    const ids = choices.flatMap((c) => (c.confirmed_by === null ? [] : [c.confirmed_by as string]));
+    const names = await this.outlines.user_names(ids);
+    return choices.map((c) => (c.confirmed_by === null ? c : ({ ...c, confirmed_by: names.get(c.confirmed_by as string) ?? c.confirmed_by } as IntakeChoiceRow)));
+  }
+
   async report(user: RequestUser, outline_version_id: string): Promise<ValidationReport> {
     void user; // every role reads
     const version = await this.outlines.version(outline_version_id);
     if (version === null) throw new DomainRefusal("NOT_FOUND", "Outline version not found.", { outline_version_id });
     const outline = await this.outlines.outline(outline_version_id);
-    const base = build_validation_report(version, outline, await this.outlines.choices(outline_version_id), await this.eld_lookup(outline));
+    const base = build_validation_report(version, outline, await this.named(await this.outlines.choices(outline_version_id)), await this.eld_lookup(outline));
     const runs = await this.outlines.runs_from_version(outline_version_id);
     return { ...base, runs_from_this_version: runs };
   }
@@ -185,7 +197,7 @@ export class OutlineService {
     return this.tx.with_tx(async (tx) => {
       const fresh = (await this.outlines.version(id)) ?? version;
       const status = req.kind === "revert" ? "default" : "confirmed";
-      const before = await this.outlines.choices(id);
+      const before = await this.named(await this.outlines.choices(id));
       const saved = await this.outlines.upsert_choice(
         { outline_version_id: id, finding_id: req.target_id, choice: stored, status, confirmed_by: status === "confirmed" ? user.user_id : null, at: this.clock.now().toISOString() } as IntakeChoiceRow,
         tx,

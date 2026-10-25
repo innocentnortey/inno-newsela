@@ -6,7 +6,7 @@ import { PrefixedIdGenerator } from "@ls/core/ports/ids";
 import { compute_lesson_links } from "@ls/core/intake/lesson-links";
 import { load_standards_index } from "@ls/core/intake/standards-index";
 import { normalize_outline } from "@ls/core/intake/normalize";
-import type { IntakeChoiceRow } from "@ls/schema/outline";
+import { IntakeChoiceRow as IntakeChoiceRowSchema, type IntakeChoiceRow } from "@ls/schema/outline";
 import { load_issued_grid } from "../../../core/tests/fixtures/outline/index.ts";
 import { create_test_db, type TestDb } from "../testing/test-db.ts";
 import { insert_row } from "../testing/insert-row.ts";
@@ -15,7 +15,7 @@ import { PgOutlineRepo } from "./outlines.ts";
 
 let tdb: TestDb;
 let repo: PgOutlineRepo;
-const USER = "usr_synthetic_author";
+const USER = new PrefixedIdGenerator().new_id("usr");
 const ID = "G6.U4.ov1";
 const choice = (over: Partial<IntakeChoiceRow>): IntakeChoiceRow =>
   ({ outline_version_id: ID, finding_id: "f_1", choice: "keep", status: "confirmed", confirmed_by: USER, at: "2026-10-25T00:00:00.000Z", ...over }) as IntakeChoiceRow;
@@ -34,7 +34,7 @@ afterAll(async () => {
 });
 
 describe("NL-77 repo choices", () => {
-  it("upsert_choice: insert then overwrite keeps one row; choices() returns the user's name", async () => {
+  it("upsert_choice: insert then overwrite keeps one row; choices() returns the user id", async () => {
     await tdb.db.with_tx((tx) => repo.upsert_choice(choice({}), tx));
     await tdb.db.with_tx((tx) => repo.upsert_choice(choice({ choice: "remap", status: "default", confirmed_by: null }), tx));
     let rows = await repo.choices(ID);
@@ -43,7 +43,11 @@ describe("NL-77 repo choices", () => {
     await tdb.db.with_tx((tx) => repo.upsert_choice(choice({}), tx));
     rows = await repo.choices(ID);
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ choice: "keep", status: "confirmed", confirmed_by: "Test author" });
+    expect(rows[0]).toMatchObject({ choice: "keep", status: "confirmed", confirmed_by: USER });
+    // The pinned form must parse as a run pin does (UserId), and the name stays readable via user_names.
+    expect(() => IntakeChoiceRowSchema.parse(JSON.parse(JSON.stringify(rows[0])))).not.toThrow();
+    expect(await repo.user_names([USER, "usr_missing"])).toEqual(new Map([[USER, "Test author"]]));
+    expect((await repo.user_names([])).size).toBe(0);
     const stored = await tdb.db.with_tx(async (tx) => (await tx.query("select confirmed_by from intake_choice")).rows);
     expect(stored).toEqual([{ confirmed_by: USER }]);
   });

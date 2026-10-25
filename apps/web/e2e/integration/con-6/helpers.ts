@@ -60,23 +60,9 @@ export async function startRun(page: Page, rows: number[] = ROWS, cap_usd = 13):
   });
   expect(res.status(), await res.text()).toBe(201);
   const run = (await res.json()) as { run_id: string };
-  await repairPinnedChoices(run.run_id);
   const started = { run_id: run.run_id, up, user, unitKey: up.unit_key };
   openRuns.push(started);
   return started;
-}
-
-/**
- * DEFECT (seam, reported in the devlog, not fixed here): PgOutlineRepo.choices() returns confirmed_by as the user's NAME for display,
- * RunService.start pins those rows into run.choices_json, and the worker's pinned_choices() parses confirmed_by as a `usr_` id, so
- * every unit_plan job throws ZodError and no run can plan. Until that is fixed upstream this test setup rewrites the pinned names back
- * to the starter's id, before any worker is started. Start runs BEFORE starting the worker.
- */
-export async function repairPinnedChoices(runId: string): Promise<void> {
-  await db().query(
-    `update run set choices_json = (select coalesce(jsonb_agg(case when c->>'confirmed_by' is null then c else jsonb_set(c, '{confirmed_by}', to_jsonb(run.started_by)) end), '[]'::jsonb) from jsonb_array_elements(run.choices_json) c) where id = $1`,
-    [runId],
-  );
 }
 
 /** Another signed-in staff member (valid ids) on the given page. */
