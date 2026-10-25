@@ -1,0 +1,24 @@
+{
+  "ticket": "NL-90",
+  "risk": "security",
+  "frozen": {
+    "apps/web/e2e/integration/con-1/not-on-list.spec.ts": "4da332808a094df4c0e97cfbdd5f72c8d839deb392ed21141ad89fff6e31ed27",
+    "apps/web/e2e/integration/con-1/wrong-password.spec.ts": "ff189601ea50645c0c6d7118cacd1d336ef4dabd0c477d9b5574492ae4be7cd2",
+    "apps/web/e2e/integration/con-1/secrets-absent.spec.ts": "55c336b02a87bc95571b0823652354e4b4ed881edf2b98b4424485378a91a39a"
+  },
+  "criteria": {
+    "AC-2": [
+      "apps/web/e2e/integration/con-1/not-on-list.spec.ts"
+    ],
+    "AC-3": [
+      "apps/web/e2e/integration/con-1/wrong-password.spec.ts"
+    ],
+    "AC-5": [
+      "apps/web/e2e/integration/con-1/secrets-absent.spec.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/e2e/integration/support/**",
+    "apps/web/playwright.real.config.ts"
+  ]
+}
