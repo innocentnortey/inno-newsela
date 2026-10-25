@@ -5,7 +5,6 @@ import {
   eld_block,
   h,
   make_ctx,
-  p,
   reading_lesson,
   section,
   table,
