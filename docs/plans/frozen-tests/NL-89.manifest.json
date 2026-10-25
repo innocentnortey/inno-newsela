@@ -1,0 +1,42 @@
+{
+  "ticket": "NL-89",
+  "risk": "security",
+  "frozen": {
+    "packages/llm/src/openrouter-judge.test.ts": "de1f0251075c7089af1ea5716873e5a5ed6ea23d0c83952c763dbafb2b9ccccb",
+    "apps/worker/src/judge/judge-job.test.ts": "00ff75099b5a0328d28f96111c7834d35901a9341d52509ffaa9acfcbc942cba",
+    "packages/db/src/repos/judge.int.test.ts": "4b0da9ec50873a8568befc1415fc3e290e96cbe80446e1199cc9667fadef6956"
+  },
+  "criteria": {
+    "AC-1": [
+      "packages/llm/src/openrouter-judge.test.ts"
+    ],
+    "AC-2": [
+      "packages/llm/src/openrouter-judge.test.ts"
+    ],
+    "AC-3": [
+      "packages/llm/src/openrouter-judge.test.ts",
+      "apps/worker/src/judge/judge-job.test.ts"
+    ],
+    "AC-4": [
+      "apps/worker/src/judge/judge-job.test.ts"
+    ],
+    "AC-5": [
+      "apps/worker/src/judge/judge-job.test.ts"
+    ],
+    "AC-6": [
+      "apps/worker/src/judge/judge-job.test.ts"
+    ],
+    "AC-7": [
+      "packages/db/src/repos/judge.int.test.ts"
+    ],
+    "AC-8": [
+      "apps/worker/src/judge/judge-job.test.ts"
+    ],
+    "AC-9": [
+      "apps/worker/src/judge/judge-job.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/llm/src/fixtures/openrouter-judge-*.json"
+  ]
+}
