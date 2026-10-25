@@ -7,7 +7,6 @@ const CASES: [string, string, string[]][] = [
   ["review", "wire_review", ["lesson_reads", "issues", "slots", "candidates", "transitions", "approvals"]],
   ["metrics", "wire_metrics", ["board", "heartbeats"]],
   ["assist", "wire_assist", ["suggestions"]],
-  ["prompts", "wire_prompts", ["prompts"]],
   ["exports", "wire_exports", ["exports"]],
   ["coverage", "wire_coverage", ["coverage"]],
 ];
