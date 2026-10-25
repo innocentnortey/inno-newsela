@@ -56,7 +56,7 @@ export function build_progress(rows: RunProgressRows, concurrency_cap: number): 
     run.state === "paused" && run.paused_check !== null
       ? {
           check: run.paused_check,
-          lesson_ids: tiles.filter((t) => t.tile_state === "failed" && t.failure_reasons.some((r) => r.check === run.paused_check)).map((t) => t.lesson_id),
+          lesson_ids: tiles.filter((t) => t.tile_state === "failed" && t.failure_reasons.some((r) => r.check === run.paused_check || r.check_kind === run.paused_check)).map((t) => t.lesson_id),
         }
       : null;
   const stamps: number[] = [run.created_at, run.plan_stored_at, run.finished_at]

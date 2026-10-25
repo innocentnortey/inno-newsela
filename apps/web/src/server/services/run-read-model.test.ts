@@ -52,6 +52,9 @@ describe("build_progress", () => {
     const paused = build_progress(progress([f, job()], run({ state: "paused", paused_check: "provider_error" })), 6);
     expect(paused.paused_reason).toEqual({ check: "provider_error", lesson_ids: [f.lesson_id] });
     expect(build_progress(progress([f]), 6).paused_reason).toBeNull();
+    const m = [1, 2, 3].map(() => job({ status: "generation_failed", tile_state: "failed", failure_reasons: [{ check: "check_failed", check_kind: "section_missing", message: "m" }] as never }));
+    const breaker = build_progress(progress([...m, job()], run({ state: "paused", paused_check: "section_missing" })), 6);
+    expect(breaker.paused_reason?.lesson_ids).toEqual(m.map((x) => x.lesson_id));
     expect(build_progress(progress([], run({ state: "paused", paused_check: "unit_plan" })), 6).paused_reason).toEqual({ check: "unit_plan", lesson_ids: [] });
   });
 

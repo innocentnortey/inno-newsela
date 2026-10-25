@@ -109,6 +109,15 @@ describe("PgRunRepo", () => {
     expect(after?.state).toBe("running");
     expect(after?.plan_stored_at).not.toBeNull();
 
+    // after Resume (state already running) a late plan still stamps plan_stored_at
+    const rr = await t.db.with_tx((tx) => repo.insert_run(new_run(), tx));
+    await t.db.with_tx((tx) => repo.set_state(rr.run_id, "running", null, tx));
+    expect((await repo.get(rr.run_id))?.plan_stored_at).toBeNull();
+    await repo.store_unit_plan(rr.run_id, draft as never, "mc_3" as never);
+    const resumed = await repo.get(rr.run_id);
+    expect(resumed?.state).toBe("running");
+    expect(resumed?.plan_stored_at).not.toBeNull();
+
     // mark_capped, each cap
     for (const cap of ["run_cap", "day_cap", "project_cap"] as const) {
       const r = await t.db.with_tx((tx) => repo.insert_run(new_run(), tx));

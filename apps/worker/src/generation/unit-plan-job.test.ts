@@ -34,6 +34,20 @@ describe("UnitPlanJob", () => {
     expect(b.runs.calls.at(-1)).toBe("store_unit_plan");
   });
 
+  it("pinned_choices_with_user_id: a run whose pins carry usr_<ULID> plans fine", async () => {
+    const b = build_job({ script: [good] });
+    const pins = [
+      { outline_version_id: "G6.U4.ov1", finding_id: "f_1", choice: "keep", status: "confirmed", confirmed_by: "usr_01J0000000000000000000ABCD", at: "2026-10-25T00:00:00.000Z" },
+    ];
+    b.runs.pinned_choices = async () => {
+      b.runs.calls.push("pinned_choices");
+      return pins as never;
+    };
+    const out = await b.job.run(b.claimed);
+    expect(out).toMatchObject({ stored: true, entries: 47, failure: null });
+    expect(b.runs.calls).toEqual(["pinned_choices", "store_unit_plan"]);
+  });
+
   it("scoped_input_and_links", async () => {
     const rows = make_rows(47, [25]);
     const links: LessonLinkRecord[] = [

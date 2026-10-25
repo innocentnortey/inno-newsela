@@ -303,11 +303,10 @@ export class PgOutlineRepo implements OutlineRepo {
       async (tx) =>
         (
           await tx.query<{ finding_id: string; choice: string; status: string; confirmed_by: string | null; at: Date }>(
-            // `confirmed_by` is stored as a user id; the read shows the name (the report copies it verbatim).
+            // `confirmed_by` is returned as the stored user id (run pins parse it as a UserId); names via `user_names`.
             // There is no per-choice timestamp column, so `at` is the version's confirmed_at/created_at.
-            `SELECT c.finding_id, c.choice, c.status, coalesce(u.name, c.confirmed_by) AS confirmed_by, coalesce(v.confirmed_at, v.created_at) AS at
+            `SELECT c.finding_id, c.choice, c.status, c.confirmed_by, coalesce(v.confirmed_at, v.created_at) AS at
              FROM intake_choice c JOIN outline_version v ON v.id = c.outline_version_id
-             LEFT JOIN app_user u ON u.id = c.confirmed_by
              WHERE c.outline_version_id=$1 ORDER BY c.finding_id`,
             [outline_version_id],
           )
@@ -321,6 +320,15 @@ export class PgOutlineRepo implements OutlineRepo {
       confirmed_by: r.confirmed_by,
       at: r.at.toISOString(),
     })) as IntakeChoiceRow[];
+  }
+
+  /** Display names for user ids (not on the port); ids without a user are absent from the map. */
+  async user_names(ids: readonly string[]): Promise<Map<string, string>> {
+    if (ids.length === 0) return new Map();
+    const rows = await this.read(
+      async (tx) => (await tx.query<{ id: string; name: string }>("SELECT id, name FROM app_user WHERE id = ANY($1)", [ids])).rows,
+    );
+    return new Map(rows.map((r) => [r.id, r.name]));
   }
 
   async links(outline_version_id: OutlineVersionId): Promise<LessonLinkRecord[]> {

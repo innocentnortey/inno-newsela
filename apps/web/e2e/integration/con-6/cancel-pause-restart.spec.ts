@@ -80,6 +80,15 @@ test("cancel-pause-restart (c): a worker killed mid-call and restarted resumes, 
   expect(lost).toHaveLength(1);
 });
 
-test("cancel-pause-restart (b2): the paused banner counts the lessons that failed the same check", async () => {
-  test.fixme(true, "GET /runs/{id}/progress returns paused_reason.lesson_ids = [] for a circuit-breaker pause (observed: {check:'section_missing', lesson_ids:[]} after three lessons failed section_missing), so SCR-6 reads 'Run paused: 0 lessons in a row failed the same check'. Cause: apps/web/src/server/services/run-read-model.ts:59 matches tiles whose failure_reasons[].check equals run.paused_check, but a check failure's check is 'check_failed' and the kind ('section_missing') is in check_kind. Owner NL-78 (run read model). Not fixed here (server code is outside this ticket). Assertion when fixed: paused_reason.lesson_ids.length >= 3 and the banner shows that number.");
+test("cancel-pause-restart (b2): the paused banner counts the lessons that failed the same check", async ({ page }) => {
+  test.setTimeout(240_000);
+  const run = await startRun(page, [8, 10, 11, 12, 13]);
+  await startWorker({ script: "same-check", env: { GENERATION_CONCURRENCY: "1" } });
+  await waitRun(run.run_id, ["paused"], 60_000);
+  const p = await getProgress(page, run.run_id);
+  expect(p.paused_reason!.lesson_ids.length).toBeGreaterThanOrEqual(3);
+  await page.goto(progressUrl(run));
+  const banner = page.getByText(/Run paused: \d+ lessons in a row failed the same check/);
+  await expect(banner).toBeVisible();
+  expect(Number((await banner.textContent())!.match(/paused: (\d+)/)![1])).toBe(p.paused_reason!.lesson_ids.length);
 });
