@@ -120,7 +120,7 @@ export default [
     },
   },
   {
-    files: ["packages/db/src/testing/**", "packages/**/*.test.ts", "packages/**/*.int.test.ts", "packages/**/test-support/**", "apps/**/*.test.ts"],
+    files: ["packages/db/src/testing/**", "packages/**/*.test.ts", "packages/**/*.int.test.ts", "packages/**/test-support/**", "apps/**/*.test.ts", "apps/**/testing/**", "apps/**/harness.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },
   {
