@@ -191,7 +191,7 @@ Route files are thin: parse the request with the Zod mirror of the OpenAPI reque
 | Module | Responsibility (one sentence) | Interface (DO-4) | Depends on | Owner area |
 |---|---|---|---|---|
 | `apps/web/src/server/http/with-route.ts` | Wraps every route: session, `Origin` check on mutations, role check, request id, Zod parse (`INVALID_REQUEST`), pool wait (`SERVICE_BUSY` + `Retry-After`), refusal → envelope, latency log line. | `with_route` | `SessionService`, `obs` | A3 auth |
-| `apps/web/src/server/http/passwords.ts` | Hashes and verifies seeded-account passwords with scrypt (CON-1). | `hash_password`, `verify_password` | node:crypto | A3 auth |
+| `packages/core/src/auth/passwords.ts` | Hashes and verifies seeded-account passwords with scrypt (CON-1); in core so the seed script (A21) and the web app share it without importing app internals (addendum 2026-10-25). | `hash_password`, `verify_password` | node:crypto | A3 auth |
 | `apps/web/src/server/http/refusal.ts` | Maps `DomainRefusal` codes to the HTTP status the card fixes and builds the envelope. | `to_error_response` | `schema/api` | A3 auth |
 | `apps/web/src/server/container.ts` | Composition root: builds settings, `WebDeps` (database, ids, clock, the chosen model client) once per process and merges every wiring file's services. | `build_web_services` | `wiring/*` | A0 platform |
 | `apps/web/src/server/wiring/<area>.ts` | One file per area that builds that area's concrete repositories, adapters and services from `WebDeps` (Metz B2). | `wire_sessions`, `wire_outlines`, `wire_runs`, `wire_review`, `wire_metrics`, `wire_assist`, `wire_prompts`, `wire_exports`, `wire_coverage` | the area's services | A0 writes the stubs in wave 0; then sessions A3, outlines A4, runs A10, review A12, metrics A13, assist A15, prompts A16, exports A17, coverage A18 |
@@ -322,7 +322,7 @@ themselves are wave 0 (A1), so a same-or-later-wave *implementation* is never ne
 | 0 | A0 platform | root `package.json`, root `package-lock.json` (the only lockfile; A0 deletes `apps/web/package-lock.json` when it adopts `apps/web`), `tsconfig.base.json`, **every** workspace `*/package.json` and `*/tsconfig.json` (with subpath `exports`, no barrel `index.ts`), root `eslint.config.js` (boundaries rule, allow-list for SheetJS and `compromise` in core), `vitest.workspace.ts`, `docker-compose.yml`, `Dockerfile.web`, `Dockerfile.node`, `render.yaml`, `packages/config/**`, `packages/obs/**`, `apps/web/src/server/container.ts`, `apps/worker/src/main.ts`, `apps/collab/src/main.ts`, and the **stubs** of every `apps/web/src/server/wiring/*.ts`, `apps/worker/src/wiring/*.ts`, `apps/collab/src/wiring/collab.ts` | none at build; at run time the roots call `wire_*` (DO-4 §12) | writes the full dependency set of §1 once; a later dependency is a one-line A0 ticket, never a feature edit; each wiring stub passes to its area after wave 0, and the roots never change again (Metz B2) |
 | 0 | A1 storage | `packages/db/migrations/**`, `packages/db/src/{pool,tx,migrate}.ts`, `packages/db/src/repos/audit.ts`, **every** `packages/core/src/ports/*.ts` (then each to its implementing area), `packages/core/src/testing/fake-tx.ts` | none | owns **all DDL**; other areas own their repo files but never write a migration (they raise a CHG to A1) |
 | 0 | A2 schema | `packages/schema/**` (incl. `content-hash.ts`, `api/transition.ts`), `packages/editor-schema/**`, `docs/contracts/schemas/**` | none | schema fixed before the batch run (HP-4 addendum) |
-| 1 | A3 auth | `apps/web/src/server/http/**` (incl. `passwords.ts`), `apps/web/src/server/services/session-service.ts`, `packages/db/src/repos/sessions.ts`, `apps/web/app/api/session/**`, `apps/web/middleware.ts`, `apps/web/src/server/wiring/sessions.ts` | `AuditLog.append`, `TxRunner.with_tx` (A1) | `risk::security`; `with_route` is the shared route wrapper, so it comes before every route area |
+| 1 | A3 auth | `apps/web/src/server/http/**`, `packages/core/src/auth/passwords.ts`, `apps/web/src/server/services/session-service.ts`, `packages/db/src/repos/sessions.ts`, `apps/web/app/api/session/**`, `apps/web/middleware.ts`, `apps/web/src/server/wiring/sessions.ts` | `AuditLog.append`, `TxRunner.with_tx` (A1) | `risk::security`; `with_route` is the shared route wrapper, so it comes before every route area |
 | 1 | A4a intake core | `packages/core/src/intake/**`, `packages/db/src/repos/outlines.ts` | none (types from A2) | pure parsing plus the outline repositories |
 | 1 | A5 compile | `packages/core/src/compile/**`, `packages/ydoc/**`, `packages/db/src/repos/lesson-doc-reads.ts` | `assert_known_nodes`, `content_hash` (A2) | |
 | 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | none (types from A2) | the first ticket writes all 28 rule files as stubs (Metz C1) |
@@ -573,3 +573,18 @@ dependencies.
 | Stored lesson and export | `packages/schema/src/{lesson,export}.ts` → emitted to `docs/contracts/schemas/lesson.schema.json` and, for the export, `docs/contracts/lesson-export.schema.json` (the path CON-23 names) |
 | Internal ports | `packages/core/src/ports/*.ts` (DO-4 §3–§4) |
 | Tables | `packages/db/migrations/*.sql` (§6) |
+
+
+## Addenda at §7 (2026-10-25, from the slice plan's open items; Claude recommendations adopted under PD-32)
+
+- **Passwords:** `hash_password` / `verify_password` live in `packages/core/src/auth/passwords.ts` (was
+  `apps/web/src/server/http/passwords.ts`), so the seed script (NL-82) and the web app share one implementation without
+  an ops script importing app internals. Owner stays A3.
+- **Stored-lesson type:** `packages/schema/src/lesson.ts` holds a structural ProseMirror JSON type and does not import
+  `editor-schema`; the node/mark allow-list check (`assert_known_nodes`) lives with the editor schema. This lets NL-09 and
+  NL-10 run in parallel (slice plan, parallelism audit edge 2).
+- **Composition roots:** one composition root per app imports one wiring file per area (`apps/*/src/**/wiring/<area>.ts`);
+  A0 creates the shells (NL-06, NL-07) and each area's ticket fills only its own wiring file (slice plan *Composition-root
+  wiring owners*).
+- **e2e ownership:** FW-4 keeps `apps/web/playwright.config.ts` and `apps/web/e2e/gallery/**`; each screen ticket owns
+  `apps/web/e2e/<screen>/**`; NL-06 deletes FW-1's `apps/web/package-lock.json` (one root lockfile).
