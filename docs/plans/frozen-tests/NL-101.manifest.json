@@ -1,0 +1,40 @@
+{
+  "ticket": "NL-101",
+  "risk": "security",
+  "frozen": {
+    "apps/web/e2e/integration/con-12/unauthenticated-refused.spec.ts": "6d247baa64fc1c89f7dc462eb943f31d6c199a5fe37dc0231015ced7d1f18147",
+    "apps/web/e2e/integration/con-12/reviewer-only-writes.spec.ts": "58f0e482dad9c24ea989ea9ba4afa31b276707201e01dc54eaaf1a13d5a2b69d",
+    "apps/web/e2e/integration/con-12/refused-after-lock.spec.ts": "894f632ae87576bd6d7eb556d3f5ea93368c27e968f7c8125ac40714a1a51a0b",
+    "apps/web/e2e/integration/con-12/paste-and-http-writes.spec.ts": "265425c960dd981bc1c355ffaa1544615b4f8bddf5b9ce576e0532be5737066f",
+    "apps/web/e2e/integration/con-12/socket.ts": "4f70224c872e543ee165edf77ea07ddf1adfcc9f7c04b7ae395614126ddc62c0",
+    "apps/web/e2e/integration/con-12/bridge.ts": "825a6656648d72c6cd407182a7fc4a249b730fb24e1d8b3172397fd036666916",
+    "apps/web/e2e/integration/con-12/helpers.ts": "6cd814c25833e072a362f61bbffdcf76f12809e84910066a3bbdc8bdae848007"
+  },
+  "criteria": {
+    "AC-4": [
+      "apps/web/e2e/integration/con-12/unauthenticated-refused.spec.ts",
+      "apps/web/e2e/integration/con-12/socket.ts",
+      "apps/web/e2e/integration/con-12/helpers.ts"
+    ],
+    "AC-5": [
+      "apps/web/e2e/integration/con-12/reviewer-only-writes.spec.ts",
+      "apps/web/e2e/integration/con-12/socket.ts",
+      "apps/web/e2e/integration/con-12/helpers.ts"
+    ],
+    "AC-6": [
+      "apps/web/e2e/integration/con-12/refused-after-lock.spec.ts",
+      "apps/web/e2e/integration/con-12/bridge.ts",
+      "apps/web/e2e/integration/con-12/helpers.ts"
+    ],
+    "AC-8": [
+      "apps/web/e2e/integration/con-12/paste-and-http-writes.spec.ts",
+      "apps/web/e2e/integration/con-12/bridge.ts",
+      "apps/web/e2e/integration/con-12/helpers.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/e2e/integration/con-12/seed.ts",
+    "apps/web/e2e/integration/support/**",
+    "apps/web/playwright.real.config.ts"
+  ]
+}
