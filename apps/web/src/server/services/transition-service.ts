@@ -32,6 +32,7 @@ export class TransitionService implements TransitionApi {
     private readonly collab: CollabCommands,
     private readonly tx: TxRunner,
     private readonly logger: Logger,
+    private readonly sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
   ) {}
 
   async transition(user: RequestUser, lesson_id: LessonId, req: TransitionRequestInput): Promise<TransitionResult> {
@@ -131,7 +132,9 @@ export class TransitionService implements TransitionApi {
           version = cur;
         }
 
-        await this.states.set_state(lesson_id, to_state, locked.reviewer_id, tx);
+        // start_review records the acting reviewer; every other move keeps the lesson's reviewer.
+        const reviewer_id = req.action === "start_review" ? user.user_id : locked.reviewer_id;
+        await this.states.set_state(lesson_id, to_state, reviewer_id, tx);
         const ev = await this.states.append_review_event(
           {
             lesson_id,
@@ -166,17 +169,31 @@ export class TransitionService implements TransitionApi {
         throw new DomainRefusal("COLLAB_UNAVAILABLE", "The editing service is unavailable. Nothing changed.", { lesson_id });
       }
       if (mode_set && from_state !== null) {
-        // The commit failed after the editor was unfrozen: freeze it again, best effort, and leave one log line.
-        await this.collab
-          .set_mode({ lesson_id, mode: "read_only", state: from_state, request_id: user.request_id })
-          .catch(() => undefined);
-        this.logger.error("transition.commit_failed_after_set_mode", {
+        // The commit failed after the editor was unfrozen: freeze it again (3 attempts, short backoff).
+        const frozen = await this.refreeze(user.request_id, lesson_id, from_state);
+        this.logger.error(frozen ? "transition.commit_failed_after_set_mode" : "transition.refreeze_failed", {
           request_id: user.request_id,
           lesson_id,
-          extra: new InvariantViolation("commit_failed_after_set_mode", { action: req.action }),
+          extra: new InvariantViolation(frozen ? "commit_failed_after_set_mode" : "refreeze_failed", { action: req.action }),
         });
+        if (!frozen) {
+          // The editor may still be editable while the database says otherwise: make that visible to the caller.
+          throw new InvariantViolation("refreeze_failed", { lesson_id, action: req.action });
+        }
       }
       throw e;
     }
+  }
+
+  private async refreeze(request_id: string, lesson_id: LessonId, state: LessonStateName): Promise<boolean> {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await this.collab.set_mode({ lesson_id, mode: "read_only", state, request_id });
+        return true;
+      } catch {
+        if (attempt < 3) await this.sleep(50 * attempt);
+      }
+    }
+    return false;
   }
 }

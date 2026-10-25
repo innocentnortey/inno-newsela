@@ -1,8 +1,9 @@
 // NL-53 AC-19 (unfrozen): set_mode failure rolls the move back; a commit failure after set_mode compensates.
 // Synthetic, in-memory; uses the frozen fixtures read-only.
 import { describe, expect, it } from "vitest";
+import { TransitionService } from "./transition-service.ts";
 import { InvariantViolation } from "@ls/core/errors";
-import { HASH, LID, VEC, build, code_of, collab_unavailable, user_for } from "./transition-service.fixtures.ts";
+import { HASH, LID, REVIEWER_ID, VEC, build, code_of, collab_unavailable, user_for } from "./transition-service.fixtures.ts";
 
 const CASES = [
   ["withdraw", "reviewer-token", "submitted", { action: "withdraw", note: "pulling it back" }],
@@ -44,5 +45,43 @@ describe("AC-19 set_mode failure", () => {
     expect(logged[0]).toContain("req_synthetic_commit");
     expect(new InvariantViolation("commit_failed_after_set_mode").name).toBe("InvariantViolation");
     expect(logged[0]).toContain("InvariantViolation");
+  });
+
+  function with_sleep(t: ReturnType<typeof world>, sleeps: number[]) {
+    return new TransitionService(t.states, t.versions, t.approvals, t.collab, t.tx, t.log.logger as never, async (ms) => { sleeps.push(ms); });
+  }
+  const req = { action: "request_changes", tag: "standards", note: "fix" } as const;
+
+  it("a failing commit and one failing first re-freeze retries and still freezes", async () => {
+    const t = world("submitted");
+    t.w.fail_commit_once = true;
+    let freezes = 0;
+    t.collab.mode_behave = async (cmd) => { if (cmd.mode === "read_only" && ++freezes === 1) throw collab_unavailable("set_mode"); };
+    const sleeps: number[] = [];
+    await expect(with_sleep(t, sleeps).transition(user_for("approver-token", "req_synthetic_a"), LID, req)).rejects.toThrow("commit failed");
+    expect(t.collab.modes.map((m) => m.mode)).toEqual(["editable", "read_only", "read_only"]);
+    expect(sleeps).toEqual([50]);
+  });
+
+  it("when every re-freeze fails it logs ids only and throws refreeze_failed", async () => {
+    const t = world("submitted");
+    t.w.fail_commit_once = true;
+    t.collab.mode_behave = async (cmd) => { if (cmd.mode === "read_only") throw collab_unavailable("set_mode"); };
+    const sleeps: number[] = [];
+    await expect(with_sleep(t, sleeps).transition(user_for("approver-token", "req_synthetic_b"), LID, req)).rejects.toThrow("refreeze_failed");
+    expect(t.collab.modes.filter((m) => m.mode === "read_only")).toHaveLength(3);
+    expect(sleeps).toEqual([50, 100]);
+    const logged = t.lines.filter((l) => l.includes("refreeze_failed"));
+    expect(logged).toHaveLength(1);
+    expect(logged[0]).toContain("req_synthetic_b");
+  });
+
+  it("start_review sets the lesson reviewer to the acting reviewer", async () => {
+    const t = build({ state: "draft" });
+    t.w.lesson = { ...t.w.lesson!, reviewer_id: null };
+    const r = await t.post("reviewer-token", { action: "start_review" });
+    expect(r.status).toBe(200);
+    expect(t.w.lesson?.state).toBe("in_review");
+    expect(t.w.lesson?.reviewer_id).toBe(REVIEWER_ID);
   });
 });
