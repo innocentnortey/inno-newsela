@@ -1,0 +1,340 @@
+{
+  "$defs": {
+    "__schema0": {
+      "additionalProperties": false,
+      "properties": {
+        "attrs": {
+          "additionalProperties": {},
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "content": {
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "type": "array"
+        },
+        "marks": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "attrs": {
+                "additionalProperties": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "export_version": {
+      "const": 1,
+      "type": "number"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+      "type": "string"
+    },
+    "lessons": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "approved_at": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "approved_by": {
+            "type": "string"
+          },
+          "content_hash": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "lesson": {
+            "additionalProperties": false,
+            "properties": {
+              "front_matter": {
+                "additionalProperties": false,
+                "properties": {
+                  "minutes_total": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "standards": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "asserted_by": {
+                          "enum": [
+                            "outline",
+                            "generator",
+                            "judge",
+                            "reviewer"
+                          ],
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "confirmation": {
+                          "anyOf": [
+                            {
+                              "enum": [
+                                "open",
+                                "confirmed",
+                                "removed"
+                              ],
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "official_text": {
+                          "type": "string"
+                        },
+                        "origin": {
+                          "enum": [
+                            "outline",
+                            "outline-fixed",
+                            "narrowed",
+                            "added"
+                          ],
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "focus",
+                            "supporting",
+                            "eld"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "role",
+                        "origin",
+                        "official_text",
+                        "asserted_by",
+                        "confirmation"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "vocabulary": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "standards",
+                  "minutes_total",
+                  "vocabulary"
+                ],
+                "type": "object"
+              },
+              "lesson_id": {
+                "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+                "type": "string"
+              },
+              "schema_version": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "address": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "attrs": {
+                          "additionalProperties": {},
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "content": {
+                          "items": {
+                            "$ref": "#/$defs/__schema0"
+                          },
+                          "type": "array"
+                        },
+                        "type": {
+                          "const": "doc",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "type": "object"
+                    },
+                    "minutes": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "name",
+                    "minutes",
+                    "content"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "text_cards": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "author": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "chapter": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "content_available": {
+                      "type": "boolean"
+                    },
+                    "edition": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "kind": {
+                      "enum": [
+                        "off-platform-text",
+                        "newsela-article",
+                        "public-domain"
+                      ],
+                      "type": "string"
+                    },
+                    "pages": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "author",
+                    "edition",
+                    "chapter",
+                    "pages",
+                    "kind",
+                    "content_available"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "lesson_id",
+              "schema_version",
+              "title",
+              "type",
+              "front_matter",
+              "sections",
+              "text_cards"
+            ],
+            "type": "object"
+          },
+          "lesson_id": {
+            "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+            "type": "string"
+          },
+          "version_id": {
+            "pattern": "^lv_[0-9A-HJKMNP-TV-Z]{26}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lesson_id",
+          "version_id",
+          "content_hash",
+          "approved_by",
+          "approved_at",
+          "lesson"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "unit_id": {
+      "pattern": "^G\\d{1,2}\\.U\\d{1,2}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "export_version",
+    "unit_id",
+    "generated_at",
+    "lessons"
+  ],
+  "title": "ExportBundleFile",
+  "type": "object"
+}

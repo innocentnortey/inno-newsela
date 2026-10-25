@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "day": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "hands_forward": {
+            "type": "string"
+          },
+          "lesson_id": {
+            "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+            "type": "string"
+          },
+          "performance_task_thread": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "routines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "lesson_id",
+          "day",
+          "purpose",
+          "routines",
+          "hands_forward",
+          "performance_task_thread"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "entries"
+  ],
+  "title": "UnitPlanDraft",
+  "type": "object"
+}

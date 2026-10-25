@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "counts": {
+      "additionalProperties": false,
+      "properties": {
+        "arc_headers": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "errors": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "flex_days": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "lessons": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "totals": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "warnings": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "lessons",
+        "flex_days",
+        "arc_headers",
+        "totals",
+        "errors",
+        "warnings"
+      ],
+      "type": "object"
+    },
+    "findings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "default_choice": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finding_id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "ok",
+              "warning",
+              "error"
+            ],
+            "type": "string"
+          },
+          "original_text": {
+            "type": "string"
+          },
+          "proposed_fix": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_number": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "finding_id",
+          "row_number",
+          "level",
+          "kind",
+          "original_text",
+          "proposed_fix",
+          "default_choice"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "rows": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "arc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "eld_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "focus_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "homework": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "lesson",
+              "flex_day",
+              "arc_header",
+              "total"
+            ],
+            "type": "string"
+          },
+          "lesson_id": {
+            "anyOf": [
+              {
+                "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lesson_type": {
+            "type": "string"
+          },
+          "msls_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pages": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "row_number": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "segments": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "applies": {
+                  "enum": [
+                    "apply",
+                    "show_only",
+                    "ignore"
+                  ],
+                  "type": "string"
+                },
+                "instruction_shaped": {
+                  "type": "boolean"
+                },
+                "kind": {
+                  "enum": [
+                    "content",
+                    "writer_task",
+                    "editor_note",
+                    "unit_rule",
+                    "safety_note"
+                  ],
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "text",
+                "instruction_shaped",
+                "applies"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "text_set": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "vocabulary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "row_number",
+          "kind",
+          "lesson_id",
+          "number",
+          "title",
+          "lesson_type",
+          "arc",
+          "segments",
+          "focus_codes",
+          "eld_codes",
+          "msls_codes",
+          "vocabulary",
+          "homework",
+          "pages",
+          "text_set"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "unit_as_written": {
+      "type": "string"
+    },
+    "unit_from_filenames": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unit_rules": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "scope_lesson_ids": {
+            "items": {
+              "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "scope_lesson_ids"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "unit_as_written",
+    "unit_from_filenames",
+    "rows",
+    "findings",
+    "unit_rules",
+    "counts"
+  ],
+  "title": "NormalizedOutline",
+  "type": "object"
+}

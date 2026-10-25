@@ -1,0 +1,22 @@
+{
+  "row_number": 8,
+  "kind": "lesson",
+  "lesson_id": "G6.U4.L4",
+  "number": 4,
+  "title": "Lesson 4: The Lightning Thief, Chapter 1",
+  "lesson_type": "Reading",
+  "arc": "Investigation 1",
+  "segments": [
+    { "kind": "content", "text": "Teacher reviews determining/clarifying the meaning of words and demonstrates how to use context.", "instruction_shaped": false, "applies": "apply" },
+    { "kind": "content", "text": "Students will add this week's vocabulary words to their Unit Vocabulary graphic organizers.", "instruction_shaped": false, "applies": "apply" },
+    { "kind": "editor_note", "text": "Instead, think about using morphology when teaching the vocabulary words. Introduce morphology tied to myth language: mort-, -ology, trans-. If mort means death, what does immortal mean?", "instruction_shaped": true, "applies": "show_only" },
+    { "kind": "editor_note", "text": "10 vocabulary words are taught, which is a lot for depth vocabulary words", "instruction_shaped": false, "applies": "show_only" }
+  ],
+  "focus_codes": ["RL.6.1", "RL.6.2", "L.6.4.b"],
+  "eld_codes": ["ELD.PI.6.7", "ELD.PI.6.6", "ELD.PII.6.5"],
+  "msls_codes": [],
+  "vocabulary": ["envy (1)", "recognize (1)", "frayed (2)", "expelled (2)", "probation (3)", "threatened (3)", "spawn (4)", "detention (4)", "immortal (6)", "dyslexia (7)"],
+  "homework": "Read and annotate The Lightning Thief Ch. 1 (pp. 9–15)",
+  "pages": "pp. 1–8",
+  "text_set": "The Lightning Thief"
+}
