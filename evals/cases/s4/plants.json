@@ -1,0 +1,249 @@
+{
+ "version": 1,
+ "source": "SP-3",
+ "plants": [
+  {
+   "id": "P01",
+   "fixture": "wp1",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 3
+   },
+   "text": "Listen to how Percy opens: \u201cNobody at my school ever listened to me.\u201d",
+   "needle": "Nobody at my school ever listened to me",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P01",
+   "expected_level": "blocking",
+   "guards": "P01 in WP-1: an invented quotation"
+  },
+  {
+   "id": "P02",
+   "fixture": "wp1",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "append_rationale",
+    "block": 16,
+    "index": 1
+   },
+   "text": "Percy says \u201cmy teachers always liked me best,\u201d so he cannot be a problem figure.",
+   "needle": "my teachers always liked me best",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P02",
+   "expected_level": "blocking",
+   "guards": "P02 in WP-1: an invented quotation"
+  },
+  {
+   "id": "P03",
+   "fixture": "wp1",
+   "expected_scan": "page",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 1
+   },
+   "text": "Reread page 27 with a partner and mark one detail.",
+   "needle": "page 27",
+   "expected_kind": "page_out_of_range",
+   "provenance": "hand-written",
+   "source": "SP-3 P03",
+   "expected_level": "blocking",
+   "guards": "P03 in WP-1: a page or chapter reference outside the row"
+  },
+  {
+   "id": "P04",
+   "fixture": "wp1",
+   "expected_scan": "name",
+   "code_detectable": true,
+   "op": {
+    "op": "append_rationale",
+    "block": 16,
+    "index": 3
+   },
+   "text": "Percy\u2019s friend Grover also gets into trouble at school.",
+   "needle": "Grover",
+   "expected_kind": "proper_noun_unsourced",
+   "provenance": "hand-written",
+   "source": "SP-3 P04",
+   "expected_level": "blocking",
+   "guards": "P04 in WP-1: a name no source holds"
+  },
+  {
+   "id": "P05",
+   "fixture": "wp1",
+   "expected_scan": "none",
+   "code_detectable": false,
+   "op": {
+    "op": "append_text",
+    "block": 22
+   },
+   "text": "Remind students that on the class trip Percy is blamed when a classmate falls into a fountain.",
+   "needle": "on the class trip Percy is blamed when a classmate falls into a fountain",
+   "expected_kind": null,
+   "provenance": "hand-written",
+   "source": "SP-3 P05",
+   "expected_level": null,
+   "guards": "P05 in WP-1: an invented event with no name or quote (not code-detectable)"
+  },
+  {
+   "id": "P06",
+   "fixture": "wp2",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 1
+   },
+   "text": "As the hare tells the lion, \u201cTrust me, friend.\u201d",
+   "needle": "Trust me, friend",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P06",
+   "expected_level": "blocking",
+   "guards": "P06 in WP-2: an invented quotation"
+  },
+  {
+   "id": "P07",
+   "fixture": "wp2",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "append_rationale",
+    "block": 11,
+    "index": 0
+   },
+   "text": "It could quote Soongoora saying \u201cthe honey was never mine\u201d as evidence.",
+   "needle": "the honey was never mine",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P07",
+   "expected_level": "blocking",
+   "guards": "P07 in WP-2: an invented quotation"
+  },
+  {
+   "id": "P08",
+   "fixture": "wp2",
+   "expected_scan": "name",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 9
+   },
+   "text": "In the tale, the elephant Tembo warns the hare about the lion.",
+   "needle": "Tembo",
+   "expected_kind": "proper_noun_unsourced",
+   "provenance": "hand-written",
+   "source": "SP-3 P08",
+   "expected_level": "advisory",
+   "guards": "P08 in WP-2: a name no source holds"
+  },
+  {
+   "id": "P09",
+   "fixture": "wp2",
+   "expected_scan": "page",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 17
+   },
+   "text": "In Chapter 4, Percy runs away from the adults who punish him.",
+   "needle": "Chapter 4",
+   "expected_kind": "page_out_of_range",
+   "provenance": "hand-written",
+   "source": "SP-3 P09",
+   "expected_level": "blocking",
+   "guards": "P09 in WP-2: a page or chapter reference outside the row"
+  },
+  {
+   "id": "P10",
+   "fixture": "wp4",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "append_text",
+    "block": 5
+   },
+   "text": "Homer calls Olympus \u201ca hall of bronze where the gods feast forever.\u201d",
+   "needle": "a hall of bronze where the gods feast forever",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P10",
+   "expected_level": "blocking",
+   "guards": "P10 in WP-4: an invented quotation"
+  },
+  {
+   "id": "P11",
+   "fixture": "wp4",
+   "expected_scan": "quote",
+   "code_detectable": true,
+   "op": {
+    "op": "insert_block",
+    "after": 6,
+    "block": {
+     "role": "sample_response",
+     "section": "Look Back",
+     "part": null,
+     "text": "Riordan\u2019s narrator says the city of the gods \u201cglows like a lantern above the busy streets.\u201d",
+     "standard_codes": [],
+     "code_origins": [],
+     "cfu": null,
+     "minutes": null
+    }
+   },
+   "text": "Riordan\u2019s narrator says the city of the gods \u201cglows like a lantern above the busy streets.\u201d",
+   "needle": "glows like a lantern above the busy streets",
+   "expected_kind": "quote_unmatched",
+   "provenance": "hand-written",
+   "source": "SP-3 P11",
+   "expected_level": "blocking",
+   "guards": "P11 in WP-4: an invented quotation"
+  },
+  {
+   "id": "P12",
+   "fixture": "wp4",
+   "expected_scan": "name",
+   "code_detectable": true,
+   "op": {
+    "op": "insert_block",
+    "after": 5,
+    "block": {
+     "role": "cfu_item",
+     "section": "Learning in Action",
+     "part": "Part B",
+     "text": "",
+     "standard_codes": [],
+     "code_origins": [],
+     "cfu": {
+      "stem": "Which detail shows power?",
+      "options": [
+       "the throne",
+       "the cloud",
+       "the street",
+       "the door"
+      ],
+      "key_index": 0,
+      "rationales": [
+       "A throne shows rule.",
+       "A cloud shows height.",
+       "The palaces were built by Hephaestus in a single night.",
+       "A door shows entry."
+      ],
+      "standard_code": "W.6.2"
+     },
+     "minutes": null
+    }
+   },
+   "text": "The palaces were built by Hephaestus in a single night.",
+   "needle": "Hephaestus",
+   "expected_kind": "proper_noun_unsourced",
+   "provenance": "hand-written",
+   "source": "SP-3 P12",
+   "expected_level": "blocking",
+   "guards": "P12 in WP-4: a name no source holds"
+  }
+ ]
+}

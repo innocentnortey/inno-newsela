@@ -10,6 +10,8 @@ import { EmptySuiteError } from "./errors.ts";
 import { make_fixture_suite } from "./fixture-suite.ts";
 import { merge_section, render_suite_section, type SectionInput } from "./report.ts";
 import { EvalRunner, type RunnerConfig } from "./runner.ts";
+import { make_s2 } from "./suites/s2.ts";
+import { make_s4 } from "./suites/s4.ts";
 import { make_shell } from "./suites/shell.ts";
 import { MemoryEvidenceRepo } from "./testing/memory-evidence.ts";
 import type { EvalOptions, EvalSuite } from "./types.ts";
@@ -115,4 +117,34 @@ describe("report", () => {
     expect(b.indexOf("## Suite S1")).toBeLessThan(b.indexOf("## Suite S2"));
     expect(b).toContain("passed: 0/1");
   });
+});
+
+// NL-85
+describe("S2/S4 records", () => {
+  it("test_eval_runner_writes_results (S2)", async () => {
+    const suite = make_s2("stub");
+    const s = await runner([suite]).run("S2", OPTS);
+    expect(repo.runs).toHaveLength(1);
+    expect(repo.cases).toHaveLength(suite.cases().length);
+    for (const c of repo.cases) {
+      expect(c.source).not.toBe("");
+      expect(c.provenance).not.toBe("");
+      expect(c.guards).not.toBe("");
+    }
+    expect(s.passed).toBe(s.total);
+  }, 60_000);
+
+  it("test_grounding_suite_records", async () => {
+    const s = await runner([make_s4("stub")]).run("S4", OPTS);
+    expect(repo.runs).toHaveLength(1);
+    expect(repo.cases).toHaveLength(19);
+    expect(s.passed).toBe(19);
+    for (const c of repo.cases) expect(c.source).not.toBe("");
+    expect(repo.cases.filter((c) => c.case_id.startsWith("plant-"))).toHaveLength(12);
+    expect(repo.cases.some((c) => c.case_id === "plant-P05-not-caught-by-code")).toBe(true);
+    for (const c of repo.cases.filter((c) => c.case_id.startsWith("clean-"))) {
+      expect(c.actual).toHaveProperty("false_flags");
+    }
+    expect(s.report_path).toBe("evals/reports/grounding-abc123def456.md");
+  }, 60_000);
 });
