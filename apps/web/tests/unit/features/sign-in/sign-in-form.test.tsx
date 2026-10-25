@@ -69,6 +69,15 @@ describe("SignInForm", () => {
     expect(screen.getByLabelText("Staff email")).toHaveValue("someone@example.org");
   });
 
+  it("the live region announces a failure without repeating the inline sentence (one text match)", async () => {
+    POST.mockRejectedValue(err("INVALID_CREDENTIALS"));
+    setup();
+    await fill();
+    await act(async () => { await new Promise((r) => setTimeout(r, 200)); });
+    expect(screen.getAllByText(/That email and password don't match/)).toHaveLength(1);
+    expect(screen.getByTestId("announcer")).toHaveTextContent("Sign-in failed. Check your email and password.");
+  });
+
   it("network error shows the network sentence", async () => {
     POST.mockRejectedValue(err("NETWORK"));
     setup();
