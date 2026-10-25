@@ -1,0 +1,40 @@
+{
+  "ticket": "NL-25",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/session/route.test.ts": "d0959161145b073364ab18254b86d2c243f0cd3906a27fd54253b418691626b7",
+    "apps/web/app/api/session/session.capture.test.ts": "3d7f1d9f18a05fce5bbbf1c84996797bb37408b20b18cb1ce9900b8c40081e94",
+    "apps/web/src/server/http/passwords.test.ts": "f0507a43d33b4eeade08419699d90f45a9007dd5c8ba0394a1b9ff86c40c7cd0",
+    "apps/web/src/server/http/testing/route-kit.ts": "91ba7d832a4c7ba5de378024919b3438725d7e69120fc221ee1bdfe94bfa6e27",
+    "apps/web/src/server/http/testing/session-harness.ts": "7ba969def4836e87eae70c0353325775c4a4ee0a80030eca2a31bdc29262d7ea",
+    "apps/web/src/server/services/session-service.test.ts": "fc395d3871ec1ff27780addbf21d6fefade3a3c2945431624ed6750f4423883f",
+    "packages/db/src/repos/sessions.int.test.ts": "9684f37cceabdf5e09550cdcd4b87cc7551ff1ae17088c5442a766f54d92beea"
+  },
+  "criteria": {
+    "AC-1, AC-2, AC-3, AC-4, AC-6, AC-7": [
+      "apps/web/app/api/session/route.test.ts",
+      "apps/web/src/server/http/testing/route-kit.ts",
+      "apps/web/src/server/http/testing/session-harness.ts"
+    ],
+    "AC-5": [
+      "apps/web/src/server/services/session-service.test.ts",
+      "apps/web/src/server/http/testing/session-harness.ts"
+    ],
+    "AC-8": [
+      "apps/web/src/server/http/passwords.test.ts"
+    ],
+    "AC-9": [
+      "packages/db/src/repos/sessions.int.test.ts"
+    ],
+    "AC-12": [
+      "apps/web/app/api/session/session.capture.test.ts",
+      "apps/web/src/server/http/testing/route-kit.ts",
+      "apps/web/src/server/http/testing/session-harness.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/middleware.test.ts",
+    "apps/web/src/server/wiring/auth.test.ts",
+    "apps/web/src/server/http/next-adapter.test.ts"
+  ]
+}
