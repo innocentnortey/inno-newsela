@@ -1,0 +1,30 @@
+{
+  "ticket": "NL-50",
+  "risk": "security",
+  "frozen": {
+    "apps/web/src/server/services/suggestion-service.fixtures.ts": "538a478757c3fc9d6e2de5371ee676ebfa636d1f8db2c0d4f49cd884683f0cd5",
+    "apps/web/src/server/services/suggestion-service.security.test.ts": "9b4138c94375f52f24e9fb77d00ab86e52a331c4a5578f08483db59a1d5b2f3a"
+  },
+  "criteria": {
+    "AC-2": [
+      "apps/web/src/server/services/suggestion-service.fixtures.ts",
+      "apps/web/src/server/services/suggestion-service.security.test.ts"
+    ],
+    "AC-3": [
+      "apps/web/src/server/services/suggestion-service.fixtures.ts",
+      "apps/web/src/server/services/suggestion-service.security.test.ts"
+    ],
+    "AC-7": [
+      "apps/web/src/server/services/suggestion-service.fixtures.ts",
+      "apps/web/src/server/services/suggestion-service.security.test.ts"
+    ],
+    "plan-added (decide_rejects_other_lessons_suggestion, concurrent_decide_applies_once, request_rejects_oversize_and_nul)": [
+      "apps/web/src/server/services/suggestion-service.fixtures.ts",
+      "apps/web/src/server/services/suggestion-service.security.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/src/server/services/suggestion-service.test.ts",
+    "apps/web/app/api/lessons/[lessonId]/suggestions/route.test.ts"
+  ]
+}
