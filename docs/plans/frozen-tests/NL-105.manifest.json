@@ -1,0 +1,72 @@
+{
+  "ticket": "NL-105",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/commands/routes.test.ts": "72c1d9c472414eb3db9e91d14e3fddccbf575350fde15bd5af8ba66e78c6cc63",
+    "apps/collab/src/commands/set-mode.test.ts": "0a383c16bc83483cf8c9f12723c0682e82bbbbd83afd65bf2c93840cf9d44b4b",
+    "apps/collab/src/commands/apply-edit.int.test.ts": "19fbb5eb3c1d8bae604ae558b79e2a18069ffcfd08aa771fa5870098eae31e57",
+    "apps/collab/src/wiring/commands.test.ts": "132573a60f0f6468699ac2ac7af1ff9da48f759f5a170b49721c3fc6a2752bba",
+    "apps/collab/src/commands/nl-105.fixtures.ts": "9701b140599e7ce686bbe8f1f9527895e847acf9429056579d137eb0a2a150cf"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/commands/routes.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/commands/routes.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/commands/routes.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-4": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-5": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-6": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-7": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-8": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-9": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-10": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-11": [
+      "apps/collab/src/commands/set-mode.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-12": [
+      "apps/collab/src/commands/routes.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ],
+    "AC-13": [
+      "apps/collab/src/commands/apply-edit.int.test.ts",
+      "apps/collab/src/wiring/commands.test.ts",
+      "apps/collab/src/commands/nl-105.fixtures.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/collab/src/commands/apply-edit.test.ts (AC-15)",
+    "apps/collab/src/commands/lock-and-snapshot.test.ts (typed refusal)",
+    "apps/collab/src/wiring/shells.test.ts (two FILLER/{} assertions; implementer edits only those lines)"
+  ],
+  "refreeze": []
+}
