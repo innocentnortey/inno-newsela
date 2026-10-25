@@ -50,13 +50,16 @@ describe("NL-06 container", () => {
       ...base,
       model: { ...base.model, model_provider_mode: "real", anthropic_api_key: new SecretStr(marker) },
     };
+    // RT-1 AC-6 (frozen): with a key, real mode builds and no longer throws "NOT BUILT: NL-32".
+    let services: unknown;
     try {
-      build_web_services(keyed);
-      expect.unreachable();
+      services = build_web_services(keyed);
     } catch (e) {
       expect((e as Error).message).not.toContain(marker);
-      expect((e as Error).message).toContain("NOT BUILT: NL-32");
+      expect((e as Error).message).not.toContain("NOT BUILT: NL-32");
+      throw e;
     }
+    expect(services).toBeDefined();
   });
 
   it("merges_nine_wirings: wire_* ran in DO-3 order, once each", async () => {
