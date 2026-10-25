@@ -71,3 +71,10 @@ None (not risk::security).
 2. Segmented control (design §3) is not in the FW-2 ticket; left out, flagged for FW-record refinement (slice-plan open item 1).
 3. "case count = §2 row count" is interpreted as one case per state key (33) plus a parse of the §2 table that every row is covered; confirm if a different count is intended.
 4. Spinner/lock/octagon icons are inline SVG, no icon package (none installed).
+
+## Deviations
+- Open item 1: built the `sm` (28 px, `h-7`) Button too, since `design.md` §3 lists it; tested.
+- Open item 3: AC-2 case count = 33 (one per §2 state key); a test parses the §2 table and asserts its state set equals `STATUS_SPECS` keys exactly.
+- Added `apps/web/tests/unit/ui/jest-dom.d.ts`: vitest 5's `Assertion<R, T>` has two type parameters, so jest-dom's own augmentation does not apply and `npm run typecheck` already failed on FW-1's `page.test.tsx` on main. The re-declaration fixes it for all tests; no FW-1 file edited.
+- Button: disabled state also shows a lock icon (design §3); spinner state reset moved into the effect cleanup (lint rule `react-hooks/set-state-in-effect`).
+- No formatter is configured in the repo; `npm run lint` and `typecheck` are the fast gates.
