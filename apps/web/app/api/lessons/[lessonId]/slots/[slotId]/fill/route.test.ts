@@ -53,6 +53,7 @@ const ack = (hash = HASH): StoreAck =>
 const no_graph: LessonGraphRepo = {
   dependants: async () => [],
   dependencies: async () => [],
+  source_outline_version: async () => null,
 };
 
 const body = (over: Record<string, unknown> = {}) => ({
