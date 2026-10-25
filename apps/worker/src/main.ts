@@ -2,6 +2,7 @@
 import { pathToFileURL } from "node:url";
 import { load_worker_settings, type WorkerSettings } from "@ls/config/settings";
 import { create_logger, type Logger } from "@ls/obs/logger";
+import { write_start_event } from "./start-event.ts";
 import { build_worker_deps } from "./deps.ts";
 import type { WorkerDeps } from "./deps-types.ts";
 import { create_inflight_tracker, install_drain, type InflightTracker, type SignalHost } from "./drain.ts";
@@ -69,7 +70,11 @@ export async function build_worker_runtime(settings: WorkerSettings, opts: Worke
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) }).catch((e) => {
+  build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) })
+    .then((rt) => {
+      void write_start_event(rt.settings, rt.logger);
+    })
+    .catch((e) => {
     process.stderr.write(`worker failed to start: ${(e as Error).name}\n`);
     process.exit(1);
   });

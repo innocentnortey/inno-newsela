@@ -1,0 +1,24 @@
+# NL-23: worker, collab and the one-shot migrate service share this image (command overridden per service).
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+COPY apps/collab/package.json apps/collab/package.json
+COPY packages packages
+COPY ops ops
+COPY evals/package.json evals/package.json
+COPY load/package.json load/package.json
+RUN npm ci --ignore-scripts
+COPY scripts scripts
+COPY apps/worker apps/worker
+COPY apps/collab apps/collab
+
+FROM node:24-bookworm-slim
+ARG BUILD_ID=dev
+ENV NODE_ENV=production BUILD_ID=$BUILD_ID RENDER_GIT_COMMIT=$BUILD_ID
+WORKDIR /app
+COPY --from=build --chown=node:node /app /app
+USER node
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
+CMD ["node_modules/.bin/tsx", "apps/worker/src/main.ts"]

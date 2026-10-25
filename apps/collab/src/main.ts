@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { Server } from "@hocuspocus/server";
 import { load_collab_settings, type CollabSettings } from "@ls/config/settings";
 import { create_logger, type Logger } from "@ls/obs/logger";
+import { write_start_event } from "./start-event.ts";
 import { build_collab_deps } from "./deps.ts";
 import type { CollabDeps } from "./deps-types.ts";
 import { create_inflight_tracker, DrainingError, install_drain, type InflightTracker, type SignalHost } from "./drain.ts";
@@ -96,7 +97,11 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  build_collab_runtime(load_collab_settings(process.env)).catch((e) => {
+  build_collab_runtime(load_collab_settings(process.env))
+    .then((rt) => {
+      void write_start_event(rt.settings, rt.logger);
+    })
+    .catch((e) => {
     process.stderr.write(`collab failed to start: ${(e as Error).name}\n`);
     process.exit(1);
   });
