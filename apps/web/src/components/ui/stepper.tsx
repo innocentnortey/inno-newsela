@@ -11,10 +11,10 @@ export interface StepperProps {
 
 export function Stepper({ current, offPath, "aria-label": ariaLabel = "Lesson progress" }: StepperProps) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex max-w-full flex-wrap items-center gap-3">
       <ol
         aria-label={ariaLabel}
-        className="bg-panel border-hair shadow-e1 flex items-center gap-2 rounded-2xl border py-2 pr-4 pl-3"
+        className="bg-panel border-hair shadow-e1 flex max-w-full flex-wrap items-center gap-2 rounded-2xl border py-2 pr-4 pl-3"
       >
         {STEPS.map((label, i) => {
           const n = i + 1;

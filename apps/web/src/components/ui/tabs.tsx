@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 export const Tabs = RT.Root;
 
 export function TabsList({ className, ...rest }: ComponentPropsWithoutRef<typeof RT.List>) {
-  return <RT.List className={cn("border-hair flex gap-4 border-b", className)} {...rest} />;
+  return <RT.List className={cn("border-hair flex flex-wrap gap-x-4 border-b", className)} {...rest} />;
 }
 
 export function TabsTrigger({
