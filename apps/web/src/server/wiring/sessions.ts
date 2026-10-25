@@ -1,13 +1,16 @@
-// Wiring stub (NL-06). Filled by NL-25. Until then every service is unset.
+// NL-25: session sign-in / resolve / sign-out wiring. Constructors must not touch d.db (stub container passes a proxy).
+import { PgAuditLog } from "@ls/db/repos/audit";
+import { PgSessionRepo } from "@ls/db/repos/sessions";
 import type { WebDeps } from "../deps.ts";
+import { SessionService } from "../services/session-service.ts";
 
 export interface SessionWiring {
-  sessions: undefined;
+  sessions: SessionService;
 }
 
-export function wire_sessions(_d: WebDeps): SessionWiring {
-  void _d;
+export function wire_sessions(d: WebDeps): SessionWiring {
+  const repo_deps = { db: d.db, ids: d.ids, clock: d.clock };
   return {
-    sessions: undefined,
+    sessions: new SessionService(new PgSessionRepo(repo_deps), new PgAuditLog(repo_deps), d.db, d.clock, d.ids, d.settings, d.logger),
   };
 }
