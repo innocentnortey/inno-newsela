@@ -1,0 +1,27 @@
+{
+  "ticket": "NL-23",
+  "risk": "security",
+  "frozen": {
+    "tests/platform/docker-images.docker.test.ts": "23ebcdf836cf6342a2b62251aa1dd6d81047c30d2b9ab6a705179fc96a265a54",
+    "tests/platform/images-static.test.ts": "794d667bc7f5fb117017436a89d64f8ee0f50ceb4ef4af39672a7ced4f579909",
+    "tests/platform/runtime-grants.int.test.ts": "f04723c87313ea334607320dc2e9c9b0f00483d7b64bd168fb3112d4a23c90c9"
+  },
+  "criteria": {
+    "AC-2": [
+      "tests/platform/images-static.test.ts",
+      "tests/platform/docker-images.docker.test.ts"
+    ],
+    "AC-3": [
+      "tests/platform/images-static.test.ts",
+      "tests/platform/docker-images.docker.test.ts"
+    ],
+    "AC-5": [
+      "tests/platform/images-static.test.ts",
+      "tests/platform/docker-images.docker.test.ts"
+    ],
+    "AC-11 (non-owner runtime role)": [
+      "tests/platform/runtime-grants.int.test.ts"
+    ]
+  },
+  "not_frozen": []
+}
