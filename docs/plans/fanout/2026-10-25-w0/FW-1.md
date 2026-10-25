@@ -23,7 +23,7 @@ Sources: ticket FW-1 (*What to build*, AC-1…AC-6); `foundation-wave.md` → *S
 
 **Context rows for AC-6 (edit only the named rows, nothing else):** `.claude/reference/area-map.md` row `FW` (line 24: `planned (FW tickets ready)` → `FW-1 built: …` actual paths); `docs/plans/foundation-wave.md` *Review requirements* first box (tick only after `code-review-agent` passes — the orchestrator ticks it; you do NOT tick); one new dev-log file `docs/devlog/2026-10-25-fw-1.md` (Changed · Why · Checked · Remaining, ~50–100 words). `.claude/state/icm-progress.md` row "Physical scaffold" (line 16) is NL-01's too: do NOT edit it; mention in your report.
 
-**Read only:** `docs/design/design.md`, `docs/artifacts/…d1…look-sheet.html` (optional visual reference; ticket cites `docs/ux/02-concepts/references/2026-10-25-d1-clear-ledger-look-sheet.html`), root files.
+**Read only:** `docs/design/design.md`, `docs/artifacts/…d1…look-sheet.html` (optional visual reference; ticket cites `docs/artifacts/2026-10-25-d1-clear-ledger-look-sheet.html`), root files.
 
 **Must not touch:** repo-root `package.json`/lockfile/`.gitignore`/`tsconfig*`/eslint (NL-01); any `apps/web/src/components/**` (FW-2/FW-3), `apps/web/app/(dev)/**`, `apps/web/e2e/**`, `playwright.config.ts` (FW-4); `docs/design/design.md` (read-only; never edit it to make a test pass). Do not add pages, fetch anything, define components, or add any dependency not listed in §4.
 

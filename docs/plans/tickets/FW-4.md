@@ -19,7 +19,7 @@ The reviewer of this wave — I need every component and state on one page in bo
 
 ### Sources
 - `docs/plans/foundation-wave.md` (FW record: *Stack*, *Owned files*, *Bounded scope*, *Ticket specs*, *Review requirements*, PE table) — authoritative for stack, owned files and review
-- `docs/design/design.md` → *Design tokens* (incl. *Machine-readable tokens*), §2 status vocabulary, §3 components, §4 layout, §5 motion; D1 look sheet `docs/ux/02-concepts/references/2026-10-25-d1-clear-ledger-look-sheet.html`
+- `docs/design/design.md` → *Design tokens* (incl. *Machine-readable tokens*), §2 status vocabulary, §3 components, §4 layout, §5 motion; D1 look sheet `docs/artifacts/2026-10-25-d1-clear-ledger-look-sheet.html`
 - DO-3 §1 (`apps/web/` adopted as FW created it) and §2.3 last row (FW components and gallery, owned by FW-1…FW-4); slice plan *Collision map* W0–W2 and *Open items* 1 (FW record refinement)
 - Workspace UI rules: `modern-ui-principles` skill index (UI-4 owned components on tokens; WCAG 2.2)
 - PE-10, PE-11 (FW record); ux-pipeline `references/phases.md` UX-5a pitfalls (axe `aria-prohibited-attr`, `scrollable-region-focusable`)
@@ -29,7 +29,7 @@ The reviewer of this wave — I need every component and state on one page in bo
 - [ ] AC-1 [invariant] the gallery has 0 serious and 0 critical axe violations at 1280 and 390, light and dark — verify: `cd apps/web && perl -e 'alarm 500; exec @ARGV' npx playwright test e2e/gallery` — evidence: four axe summaries, 0 serious / 0 critical — covers: PE-10
 - [ ] AC-2 [invariant] at 390 px the gallery page has no horizontal scroll (`scrollWidth <= innerWidth`) and the side rail stacks under the content — verify: same spec, 390 cases — evidence: pass — covers: PE-9
 - [ ] AC-3 [invariant] with no `data-theme`, emulated `prefers-color-scheme: dark` renders dark tokens; reduced motion shows no transition — verify: same spec, theme cases — evidence: pass + dark screenshot — covers: PE-3
-- [ ] AC-4 [visual] screenshots at 1280 light and dark show the Clear Ledger palette, radius and type (cool grey desk, white sheet, ink-blue primary, 8 px radius) side by side with the D1 look sheet — verify: orchestrator review of `e2e/__screenshots__/gallery/*.png` against `docs/ux/02-concepts/references/2026-10-25-d1-clear-ledger-look-sheet.html` — evidence: PASS (or listed deltas) recorded in the dev log — covers: PE-11
+- [ ] AC-4 [visual] screenshots at 1280 light and dark show the Clear Ledger palette, radius and type (cool grey desk, white sheet, ink-blue primary, 8 px radius) side by side with the D1 look sheet — verify: orchestrator review of `e2e/__screenshots__/gallery/*.png` against `docs/artifacts/2026-10-25-d1-clear-ledger-look-sheet.html` — evidence: PASS (or listed deltas) recorded in the dev log — covers: PE-11
 - [ ] AC-5 [negative] the gallery is not served in production: `npm run build && npm start` then `curl -s -o /dev/null -w '%{http_code}' localhost:3000/gallery` — verify: that command — evidence: `404` — covers: PE-10
 - [ ] AC-6 [regression/context] area map row(s) for this ticket's paths planned → actual; FW record *Review requirements* accessibility and visual boxes ticked with the evidence; ICM row if a route's evidence changed; dev-log entry (Changed · Why · Checked · Remaining) — verify: `git diff --stat` and `python3 ~/.claude/skills/icm-project/scripts/check_context.py .` — evidence: diff touches only those rows; no FAIL
 

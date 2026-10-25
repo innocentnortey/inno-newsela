@@ -35,7 +35,7 @@ Prism mock**. The real backend is an integration ticket's job ([integration rout
 
 | Thing | Path · symbol | Status |
 |---|---|---|
-| Dialog shells to replace (keep their props) | `src/features/insert-quote/insert-quote-dialog.tsx` `InsertQuoteDialog` · `src/features/resolve/resolve-dialog.tsx` `ResolveDialog` · `src/features/send-back/send-back-dialog.tsx` `SendBackDialog` · `src/features/assist/assist-panel.tsx` `AssistPanel` | built as NL-24 shells |
+| Dialog shells | `src/features/insert-quote/insert-quote-dialog.tsx` `InsertQuoteDialog` (NL-65), `src/features/resolve/resolve-dialog.tsx` `ResolveDialog` (NL-66), `src/features/send-back/send-back-dialog.tsx` `SendBackDialog` (NL-69): **built**. `src/features/assist/assist-panel.tsx` `AssistPanel`: still an NL-24 shell (NL-72) | verified at merge of NL-65/66/69
 | A replaced shell to copy | `src/features/start-run/start-run-dialog.tsx` `StartRunDialog` → `start-run-form.tsx` `StartRunForm`; mounted by `src/features/validation-report/report-view.tsx` | verified at merge (NL-58) |
 | Dialog primitive | `src/components/ui/dialog-shell.tsx` `DialogShell` | verified at merge (FW-2) |
 | Workspace mount points | `src/features/workspace/workspace-screen.tsx`: comments `SLOT NL-65 / NL-66: renderIssueActions`, `SLOT NL-64: renderStandardActions`, heartbeat mount; `src/features/workspace/rail/issues-tab.tsx` and `src/features/workspace/rail/issue-card.tsx` slot props | built (NL-62) |
@@ -68,9 +68,7 @@ Prism mock**. The real backend is an integration ticket's job ([integration rout
 
 ## Check before planning (in the work system, not here)
 
-- NL-64 (merged) built the buttons but not the mount: `workspace-screen.tsx` still carries `SLOT NL-65 / NL-66:
-  renderIssueActions`. Check NL-65/NL-66's plans (`docs/plans/fanout/2026-10-25-w4/`) for which one fills it; if neither,
-  record it as a request to the integrator, not a blocker (the dialog is testable on its own `(dev)/harness` page).
+- NL-64 built the openers (`IssueOpenerButtons`); NL-65 and NL-66 built the dialogs; **none of them mounts a dialog**. `workspace-screen.tsx` still carries `SLOT NL-65 / NL-66: renderIssueActions`. Owner: **NL-113** (SCR-9 evidence pane, SCR-10, SCR-11; slice plan collision map W6). A screen planner delivers the dialog and its `(dev)/harness` page only. Open row: seam S-22.
 - For NL-69 and NL-72: which ticket adds the opener (no opener at `9951739`)? The ticket's *Agent handoff* names it.
 - Any `CHG-N` in `docs/contracts/CHANGES.md` touching the screen's CON card since the ticket was cut.
 - Open rows in `docs/plans/seam-followups.md` that name the screen or its helpers (below).

@@ -53,6 +53,7 @@
 
 Rules for editing this section (collision map, one-line-per-ticket files): each FE ticket and each INT ticket edits **only its own SCR rows**
 (the FE column's ticket edits its FE-owned cells, the INT column's ticket its INT-owned cells; NL-93 owns SCR-2 and SCR-3, NL-96 SCR-6 and SCR-7).
+Only the *Requirement* table above is generated (`trace_check.py --write`, `--upto CON`); this section is hand-maintained, and each ticket edits its own rows here, never the generated table. `trace_check.py` counts a test only when it is a `TEST-N` id defined in `docs/ux/` or `docs/contracts/` (seam S-11), so `--upto TEST` reports `FAIL SCR-n has no linked TEST` for every screen until those ids exist. Until then a row's proof is: `trace_check.py --upto CON` has no FAIL line, and the spec path in the TEST cell exists (`test -f`). One row per SCR: replace a row, never add a second.
 `NL-126` owns the **UX-5b link** column. Cell values `planned` are replaced by a link to the evidence when it exists; nothing is claimed before then.
 US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`](../../plans/slice-plan.md)); FE and INT tickets from its
 *Coverage at a glance*. Screens cut by PD-17 keep their row with the cut number.

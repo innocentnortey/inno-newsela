@@ -211,7 +211,7 @@ reruns them against the real backend** and drives the real entry point for its W
 | NL-103 | integration: CON-24 save and one-lesson trial end to end | INT | BL | NL-76, 79, 88 | 24, 5 | 21 | 10 | WP-1 | WF-20 | M-5 | no | A16+A14 | #7 |
 | NL-104 | integration: CON-10 unit quality page end to end | INT | BL | NL-54, NL-74 | 10 | 19 | 34, 36 | — | WF-7 | M-1…M-20 tiles | no | A13+A14 | #6 |
 | NL-105 | collab: internal command routes (token guard, `apply_edit` tagged by a named person, `set_mode`); fills collab commands wiring | BE | BL | NL-26, 38, 43, 80 | 14, 15, 16, 17, 18 | — | 19, 22 | WP-1 | WF-11, 12, 13 | M-8 | yes | A11 | — |
-| NL-106 | collab: Submit freeze — store at once, cover check, blocking checks on the stored row, snapshot + state + transition in one tx, server-side read-only flip (SP-2 A) | BE | BL | NL-20, 21, 38, 42, 80 | 18, 12 | — | 24 | WP-1 | WF-15, WF-9 | M-36, M-37 | yes | A11 | — |
+| NL-106 | collab: Submit freeze — store at once, cover check, blocking checks on the stored row, snapshot + state + transition in one tx, server-side read-only flip (SP-2 A) | BE | BL | NL-20, 21, 38, 42, 80, 105 | 18, 12 | — | 24 | WP-1 | WF-15, WF-9 | M-36, M-37 | yes | A11 | — |
 | NL-107 | evals: S6 fault-injection script (kill, 429, truncation, cap) | INT | BL | NL-49, NL-79 | 5, 6, 7 | — | 8 | — | WF-28 | M-15, 17, 44 | no | A20 | — |
 | NL-108 | experiment: §9 kickoff page generated from code (flow, prompts with versions, failure types); registers its WF row | INT | BL | NL-14, NL-79 | — | — | — | — | new WF-41 | — | no | A20 | — |
 | NL-109 | evals: S3 draft golden on the real model (WP-1…WP-3 × 3), `gate::paid` | INT | BL | NL-02, NL-79 | 5 | — | 36 | WP-1, WP-2, WP-3 | WF-24 | M-30, M-31 | no | A20 | — |
@@ -327,7 +327,7 @@ so it sits where its input lands.
 | W2 | none: all imports point at W0–W1 (ports → NL-09; wrapper → NL-11; compile/ydoc/checks → NL-09/10; FW-4 → FW-2/3) |
 | W3 | none by import: services use NL-12 ports and NL-13; NL-29/31/50 → recorder typed from DO-4 §4; wiring is filled only by tickets whose real deps are earlier or their own |
 | W4 | none: wiring tickets import W3 classes; FE screens import NL-24 shells and FW; NL-53 imports NL-38/48 (W3) |
-| W5 | NL-105 ↔ NL-106 share no file: `commands/routes.ts` (NL-105) imports the `lock-and-snapshot.ts` shell from NL-07 (W1), which NL-106 fills |
+| W5 | NL-105 → NL-106 (ordered, 2026-10-25 routing audit): NL-105 builds `CollabCommandHandler` in `routes.ts` and adds the typed `lock_and_snapshot` export (a `COLLAB_UNAVAILABLE` refusal) to the NL-07 shell `lock-and-snapshot.ts`; NL-106 replaces that body and edits nothing else. NL-106 is blocked by NL-105 |
 | W6 | none: INT tickets import NL-105/106 (W5); load scripts use NL-49's `load/` shells |
 | W7+ | XP slots only: each names its one change at 7b; two XPs touching the same prompt or policy file get an edge then |
 
