@@ -1,0 +1,16 @@
+{
+  "ticket": "CHG-3-4",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/lessons/[lessonId]/transitions/route.pin.security.test.ts": "2c569f336585f3956a56f29e60b4df7d4113bafb66166c2beb1c20c47b9bd2ee",
+    "apps/web/src/server/services/transition-service.pin.security.test.ts": "c57c98c4206689a20dc68f09e80d8e5ec969849638a8ff2175136cd0d351a837"
+  },
+  "criteria": {
+    "F1, F2, F3, F4, F5, F6, F7, F8, F9": [
+      "apps/web/app/api/lessons/[lessonId]/transitions/route.pin.security.test.ts"
+    ],
+    "F1, F2, F9 (service level)": [
+      "apps/web/src/server/services/transition-service.pin.security.test.ts"
+    ]
+  }
+}
