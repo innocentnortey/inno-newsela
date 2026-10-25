@@ -9,9 +9,10 @@
   "eval:full-run":        { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "full-run"] },
   "eval:seed":            { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "seed"] },
   "eval:heldout":         { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "heldout"] },
-  "eval:judge-calibrate": { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "judge-calibrate"] },
+  "eval:judge-calibrate": { "target": "evals/src/judge-calibrate/main.ts", "owner": "NL-111", "run": ["npx", "tsx", "evals/src/judge-calibrate/main.ts"] },
   "load:spike":           { "target": "load/spike.ts",    "owner": "NL-49", "run": ["npx", "tsx", "load/spike.ts"] },
   "ops:backup":           { "target": "ops/backup.sh",    "owner": "NL-83", "run": ["bash", "ops/backup.sh"] },
   "ops:import-spike":    { "target": "ops/import-spike.ts", "owner": "NL-87", "run": ["npx", "tsx", "ops/import-spike.ts"] },
+  "eval:kickoff":        { "target": "evals/src/kickoff/cli.ts", "owner": "NL-108", "run": ["npx", "tsx", "evals/src/kickoff/cli.ts"] },
   "dev":                  { "target": "Dockerfile.node",  "owner": "NL-23", "run": ["docker", "compose", "up", "--build"] }
 }

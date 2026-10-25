@@ -1,0 +1,43 @@
+{
+  "ticket": "RT-1",
+  "risk": "security",
+  "frozen": {
+    "packages/llm/src/provider.test.ts": "4189a26cf4015581d2762a488fe6dc826b6e968ee38280bf5c71036fe1e74f84",
+    "apps/web/src/server/container.test.ts": "5a5019a7cbbf0b8df7463cdc788c2cf58d26ff2fd20f9cad1071f5e8fe245921",
+    "apps/web/src/server/container-real-leak.test.ts": "20f44be6f966f2c79fde9ccebc80e470324a4362790ef6768ae9997c9c2c0c19",
+    "apps/worker/src/loops-canary.test.ts": "59e9b1788c942fee56f7a6b7439591abcc272d432237e8a63ce4c60c7cd8c2d6",
+    "apps/worker/src/wiring/real-mode.int.test.ts": "bc1119efa562bf57177c1b8b6808a1ee07c347790da3b25ab7fca1d55e7d3526"
+  },
+  "criteria": {
+    "AC-5": [
+      "packages/llm/src/provider.test.ts"
+    ],
+    "AC-6": [
+      "apps/web/src/server/container.test.ts",
+      "apps/web/src/server/container-real-leak.test.ts"
+    ],
+    "AC-7": [
+      "packages/llm/src/provider.test.ts",
+      "apps/web/src/server/container-real-leak.test.ts"
+    ],
+    "AC-8": [
+      "apps/worker/src/wiring/real-mode.int.test.ts"
+    ],
+    "AC-9": [
+      "apps/worker/src/loops-canary.test.ts"
+    ],
+    "AC-3-canary": [
+      "apps/worker/src/loops-canary.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/worker/src/loops.test.ts",
+    "apps/worker/src/deps.test.ts",
+    "tests/platform/rt-1-harness.test.ts",
+    "apps/web/e2e/integration/support/**"
+  ],
+  "refreeze": [
+    "2026-10-25 provider.test.ts: load_model_settings is not exported from @ls/config/settings; the test builds ModelSettings from load_worker_settings(...).model instead (same values).",
+    "2026-10-25 container-real-leak.test.ts: JSON.stringify(deps) threw on a BigInt inside PrefixedIdGenerator (not the key); added a bigint-safe replacer. Assertion strength unchanged."
+  ]
+}

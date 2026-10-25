@@ -344,7 +344,8 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | web `wiring/outlines.ts` (OutlineService) | NL-06 | NL-26 (W3); NL-77 adds methods only, no constructor change |
 | web `wiring/prompts.ts` (PromptService) | NL-06 | NL-34 (W3) |
 | web `wiring/runs.ts` (RunService) | NL-06 | NL-78 (W4), filled |
-| web `wiring/metrics.ts` (Board, Heartbeat, MetricsWriter) | NL-06 | NL-54 (W4) done; NL-91 adds a method only |
+| web `wiring/metrics.ts` (Board, Heartbeat, MetricsWriter) | NL-06 | NL-54 (W4) done |
+| web `wiring/coverage.ts` (CoverageService) | NL-06 | NL-91 (W5), filled |
 | web `wiring/review.ts` (LessonRead, Issue, Slot, Candidate, Transition, web CheckContextLoader, collab client) | NL-06 | NL-53 (W4) (done) |
 | web `wiring/exports.ts` | NL-06 | NL-102 (W5) |
 | web `wiring/assist.ts` (SuggestionService, web model client) | NL-06 | NL-116 (W6) |
@@ -352,7 +353,7 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | worker `wiring/checks.ts` | NL-07 | NL-81 (W4) |
 | worker `wiring/judge.ts` | NL-07 | NL-110 (W5) |
 | collab `wiring/server.ts` (auth, guard, persistence, acks) | NL-07 | NL-80 (W4) — built |
-| collab `wiring/commands.ts` (+ `commands/routes.ts`) | NL-07 | NL-105 (W5) — built; NL-106 fills `lock-and-snapshot.ts` |
+| collab `wiring/commands.ts` (+ `commands/routes.ts`) | NL-07 | NL-105 (W5) — built; NL-106 built `lock-and-snapshot.ts` and added the Submit deps |
 | worker/collab `health.ts`, web `app/api/healthz` | NL-07 (shells) | NL-83 (W4) (built NL-83) |
 
 ## Collision map (waves with more than one ticket)

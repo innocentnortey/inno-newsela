@@ -4,7 +4,6 @@ import type { WebDeps } from "./deps.ts";
 const CASES: [string, string, string[]][] = [
   ["assist", "wire_assist", ["suggestions"]],
   ["exports", "wire_exports", ["exports"]],
-  ["coverage", "wire_coverage", ["coverage"]],
 ];
 
 describe("NL-06 AC-4 wiring stubs", () => {

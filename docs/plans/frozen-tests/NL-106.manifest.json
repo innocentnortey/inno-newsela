@@ -1,0 +1,77 @@
+{
+  "ticket": "NL-106",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/commands/lock-and-snapshot.int.test.ts": "f80c3f48490d914e2f429ca35c1d669efeebfadc4d74c78d78656db792d5a078",
+    "apps/collab/src/commands/nl-106.fixtures.ts": "aa69fa8216dec00a02c61accbf5dfcb7029220f2011a886d8917fb725f889a06"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-4": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-5": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-6": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-7": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-8": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-9": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-10": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ],
+    "AC-11": [
+      "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "apps/collab/src/commands/nl-106.fixtures.ts"
+    ]
+  },
+  "extra_cases": {
+    "apply_edit_after_freeze_is_refused": "AC-2",
+    "never_unfreezes_a_freeze_it_did_not_take": "AC-7",
+    "release_keeps_frozen_when_state_not_editable": "AC-7",
+    "socket_connecting_mid_submit_is_read_only": "AC-3"
+  },
+  "not_frozen": [
+    "apps/collab/src/commands/wf-41-obligations.int.test.ts (AC-13)",
+    "apps/collab/src/commands/submit-gate.test.ts",
+    "apps/collab/src/commands/lock-and-snapshot.test.ts (unit)",
+    "apps/collab/src/wiring/shells.test.ts (FILLER assertion; implementer edits only that line)",
+    "AC-12 context rows"
+  ],
+  "refreeze": [
+    {
+      "file": "apps/collab/src/commands/lock-and-snapshot.int.test.ts",
+      "old_sha": "d82cc96faf87a23cc2707b839f26e2d2cc9b99523de5ce92703d815b69a8aba0",
+      "new_sha": "f80c3f48490d914e2f429ca35c1d669efeebfadc4d74c78d78656db792d5a078"
+    }
+  ],
+  "refreeze_notes": [
+    "Harness only, no assertion changed: new_lesson now writes a generated lesson_version (PgLessonRepo.write_snapshot descends from one and raises InvariantViolation without it), and versions_of / the one version-row probe count kind<>'generated' / kind='submit' so snapshot counts stay as asserted."
+  ]
+}

@@ -27,6 +27,8 @@ function forbidden_for(root: string, f: string): RegExp {
   // Composition roots under wiring/ build the Pg repositories and the PaidCaller, so they may import @ls/db and @ls/llm; a driver or provider SDK stays forbidden everywhere.
   if (/(^|\/)wiring\/[^/]+\.ts$/.test(rel)) return /from\s+"(pg|@anthropic-ai\/sdk|openai)["/]/;
   // NL-89: the worker's judge client factory is the one place outside wiring/ that builds the OpenRouter adapter from @ls/llm.
+  // RT-1: the worker composition root builds the Pg database and the model client.
+  if (rel === "worker/src/deps.ts") return /from\s+"(pg|@anthropic-ai\/sdk|openai)["/]/;
   if (rel === "worker/src/judge/judge-client-factory.ts") return /from\s+"(@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
   return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
 }
@@ -34,8 +36,8 @@ function forbidden_for(root: string, f: string): RegExp {
 describe("collab shells", () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it("the remaining shell names its filler", () => {
-    expect([lockSnap.FILLER]).toEqual(["NL-106"]);
+  it("lock_and_snapshot is built", () => {
+    expect(typeof lockSnap.lock_and_snapshot).toBe("function");
   });
 
   it("collab starts with ANTHROPIC_API_KEY unset and no model settings", async () => {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { cleanReport, issuedShapeReport } from "../../../../e2e/validation-report/fixtures";
 import {
   applyChoiceResult,
+  eldItems,
   eldSummary,
   errorItems,
   gateBanner,
@@ -54,6 +55,21 @@ describe("items", () => {
     expect(warningItems(r).some((w) => w.type === "finding" && w.finding.kind.startsWith("eld"))).toBe(false);
   });
   it("ELD: 12 codes, 7 flagged", () => expect(eldSummary(r)).toEqual({ total: 12, flagged: 7 }));
+  it("ELD: a code flagged on a later row is flagged, whatever its first row said (real-stack finding, NL-94)", () => {
+    const e = (verdict: "fits" | "mismatch") => ({ code: "ELD.PI.6.7", sheet_label: "", official_strand: "", verdict, suggested_remap: null, choice: "keep" as const });
+    const [a, b] = r.rows.filter((x) => x.eld.length === 0);
+    const two = { ...r, rows: [{ ...a!, eld: [e("fits")] }, { ...b!, eld: [e("mismatch")] }] };
+    expect(eldSummary(two)).toEqual({ total: 1, flagged: 1 });
+    expect(eldItems(two)[0]!.rows).toEqual([a!.row_number, b!.row_number]);
+    expect(eldItems(two)[0]!.finding_ids).toEqual([]);
+  });
+  it("ELD: finding_ids lists the eld_mismatch findings that name the code, across rows", () => {
+    const f = (id: string, text: string) => ({ finding_id: id, level: "warning" as const, kind: "eld_mismatch" as const, column: "ELD", original_text: text, proposed_fix: null, choice: { value: null, source: "default" as const, by: null, at: null } });
+    const e = { code: "ELD.PI.6.7", sheet_label: "", official_strand: "", verdict: "mismatch" as const, suggested_remap: null, choice: "keep" as const };
+    const [a, b] = r.rows.filter((x) => x.eld.length === 0);
+    const two = { ...r, rows: [{ ...a!, eld: [e], findings: [f("f_1", "• ELD.PI.6.7 – x")] }, { ...b!, eld: [e], findings: [f("f_2", "• ELD.PI.6.7 – y"), f("f_3", "• ELD.PI.6.6 – z")] }] };
+    expect(eldItems(two)[0]!.finding_ids).toEqual(["f_1", "f_2"]);
+  });
   it("35 OK rows with the right label", () => {
     const ok = okRows(r);
     expect(ok).toHaveLength(35);

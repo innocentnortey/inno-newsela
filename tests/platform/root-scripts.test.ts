@@ -23,7 +23,7 @@ describe("NL-01 AC-11 root scripts", () => {
   });
   it("lint, typecheck, test are real commands, not in the map", () => {
     for (const n of ["lint", "typecheck", "test"]) expect(map[n]).toBeUndefined();
-    expect(Object.keys(map)).toHaveLength(15);
+    expect(Object.keys(map)).toHaveLength(16);
   });
   it.each(Object.entries(map))("%s exits 2 while unbuilt", (name, e) => {
     if (fs.existsSync(path.join(root, e.target))) return; // built by its owner: skip
