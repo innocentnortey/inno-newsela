@@ -142,7 +142,7 @@ describe("AC-9 no_name_beside_minutes [negative]", () => {
       ["approved", "caption", "fast_approvals", "median_minutes", "n", "segment_label"],
     );
     const text = JSON.stringify(body);
-    expect(text).not.toMatch(/lesson_id|user_id|reviewer|G6\.U4\.L\d/);
+    expect(text).not.toMatch(/lesson_id|user_id|reviewer(?!s)|G6\.U4\.L\d/); // the fixed caption says "reviewers" (AC-7)
     expect(text).not.toMatch(/Test Reviewer/);
   });
 

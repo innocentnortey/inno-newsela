@@ -81,7 +81,7 @@ export class FakeGraph implements GraphLookup {
 
 // The NL-48 fake returns [] from unit_metrics_rows; this one serves what was written (first write wins, as ON CONFLICT DO NOTHING).
 export class FrozenMetricsRepo extends InMemoryMetricsRepo {
-  async unit_metrics_rows(_unit_id: UnitId): Promise<LessonMetricsRecord[]> {
+  override async unit_metrics_rows(_unit_id: UnitId): Promise<LessonMetricsRecord[]> {
     void _unit_id;
     return this.rows.map((r) => ({ ...r }));
   }
