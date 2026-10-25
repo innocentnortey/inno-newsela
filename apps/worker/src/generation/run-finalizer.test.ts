@@ -4,7 +4,7 @@ import { FakeClock } from "@ls/core/ports/clock";
 import type { BrakeName } from "@ls/core/ports/common";
 import type { JobOutcome } from "@ls/core/ports/job-queue";
 import {
-  MemJobQueue, MemRunRepo, MemTxRunner, StubCalls, make_job_row, make_logger, make_run_row,
+  MemJobQueue, MemRunRepo, MemTxRunner, StubCalls, StubRunSpend, make_job_row, make_logger, make_run_row,
   reference_derive_run_state,
 } from "./finalizer-doubles.ts";
 import { RunFinalizer } from "./run-finalizer.ts";
@@ -14,14 +14,15 @@ function world(run_state: "running" | "capped" | "cancelled" | "paused" = "runni
   const runs = new MemRunRepo(clock);
   const queue = new MemJobQueue(clock);
   const calls = new StubCalls();
+  const spend = new StubRunSpend();
   const tx = new MemTxRunner(runs, queue);
   const { logger, lines } = make_logger();
   const run = runs.add(make_run_row({ state: run_state }));
-  const finalizer = new RunFinalizer(runs, queue, calls, tx, { circuit_breaker_same_check: 3 }, reference_derive_run_state, logger);
+  const finalizer = new RunFinalizer(runs, queue, calls, spend, tx, { circuit_breaker_same_check: 3 }, reference_derive_run_state, logger);
   const add_job = (p: Parameters<typeof make_job_row>[0] = {}) => queue.add(make_job_row({ run_id: run.run_id, ...p }));
   const outcome = (brakes: BrakeName[] = []): JobOutcome =>
     ({ job_id: "job_x", brakes_fired: brakes, failure_reasons: [], cost_usd: new Decimal(0) }) as unknown as JobOutcome;
-  return { clock, runs, queue, calls, tx, lines, run, finalizer, add_job, outcome };
+  return { clock, runs, queue, calls, spend, tx, lines, run, finalizer, add_job, outcome };
 }
 
 const done = (lesson: string, at: number, extra = {}) => ({
@@ -118,6 +119,7 @@ describe("completeness", () => {
     w.calls.add_completed(a.job_id, "lesson_draft");
     w.calls.add_completed(b.job_id, "lesson_draft");
     w.calls.totals_cost = new Decimal("0.0246");
+    w.spend.settled_usd = new Decimal("0.0246");
     return { ...w, a, b };
   }
   it("completeness: clean run has no gaps and matching totals", async () => {
@@ -134,8 +136,27 @@ describe("completeness", () => {
   });
   it("completeness: totals drifting by 0.01 flips summary_matches_calls", async () => {
     const w = clean();
-    w.calls.totals_cost = w.calls.totals_cost.plus("0.01");
+    w.spend.settled_usd = w.spend.settled_usd.plus("0.01");
     expect((await w.finalizer.completeness(w.run.run_id)).summary_matches_calls).toBe(false);
+  });
+  it("completeness: ledger/call mismatch is detected even when job costs agree with the calls", async () => {
+    const w = clean();
+    w.calls.totals_cost = new Decimal("0.0246"); // equals the sum of job costs
+    w.spend.settled_usd = new Decimal("0.0200");
+    expect((await w.finalizer.completeness(w.run.run_id)).summary_matches_calls).toBe(false);
+  });
+  it("completeness: job costs drifting from the calls do not matter when ledger matches calls", async () => {
+    const w = clean();
+    w.queue.jobs[0]!.cost_usd = new Decimal("0.5");
+    expect((await w.finalizer.completeness(w.run.run_id)).summary_matches_calls).toBe(true);
+  });
+  it("completeness: zero-cost failed job with no calls and no capped/cancelled reason is listed", async () => {
+    const w = clean();
+    const f = w.add_job({
+      lesson_id: "G6.U1.L4", status: "generation_failed", tile_state: "failed", cost_usd: new Decimal(0),
+      failure_reasons: [{ check: "check_failed", message: "x" }], calls_lost: 0, finished_at: new Date(1003),
+    });
+    expect((await w.finalizer.completeness(w.run.run_id)).terminal_jobs_without_calls).toEqual([f.job_id]);
   });
   it("completeness: capped refusal with zero cost and no call is not listed", async () => {
     const w = clean();

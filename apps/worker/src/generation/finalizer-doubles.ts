@@ -6,6 +6,7 @@ import { PrefixedIdGenerator } from "@ls/core/ports/ids";
 import type { ClaimedJob, JobOutcome, JobQueue, JobRow, RequeueReport } from "@ls/core/ports/job-queue";
 import type { ModelCallLog, RecordedCall, RunCallTotals } from "@ls/core/ports/model-call-log";
 import type { RunRepo, RunRow } from "@ls/core/ports/runs";
+import type { RunSpend, SpendLedger } from "@ls/core/ports/spend";
 import type { Tx, TxFunction, TxRunner } from "@ls/core/ports/tx";
 import type { Logger, LogFields } from "@ls/obs/logger";
 import type { DeriveRunState } from "./run-finalizer.ts";
@@ -236,6 +237,13 @@ export class MemTxRunner implements TxRunner {
       this.rollbacks += 1;
       throw err;
     }
+  }
+}
+
+export class StubRunSpend implements Pick<SpendLedger, "run_totals"> {
+  settled_usd: Usd = new Decimal(0);
+  async run_totals(run_id: RunId): Promise<RunSpend> {
+    return { run_id, cap_usd: new Decimal("1.00"), settled_usd: this.settled_usd, reserved_usd: new Decimal(0) };
   }
 }
 

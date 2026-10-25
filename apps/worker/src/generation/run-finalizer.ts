@@ -2,6 +2,7 @@ import type { BrakeName, CapName, JobId, JobKind, JobStatus, RunId, RunStateName
 import type { JobOutcome, JobQueue } from "@ls/core/ports/job-queue";
 import type { ModelCallLog } from "@ls/core/ports/model-call-log";
 import type { RunRepo } from "@ls/core/ports/runs";
+import type { SpendLedger } from "@ls/core/ports/spend";
 import type { TxRunner } from "@ls/core/ports/tx";
 import { should_pause_run, type TerminalJobView } from "@ls/core/pipeline/circuit-breaker";
 import type { CheckKind } from "@ls/core/pipeline/state";
@@ -56,6 +57,7 @@ export class RunFinalizer {
     private readonly runs: RunRepo,
     private readonly queue: JobQueue,
     private readonly calls: ModelCallLog,
+    private readonly spend: Pick<SpendLedger, "run_totals">,
     private readonly tx: TxRunner,
     private readonly settings: FinalizerSettings,
     private readonly derive_run_state: DeriveRunState,
@@ -141,7 +143,7 @@ export class RunFinalizer {
         const refused =
           j.failure_reasons.length > 0 &&
           j.failure_reasons.every((r) => r.check === "capped" || r.check === "cancelled");
-        if (refused || j.calls_lost === 0) continue;
+        if (refused) continue;
       }
       let found = false;
       if (j.kind === "unit_plan") {
@@ -156,8 +158,8 @@ export class RunFinalizer {
       }
       if (!found) missing.push(j.job_id);
     }
-    const totals = await this.calls.totals_for_run(run_id);
-    const summary = jobs.reduce((acc, j) => acc.plus(j.cost_usd), totals.cost_usd.times(0));
-    return { run_id, terminal_jobs_without_calls: missing, summary_matches_calls: summary.equals(totals.cost_usd) };
+    // AC-10: the run's call-cost total against the ledger's SETTLED spend, independent of job costs.
+    const [totals, spend] = await Promise.all([this.calls.totals_for_run(run_id), this.spend.run_totals(run_id)]);
+    return { run_id, terminal_jobs_without_calls: missing, summary_matches_calls: spend.settled_usd.equals(totals.cost_usd) };
   }
 }

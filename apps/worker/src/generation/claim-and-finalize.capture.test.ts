@@ -8,7 +8,7 @@ import type { ModelCallLog } from "@ls/core/ports/model-call-log";
 import { ClaimLoop, type LessonJobPort } from "../queue/claim-loop.ts";
 import { StopFlag, StubSpend, StubUnitPlans, flush } from "../queue/claim-loop-doubles.ts";
 import {
-  MemJobQueue, MemRunRepo, MemTxRunner, StubCalls, make_job_row, make_logger, make_run_row,
+  MemJobQueue, MemRunRepo, MemTxRunner, StubCalls, StubRunSpend, make_job_row, make_logger, make_run_row,
   reference_derive_run_state,
 } from "./finalizer-doubles.ts";
 import { RunFinalizer } from "./run-finalizer.ts";
@@ -20,11 +20,12 @@ function build(n_jobs: number, concurrency: number, decide: Decide) {
   const runs = new MemRunRepo(clock);
   const queue = new MemJobQueue(clock);
   const calls = new StubCalls();
+  const run_spend = new StubRunSpend();
   const tx = new MemTxRunner(runs, queue);
   const { logger, lines } = make_logger();
   const run = runs.add(make_run_row({ cap_usd: new Decimal("1.00") }));
   for (let i = 1; i <= n_jobs; i++) queue.add(make_job_row({ run_id: run.run_id, lesson_id: `G6.U1.L${i}` }));
-  const finalizer = new RunFinalizer(runs, queue, calls, tx, { circuit_breaker_same_check: 3 }, reference_derive_run_state, logger);
+  const finalizer = new RunFinalizer(runs, queue, calls, run_spend, tx, { circuit_breaker_same_check: 3 }, reference_derive_run_state, logger);
   const world_runner: LessonJobPort = {
     async run(job: ClaimedJob): Promise<JobOutcome> {
       const d = decide(job);
