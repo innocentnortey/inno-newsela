@@ -116,11 +116,11 @@ reviews are recorded. An agreed card changes only through the change procedure (
 - **Gate:** ☐ FW tickets merged with their review evidence — Claude ✓ ____
 
 ## 5 · Spikes  (§5) — System track
-*2026-10-25: no System-track session has started (checked with `ListAgents`; no `docs/analysis/spikes/`). SP-1…SP-3 are defined in `docs/design/hard-problems.md`.*
-- [ ] `SP-N` record for every card not yet `chosen`: brief + pass line first, frozen scoring harness, options built **in parallel by fan-out agents**, harness re-run by the orchestrator on each branch (`references/spikes.md`)
-- [ ] Innocent has read each SP result
-- [ ] Any spike result that changes what a screen needs or what the backend can promise logged as a `CHG-N` and run through the change procedure
-- **Gate:** ☐ no HP card is `open`
+*2026-10-25: run in the Phase A VPS session (Opus orchestrator; Opus planners → Sonnet implementers per spike, in worktrees `spike/SP-N`).*
+- [x] `SP-N` record for every card not yet `chosen`: brief + pass line first, frozen scoring harness, options built **in parallel by fan-out agents**, harness re-run by the orchestrator on each branch (`references/spikes.md`) — `docs/analysis/spikes/SP-1-one-call-draft.md` (PASS, A; harness `29db9be`), `SP-2-freeze-at-submit.md` (PASS, A; `919ac12`), `SP-3-invention-scans.md` (PASS with the fallback scope, B; `c8e4fe8`, re-run on SP-1's real drafts); tamper checks empty; SP-1 spend $3.55 ledger ≤ $5 (2026-10-25)
+- [ ] Innocent has read each SP result — **not yet** (human-only; he has not read them). The results were adopted under PD-32 so §6 could proceed; anything he raises reopens the card
+- [x] Any spike result that changes what a screen needs or what the backend can promise logged as a `CHG-N` and run through the change procedure — none needed: SP-1's caps sit inside the agreed ranges (cap 6 of 4–6; ≤ 5 min, ≤ $1), SP-2 confirms CON-12/CON-18, SP-3 confirms CON-13's stated default (name scan blocks in check items); 0 CHG
+- **Gate:** ☑ no HP card is `open` — Claude ✓ 2026-10-25: HP-1, HP-2, HP-4, HP-5 proven by SP-1…SP-3, HP-7's caps set from SP-1, every other card chosen at §3 (`docs/design/hard-problems.md` *Spike result* lines). Innocent's reading of the results is still open (row above)
 
 ## 6 · Design  (§6) — System track
 - [ ] **Foundation questions answered by Innocent before DO-1** (`.claude/rules/system-design-questioning.md`): SD-3.1 load target + scale path, SD-3.4 peak/concurrency, SD-7.2 failure to survive, SD-1.6 spend ceiling, SD-1.9 hardest uncertainty. Each recorded with date and his words in the readiness report and the PRD decision table; none filled by a test load, default or public count
@@ -209,7 +209,7 @@ reviews are recorded. An agreed card changes only through the change procedure (
 | CON | `docs/contracts/INTERFACE.md` | 24 (all `agreed` 2026-10-25) |
 | CHG | `docs/contracts/CHANGES.md` | 0 |
 | FW / PE | `docs/plans/foundation-wave.md` | 4 / 11 |
-| SP | defined in `docs/design/hard-problems.md`; results in `docs/analysis/spikes/` (§5) | 3 defined (SP-1…SP-3), 0 run |
+| SP | defined in `docs/design/hard-problems.md`; results in `docs/analysis/spikes/` (§5) | 3 run 2026-10-25, all pass (SP-3 with its fallback scope) |
 | FT | `docs/testing/error-analysis/` | 0 (§9) |
 | XP | `docs/testing/experiments/` | 0 (§9) |
 | T / AR / AD | `docs/analysis/2026-10-24-brief-audit.md` (traps / audit requirements / audit decisions) | 26 / 40 / 20 |

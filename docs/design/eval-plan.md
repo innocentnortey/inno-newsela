@@ -175,7 +175,7 @@ Every suite starts without a measured result; each row names the run that sets i
 | S11 Held-out comparison | none yet — Plan: first local R-53 run after the full run | `evals/local/held-out/` (git-ignored) |
 | S12 Judge calibration | none yet — Plan: Innocent labels ~30 pairs if the judge is built (cut #2) | `evals/reports/judge-calibration.md` |
 | S13 Draft quality | none yet — Plan: ratings on the approved demo lessons (WP-1…WP-3) | frozen metrics rows |
-| S14 Capacity spike | none yet — Plan: first load-script run on the VPS with the provider stubbed (PD-33) | `load_test_run` rows |
+| S14 Capacity spike | none yet — Plan: first load-script run on the VPS with the provider stubbed (PD-33) | `probe_run` rows |
 
 ## Acceptance conditions
 
@@ -231,23 +231,25 @@ fixture asserting they warn and do not block. A draft that still fails after the
 
 ## Verification and evidence
 
-Command names are fixed at DO-3 (code design); they run from the repo root in the TypeScript workspace (PD-11).
+Command names are fixed at DO-3 (code design §9); they run from the repo root in the TypeScript workspace (PD-11)
+with **npm** (npm workspaces, Node 24, npm 11: the FW record's choice), so arguments follow `--`. Each command's
+workflow in DO-6 is in brackets.
 
 | Suite | Command or procedure | Evidence a reviewer sees |
 |---|---|---|
-| S1, S2 | `pnpm eval:golden --suite intake,checks` (no model calls) | `evals/reports/golden-<git-sha>.md` with per-case pass/fail; CI log |
-| S3 | `pnpm eval:golden --suite drafts --repeat 3` (real model, ~9 calls, cost printed) | `evals/reports/drafts-<git-sha>.md`: per-case assertions, spread over repeats, cost |
-| S4 | `pnpm eval:grounding` over the seeded copies (no new model spend) | `evals/reports/grounding-<git-sha>.md`: each plant caught or missed, false flags per lesson |
-| S5 | `pnpm test:e2e integrity --trials 20` (Playwright, 3 contexts) | Playwright report; `evals/reports/integrity-<git-sha>.md` with 20/20 per assertion and store p95 |
-| S6 | `pnpm eval:faults` (stubbed provider) | `evals/reports/faults-<git-sha>.md`: each invariant, the run summary of the stubbed run |
-| S7 | `pnpm eval:golden --suite safety` | report section with WP-4 4/4 and recall with *n*, labelled synthetic |
-| S8 | `pnpm test:e2e heartbeat`; Innocent's stopwatch sheet for 2 reviews | report with computed vs scripted minutes; stopwatch readings in the dev log |
-| S9 | `pnpm eval:full-run --unit G6-U4` (the one real run, inside the PD-29 ceiling) | `evals/reports/full-run-<run_id>.md` with *n* = 47, rates, failures by reason, placeholders, grounding flags, confirmations, cost; `run_id` traceable to `run` and `model_call` rows |
-| S10 | Claude plants ~5 errors via `pnpm eval:seed --plan <hidden key>`; Innocent reviews through the normal flow | `evals/reports/seeded-<run_id>.md`: each planted error, caught or not, by check or reviewer, labelled "our reviewers" |
-| S11 | `pnpm eval:heldout` (local only; reads S-5 per its handling rule) | counts in `evals/local/held-out/<date>.json` (git-ignored); only the headline counts may be quoted in docs |
-| S12 | Innocent labels pairs in `evals/judge/labels.csv`; `pnpm eval:judge-calibrate` | `evals/reports/judge-calibration.md`: agreement, *n*, the 10 held-back results, judge model and prompt version |
-| S13 | Approver's rating at Approve (R-60) | Unit quality page rating split with *n*; frozen metrics rows |
-| S14 | `pnpm load:spike` (200 users, 2-min ramp, 15-min plateau, provider stubbed, on the VPS) | `load_test_run` rows and `evals/reports/load-<date>.md` with p95s, error rate, lost updates, machine and stub stated |
+| S1, S2 | `npm run eval:golden -- --suite intake,checks` (no model calls) [WF-24] | `evals/reports/golden-<git-sha>.md` with per-case pass/fail; CI log |
+| S3 | `npm run eval:golden -- --suite drafts --repeat 3` [WF-24] (real model, ~9 calls, cost printed) | `evals/reports/drafts-<git-sha>.md`: per-case assertions, spread over repeats, cost |
+| S4 | `npm run eval:grounding` [WF-42] over the seeded copies (no new model spend) | `evals/reports/grounding-<git-sha>.md`: each plant caught or missed, false flags per lesson |
+| S5 | `npm run test:e2e -- integrity --trials 20` [WF-43] (Playwright, 3 contexts) | Playwright report; `evals/reports/integrity-<git-sha>.md` with 20/20 per assertion and store p95 |
+| S6 | `npm run eval:faults` [WF-28] (stubbed provider) | `evals/reports/faults-<git-sha>.md`: each invariant, the run summary of the stubbed run |
+| S7 | `npm run eval:golden -- --suite safety` [WF-24] | report section with WP-4 4/4 and recall with *n*, labelled synthetic |
+| S8 | `npm run test:e2e -- heartbeat` [WF-44]; Innocent's stopwatch sheet for 2 reviews | report with computed vs scripted minutes; stopwatch readings in the dev log |
+| S9 | `npm run eval:full-run -- --unit G6-U4` [WF-25] (the one real run, inside the PD-29 ceiling) | `evals/reports/full-run-<run_id>.md` with *n* = 47, rates, failures by reason, placeholders, grounding flags, confirmations, cost; `run_id` traceable to `run` and `model_call` rows |
+| S10 | Claude plants ~5 errors via `npm run eval:seed -- --plan <hidden key>` [WF-26]; Innocent reviews through the normal flow | `evals/reports/seeded-<run_id>.md`: each planted error, caught or not, by check or reviewer, labelled "our reviewers" |
+| S11 | `npm run eval:heldout` [WF-27] (local only; reads S-5 per its handling rule) | counts in `evals/local/held-out/<date>.json` (git-ignored); only the headline counts may be quoted in docs |
+| S12 | Innocent labels pairs in `evals/judge/labels.csv`; `npm run eval:judge-calibrate` [WF-31] | `evals/reports/judge-calibration.md`: agreement, *n*, the 10 held-back results, judge model and prompt version |
+| S13 | Approver's rating at Approve (R-60) [WF-15] | Unit quality page rating split with *n*; frozen metrics rows |
+| S14 | `npm run load:spike` [WF-29, WF-30] (200 users, 2-min ramp, 15-min plateau, provider stubbed, on the VPS) | `probe_run` rows and `evals/reports/load-<date>.md` with p95s, error rate, lost updates, machine and stub stated |
 
 Every report names the git SHA, prompt version, model IDs and *n*. A PR that changes a prompt, model, schema or check
 attaches the S2/S3 report and cost from before and after (GP-21). The golden tier runs in the merge gate as an affected
