@@ -93,7 +93,7 @@ export default [
     },
   },
   {
-    files: ["packages/db/src/testing/**"],
+    files: ["packages/db/src/testing/**", "packages/**/*.test.ts", "packages/**/*.int.test.ts", "packages/**/test-support/**", "apps/**/*.test.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },
   {
