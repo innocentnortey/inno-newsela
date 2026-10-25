@@ -45,6 +45,8 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
     port: opts.port ?? settings.collab_port,
     stopOnSignals: false,
     quiet: true,
+    // Frames are accepted before authentication, so cap them (the ws default is 100 MiB). Lesson documents are small.
+    websocketOptions: { maxPayload: 2 * 1024 * 1024 },
     extensions: [],
     // Hocuspocus convention: write the response, then `throw null` to stop the default "Welcome" reply.
     async onRequest({ request, response }) {

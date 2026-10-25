@@ -167,6 +167,10 @@ export async function seed_reference_data(db: PgDatabase, opts: SeedOptions = {}
 }
 
 export async function main(env: Env = process.env): Promise<SeedReport> {
+  // Demo accounts must never appear in a production database by accident (wave-4 security review).
+  if (env["NODE_ENV"] === "production" && env["SEED_ALLOW_DEMO_ACCOUNTS"] !== "1") {
+    throw new SeedInputError("NODE_ENV", "refusing to create demo accounts when NODE_ENV=production; set SEED_ALLOW_DEMO_ACCOUNTS=1 to override");
+  }
   const build_id = resolve_build_id(env, git_short_sha);
   const settings = {
     database_url: read_secret_url(env, "DATABASE_URL", ["postgres:", "postgresql:"]),
