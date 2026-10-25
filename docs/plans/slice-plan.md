@@ -413,6 +413,8 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | W10 | `docs/artifacts/*-demo-video.mp4`, `.demo/**` NL-138 · `docs/ARCHITECTURE.md`, `README.md`, `docs/AI-USAGE.md` NL-139 · `.claude/reference/area-map.md`, `.claude/README.md`, `.claude/state/icm-progress.md` NL-140 | as listed |
 | W11 | `SUBMISSION.md` NL-141 · `docs/delivery/*-retro.md` NL-142 | as listed |
 
+- NL-12 edits `apps/{worker,collab}/src/deps-types.ts` only to re-point the local structural `db`/`ids`/`clock`/`model_client` types at the real ports (same as NL-06 section 4).
+
 ### Collision-map addenda from 7b (2026-10-25)
 
 | Wave | Shared surface | Rule |
