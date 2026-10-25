@@ -1,0 +1,267 @@
+{
+ "lesson_id": "G6.U4.FLEX-1a",
+ "schema_version": 1,
+ "title": "Flex Day: Meaning-Making Huddle",
+ "type": "Flex Day",
+ "front_matter": {
+  "standards": [],
+  "minutes_total": 50,
+  "vocabulary": []
+ },
+ "sections": [
+  {
+   "address": "G6.U4.FLEX-1a.Launch",
+   "name": "Launch",
+   "minutes": 5,
+   "content": {
+    "type": "doc",
+    "content": [
+     {
+      "type": "routine_heading",
+      "attrs": {
+       "icon": "academic_discussion"
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Turn and Talk"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "strong"
+         },
+         {
+          "type": "teacher_talk"
+         }
+        ],
+        "text": "Ask:"
+       },
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "teacher_talk"
+         }
+        ],
+        "text": " What questions emerged from the texts you've read?"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "address": "G6.U4.FLEX-1a.LearningInAction",
+   "name": "Learning in Action",
+   "minutes": 40,
+   "content": {
+    "type": "doc",
+    "content": [
+     {
+      "type": "routine_heading",
+      "attrs": {
+       "icon": "notes_section"
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Graphic Organizer"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "teacher_talk"
+         }
+        ],
+        "text": "Choose small group or whole class from formative data."
+       }
+      ]
+     },
+     {
+      "type": "teacher_tip",
+      "attrs": {
+       "safety_note_id": null
+      },
+      "content": [
+       {
+        "type": "paragraph",
+        "attrs": {
+         "align": null
+        },
+        "content": [
+         {
+          "type": "text",
+          "text": "Choose clips that match the events students pick; preview them."
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "routine_heading",
+      "attrs": {
+       "icon": "cfu"
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Pulse Check (RL.6.7)"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "What do you see in the film that you hear in the text?"
+       }
+      ]
+     },
+     {
+      "type": "ordered_list",
+      "attrs": {
+       "order": 1,
+       "type": "A"
+      },
+      "content": [
+       {
+        "type": "list_item",
+        "content": [
+         {
+          "type": "paragraph",
+          "attrs": {
+           "align": null
+          },
+          "content": [
+           {
+            "type": "text",
+            "text": "the same event"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "list_item",
+        "content": [
+         {
+          "type": "paragraph",
+          "attrs": {
+           "align": null
+          },
+          "content": [
+           {
+            "type": "text",
+            "text": "a different event"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "strong"
+         }
+        ],
+        "text": "A. Correct:"
+       },
+       {
+        "type": "text",
+        "text": " Both show the event."
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "strong"
+         }
+        ],
+        "text": "B. Incorrect:"
+       },
+       {
+        "type": "text",
+        "text": " The huddle compares the same events."
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "address": "G6.U4.FLEX-1a.LookBack",
+   "name": "Look Back",
+   "minutes": 5,
+   "content": {
+    "type": "doc",
+    "content": [
+     {
+      "type": "routine_heading",
+      "attrs": {
+       "icon": "writing"
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Quick Write"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "align": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Based on what you've read so far, how do you feel retellings change across cultures and generations?"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "text_cards": []
+}

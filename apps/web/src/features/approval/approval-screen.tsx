@@ -12,6 +12,7 @@ import { TwoPane } from "@/components/layout/two-pane";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
 import { SendBackDialog } from "@/features/send-back/send-back-dialog";
+import { DISCLOSURE } from "@/features/workspace/actions/copy";
 import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
 import { api } from "@/lib/api-client";
 import { useAnnounce } from "@/lib/announce";
@@ -34,7 +35,7 @@ const STATE_LABEL: Record<Lesson["state"], string> = {
 
 function ReviewHeartbeat({ lessonId, versionId }: { lessonId: string; versionId: string }) {
   useReviewHeartbeat({ lessonId, versionId });
-  return null;
+  return <p className="text-small text-ink2">{DISCLOSURE}</p>;
 }
 
 export interface ApprovalScreenProps {

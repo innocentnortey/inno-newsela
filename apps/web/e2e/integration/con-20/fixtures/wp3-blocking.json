@@ -1,0 +1,32 @@
+[
+ {
+  "kind": "section_missing",
+  "message": "Section \"Learning in Action\" is missing required role eld_callout_purpose",
+  "address": "G6.U4.FLEX-1a.LearningInAction",
+  "code": null
+ },
+ {
+  "kind": "section_missing",
+  "message": "Section \"Learning in Action\" is missing required role eld_callout_say",
+  "address": "G6.U4.FLEX-1a.LearningInAction",
+  "code": null
+ },
+ {
+  "kind": "section_missing",
+  "message": "Section \"Learning in Action\" is missing required role eld_callout_watch",
+  "address": "G6.U4.FLEX-1a.LearningInAction",
+  "code": null
+ },
+ {
+  "kind": "schema_invalid",
+  "message": "CFU item must have exactly one Correct option (found 0)",
+  "address": "G6.U4.FLEX-1a.LearningInAction",
+  "code": null
+ },
+ {
+  "kind": "schema_invalid",
+  "message": "CFU item is missing a rationale for each option",
+  "address": "G6.U4.FLEX-1a.LearningInAction",
+  "code": null
+ }
+]
