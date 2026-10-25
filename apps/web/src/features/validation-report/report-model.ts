@@ -39,7 +39,8 @@ export type WarningItem =
   | { type: "finding"; row: Row; finding: Finding }
   | { type: "unit_rule"; rule: UnitRule };
 
-export type EldItem = EldEntry & { rows: number[] };
+/** finding_ids: the eld_mismatch findings that name this code; the choices route stores an ELD choice per finding, not per code. */
+export type EldItem = EldEntry & { rows: number[]; finding_ids: string[] };
 
 export const choiceFailedCopy = "Couldn't save this choice. Try again.";
 
@@ -113,9 +114,17 @@ export function eldItems(report: Report): EldItem[] {
   const byCode = new Map<string, EldItem>();
   for (const row of report.rows) {
     for (const e of row.eld) {
+      const ids = row.findings.filter((f) => f.kind === "eld_mismatch" && f.original_text.includes(e.code)).map((f) => f.finding_id);
       const seen = byCode.get(e.code);
-      if (seen) seen.rows.push(row.row_number);
-      else byCode.set(e.code, { ...e, rows: [row.row_number] });
+      if (!seen) {
+        byCode.set(e.code, { ...e, rows: [row.row_number], finding_ids: ids });
+        continue;
+      }
+      seen.rows.push(row.row_number);
+      seen.finding_ids.push(...ids);
+      // The API judges each row on its own; a code flagged on any row is flagged (found on the real stack, NL-94).
+      if (e.verdict === "mismatch" && seen.verdict !== "mismatch") Object.assign(seen, { verdict: e.verdict, sheet_label: e.sheet_label, official_strand: e.official_strand, suggested_remap: e.suggested_remap });
+      if (e.choice === "remap") seen.choice = "remap";
     }
   }
   return [...byCode.values()];
