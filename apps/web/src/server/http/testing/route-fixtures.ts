@@ -58,7 +58,7 @@ export function make_deps(overrides: Partial<WithRouteDeps> = {}) {
 
 export function make_request(over: Partial<HttpRequest> & { token?: string | null; origin?: string | null } = {}): HttpRequest {
   const { token = "valid-token", origin = APP_ORIGIN, ...rest } = over;
-  const headers: Record<string, string> = { ...(rest.headers ?? {}) };
+  const headers: Record<string, string | undefined> = { ...(rest.headers ?? {}) };
   if (origin !== null && headers["origin"] === undefined) headers["origin"] = origin;
   return {
     method: "POST",

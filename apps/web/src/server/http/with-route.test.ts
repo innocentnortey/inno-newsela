@@ -196,3 +196,16 @@ describe("request_id_minting", () => {
     expect(mint_request_id()).toMatch(/^req_[0-9A-HJKMNP-TV-Z]{26}$/);
   });
 });
+
+describe("undefined_headers", () => {
+  it("an undefined header value is treated as absent", async () => {
+    const { deps } = make_deps();
+    const res = await make_with_route(deps)(ok_handler(), OPEN)(
+      make_request({
+        headers: { "x-request-id": undefined, origin: undefined },
+        body: { email: "a@b.co", password: "x" },
+      }),
+    );
+    expect(res.headers["X-Request-Id"]).toMatch(/^req_/);
+  });
+});

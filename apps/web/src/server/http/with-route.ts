@@ -35,7 +35,7 @@ export interface HttpRequest {
   method: string;
   path_params: Record<string, string>;
   query: Record<string, string | string[]>;
-  headers: Record<string, string>; // keys lower-case
+  headers: Record<string, string | undefined>; // keys lower-case
   body: JsonValue | null;
   cookies: Record<string, string>;
 }
@@ -117,7 +117,7 @@ export function mint_request_id(now: number = Date.now()): string {
 }
 
 function resolve_request_id(
-  headers: Record<string, string>,
+  headers: Record<string, string | undefined>,
   mint: () => string,
 ): string {
   const v = headers["x-request-id"];
@@ -128,7 +128,7 @@ const MUTATIONS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 function check_origin(
   method: string,
-  headers: Record<string, string>,
+  headers: Record<string, string | undefined>,
   app_origin: string,
 ): boolean {
   if (!MUTATIONS.has(method.toUpperCase())) return true;
