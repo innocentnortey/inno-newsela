@@ -3,7 +3,6 @@ import type { WebDeps } from "./deps.ts";
 
 const CASES: [string, string, string[]][] = [
   ["sessions", "wire_sessions", ["sessions"]],
-  ["outlines", "wire_outlines", ["outlines"]],
   ["runs", "wire_runs", ["runs"]],
   ["review", "wire_review", ["lesson_reads", "issues", "slots", "candidates", "transitions", "approvals"]],
   ["metrics", "wire_metrics", ["board", "heartbeats"]],
