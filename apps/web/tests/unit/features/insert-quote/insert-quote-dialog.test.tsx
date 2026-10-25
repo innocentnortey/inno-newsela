@@ -22,8 +22,8 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-const setup = (onClose = vi.fn()) => {
-  const view = renderWithSession(<InsertQuoteDialog lessonId="G6.U4.L4" slotId="s1" open onClose={onClose} />, "reviewer");
+const setup = (onClose = vi.fn(), onFilled?: () => void) => {
+  const view = renderWithSession(<InsertQuoteDialog lessonId="G6.U4.L4" slotId="s1" open onClose={onClose} onFilled={onFilled} />, "reviewer");
   return { onClose, ...view };
 };
 const textBox = async () => (await screen.findByLabelText("Text")) as HTMLTextAreaElement;
@@ -115,6 +115,26 @@ describe("InsertQuoteDialog", () => {
     await userEvent.click(insert());
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(POST.mock.calls[0]?.[1].body).toMatchObject({ text: NINE, rights_status: "short-quote-commentary", source_ref: { title: "Synthetic Reader", chapter: null, pages: null } });
+  });
+
+  it("on_filled_called_once_after_success", async () => {
+    const onFilled = vi.fn();
+    const { onClose } = setup(vi.fn(), onFilled);
+    await type(NINE);
+    await typeSource();
+    await userEvent.click(insert());
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(onFilled).toHaveBeenCalledTimes(1);
+  });
+
+  it("on_filled_not_called_on_refusal", async () => {
+    POST.mockRejectedValue(err("SOURCE_REQUIRED"));
+    const onFilled = vi.fn();
+    setup(vi.fn(), onFilled);
+    await type(NINE);
+    await userEvent.click(insert());
+    await waitFor(() => expect(POST).toHaveBeenCalled());
+    expect(onFilled).not.toHaveBeenCalled();
   });
 
   it("to-clear success says it is still blocking", async () => {

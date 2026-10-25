@@ -24,9 +24,10 @@ export interface InsertQuoteFormProps {
   lessonId: string;
   slotId: string;
   onClose: () => void;
+  onFilled?: () => void;
 }
 
-export function InsertQuoteForm({ lessonId, slotId, onClose }: InsertQuoteFormProps) {
+export function InsertQuoteForm({ lessonId, slotId, onClose, onFilled }: InsertQuoteFormProps) {
   const { load, retry } = useLesson(lessonId);
   const toast = useWorkspaceToast();
   const announce = useAnnounce();
@@ -119,6 +120,7 @@ export function InsertQuoteForm({ lessonId, slotId, onClose }: InsertQuoteFormPr
       toast.show({
         message: data?.still_blocking || rights === "to-clear" ? "Inserted. Still blocking: rights to clear." : "Quote inserted. Issue 1 resolved.",
       });
+      onFilled?.();
       finish();
     } catch (e) {
       setFailure(mapFillError(e, words));
