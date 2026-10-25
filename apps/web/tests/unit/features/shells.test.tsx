@@ -24,7 +24,7 @@ describe("handed-over shells", () => {
       const onClose = vi.fn();
       const { unmount } = renderWithSession(make(true, onClose));
       expect(screen.getByRole("dialog", { name: title })).toBeInTheDocument();
-      await userEvent.click(screen.getByRole("button", { name: "Close" }));
+      await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]!);
       expect(onClose).toHaveBeenCalled();
       unmount();
       render(make(false, onClose));
@@ -36,7 +36,7 @@ describe("handed-over shells", () => {
     const onClose = vi.fn();
     render(<AssistPanel lessonId="G6.U4.L4" selection={null} onClose={onClose} />);
     expect(screen.getByRole("region", { name: "AI assist" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]!);
     expect(onClose).toHaveBeenCalled();
   });
 });
