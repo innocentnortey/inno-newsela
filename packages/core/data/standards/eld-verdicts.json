@@ -1,0 +1,209 @@
+{
+  "header": {
+    "source": "docs/source/05-standards-referenced.md, ELD table and Count paragraph; sheet labels are the synthetic sample's (WP-1, WP-5)",
+    "official_documents": [
+      "https://www.cde.ca.gov/sp/el/er/documents/eldstndspublication14.pdf"
+    ],
+    "derived": "2026-10-25",
+    "rule": "official text only, never the sheet's labels (GR-5)",
+    "set": "CA_ELD_6"
+  },
+  "verdicts": [
+    {
+      "code": "ELD.PI.6.1",
+      "strand_part": "I.A.1",
+      "strand": "Exchanging information/ideas",
+      "verdict": "fits",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Participate in collaborative discussions",
+          "verdict": "fits"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.2",
+      "strand_part": "I.A.2",
+      "strand": "Interacting via written English",
+      "verdict": "mismatch",
+      "suggested_remap": "ELD.PI.6.10b",
+      "descriptions": [
+        {
+          "label": "Summarize key ideas accurately",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.4",
+      "strand_part": "I.A.4",
+      "strand": "Adapting language choices",
+      "verdict": "mismatch",
+      "suggested_remap": "ELD.PI.6.9",
+      "descriptions": [
+        {
+          "label": "Present ideas clearly",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.5",
+      "strand_part": "I.B.5",
+      "strand": "Listening actively",
+      "verdict": "mismatch",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Revise writing for clarity",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.6",
+      "strand_part": "I.B.6",
+      "strand": "Reading/viewing closely",
+      "verdict": "partial",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Explain ideas using evidence",
+          "verdict": "fits"
+        },
+        {
+          "label": "Explain mood using evidence",
+          "verdict": "fits"
+        },
+        {
+          "label": "Justify interpretations with evidence",
+          "verdict": "fits"
+        },
+        {
+          "label": "Exchange information and ideas orally",
+          "verdict": "mismatch"
+        },
+        {
+          "label": "Maintain formal style",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.7",
+      "strand_part": "I.B.7",
+      "strand": "Evaluating language choices",
+      "verdict": "partial",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Analyze how language creates meaning",
+          "verdict": "fits"
+        },
+        {
+          "label": "Compare ideas across texts",
+          "verdict": "mismatch"
+        },
+        {
+          "label": "Apply archetypal ideas",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PI.6.10",
+      "strand_part": "I.C.10",
+      "strand": "Writing",
+      "verdict": "fits",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Write explanatory texts",
+          "verdict": "fits"
+        },
+        {
+          "label": "Write narrative texts",
+          "verdict": "fits"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PII.6.1",
+      "strand_part": "II.A.1",
+      "strand": "Understanding text structure",
+      "verdict": "mismatch",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Use collaborative discussion strategies",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PII.6.3",
+      "strand_part": "II.B.3",
+      "strand": "Using verbs and verb phrases",
+      "verdict": "mismatch",
+      "suggested_remap": "ELD.PI.6.12a",
+      "descriptions": [
+        {
+          "label": "Use precise descriptive vocabulary",
+          "verdict": "mismatch"
+        },
+        {
+          "label": "Use content-specific vocabulary accurately",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PII.6.4",
+      "strand_part": "II.B.4",
+      "strand": "Using nouns and noun phrases",
+      "verdict": "fits",
+      "suggested_remap": null,
+      "descriptions": [
+        {
+          "label": "Expand noun phrases and descriptive language",
+          "verdict": "fits"
+        },
+        {
+          "label": "Produce expanded summaries",
+          "verdict": "fits"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PII.6.5",
+      "strand_part": "II.B.5",
+      "strand": "Modifying to add details",
+      "verdict": "mismatch",
+      "suggested_remap": "ELD.PII.6.2b",
+      "descriptions": [
+        {
+          "label": "Use transitions to connect ideas",
+          "verdict": "mismatch"
+        },
+        {
+          "label": "Use cohesive comparison language",
+          "verdict": "mismatch"
+        }
+      ]
+    },
+    {
+      "code": "ELD.PII.6.6",
+      "strand_part": "II.C.6",
+      "strand": "Connecting ideas",
+      "verdict": "mismatch",
+      "suggested_remap": "ELD.PI.6.4",
+      "descriptions": [
+        {
+          "label": "Adjust language to task and audience",
+          "verdict": "mismatch"
+        }
+      ]
+    }
+  ]
+}

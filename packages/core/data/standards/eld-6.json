@@ -1,0 +1,595 @@
+{
+  "header": {
+    "source": "CA ELD Standards (CDE, 2014), grade 6 pp. 85-93 (PDF pp. 94-104); Expanding text cross-checked against docs/source/05-standards-referenced.md",
+    "official_documents": [
+      "https://www.cde.ca.gov/sp/el/er/documents/eldstndspublication14.pdf"
+    ],
+    "derived": "2026-10-25",
+    "rule": "official text only, never the sheet's labels (GR-5)",
+    "set": "CA_ELD_6"
+  },
+  "sheet_codes": [
+    "ELD.PI.6.1",
+    "ELD.PI.6.2",
+    "ELD.PI.6.4",
+    "ELD.PI.6.5",
+    "ELD.PI.6.6",
+    "ELD.PI.6.7",
+    "ELD.PI.6.10",
+    "ELD.PII.6.1",
+    "ELD.PII.6.3",
+    "ELD.PII.6.4",
+    "ELD.PII.6.5",
+    "ELD.PII.6.6"
+  ],
+  "standards": [
+    {
+      "code": "ELD.PI.6.1",
+      "text": "Contribute to class, group, and partner discussions by following turn-taking rules, asking relevant questions, affirming others, adding relevant information, and paraphrasing key ideas.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Exchanging information/ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.1.Em",
+      "text": "Engage in conversational exchanges and express ideas on familiar topics by asking and answering yes-no and wh- questions and responding using simple phrases.",
+      "parent_code": "ELD.PI.6.1",
+      "is_leaf": true,
+      "eld_strand": "Exchanging information/ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.1.Ex",
+      "text": "Contribute to class, group, and partner discussions by following turn-taking rules, asking relevant questions, affirming others, adding relevant information, and paraphrasing key ideas.",
+      "parent_code": "ELD.PI.6.1",
+      "is_leaf": true,
+      "eld_strand": "Exchanging information/ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.1.Br",
+      "text": "Contribute to class, group, and partner discussions by following turn-taking rules, asking relevant questions, affirming others, adding relevant information and evidence, paraphrasing key ideas, building on responses, and providing useful feedback.",
+      "parent_code": "ELD.PI.6.1",
+      "is_leaf": true,
+      "eld_strand": "Exchanging information/ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.2",
+      "text": "Engage in longer written exchanges with peers and collaborate on more detailed written texts on a variety of topics, using technology when appropriate.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Interacting via written English",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.2.Em",
+      "text": "Engage in short written exchanges with peers and collaborate on simple written texts on familiar topics, using technology when appropriate.",
+      "parent_code": "ELD.PI.6.2",
+      "is_leaf": true,
+      "eld_strand": "Interacting via written English",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.2.Ex",
+      "text": "Engage in longer written exchanges with peers and collaborate on more detailed written texts on a variety of topics, using technology when appropriate.",
+      "parent_code": "ELD.PI.6.2",
+      "is_leaf": true,
+      "eld_strand": "Interacting via written English",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.2.Br",
+      "text": "Engage in extended written exchanges with peers and collaborate on complex written texts on a variety of topics, using technology when appropriate.",
+      "parent_code": "ELD.PI.6.2",
+      "is_leaf": true,
+      "eld_strand": "Interacting via written English",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.4",
+      "text": "Adjust language choices according to purpose (e.g., explaining, persuading, entertaining), task, and audience.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Adapting language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.4.Em",
+      "text": "Adjust language choices according to social setting (e.g., classroom, break time) and audience (e.g., peers, teacher).",
+      "parent_code": "ELD.PI.6.4",
+      "is_leaf": true,
+      "eld_strand": "Adapting language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.4.Ex",
+      "text": "Adjust language choices according to purpose (e.g., explaining, persuading, entertaining), task, and audience.",
+      "parent_code": "ELD.PI.6.4",
+      "is_leaf": true,
+      "eld_strand": "Adapting language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.4.Br",
+      "text": "Adjust language choices according to task (e.g., facilitating a science experiment, providing peer feedback on a writing assignment), purpose, task, and audience.",
+      "parent_code": "ELD.PI.6.4",
+      "is_leaf": true,
+      "eld_strand": "Adapting language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.5",
+      "text": "Demonstrate active listening in oral presentation activities by asking and answering detailed questions, with occasional prompting and moderate support.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Listening actively",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.5.Em",
+      "text": "Demonstrate active listening in oral presentation activities by asking and answering basic questions, with prompting and substantial support.",
+      "parent_code": "ELD.PI.6.5",
+      "is_leaf": true,
+      "eld_strand": "Listening actively",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.5.Ex",
+      "text": "Demonstrate active listening in oral presentation activities by asking and answering detailed questions, with occasional prompting and moderate support.",
+      "parent_code": "ELD.PI.6.5",
+      "is_leaf": true,
+      "eld_strand": "Listening actively",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.5.Br",
+      "text": "Demonstrate active listening in oral presentation activities by asking and answering detailed questions, with minimal prompting and support.",
+      "parent_code": "ELD.PI.6.5",
+      "is_leaf": true,
+      "eld_strand": "Listening actively",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6",
+      "text": "Reading/viewing closely",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6a",
+      "text": "Explain ideas, phenomena, processes, and text relationships (e.g., compare/contrast, cause/effect, problem/solution) based on close reading of a variety of grade-level texts and viewing of multimedia, with moderate support.",
+      "parent_code": "ELD.PI.6.6",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6a.Em",
+      "text": "Explain ideas, phenomena, processes, and text relationships (e.g., compare/contrast, cause/effect, problem/solution) based on close reading of a variety of grade-level texts and viewing of multimedia, with substantial support.",
+      "parent_code": "ELD.PI.6.6a",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6a.Ex",
+      "text": "Explain ideas, phenomena, processes, and text relationships (e.g., compare/contrast, cause/effect, problem/solution) based on close reading of a variety of grade-level texts and viewing of multimedia, with moderate support.",
+      "parent_code": "ELD.PI.6.6a",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6a.Br",
+      "text": "Explain ideas, phenomena, processes, and text relationships (e.g., compare/contrast, cause/effect, problem/solution) based on close reading of a variety of grade-level texts and viewing of multimedia, with light support.",
+      "parent_code": "ELD.PI.6.6a",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6b",
+      "text": "Express inferences and conclusions drawn based on close reading of grade-level texts and viewing of multimedia using a variety of verbs (e.g., suggests that, leads to).",
+      "parent_code": "ELD.PI.6.6",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6b.Em",
+      "text": "Express inferences and conclusions drawn based on close reading of grade-level texts and viewing of multimedia using some frequently used verbs (e.g., shows that, based on).",
+      "parent_code": "ELD.PI.6.6b",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6b.Ex",
+      "text": "Express inferences and conclusions drawn based on close reading of grade-level texts and viewing of multimedia using a variety of verbs (e.g., suggests that, leads to).",
+      "parent_code": "ELD.PI.6.6b",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6b.Br",
+      "text": "Express inferences and conclusions drawn based on close reading of grade-level texts and viewing of multimedia using a variety of precise academic verbs (e.g., indicates that, influences).",
+      "parent_code": "ELD.PI.6.6b",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6c",
+      "text": "Use knowledge of morphology (e.g., affixes, roots, and base words), context, reference materials, and visual cues to determine the meaning of unknown and multiple-meaning words on familiar and new topics.",
+      "parent_code": "ELD.PI.6.6",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6c.Em",
+      "text": "Use knowledge of morphology (e.g., affixes, roots, and base words), context, reference materials, and visual cues to determine the meaning of unknown and multiple-meaning words on familiar topics.",
+      "parent_code": "ELD.PI.6.6c",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6c.Ex",
+      "text": "Use knowledge of morphology (e.g., affixes, roots, and base words), context, reference materials, and visual cues to determine the meaning of unknown and multiple-meaning words on familiar and new topics.",
+      "parent_code": "ELD.PI.6.6c",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.6c.Br",
+      "text": "Use knowledge of morphology (e.g., affixes, roots, and base words), context, reference materials, and visual cues to determine the meaning, including figurative and connotative meanings, of unknown and multiple-meaning words on a variety of new topics.",
+      "parent_code": "ELD.PI.6.6c",
+      "is_leaf": true,
+      "eld_strand": "Reading/viewing closely",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.7",
+      "text": "Explain how well writers and speakers use specific language to present ideas or support arguments and provide detailed evidence (e.g., showing the clarity of the phrasing used to present an argument) with moderate support.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Evaluating language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.7.Em",
+      "text": "Explain how well writers and speakers use language to support ideas and arguments with detailed evidence (e.g., identifying the precise vocabulary used to present evidence, or the phrasing used to signal a shift in meaning) with substantial support.",
+      "parent_code": "ELD.PI.6.7",
+      "is_leaf": true,
+      "eld_strand": "Evaluating language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.7.Ex",
+      "text": "Explain how well writers and speakers use specific language to present ideas or support arguments and provide detailed evidence (e.g., showing the clarity of the phrasing used to present an argument) with moderate support.",
+      "parent_code": "ELD.PI.6.7",
+      "is_leaf": true,
+      "eld_strand": "Evaluating language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.7.Br",
+      "text": "Explain how well writers and speakers use specific language resources to present ideas or support arguments and provide detailed evidence (e.g., identifying the specific language used to present ideas and claims that are well supported and distinguishing them from those that are not) with light support.",
+      "parent_code": "ELD.PI.6.7",
+      "is_leaf": true,
+      "eld_strand": "Evaluating language choices",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10",
+      "text": "Writing",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10a",
+      "text": "Write longer literary and informational texts (e.g., an argument for protecting the rain forests) collaboratively (e.g., with peers) and independently using appropriate text organization.",
+      "parent_code": "ELD.PI.6.10",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10a.Em",
+      "text": "Write short literary and informational texts (e.g., an argument for protecting the rain forests) collaboratively (e.g., with peers) and independently.",
+      "parent_code": "ELD.PI.6.10a",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10a.Ex",
+      "text": "Write longer literary and informational texts (e.g., an argument for protecting the rain forests) collaboratively (e.g., with peers) and independently using appropriate text organization.",
+      "parent_code": "ELD.PI.6.10a",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10a.Br",
+      "text": "Write longer and more detailed literary and informational texts (e.g., an argument for protecting the rain forests) collaboratively (e.g., with peers) and independently using appropriate text organization and growing understanding of register.",
+      "parent_code": "ELD.PI.6.10a",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10b",
+      "text": "Write increasingly concise summaries of texts and experiences using complete sentences and key words (e.g., from notes or graphic organizers).",
+      "parent_code": "ELD.PI.6.10",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10b.Em",
+      "text": "Write brief summaries of texts and experiences using complete sentences and key words (e.g., from notes or graphic organizers).",
+      "parent_code": "ELD.PI.6.10b",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10b.Ex",
+      "text": "Write increasingly concise summaries of texts and experiences using complete sentences and key words (e.g., from notes or graphic organizers).",
+      "parent_code": "ELD.PI.6.10b",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PI.6.10b.Br",
+      "text": "Write clear and coherent summaries of texts and experiences using complete and concise sentences and key words (e.g., from notes or graphic organizers).",
+      "parent_code": "ELD.PI.6.10b",
+      "is_leaf": true,
+      "eld_strand": "Writing",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.1",
+      "text": "Apply growing understanding of how different text types are organized to express ideas (e.g., how a narrative is organized sequentially with predictable stages versus how arguments are structured logically around reasons and evidence) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Understanding text structure",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.1.Em",
+      "text": "Apply basic understanding of how different text types are organized to express ideas (e.g., how a narrative is organized sequentially with predictable stages versus how arguments are organized around ideas) to comprehending texts and writing basic texts.",
+      "parent_code": "ELD.PII.6.1",
+      "is_leaf": true,
+      "eld_strand": "Understanding text structure",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.1.Ex",
+      "text": "Apply growing understanding of how different text types are organized to express ideas (e.g., how a narrative is organized sequentially with predictable stages versus how arguments are structured logically around reasons and evidence) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": "ELD.PII.6.1",
+      "is_leaf": true,
+      "eld_strand": "Understanding text structure",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.1.Br",
+      "text": "Apply increasing understanding of how different text types are organized to express ideas (e.g., how a historical account is organized chronologically versus how arguments are structured logically around reasons and evidence) to comprehending texts and writing cohesive texts.",
+      "parent_code": "ELD.PII.6.1",
+      "is_leaf": true,
+      "eld_strand": "Understanding text structure",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2",
+      "text": "Understanding cohesion",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2a",
+      "text": "Apply growing understanding of language resources for referring the reader back or forward in text (e.g., how pronouns or synonyms refer back to nouns in text) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": "ELD.PII.6.2",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2a.Em",
+      "text": "Apply basic understanding of language resources for referring the reader back or forward in text (e.g., how pronouns refer back to nouns in text) to comprehending texts and writing basic texts.",
+      "parent_code": "ELD.PII.6.2a",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2a.Ex",
+      "text": "Apply growing understanding of language resources for referring the reader back or forward in text (e.g., how pronouns or synonyms refer back to nouns in text) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": "ELD.PII.6.2a",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2a.Br",
+      "text": "Apply increasing understanding of language resources for referring the reader back or forward in text (e.g., how pronouns, synonyms, or nominalizations refer back to nouns in text) to comprehending texts and writing cohesive texts.",
+      "parent_code": "ELD.PII.6.2a",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2b",
+      "text": "Apply growing understanding of how ideas, events, or reasons are linked throughout a text using a variety of connecting words or phrases (e.g., for example, in the first place, as a result, on the other hand) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": "ELD.PII.6.2",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2b.Em",
+      "text": "Apply basic understanding of how ideas, events, or reasons are linked throughout a text using a select set of everyday connecting words or phrases (e.g., first/next, at the beginning) to comprehending texts and writing basic texts.",
+      "parent_code": "ELD.PII.6.2b",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2b.Ex",
+      "text": "Apply growing understanding of how ideas, events, or reasons are linked throughout a text using a variety of connecting words or phrases (e.g., for example, in the first place, as a result, on the other hand) to comprehending texts and writing texts with increasing cohesion.",
+      "parent_code": "ELD.PII.6.2b",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.2b.Br",
+      "text": "Apply increasing understanding of how ideas, events, or reasons are linked throughout a text using an increasing variety of academic connecting and transitional words or phrases (e.g., consequently, specifically, however, moreover) to comprehending texts and writing cohesive texts.",
+      "parent_code": "ELD.PII.6.2b",
+      "is_leaf": true,
+      "eld_strand": "Understanding cohesion",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.3",
+      "text": "Use various verb types (e.g., doing, saying, being/having, thinking/feeling, reporting), tenses (e.g., present, past, future, simple, progressive, perfect) appropriate to the task, text type, and discipline (e.g., simple present for literary analysis) on an increasing variety of topics.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Using verbs and verb phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.3.Em",
+      "text": "Use a variety of verb types (e.g., doing, saying, being/having, thinking/feeling), tenses (e.g., present, past, future, simple, progressive) appropriate to the text type and discipline (e.g., simple past and past progressive for recounting an experience) on familiar topics.",
+      "parent_code": "ELD.PII.6.3",
+      "is_leaf": true,
+      "eld_strand": "Using verbs and verb phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.3.Ex",
+      "text": "Use various verb types (e.g., doing, saying, being/having, thinking/feeling, reporting), tenses (e.g., present, past, future, simple, progressive, perfect) appropriate to the task, text type, and discipline (e.g., simple present for literary analysis) on an increasing variety of topics.",
+      "parent_code": "ELD.PII.6.3",
+      "is_leaf": true,
+      "eld_strand": "Using verbs and verb phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.3.Br",
+      "text": "Use various verb types (e.g., doing, saying, being/having, thinking/feeling, reporting), tenses (e.g., present, past, future, simple, progressive, perfect) appropriate to the task, text type, and discipline (e.g., the present perfect to describe previously made claims or conclusions) on a variety of topics.",
+      "parent_code": "ELD.PII.6.3",
+      "is_leaf": true,
+      "eld_strand": "Using verbs and verb phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.4",
+      "text": "Expand noun phrases in a variety of ways (e.g., adding comparative/superlative adjectives to noun phrases or simple clause embedding) in order to enrich the meaning of sentences and add details about ideas, people, things, and the like.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Using nouns and noun phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.4.Em",
+      "text": "Expand noun phrases in simple ways (e.g., adding a sensory adjective to a noun) in order to enrich the meaning of sentences and add details about ideas, people, things, and the like.",
+      "parent_code": "ELD.PII.6.4",
+      "is_leaf": true,
+      "eld_strand": "Using nouns and noun phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.4.Ex",
+      "text": "Expand noun phrases in a variety of ways (e.g., adding comparative/superlative adjectives to noun phrases or simple clause embedding) in order to enrich the meaning of sentences and add details about ideas, people, things, and the like.",
+      "parent_code": "ELD.PII.6.4",
+      "is_leaf": true,
+      "eld_strand": "Using nouns and noun phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.4.Br",
+      "text": "Expand noun phrases in an increasing variety of ways (e.g., adding comparative/superlative and general academic adjectives to noun phrases or more complex clause embedding) in order to enrich the meaning of sentences and add details about ideas, people, things, and the like.",
+      "parent_code": "ELD.PII.6.4",
+      "is_leaf": true,
+      "eld_strand": "Using nouns and noun phrases",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.5",
+      "text": "Expand sentences with an increasing variety of adverbials (e.g., adverbs, adverb phrases, prepositional phrases) to provide details (e.g., time, manner, place, cause) about a familiar or new activity or process.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Modifying to add details",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.5.Em",
+      "text": "Expand sentences with simple adverbials (e.g., adverbs, adverb phrases, prepositional phrases) to provide details (e.g., time, manner, place, cause) about a familiar activity or process.",
+      "parent_code": "ELD.PII.6.5",
+      "is_leaf": true,
+      "eld_strand": "Modifying to add details",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.5.Ex",
+      "text": "Expand sentences with an increasing variety of adverbials (e.g., adverbs, adverb phrases, prepositional phrases) to provide details (e.g., time, manner, place, cause) about a familiar or new activity or process.",
+      "parent_code": "ELD.PII.6.5",
+      "is_leaf": true,
+      "eld_strand": "Modifying to add details",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.5.Br",
+      "text": "Expand sentences with a variety of adverbials (e.g., adverbs, adverb phrases and clauses, prepositional phrases) to provide details (e.g., time, manner, place, cause) about a variety of familiar and new activities and processes.",
+      "parent_code": "ELD.PII.6.5",
+      "is_leaf": true,
+      "eld_strand": "Modifying to add details",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.6",
+      "text": "Combine clauses in an increasing variety of ways (e.g., creating compound and complex sentences) to make connections between and join ideas, for example, to express a reason (e.g., He stayed at home on Sunday to study for Monday’s exam) or to make a concession (e.g., She studied all night even though she wasn’t feeling well).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": "Connecting ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.6.Em",
+      "text": "Combine clauses in a few basic ways to make connections between and join ideas (e.g., creating compound sentences using and, but, so).",
+      "parent_code": "ELD.PII.6.6",
+      "is_leaf": true,
+      "eld_strand": "Connecting ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.6.Ex",
+      "text": "Combine clauses in an increasing variety of ways (e.g., creating compound and complex sentences) to make connections between and join ideas, for example, to express a reason (e.g., He stayed at home on Sunday to study for Monday’s exam) or to make a concession (e.g., She studied all night even though she wasn’t feeling well).",
+      "parent_code": "ELD.PII.6.6",
+      "is_leaf": true,
+      "eld_strand": "Connecting ideas",
+      "ca": false
+    },
+    {
+      "code": "ELD.PII.6.6.Br",
+      "text": "Combine clauses in a wide variety of ways (e.g., creating compound and complex sentences) to make connections between and join ideas, for example, to express a reason (e.g., He stayed at home on Sunday because he had an exam on Monday), to make a concession (e.g., She studied all night even though she wasn’t feeling well), or to link two ideas that happen at the same time (e.g., The students worked in groups while their teacher walked around the room).",
+      "parent_code": "ELD.PII.6.6",
+      "is_leaf": true,
+      "eld_strand": "Connecting ideas",
+      "ca": false
+    }
+  ]
+}
