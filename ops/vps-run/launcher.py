@@ -314,6 +314,7 @@ def run_once_bg(phase: str, st: dict) -> dict:
     try:
         short, real_sid = bgsession.start(CLAUDE, ROOT, phase_env(phase), args, turn_prompt(phase, n))
     except Exception as exc:                              # noqa: BLE001 - reported, then the loop's bounded retry
+        st["attempts"][phase] -= 1                        # nothing ran, so it does not use up an attempt
         log(f"phase {phase} run {n}: background start failed: {exc}")
         return {"init_model": None, "model_usage": {}, "cost": 0.0, "subtype": "error_start", "detail": str(exc)}
     if real_sid != sid:                                   # fresh --bg sessions pick their own id
@@ -462,6 +463,16 @@ def cmd_run(args) -> int:
                 write_resume(st, f"phase {phase} used all {cfg['max_runs']} runs without passing its checkpoint")
                 return 1
             info = run_once(phase, st)
+            if info["subtype"] == "error_start":           # nothing ran: not a model problem
+                if "not trusted" in (info.get("detail") or ""):
+                    st["status"] = f"blocked before phase {phase} run (workspace not trusted)"
+                    save_state(st)
+                    write_resume(st, f"Claude Code does not trust {ROOT} for background sessions. Run `claude` in that "
+                                     "folder once, accept the trust prompt, type /exit, then `bash ops/vps-run/run.sh`")
+                    return 2
+                log("background start failed; waiting 60 s before retrying")
+                time.sleep(60)
+                continue
             bad = model_ok(phase, info)
             if bad:
                 st["status"] = f"phase {phase} model mismatch"

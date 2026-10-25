@@ -6,7 +6,7 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 SESSION=newsela-run
 export PATH="$HOME/.local/bin:$PATH"
 if tmux has-session -t "$SESSION" 2>/dev/null; then
-  if pgrep -f "python3 ops/vps-run/launcher.py run" >/dev/null; then
+  if pgrep -f "^python3 ops/vps-run/launcher.py run" >/dev/null; then
     echo "The launcher is already running in tmux session '$SESSION'."
     echo "Attach: tmux attach -t $SESSION   (detach again with Ctrl-b then d) · Session: claude attach newsela-phase-b"
     exit 0
