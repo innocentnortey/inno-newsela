@@ -303,8 +303,11 @@ export class PgOutlineRepo implements OutlineRepo {
       async (tx) =>
         (
           await tx.query<{ finding_id: string; choice: string; status: string; confirmed_by: string | null; at: Date }>(
-            `SELECT c.finding_id, c.choice, c.status, c.confirmed_by, coalesce(v.confirmed_at, v.created_at) AS at
+            // `confirmed_by` is stored as a user id; the read shows the name (the report copies it verbatim).
+            // There is no per-choice timestamp column, so `at` is the version's confirmed_at/created_at.
+            `SELECT c.finding_id, c.choice, c.status, coalesce(u.name, c.confirmed_by) AS confirmed_by, coalesce(v.confirmed_at, v.created_at) AS at
              FROM intake_choice c JOIN outline_version v ON v.id = c.outline_version_id
+             LEFT JOIN app_user u ON u.id = c.confirmed_by
              WHERE c.outline_version_id=$1 ORDER BY c.finding_id`,
             [outline_version_id],
           )
@@ -375,14 +378,42 @@ export class PgOutlineRepo implements OutlineRepo {
     };
   }
 
-  async upsert_choice(_choice: IntakeChoiceRow, _tx: Tx): Promise<IntakeChoiceRow> {
-    throw new NotBuiltYet("NL-77");
+  async upsert_choice(choice: IntakeChoiceRow, tx: Tx): Promise<IntakeChoiceRow> {
+    if (!(tx instanceof DbTx)) throw new InvariantViolation("choice write needs a real transaction");
+    // Last write wins by the primary key (outline_version_id, finding_id).
+    await tx.query(
+      `INSERT INTO intake_choice (outline_version_id, finding_id, choice, status, confirmed_by) VALUES ($1,$2,$3,$4,$5)
+       ON CONFLICT (outline_version_id, finding_id) DO UPDATE SET choice=EXCLUDED.choice, status=EXCLUDED.status, confirmed_by=EXCLUDED.confirmed_by`,
+      [choice.outline_version_id, choice.finding_id, choice.choice, choice.status, choice.confirmed_by],
+    );
+    return choice;
   }
-  async mark_confirmed(_id: OutlineVersionId, _at: Date, _tx: Tx): Promise<void> {
-    throw new NotBuiltYet("NL-77");
+
+  async mark_confirmed(outline_version_id: OutlineVersionId, at: Date, tx: Tx): Promise<void> {
+    if (!(tx instanceof DbTx)) throw new InvariantViolation("confirm write needs a real transaction");
+    // Writes once: a later call never moves the date.
+    await tx.query("UPDATE outline_version SET confirmed_at=$2::timestamptz WHERE id=$1 AND confirmed_at IS NULL", [
+      outline_version_id,
+      at.toISOString(),
+    ]);
   }
-  async generate_gate_inputs(_id: OutlineVersionId): Promise<GateInputs> {
-    throw new NotBuiltYet("NL-77");
+
+  async generate_gate_inputs(outline_version_id: OutlineVersionId): Promise<GateInputs> {
+    return { outline: await this.outline(outline_version_id), choices: await this.choices(outline_version_id) };
+  }
+
+  /** Not on the port (like `outline`): runs started from a version, newest first. */
+  async runs_from_version(outline_version_id: OutlineVersionId): Promise<{ run_id: string; started_at: string; choices_hash: string }[]> {
+    const rows = await this.read(
+      async (tx) =>
+        (
+          await tx.query<{ id: string; created_at: Date; choices_hash: string }>(
+            "SELECT id, created_at, choices_hash FROM run WHERE outline_version_id=$1 ORDER BY created_at DESC, id DESC",
+            [outline_version_id],
+          )
+        ).rows,
+    );
+    return rows.map((r) => ({ run_id: r.id, started_at: r.created_at.toISOString(), choices_hash: r.choices_hash }));
   }
 
   /** Not on the port (port request recorded in the devlog): everything the unit list needs, in one transaction. */
