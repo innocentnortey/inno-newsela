@@ -1,0 +1,46 @@
+{
+ "version": 1,
+ "cases": [
+  {
+   "case_id": "clean-wp1",
+   "provenance": "hand-written",
+   "source": "WP-1",
+   "guards": "wp1 unseeded: at most 1 false scan flag",
+   "fixture": "wp1",
+   "max_false_flags": 1
+  },
+  {
+   "case_id": "clean-wp2",
+   "provenance": "hand-written",
+   "source": "WP-2",
+   "guards": "wp2 unseeded: at most 1 false scan flag",
+   "fixture": "wp2",
+   "max_false_flags": 1
+  },
+  {
+   "case_id": "clean-wp3",
+   "provenance": "hand-written",
+   "source": "WP-3",
+   "guards": "wp3 unseeded: at most 0 false scan flags",
+   "fixture": "wp3",
+   "max_false_flags": 0
+  },
+  {
+   "case_id": "clean-wp4",
+   "provenance": "hand-written",
+   "source": "WP-4",
+   "guards": "wp4 unseeded: at most 1 false scan flag",
+   "fixture": "wp4",
+   "max_false_flags": 1
+  },
+  {
+   "case_id": "clean-syn1-twin",
+   "provenance": "synthetic",
+   "source": "SYN-1",
+   "guards": "wp2 unseeded: at most 1 false scan flag (SYN-1 clean twin)",
+   "fixture": "wp2",
+   "max_false_flags": 1,
+   "grid": "syn1"
+  }
+ ]
+}

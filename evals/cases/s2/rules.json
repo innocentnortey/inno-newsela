@@ -1,0 +1,466 @@
+{
+ "version": 1,
+ "cases": [
+  {
+   "case_id": "s2-rule-quote_placeholder_open",
+   "provenance": "hand-written",
+   "source": "WP-1 R-19 quote_placeholder_open",
+   "guards": "quote_placeholder_open: a quote placeholder left in the draft blocks approval",
+   "recipe": "quote_placeholder_open",
+   "focus_kinds": [
+    "quote_placeholder_open"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "quote_placeholder_open",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.LearningInAction.PartA"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-excerpt_slot_open",
+   "provenance": "hand-written",
+   "source": "WP-1 R-19 excerpt_slot_open",
+   "guards": "excerpt_slot_open: an unfilled excerpt slot blocks approval",
+   "recipe": "excerpt_slot_open",
+   "focus_kinds": [
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "excerpt_slot_open",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Homework"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-cross_lesson_link",
+   "provenance": "hand-written",
+   "source": "R-19 cross_lesson_link",
+   "guards": "cross_lesson_link: homework waiting on an empty slot in the linked lesson blocks",
+   "recipe": "cross_lesson_link",
+   "focus_kinds": [
+    "cross_lesson_link"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "cross_lesson_link",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Homework"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-standard_not_taught",
+   "provenance": "hand-written",
+   "source": "R-19 standard_not_taught",
+   "guards": "standard_not_taught: a checked standard with no teaching part blocks",
+   "recipe": "standard_not_taught",
+   "focus_kinds": [
+    "standard_not_taught"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "standard_not_taught",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.FrontMatter",
+      "code": "L.6.4"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-standard_not_checked",
+   "provenance": "hand-written",
+   "source": "R-19 standard_not_checked",
+   "guards": "standard_not_checked: a taught standard with no tagged Pulse Check blocks",
+   "recipe": "standard_not_checked",
+   "focus_kinds": [
+    "standard_not_checked"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "standard_not_checked",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.LiteracyLab",
+      "code": "L.6.4"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-code_not_allowed",
+   "provenance": "hand-written",
+   "source": "R-19 code_not_allowed",
+   "guards": "code_not_allowed: a recorded code outside the row's allowed list blocks",
+   "recipe": "code_not_allowed",
+   "focus_kinds": [
+    "code_not_allowed"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "code_not_allowed",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.FrontMatter",
+      "code": "RL.6.7"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-minutes_out_of_range",
+   "provenance": "hand-written",
+   "source": "R-19 minutes_out_of_range",
+   "guards": "minutes_out_of_range: section and lesson minutes outside tolerance block",
+   "recipe": "minutes_out_of_range",
+   "focus_kinds": [
+    "minutes_out_of_range"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "minutes_out_of_range",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4"
+     },
+     {
+      "kind": "minutes_out_of_range",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-section_missing",
+   "provenance": "hand-written",
+   "source": "R-19 section_missing",
+   "guards": "section_missing: a missing template section blocks",
+   "recipe": "section_missing",
+   "focus_kinds": [
+    "section_missing"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "section_missing",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Homework"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-schema_invalid",
+   "provenance": "hand-written",
+   "source": "R-19 schema_invalid",
+   "guards": "schema_invalid: a heading jump (h2 to h4) is schema-invalid and blocks",
+   "recipe": "schema_invalid",
+   "focus_kinds": [
+    "schema_invalid"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "schema_invalid",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.LearninginAction.PartA"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-quote_unmatched",
+   "provenance": "hand-written",
+   "source": "R-19 quote_unmatched",
+   "guards": "quote_unmatched: a quotation absent from every source field blocks",
+   "recipe": "quote_unmatched",
+   "focus_kinds": [
+    "quote_unmatched"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "quote_unmatched",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L5.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-page_out_of_range",
+   "provenance": "hand-written",
+   "source": "R-19 page_out_of_range",
+   "guards": "page_out_of_range: a page reference outside the row's pages blocks",
+   "recipe": "page_out_of_range",
+   "focus_kinds": [
+    "page_out_of_range"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "page_out_of_range",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-proper_noun_unsourced",
+   "provenance": "hand-written",
+   "source": "R-19 proper_noun_unsourced",
+   "guards": "proper_noun_unsourced: a name in a CFU rationale that no source holds blocks",
+   "recipe": "proper_noun_unsourced",
+   "focus_kinds": [
+    "proper_noun_unsourced"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "proper_noun_unsourced",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.LearningInAction.PartB"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-quote_without_source",
+   "provenance": "hand-written",
+   "source": "R-19 quote_without_source",
+   "guards": "quote_without_source: a quote node with no source reference blocks",
+   "recipe": "quote_without_source",
+   "focus_kinds": [
+    "quote_without_source"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "quote_without_source",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-quote_too_long",
+   "provenance": "hand-written",
+   "source": "R-19 quote_too_long",
+   "guards": "quote_too_long: a 13-word short-quote blocks",
+   "recipe": "quote_too_long",
+   "focus_kinds": [
+    "quote_too_long"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "quote_too_long",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-rights_to_clear",
+   "provenance": "hand-written",
+   "source": "R-19 rights_to_clear",
+   "guards": "rights_to_clear: a quote whose rights are still to clear blocks",
+   "recipe": "rights_to_clear",
+   "focus_kinds": [
+    "rights_to_clear"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "rights_to_clear",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Launch"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-suggestion_pending",
+   "provenance": "hand-written",
+   "source": "R-19 suggestion_pending",
+   "guards": "suggestion_pending: a pending AI suggestion blocks",
+   "recipe": "suggestion_pending",
+   "focus_kinds": [
+    "suggestion_pending"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "suggestion_pending",
+      "level": "blocking",
+      "blocks": true,
+      "address": null
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-safety_flag_open",
+   "provenance": "hand-written",
+   "source": "R-19 safety_flag_open",
+   "guards": "safety_flag_open: an open safety flag blocks at its teacher tip",
+   "recipe": "safety_flag_open",
+   "focus_kinds": [
+    "safety_flag_open"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "safety_flag_open",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.LearninginAction.Tip1"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-safety_note_without_tip",
+   "provenance": "hand-written",
+   "source": "R-19 safety_note_without_tip",
+   "guards": "safety_note_without_tip: a safety note with no carrying tip blocks",
+   "recipe": "safety_note_without_tip",
+   "focus_kinds": [
+    "safety_note_without_tip"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "safety_note_without_tip",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.FrontMatter"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-safety_text_in_student_block",
+   "provenance": "hand-written",
+   "source": "R-19 safety_text_in_student_block",
+   "guards": "safety_text_in_student_block: note wording copied into a student block blocks",
+   "recipe": "safety_text_in_student_block",
+   "focus_kinds": [
+    "safety_text_in_student_block"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "safety_text_in_student_block",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Homework"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-linked_text_changed",
+   "provenance": "hand-written",
+   "source": "R-19 linked_text_changed",
+   "guards": "linked_text_changed: a linked lesson changed since the hash was recorded blocks",
+   "recipe": "linked_text_changed",
+   "focus_kinds": [
+    "linked_text_changed"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "linked_text_changed",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.Homework"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-vocabulary_word_missing",
+   "provenance": "hand-written",
+   "source": "R-19 vocabulary_word_missing",
+   "guards": "vocabulary_word_missing: a row vocabulary word missing from both lists blocks",
+   "recipe": "vocabulary_word_missing",
+   "focus_kinds": [
+    "vocabulary_word_missing"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "vocabulary_word_missing",
+      "level": "blocking",
+      "blocks": true,
+      "address": "G6.U4.L4.FrontMatter"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-rule-standard_confirmation",
+   "provenance": "hand-written",
+   "source": "R-19 standard_confirmation",
+   "guards": "standard_confirmation: a narrowed code needs one confirmation and does not block",
+   "recipe": "standard_confirmation",
+   "focus_kinds": [
+    "standard_confirmation"
+   ],
+   "expected": {
+    "issues": [
+     {
+      "kind": "standard_confirmation",
+      "level": "confirmation",
+      "blocks": false,
+      "address": "G6.U4.L4.FrontMatter",
+      "code": "L.6.4.b"
+     }
+    ]
+   }
+  },
+  {
+   "case_id": "s2-clean-lesson",
+   "provenance": "hand-written",
+   "source": "R-19 clean",
+   "guards": "a clean reading lesson has zero blocking findings",
+   "recipe": "clean_reading",
+   "focus_kinds": [],
+   "expected": {
+    "blocking": 0
+   }
+  }
+ ]
+}

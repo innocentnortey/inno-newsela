@@ -5,7 +5,7 @@ import { default_suite_factory } from "../registry.ts";
 import type { EvalCase, EvalOptions, SuiteName } from "../types.ts";
 
 const TICKETS: [SuiteName, string][] = [
-  ["S1", "NL-84"], ["S2", "NL-85"], ["S3", "NL-109"], ["S4", "NL-85"], ["S5", "NL-125"], ["S6", "NL-107"], ["S7", "NL-84"],
+  ["S1", "NL-84"], ["S3", "NL-109"], ["S5", "NL-125"], ["S6", "NL-107"], ["S7", "NL-84"],
   ["S8", "NL-127"], ["S9", "NL-86"], ["S10", "NL-92"], ["S11", "NL-121"], ["S12", "NL-111"], ["S13", "NL-86"], ["S14", "NL-118/NL-119"],
 ];
 const OPTS: EvalOptions = { repeat: 1, provider_mode: "stub", git_sha: "x", unit: null };
