@@ -40,3 +40,11 @@ each route lists the checks to make there.
   from those lines. One writer, so no merge conflicts on these files.
 - A route's *Stale when* list names the changes that invalidate it; whoever makes such a change updates the route's
   *As of* line or marks the fact *re-check*.
+
+## Corrections that apply to every ticket (2026-10-25 routing audit)
+
+- Look sheet: `docs/artifacts/2026-10-25-d1-clear-ledger-look-sheet.html` (the old `docs/ux/02-concepts/references/…` path does not exist).
+- TRACEABILITY: only the *Tickets and evidence* table is edited by hand, one row per SCR. Proof is `trace_check.py --upto CON` with no FAIL line, plus `test -f` on the spec path in the row. `--upto TEST` counts only `TEST-N` ids (S-11) and fails every SCR; do not use it as an acceptance check.
+- Dialogs (SCR-10, SCR-11, SCR-15) are delivered with a harness page only. Mounting SCR-10/11 in the workspace is NL-113; SCR-15's opener is NL-68's card or NL-115's wiring.
+- `StubJudgeClient` is in `packages/llm/src/stub.ts` (NL-32); there is no `stub-judge.ts`.
+- NL-106 is blocked by NL-105; NL-105 builds `CollabCommandHandler` and the typed `lock_and_snapshot` refusal; NL-106 replaces that body.
