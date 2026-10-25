@@ -26,11 +26,16 @@ export class LessonJobRunner {
   ) {}
 
   /** Only LeaseLost propagates; after it nothing is written and the job is left to requeue_expired. */
-  async run(job: ClaimedJob): Promise<JobOutcome> {
+  async run(job: ClaimedJob, signal?: AbortSignal): Promise<JobOutcome> {
     let s = initial_state(job, this.clock.now().getTime()) as JobState;
     const id = job.job_id;
 
+    // An aborted signal means the claim loop lost the lease: stop at once, write nothing.
+    const check_signal = (): void => {
+      if (signal?.aborted) throw signal.reason instanceof LeaseLost ? signal.reason : new LeaseLost({ job_id: id });
+    };
     const lease = async (): Promise<void> => {
+      check_signal();
       if (!(await this.queue.renew_lease(id, this.settings.job_lease_ms))) throw new LeaseLost({ job_id: id });
     };
     // Before every node but fail: lease, cancel, wall clock. True when a brake fired (go to fail, no further call).
@@ -45,7 +50,8 @@ export class LessonJobRunner {
     flow: {
       if (await gate()) break flow;
       await this.queue.set_tile_state(id, "drafting");
-      s = await this.draft.run(s);
+      s = await this.aborting(() => this.draft.run(s, signal), check_signal);
+      check_signal();
       if (is_fatal(s)) break flow;
       for (;;) {
         if (await gate()) break flow;
@@ -60,6 +66,7 @@ export class LessonJobRunner {
         });
         if (next === "store") {
           if (await gate()) break flow;
+          check_signal();
           s = await this.store.run(s);
           stored = true;
           break flow;
@@ -67,7 +74,8 @@ export class LessonJobRunner {
         if (next === "fail") break flow;
         if (await gate()) break flow;
         await this.queue.set_tile_state(id, "repairing");
-        s = await this.repair.run(s);
+        s = await this.aborting(() => this.repair.run(s, signal), check_signal);
+        check_signal();
         if (is_fatal(s)) break flow;
       }
     }
@@ -80,5 +88,15 @@ export class LessonJobRunner {
     await this.queue.finish(outcome);
     await this.finalizer.after_job(job.run_id, outcome);
     return outcome;
+  }
+
+  /** An aborted in-flight call surfaces as some provider error; report it as the lease loss it is. */
+  private async aborting<T>(fn: () => Promise<T>, check_signal: () => void): Promise<T> {
+    try {
+      return await fn();
+    } catch (e) {
+      check_signal();
+      throw e;
+    }
   }
 }

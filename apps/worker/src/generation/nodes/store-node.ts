@@ -3,7 +3,7 @@ import type { LessonDocStore } from "@ls/core/ports/lesson-docs";
 import type { LessonStateRepo } from "@ls/core/ports/lesson-state";
 import type { LessonVersionRepo, NewGeneratedVersion, ProvenanceRecord } from "@ls/core/ports/lesson-versions";
 import type { SafetyFlagRepo } from "@ls/core/ports/safety-flags";
-import type { TxRunner } from "@ls/core/ports/tx";
+import type { Tx, TxRunner } from "@ls/core/ports/tx";
 import type { LessonId, VersionId } from "@ls/core/ports/common";
 import type { NormalizedRow } from "@ls/schema/outline";
 import { build_outcome, SYSTEM_ACTOR, sum_cost, type JobState } from "./job-state.ts";
@@ -74,7 +74,7 @@ export class StoreNode {
     lesson_id: LessonId,
     base: Omit<NewGeneratedVersion, "kind">,
     as_generated: () => Promise<VersionId>,
-    tx: object,
+    tx: Tx,
   ): Promise<VersionId> {
     const has = await this.versions.has_generated_version(lesson_id);
     const row = await this.states.lock_for_update(lesson_id, tx);

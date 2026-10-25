@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LeaseLost } from "@ls/core/errors";
+import { LeaseLost, ProviderError } from "@ls/core/errors";
 import { bad_wp1_draft, good_wp1_draft, make_job } from "./nodes/testing/fixtures.ts";
 import { make_harness } from "./nodes/testing/harness.ts";
 
@@ -112,5 +112,40 @@ describe("LessonJobRunner", () => {
     expect(h.world.queue.finished).toHaveLength(0);
     expect(h.world.versions.rows).toHaveLength(0);
     expect(h.finalized).toHaveLength(0);
+  });
+
+  it("signal_aborted_before_start_makes_no_call", async () => {
+    const h = make_harness([good()]);
+    const ctl = new AbortController();
+    ctl.abort(new LeaseLost({ job_id: make_job().job_id }));
+    await expect(h.runner.run(make_job(), ctl.signal)).rejects.toBeInstanceOf(LeaseLost);
+    expect(h.caller.requests).toHaveLength(0);
+    expect(h.world.queue.finished).toHaveLength(0);
+  });
+
+  it("abort_mid_draft_forwards_signal_and_stores_nothing", async () => {
+    const h = make_harness([good()]);
+    const ctl = new AbortController();
+    const real = h.caller.call.bind(h.caller);
+    h.caller.call = async (p) => {
+      expect(p.signal).toBe(ctl.signal);
+      ctl.abort(new LeaseLost({ job_id: p.job_id! }));
+      await real(p);
+      throw new ProviderError({ kind: "timeout" }); // what an aborted in-flight call surfaces as
+    };
+    await expect(h.runner.run(make_job(), ctl.signal)).rejects.toBeInstanceOf(LeaseLost);
+    expect(h.caller.requests).toHaveLength(1);
+    expect(h.world.versions.rows).toHaveLength(0);
+    expect(h.world.states.set_calls).toHaveLength(0);
+    expect(h.world.queue.finished).toHaveLength(0);
+    expect(h.finalized).toHaveLength(0);
+  });
+
+  it("abort_during_a_call_that_returns_still_stops_before_store", async () => {
+    const ctl = new AbortController();
+    const h = make_harness([{ ...good(), on_call: () => ctl.abort(new LeaseLost({ job_id: make_job().job_id })) }]);
+    await expect(h.runner.run(make_job(), ctl.signal)).rejects.toBeInstanceOf(LeaseLost);
+    expect(h.world.versions.rows).toHaveLength(0);
+    expect(h.world.queue.finished).toHaveLength(0);
   });
 });

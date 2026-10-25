@@ -25,6 +25,8 @@ export interface PaidCallRequest {
   run_id: RunId | null;
   job_id: JobId | null;
   user_id: UserId;
+  /** Aborted when the job lease is lost; the caller must stop the in-flight call and release its reservation. */
+  signal?: AbortSignal;
 }
 export interface PaidCallerPort {
   call(p: PaidCallRequest): Promise<RecordedCall>;

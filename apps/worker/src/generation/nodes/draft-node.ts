@@ -27,7 +27,7 @@ export class DraftNode {
     private readonly recorder: CheckpointPort,
   ) {}
 
-  async run(state: JobState): Promise<JobState> {
+  async run(state: JobState, signal?: AbortSignal): Promise<JobState> {
     const job = state.job;
     const lesson_id = job.lesson_id;
     if (lesson_id === null) throw new InvariantViolation("lesson_job_without_lesson", { job_id: job.job_id });
@@ -72,14 +72,14 @@ export class DraftNode {
     };
     let s: JobState = { ...state, context };
 
-    const first = await this.call(s, rendered, "lesson_draft", this.settings.draft_output_token_cap);
+    const first = await this.call(s, rendered, "lesson_draft", this.settings.draft_output_token_cap, signal);
     if (first.kind === "stop") return first.state;
     s = first.state;
     if (first.call.stop_reason !== "max_tokens") return this.accept(s, first.call, this.settings.draft_output_token_cap);
 
     // Truncated: one retry with the larger cap. Not a repair round.
     s = { ...s, truncation_retries: 1 };
-    const retry = await this.call(s, rendered, "truncation_retry", this.settings.truncation_retry_token_cap);
+    const retry = await this.call(s, rendered, "truncation_retry", this.settings.truncation_retry_token_cap, signal);
     if (retry.kind === "stop") return retry.state;
     if (retry.call.stop_reason === "max_tokens") return with_brake(retry.state, "truncation_retry");
     return this.accept(retry.state, retry.call, this.settings.truncation_retry_token_cap);
@@ -90,7 +90,7 @@ export class DraftNode {
     return { ...s, draft_call: call, context: { ...ctx, draft_call: call, draft_max_output_tokens: cap, raw_output: call.raw_output } };
   }
 
-  private async call(s: JobState, rendered: RenderedPrompt, purpose: CallPurpose, cap: number): Promise<CallResult> {
+  private async call(s: JobState, rendered: RenderedPrompt, purpose: CallPurpose, cap: number, signal?: AbortSignal): Promise<CallResult> {
     const job = s.job;
     const hit = await this.recorder.checkpoint(job.job_id, purpose, 1);
     try {
@@ -114,9 +114,11 @@ export class DraftNode {
           run_id: job.run_id,
           job_id: job.job_id,
           user_id: job.started_by,
+          ...(signal ? { signal } : {}),
         }));
       return { kind: "ok", state: with_call(s, call), call };
     } catch (e) {
+      if (signal?.aborted) throw e;
       if (e instanceof SpendRefused) return { kind: "stop", state: with_brake(s, brake_for(e)) };
       if (e instanceof ProviderError) {
         const ctx = s.context!;

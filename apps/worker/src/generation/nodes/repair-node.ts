@@ -17,7 +17,7 @@ export class RepairNode {
     private readonly recorder: CheckpointPort,
   ) {}
 
-  async run(state: JobState): Promise<JobState> {
+  async run(state: JobState, signal?: AbortSignal): Promise<JobState> {
     const job = state.job;
     const ctx = state.context;
     if (ctx === null) throw new InvariantViolation("job_context_missing");
@@ -57,11 +57,13 @@ export class RepairNode {
           run_id: job.run_id,
           job_id: job.job_id,
           user_id: job.started_by,
+          ...(signal ? { signal } : {}),
         });
       }
       const next = with_call(state, call);
       return { ...next, repair_rounds: next.repair_rounds + 1, context: { ...next.context!, raw_output: call.raw_output } };
     } catch (e) {
+      if (signal?.aborted) throw e;
       if (e instanceof SpendRefused) return with_brake({ ...state, context: { ...ctx, raw_output: null } }, brake_for(e));
       if (e instanceof ProviderError) {
         let next: JobState = { ...state, context: { ...ctx, provider_error: e.kind, raw_output: null } };
