@@ -76,7 +76,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-14 | US-25, US-26, US-27, US-28, US-31 | CON-11, CON-13, CON-18, CON-20 | NL-68 | NL-99, NL-115 | apps/web/e2e/approval/approval.spec.ts | axe + screenshots: e2e/__screenshots__/approval/ | planned |
 | SCR-15 | US-26, US-28 | CON-18 | NL-69 | NL-115 | apps/web/e2e/send-back/send-back.spec.ts | axe + screenshots: e2e/__screenshots__/send-back/ | planned |
 | SCR-16 | US-29 | CON-11, CON-19 | NL-70 | NL-100 | apps/web/e2e/history/history.spec.ts | axe + screenshots: e2e/__screenshots__/history/ | planned |
-| SCR-17 | US-32, US-36 | CON-21 | NL-71 | NL-97 | apps/web/e2e/run-summary/run-summary.spec.ts | axe + screenshots: e2e/__screenshots__/run-summary/ | planned |
+| SCR-17 | US-32, US-36 | CON-21 | NL-71 | NL-97 | apps/web/e2e/run-summary/run-summary.spec.ts; apps/web/e2e/integration/con-21/ | axe + screenshots: e2e/__screenshots__/run-summary/; real stack: NL-97 apps/web/e2e/integration/con-21/ | planned |
 | SCR-18 | US-33 | CON-22 | NL-73 (cut #4) | NL-117 | planned | planned | planned |
 | SCR-19 | US-34, US-36 | CON-10 | NL-74 (cut #6) | NL-104 | planned | planned | planned |
 | SCR-20 | US-28, US-35 | CON-23 | NL-75 (cut #5) | NL-102 | apps/web/e2e/export/export.spec.ts | axe + screenshots: e2e/__screenshots__/export/ | planned |
