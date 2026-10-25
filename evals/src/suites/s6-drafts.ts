@@ -1,0 +1,48 @@
+// NL-107: a healthy stub draft for any generatable lesson of the issued grid, derived from the WP-2 fixture (synthetic).
+// The fixture's non-CFU blocks are kept for the sections the row's lesson-type template has; one CFU item per focus
+// code replaces the fixture's CFU items, so the standards checks have something to find.
+import { template_for } from "@ls/core/compile/templates";
+import type { StubScriptItem } from "@ls/llm/stub";
+import type { NormalizedRow } from "@ls/schema/outline";
+import { lesson_of, load_fixture, text } from "./s6-world.ts";
+
+type Block = { role: string; section: string; part: string | null; text: string; standard_codes: string[]; code_origins: string[]; cfu: unknown; minutes: number | null };
+const base = load_fixture("wp-2.json").draft as { lesson_id: string; title: string; text_cards: unknown[]; blocks: Block[] };
+
+function cfu_block(code: string): Block {
+  return {
+    role: "cfu_item", section: "Learning in Action", part: "Part B", standard_codes: [code], code_origins: ["outline"], minutes: null,
+    text: "Check for understanding.",
+    cfu: {
+      stem: `Which choice best shows the skill named by ${code}?`,
+      options: ["The choice that applies the skill to the text.", "A choice about page numbers.", "A choice about the cover.", "A choice about the title."],
+      key_index: 0,
+      rationales: ["Correct: It applies the skill.", "Incorrect: It is unrelated.", "Incorrect: It is unrelated.", "Incorrect: It is unrelated."],
+      standard_code: code,
+    },
+  };
+}
+
+/** The draft JSON for one outline row. */
+export function draft_for(row: NormalizedRow): unknown {
+  const template = template_for(row.lesson_type);
+  const names = new Set((template?.sections ?? []).map((s) => s.name));
+  const kept = base.blocks.filter((b) => b.role !== "cfu_item" && names.has(b.section)).map((b) => ({ ...b, minutes: null as number | null, text: b.text.replace(/pages? \d+(-\d+)?/gi, "the pages") }));
+  // Section minutes are the sum of block minutes: put each template section's minutes on its first block.
+  for (const slot of template?.sections ?? []) {
+    const first = kept.find((b) => b.section === slot.name);
+    if (first) first.minutes = slot.minutes;
+  }
+  const codes = row.focus_codes.length > 0 ? row.focus_codes : ["W.6.2.a"]; // flex days name no focus code but the template still needs a CFU item
+  return { lesson_id: row.lesson_id, title: `${row.title}`.slice(0, 120) || "Lesson", text_cards: base.text_cards, blocks: [...kept, ...codes.map(cfu_block)] };
+}
+
+/** Script function for the draft and repair purposes: a healthy draft for the lesson the request names. */
+export function make_healthy(rows: readonly NormalizedRow[]): (req: { user_blocks: ReadonlyArray<{ text: string }> }) => StubScriptItem {
+  return (req) => {
+    const id = lesson_of(req);
+    const row = rows.find((r) => r.lesson_id === id);
+    if (!row) throw new Error("stub draft: no outline row for lesson " + JSON.stringify(id));
+    return text(draft_for(row));
+  };
+}
