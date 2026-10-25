@@ -1,0 +1,67 @@
+{
+  "ticket": "NL-83",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/health.test.ts": "53f409c2c5bc66d423a0a1556830f8a9289b1be9db987a67bece9842a8132f1c",
+    "apps/web/app/api/healthz/route.test.ts": "0bef69e93e16e168b3330821f53b3e32ba594383f824ce9e5b233303afb4749d",
+    "apps/web/src/server/health.test.ts": "f3d605378af4b2f32d38110c55ad64c736e71062702f41ea0ad3892822dc699a",
+    "apps/worker/src/health.test.ts": "dc99d7bbd27a9659e9d7c643351e3666909d7e31584604cc15bb5110cfecf753",
+    "ops/backup.test.ts": "d0ec1cf7b32fd999e2c10b1b6f1fd1edeb27ade4b9f2ad36fa8b6ec7fdbd4bc5",
+    "ops/compose-exposure.test.ts": "26890bdc83b188129417fadbe08a584b145aaca550c3a60f30af4bd999a8ae45",
+    "ops/run-sample-builder.test.ts": "41e8baad9dd1657dae346a94d5220da6d45a8f88e1273468d9b7d1355f4ad8d2",
+    "ops/start-events.int.test.ts": "e82d17c1842d86fdc399179ca108ec243e5fd5dcce2b831e9eea36df69648b02"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-4": [
+      "ops/start-events.int.test.ts"
+    ],
+    "AC-5": [
+      "ops/backup.test.ts"
+    ],
+    "AC-6": [
+      "ops/backup.test.ts"
+    ],
+    "AC-7": [
+      "ops/backup.test.ts"
+    ],
+    "AC-8": [
+      "ops/run-sample-builder.test.ts"
+    ],
+    "AC-9": [
+      "ops/compose-exposure.test.ts"
+    ],
+    "AC-10": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts",
+      "ops/backup.test.ts",
+      "ops/run-sample-builder.test.ts",
+      "ops/start-events.int.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "ops/wf-35-obligations.int.test.ts",
+    "ops/wf-38-obligations.int.test.ts",
+    "ops/wf-39-obligations.int.test.ts",
+    "ops/wf-40-obligations.int.test.ts",
+    "tests/platform/start-event.int.test.ts"
+  ]
+}
