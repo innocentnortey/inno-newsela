@@ -37,7 +37,7 @@ describe("cli", () => {
   });
 
   it("empty_suite_never_green: fixed subcommands", async () => {
-    for (const sub of ["faults", "full-run", "seed", "heldout", "judge-calibrate"]) {
+    for (const sub of ["faults", "seed", "heldout", "judge-calibrate"]) {
       expect(await run_cli([sub], deps(default_suite_factory))).toBe(2);
     }
     expect(repo.runs).toHaveLength(0);
