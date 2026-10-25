@@ -31,6 +31,8 @@ function forbidden_for(root: string, f: string): RegExp {
   const rel = f.slice(root.length + 1);
   // Composition roots under wiring/ build the Pg repositories and the PaidCaller, so they may import @ls/db and @ls/llm; a driver or provider SDK stays forbidden everywhere.
   if (/(^|\/)wiring\/[^/]+\.ts$/.test(rel)) return /from\s+"(pg|@anthropic-ai\/sdk|openai)["/]/;
+  // NL-89: the worker's judge client factory is the one place outside wiring/ that builds the OpenRouter adapter from @ls/llm.
+  if (rel === "worker/src/judge/judge-client-factory.ts") return /from\s+"(@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
   return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
 }
 
