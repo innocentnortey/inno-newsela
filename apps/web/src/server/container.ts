@@ -2,6 +2,9 @@ import "server-only";
 import { ConfigError } from "@ls/config/errors";
 import { load_web_settings, type WebSettings } from "@ls/config/settings";
 import { create_logger, type Logger } from "@ls/obs/logger";
+import { PgDatabase as RealPgDatabase } from "@ls/db/pool";
+import { PrefixedIdGenerator } from "@ls/core/ports/ids";
+import { SystemClock } from "@ls/core/ports/clock";
 import type { WebDeps } from "./deps.ts";
 import type { Clock, IdGenerator, ModelClient, PgDatabase } from "./deps-types.ts";
 import { wire_assist, type AssistWiring } from "./wiring/assist.ts";
@@ -76,9 +79,9 @@ export function build_web_services(settings: WebSettings): WebServices {
   const deps: WebDeps = {
     settings,
     logger,
-    db: unbuilt<PgDatabase>("NL-08", ["with_tx", "ping", "close"]),
-    ids: unbuilt<IdGenerator>("NL-12", ["new_id"]),
-    clock: unbuilt<Clock>("NL-12", ["now", "sleep"]),
+    db: new RealPgDatabase(settings.shared, settings.shared.pg_pool_max, settings.pg_acquire_timeout_ms),
+    ids: new PrefixedIdGenerator(),
+    clock: new SystemClock(),
     model_client: unbuilt<ModelClient>("NL-12", ["complete"]),
   };
 

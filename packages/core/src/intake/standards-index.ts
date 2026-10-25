@@ -1,3 +1,4 @@
+import { join } from "node:path";
 // CDE standards index (NL-15, DO-4 section 8). Pure lookup over seeded official text (GR-5):
 // text and strands come only from the seed rows, never from a sheet label.
 import fs from "node:fs";
@@ -39,8 +40,13 @@ export interface EldVerdictEntry {
 
 export type EldVerdictTable = Record<string, EldVerdictEntry>;
 
-export const DEFAULT_STANDARDS_DIR: string = fileURLToPath(
-  new URL("../../data/standards/", import.meta.url),
+export const DEFAULT_STANDARDS_DIR: string = join(
+  fileURLToPath(import.meta.url),
+  "..",
+  "..",
+  "..",
+  "data",
+  "standards",
 );
 
 const TIER_RE = /^(ELD\..+)\.(Em|Ex|Br)$/;
