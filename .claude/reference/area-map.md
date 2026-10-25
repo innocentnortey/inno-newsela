@@ -42,7 +42,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 2 | A13b metrics writer | `apps/web/src/server/services/metrics-writer.ts` | planned |
 | 3 | A4 intake service | `apps/web/src/server/services/outline-service.ts`, `apps/web/src/server/adapters/google-sheets.ts`, `apps/web/app/api/units/route.ts`, `apps/web/app/api/outline-versions/**`, `apps/web/src/server/wiring/outlines.ts` | planned |
 | 3 | A6 check runner | `apps/worker/src/checks/**`, `apps/worker/src/wiring/checks.ts` | planned |
-| 3 | A9 generation | `apps/worker/src/{queue,generation}/**`, `packages/core/src/pipeline/**`, `apps/worker/src/wiring/generation.ts` | planned |
+| 3 | A9 generation | `apps/worker/src/{queue,generation}/**`, `packages/core/src/pipeline/**` (built, NL-22), `apps/worker/src/wiring/generation.ts` | planned |
 | 3 | A10 runs | `apps/web/src/server/services/run-service.ts`, `apps/web/app/api/runs/**`, `apps/web/src/server/wiring/runs.ts` | planned |
 | 3 | A11 collab server | `apps/collab/**` (except `main.ts`, `health.ts`; incl. `frozen-docs.ts`, `wiring/collab.ts`) | planned |
 | 3 | A12 review | `apps/web/src/server/services/{lesson-read,issue,slot,candidate,transition,approve}-service.ts`, `apps/web/app/api/lessons/**` (except suggestions, heartbeats), `apps/web/src/server/wiring/review.ts` | planned |
