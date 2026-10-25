@@ -1,0 +1,30 @@
+{
+  "ticket": "NL-13",
+  "risk": "security",
+  "frozen": {
+    "apps/web/src/server/http/testing/route-fixtures.ts": "154fbacfc089fd72f26537bed55c37824deb056f1b7a93cbecebb4e96e9cb97e",
+    "apps/web/src/server/http/with-route.security.test.ts": "645bc7ddcc46189efe7793e34748f3352da8d86e8cd994c030b5078fb1187d99"
+  },
+  "criteria": {
+    "AC-1 (precedence)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-2 (origin_check)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-3 (session_and_secrets)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-4 (request_id)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/src/server/http/with-route.test.ts (implementer: AC-5..AC-9)",
+    "apps/web/src/server/http/refusal.test.ts"
+  ]
+}
