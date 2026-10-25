@@ -3,7 +3,7 @@
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 
-export const APPEND_ONLY = ["review_event", "audit_event", "lesson_metrics", "ops_event"];
+export const APPEND_ONLY = ["review_event", "audit_event", "lesson_metrics", "ops_event", "prompt_version"];
 export const NO_DELETE = ["lesson_version"];
 export const NO_WRITE = ["schema_migrations"];
 

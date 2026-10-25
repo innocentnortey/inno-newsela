@@ -39,6 +39,34 @@ describe("attribute and content domains", () => {
       }),
     ],
     [
+      "quote rights free",
+      doc({
+        type: "quote",
+        attrs: { slot_id: "a", source_ref: "x", rights: "free" },
+        content: [{ type: "text", text: "x" }],
+      }),
+    ],
+    [
+      "quote with a strong mark",
+      doc({
+        type: "quote",
+        attrs: { slot_id: "a", source_ref: "x", rights: "licensed" },
+        content: [{ type: "text", text: "x", marks: [{ type: "strong" }] }],
+      }),
+    ],
+    [
+      "quote without slot_id",
+      doc({ type: "quote", content: [{ type: "text", text: "x" }] }),
+    ],
+    [
+      "quote holding a paragraph",
+      doc({
+        type: "quote",
+        attrs: { slot_id: "a" },
+        content: [para],
+      }),
+    ],
+    [
       "ordered_list type z",
       doc({
         type: "ordered_list",
@@ -83,4 +111,24 @@ describe("attribute and content domains", () => {
       expect((err as Error).message.length).toBeGreaterThan(0);
     });
   }
+});
+
+describe("quote node (NL-46)", () => {
+  it("accepts a plain-text quote with a source string and a rights status", () => {
+    const json = doc({
+      type: "quote",
+      attrs: {
+        slot_id: "slot-a",
+        source_ref: '{"title":"Synthetic"}',
+        rights: "to-clear",
+      },
+      content: [{ type: "text", text: "<b>kept verbatim</b>" }],
+    });
+    expect(() => build(json)).not.toThrow();
+    expect(EDITOR_SCHEMA.nodeFromJSON(json).toJSON()).toEqual(json);
+  });
+  it("defaults source_ref to a blank string and rights to unset", () => {
+    const n = EDITOR_SCHEMA.nodes["quote"]!.create({ slot_id: "s" });
+    expect(n.attrs).toEqual({ slot_id: "s", source_ref: "", rights: "unset" });
+  });
 });

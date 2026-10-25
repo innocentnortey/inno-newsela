@@ -16,7 +16,8 @@
     "@ls/llm": "*",
     "@ls/prompts": "*",
     "@ls/config": "*",
-    "@ls/obs": "*"
+    "@ls/obs": "*",
+    "decimal.js": "10.6.0"
   },
   "devDependencies": {}
 }

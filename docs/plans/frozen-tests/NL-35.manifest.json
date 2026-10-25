@@ -1,0 +1,15 @@
+{
+  "ticket": "NL-35",
+  "risk": "security",
+  "frozen": {
+    "packages/core/src/spend/reservation.test.ts": "083e5c616118e3b989170b5c2facac071478aa674190fde06ea33f6f38056f5f",
+    "packages/db/src/repos/spend.int.test.ts": "d1f75717a9f47f091bdf3da02fa21eb570a3faadf4ca3996f700d689dba6e249"
+  },
+  "criteria": {
+    "AC-1, AC-2, AC-3": ["packages/core/src/spend/reservation.test.ts"],
+    "AC-6, AC-7, AC-8, AC-10, AC-11, AC-12, AC-13": ["packages/db/src/repos/spend.int.test.ts"]
+  },
+  "not_frozen": [
+    "AC-4, AC-5, AC-9, AC-15 tests: implementer adds them in sibling files (reservation.formulas.test.ts, spend.settle.int.test.ts) because the frozen files must stay byte-identical"
+  ]
+}
