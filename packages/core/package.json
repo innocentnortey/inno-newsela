@@ -10,10 +10,9 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ls/schema": "*",
     "@ls/editor-schema": "*",
-    "xlsx": "0.18.5",
-    "compromise": "14.19.0"
-  },
-  "devDependencies": {}
+    "@ls/schema": "*",
+    "compromise": "14.19.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
 }
