@@ -68,7 +68,7 @@ describe("PaidCaller abort seam", () => {
     const { client, spend, call } = setup();
     let finish!: () => void;
     client.on_enter = () => new Promise<void>((r) => (finish = r));
-    client.script(new ProviderError({ kind: "invalid_request", http_status: 400 }));
+    client.script(new ProviderError({ kind: "bad_request", http_status: 400 }));
     const ac = new AbortController();
     const reason = new Error("lease lost");
     const pending = call(ac.signal).catch((e: unknown) => e);
