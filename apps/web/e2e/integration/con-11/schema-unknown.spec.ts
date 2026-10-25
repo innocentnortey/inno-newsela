@@ -59,6 +59,8 @@ test("schema-unknown: a stored node of unknown type fails the same loud way and 
   await page.goto(scr9(id));
   const alert = page.getByRole("alert").filter({ hasText: "won't open" });
   await expect(alert).toContainText("Lesson 9 won't open");
+  await expect(alert).toContainText("(mystery_block)");
+  await expect(alert).not.toContainText("schema version");
   await expect(alert).toContainText("Nothing has been dropped.");
   expect(await stored(id)).toEqual(before); // the unknown node is still in the stored row
 });

@@ -45,6 +45,8 @@ const LESSONS = {
   badnode: "G6.U4.L9",
   markup: "G6.U4.L10",
   missing: "G6.U4.L11",
+  fresh: "G6.U4.L12",
+  inreview: "G6.U4.L13",
 } as const;
 type Key = keyof typeof LESSONS;
 
@@ -664,6 +666,25 @@ async function seed(
     ...prov(),
     prompt_version_id: undefined as never,
   });
+
+  // 9. Fresh: a plain draft for the reviewer's first page-open (the one lesson a spec may move to in_review).
+  const fresh = retarget(base, LESSONS.fresh);
+  await put_doc(fresh);
+  await generated("fresh", fresh);
+
+  // 10. In review: already started, so reviewer page-opens in other specs change nothing.
+  const inrev = retarget(base, LESSONS.inreview);
+  await put_doc(inrev);
+  await generated("inreview", inrev);
+  await move(
+    "inreview",
+    "draft",
+    "in_review",
+    users["reviewer"]!,
+    null,
+    null,
+    null,
+  );
 
   return {
     lessons: LESSONS,

@@ -3,7 +3,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { setTheme } from "../support/axe";
 import { signInAs } from "../support/users";
-import { blockStartReview, scr16, scr9, waitForLesson } from "./helpers";
+import { scr16, scr9, waitForLesson } from "./helpers";
 import { seed } from "./seed";
 
 const DIR = "e2e/__screenshots__/integration/con-11";
@@ -36,7 +36,6 @@ test("SCR-9 main WP-1 @visual", async ({ page }) => {
 test("SCR-9 error unknown schema @visual", async ({ page }) => {
   const s = await seed();
   await signInAs(page, "author");
-  await blockStartReview(page);
   await page.goto(scr9(s.lessons.schema99));
   await expect(
     page.getByRole("alert").filter({ hasText: "won't open" }),

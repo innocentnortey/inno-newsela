@@ -2,7 +2,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { axeScan, matrix, setTheme } from "../support/axe";
 import { signInAs, type Role } from "../support/users";
-import { blockStartReview, scr16, scr9, waitForLesson } from "./helpers";
+import { scr16, scr9, waitForLesson } from "./helpers";
 import { seed } from "./seed";
 
 async function check(page: Page, state: string): Promise<void> {
@@ -36,7 +36,6 @@ async function scr9State(
 ) {
   const s = await seed();
   await signInAs(page, role);
-  await blockStartReview(page);
   await page.goto(scr9(s.lessons[lessonKey]));
   await ready();
   await check(page, state);

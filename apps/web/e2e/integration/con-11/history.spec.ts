@@ -11,6 +11,11 @@ const KIND: Record<string, string> = {
   approval: "Approval",
   reopen: "Reopen",
 };
+const TO_STATE: Record<string, string> = {
+  submit: "submitted",
+  approval: "approved",
+  reopen: "reopened",
+};
 const when = (iso: string) =>
   new Date(iso).toLocaleString("en-GB", {
     timeZone: "UTC",
@@ -54,19 +59,22 @@ test("history: five versions, field by field, with inherited provenance on the h
 
   for (const v of h.versions) {
     const n = v.version_number;
-    const item = list
-      .getByRole("listitem")
-      .filter({
-        has: page.getByRole("button", {
-          name: new RegExp(
-            `^v${n} · ${KIND[v.kind]!.replace(/[()]/g, "\\$&")}$`,
-          ),
-        }),
-      });
+    // Human-made versions carry a user id; the page shows the person's name from the matching audit row.
+    const author = (x: typeof v) =>
+      /^usr_/.test(x.created_by)
+        ? h.audit.find(
+            (a) =>
+              a.to_state === TO_STATE[x.kind] &&
+              a.version_hash === x.content_hash,
+          )!.user
+        : x.created_by;
+    const item = list.getByRole("listitem").filter({
+      has: page.getByRole("button", {
+        name: new RegExp(`^v${n} · ${KIND[v.kind]!.replace(/[()]/g, "\\$&")}$`),
+      }),
+    });
     await expect(item).toHaveCount(1);
-    await expect(item).toContainText(
-      `By ${v.created_by} · ${when(v.created_at)}`,
-    );
+    await expect(item).toContainText(`By ${author(v)} · ${when(v.created_at)}`);
     await expect(item).toContainText(short(v.content_hash));
     await expect(item.getByRole("button", { name: "Copy hash" })).toBeVisible();
     await expect(item).toContainText(moves[v.kind] ?? "No state change");

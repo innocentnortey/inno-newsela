@@ -9,7 +9,7 @@ type Lesson = components["schemas"]["Lesson"];
 export type LessonLoad =
   | { kind: "loading" }
   | { kind: "ready"; lesson: Lesson }
-  | { kind: "schema_unknown"; schemaVersion: number | null }
+  | { kind: "schema_unknown"; schemaVersion: number | null; unknownNodes: string[] }
   | { kind: "not_found" }
   | { kind: "error" };
 
@@ -32,7 +32,8 @@ export function useLesson(lessonId: string | null): { load: LessonLoad; retry: (
         let load: LessonLoad = { kind: "error" };
         if (isApiError(e) && e.code === "SCHEMA_UNKNOWN") {
           const v = Number(e.details.schema_version);
-          load = { kind: "schema_unknown", schemaVersion: Number.isFinite(v) ? v : null };
+          const nodes = Array.isArray(e.details.unknown_nodes) ? e.details.unknown_nodes.filter((n): n is string => typeof n === "string") : [];
+          load = { kind: "schema_unknown", schemaVersion: Number.isFinite(v) ? v : null, unknownNodes: nodes };
         } else if (isApiError(e) && e.code === "NOT_FOUND") {
           load = { kind: "not_found" };
         }

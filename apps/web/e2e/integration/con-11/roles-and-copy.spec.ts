@@ -2,7 +2,7 @@
 import { expect, test } from "@playwright/test";
 import { bannedIn } from "../support/copy-rules";
 import { signInAs, type Role } from "../support/users";
-import { blockStartReview, scr16, scr9, waitForLesson } from "./helpers";
+import { scr16, scr9, waitForLesson } from "./helpers";
 import { seed } from "./seed";
 
 for (const role of ["author", "reviewer", "approver"] as Role[]) {
@@ -11,8 +11,7 @@ for (const role of ["author", "reviewer", "approver"] as Role[]) {
   }) => {
     const s = await seed();
     await signInAs(page, role);
-    await blockStartReview(page); // a reviewer's page open would otherwise start the review (see helpers.ts)
-    const lesson = await page.goto(scr9(s.lessons.wp1));
+    const lesson = await page.goto(scr9(s.lessons.inreview));
     expect(lesson!.status()).toBe(200);
     await waitForLesson(page);
     await expect(

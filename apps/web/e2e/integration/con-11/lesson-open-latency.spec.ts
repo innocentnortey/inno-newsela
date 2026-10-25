@@ -2,7 +2,7 @@
 import { expect, test } from "@playwright/test";
 import { getStack } from "../support/real-stack";
 import { signInAs } from "../support/users";
-import { blockStartReview, p95, scr9, timedOpens } from "./helpers";
+import { p95, scr9, timedOpens } from "./helpers";
 import { seed } from "./seed";
 
 test("test_lesson_open_logs_latency: log line fields, page timing mark, 20 single-user opens", async ({
@@ -10,8 +10,7 @@ test("test_lesson_open_logs_latency: log line fields, page timing mark, 20 singl
 }) => {
   const s = await seed();
   await signInAs(page, "reviewer");
-  await blockStartReview(page);
-  await page.goto(scr9(s.lessons.wp1));
+  await page.goto(scr9(s.lessons.inreview));
   await expect(
     page.getByRole("heading", { level: 1, name: /The Lightning Thief/ }),
   ).toBeVisible({ timeout: 30_000 });
@@ -28,7 +27,7 @@ test("test_lesson_open_logs_latency: log line fields, page timing mark, 20 singl
     return { startTime: m.startTime, detail: (m as PerformanceMark).detail };
   });
   expect(mark.startTime).toBeGreaterThan(0);
-  expect(mark.detail).toEqual({ lesson_id: s.lessons.wp1 });
+  expect(mark.detail).toEqual({ lesson_id: s.lessons.inreview });
 
   let line: Record<string, unknown> | undefined;
   await expect
@@ -38,21 +37,21 @@ test("test_lesson_open_logs_latency: log line fields, page timing mark, 20 singl
         .filter(
           (l) =>
             l.includes('"event":"lesson.open"') &&
-            l.includes(`"lesson_id":"${s.lessons.wp1}"`),
+            l.includes(`"lesson_id":"${s.lessons.inreview}"`),
         )
         .at(-1);
       line = hit ? (JSON.parse(hit) as Record<string, unknown>) : undefined;
       return line !== undefined;
     })
     .toBe(true);
-  expect(line!["lesson_id"]).toBe(s.lessons.wp1);
+  expect(line!["lesson_id"]).toBe(s.lessons.inreview);
   expect(line!["request_id"]).toMatch(/^req_/);
   expect(typeof line!["duration_ms"]).toBe("number");
   expect(line!["duration_ms"] as number).toBeGreaterThanOrEqual(0);
   const extra = line!["extra"] as { version_id: string };
-  expect(extra.version_id).toBe(s.versions["wp1"]![0]!.id); // current version of a draft lesson = generated v1
+  expect(extra.version_id).toBe(s.versions["inreview"]![0]!.id); // current version = generated v1
 
-  const times = await timedOpens(page, s.lessons.wp1, 20);
+  const times = await timedOpens(page, s.lessons.inreview, 20);
   console.log("lesson-open p95 (20 single-user) ms:", p95(times));
   expect(times).toHaveLength(20);
 });

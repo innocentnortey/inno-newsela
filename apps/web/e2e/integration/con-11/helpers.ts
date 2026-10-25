@@ -108,11 +108,3 @@ export async function readCounts(): Promise<Record<string, number | string>> {
     lesson_version: await d.count("lesson_version"),
   };
 }
-
-/**
- * NL-100 finding: on SCR-9 the action bar POSTs start_review by itself when a reviewer opens a draft (NL-64, UXP-1), so a reviewer's
- * page open moves the lesson to in_review. Specs that only need the read view as a reviewer drop that one POST so the seeded draft stays a draft.
- */
-export async function blockStartReview(page: Page): Promise<void> {
-  await page.route("**/api/lessons/*/transitions", (route) => route.abort());
-}

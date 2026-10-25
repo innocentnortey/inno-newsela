@@ -75,6 +75,7 @@ export function transitionFor(
   from_state: AuditRow["from_state"];
   to_state: AuditRow["to_state"];
   reason: AuditRow["reason"];
+  user: AuditRow["user"];
 } | null {
   const action = KIND_ACTION[version.kind];
   if (!action) return null;
@@ -82,7 +83,7 @@ export function transitionFor(
     (r) => r.action === action || (r.action === "lesson.transition" && r.to_state === KIND_TO_STATE[version.kind]),
   );
   return row
-    ? { from_state: row.from_state, to_state: row.to_state, reason: row.reason }
+    ? { from_state: row.from_state, to_state: row.to_state, reason: row.reason, user: row.user }
     : null;
 }
 

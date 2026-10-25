@@ -20,7 +20,9 @@ export interface Seeded {
     | "schema99"
     | "badnode"
     | "markup"
-    | "missing",
+    | "missing"
+    | "fresh"
+    | "inreview",
     string
   >;
   versions: Record<string, { id: string; number: number; kind: string }[]>;
