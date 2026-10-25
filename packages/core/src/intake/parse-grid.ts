@@ -1,3 +1,4 @@
+import { inflateRawSync } from "node:zlib";
 import { read, utils } from "xlsx";
 import { IntakeError } from "./errors.ts";
 
@@ -127,7 +128,11 @@ function parse_csv(data: Uint8Array, lim: ParseLimits): CellGrid {
   return { rows: finish(rows), sheet_name: "" };
 }
 
-/** Walks the zip central directory using declared sizes only; nothing is inflated before the budget is checked. */
+/**
+ * Two passes. First the central directory's declared sizes are checked (cheap, nothing inflated). Declared sizes
+ * are attacker-controlled, so the second pass inflates every entry here with a hard output cap equal to the
+ * remaining budget and compares the actual size with what was declared; SheetJS only sees a file that passed both.
+ */
 function inspect_zip(data: Uint8Array, lim: ParseLimits): void {
   const len = data.byteLength;
   const view = new DataView(data.buffer, data.byteOffset, len);
@@ -145,9 +150,13 @@ function inspect_zip(data: Uint8Array, lim: ParseLimits): void {
   if (cd_offset >= len) refuse("not_csv_or_xlsx");
   let pos = cd_offset;
   let total = 0;
+  const found: { method: number; csize: number; usize: number; lho: number }[] = [];
   for (let e = 0; e < entries; e++) {
     if (pos + 46 > len || view.getUint32(pos, true) !== 0x02014b50) refuse("not_csv_or_xlsx");
+    const method = view.getUint16(pos + 10, true);
+    const csize = view.getUint32(pos + 20, true);
     const usize = view.getUint32(pos + 24, true);
+    const lho = view.getUint32(pos + 42, true);
     const name_len = view.getUint16(pos + 28, true);
     const extra_len = view.getUint16(pos + 30, true);
     const comment_len = view.getUint16(pos + 32, true);
@@ -157,7 +166,48 @@ function inspect_zip(data: Uint8Array, lim: ParseLimits): void {
     if (total > lim.max_zip_uncompressed_bytes) refuse("too_large", { uncompressed: total });
     const name = new TextDecoder("latin1").decode(data.subarray(pos + 46, pos + 46 + name_len));
     if (name.includes("..") || name.startsWith("/") || name.startsWith("\\")) refuse("not_csv_or_xlsx");
+    found.push({ method, csize, usize, lho });
     pos += 46 + name_len + extra_len + comment_len;
+  }
+  verify_inflated(data, view, found, lim);
+}
+
+function verify_inflated(
+  data: Uint8Array,
+  view: DataView,
+  found: { method: number; csize: number; usize: number; lho: number }[],
+  lim: ParseLimits,
+): void {
+  const len = data.byteLength;
+  let actual_total = 0;
+  for (const { method, csize, usize, lho } of found) {
+    if (method !== 0 && method !== 8) refuse("not_csv_or_xlsx");
+    if (csize === 0xffffffff || lho + 30 > len || view.getUint32(lho, true) !== 0x04034b50) refuse("not_csv_or_xlsx");
+    const start = lho + 30 + view.getUint16(lho + 26, true) + view.getUint16(lho + 28, true);
+    if (start + csize > len) refuse("not_csv_or_xlsx");
+    // Local sizes are zero when a data descriptor follows (flag bit 3); otherwise they must agree with the central directory.
+    const flags = view.getUint16(lho + 6, true);
+    if (view.getUint16(lho + 8, true) !== method) refuse("not_csv_or_xlsx");
+    if ((flags & 0x08) === 0 && (view.getUint32(lho + 18, true) !== csize || view.getUint32(lho + 22, true) !== usize)) {
+      refuse("not_csv_or_xlsx");
+    }
+    const chunk = data.subarray(start, start + csize);
+    let actual: number;
+    if (method === 0) {
+      actual = csize;
+    } else {
+      const remaining = lim.max_zip_uncompressed_bytes - actual_total;
+      try {
+        actual = inflateRawSync(chunk, { maxOutputLength: Math.max(1, remaining) }).byteLength;
+      } catch (err) {
+        const code = (err as { code?: string }).code;
+        if (code === "ERR_BUFFER_TOO_LARGE") refuse("too_large", { uncompressed: lim.max_zip_uncompressed_bytes });
+        return refuse("not_csv_or_xlsx");
+      }
+    }
+    if (actual !== usize) refuse("not_csv_or_xlsx");
+    actual_total += actual;
+    if (actual_total > lim.max_zip_uncompressed_bytes) refuse("too_large", { uncompressed: actual_total });
   }
 }
 
