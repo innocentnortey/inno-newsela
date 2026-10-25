@@ -40,6 +40,6 @@ export default defineConfig({
   ],
   projects: [
     { name: "chromium", testMatch: "gallery/**/*.spec.ts", use: { browserName: "chromium" } },
-    { name: "mock", testMatch: "{frame,sign-in,units-home,upload-outline,validation-report,start-run,progress,board,workspace-read,workspace-actions,workspace-editor,approval}/**/*.spec.ts", use: { browserName: "chromium" } },
+    { name: "mock", testMatch: "{frame,sign-in,units-home,upload-outline,validation-report,start-run,progress,board,workspace-read,workspace-actions,workspace-editor,approval,unit-plan}/**/*.spec.ts", use: { browserName: "chromium" } },
   ],
 });
