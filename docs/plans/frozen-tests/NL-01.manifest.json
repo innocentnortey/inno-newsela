@@ -1,0 +1,21 @@
+{
+  "ticket": "NL-01",
+  "risk": "security",
+  "frozen": {
+    "packages/config/src/errors.test.ts": "f3e7f5bccfa5b487616695fa2def0b0f83c80173e4e98bb587a346523827fcbb",
+    "packages/config/src/secret.test.ts": "6bb8ca41fd2511b48752a85416d76babb7da990702fd68942121839e3b3986a6",
+    "packages/obs/src/logger.test.ts": "6f5a47fc57087682ac3dd449d75276377cd6e715d3aefc47fef1f4effbc49f96"
+  },
+  "criteria": {
+    "AC-6": [
+      "packages/config/src/errors.test.ts"
+    ],
+    "AC-7": [
+      "packages/config/src/secret.test.ts",
+      "packages/obs/src/logger.test.ts"
+    ],
+    "AC-9 (partial, logger shape)": [
+      "packages/obs/src/logger.test.ts"
+    ]
+  }
+}
