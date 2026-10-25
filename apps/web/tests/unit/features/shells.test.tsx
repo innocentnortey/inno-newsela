@@ -12,7 +12,7 @@ const dialogs: Array<[string, (open: boolean, onClose: () => void) => React.Reac
   ["StartRunDialog", (open, onClose) => <StartRunDialog outlineVersionId="ov1" open={open} onClose={onClose} />, "Start a run"],
   ["InsertQuoteDialog", (open, onClose) => <InsertQuoteDialog lessonId="G6.U4.L4" slotId="s1" open={open} onClose={onClose} />, "Insert quote or excerpt"],
   ["ResolveDialog", (open, onClose) => <ResolveDialog lessonId="G6.U4.L4" mode="resolve" open={open} onClose={onClose} />, "Resolve or clear"],
-  ["SendBackDialog", (open, onClose) => <SendBackDialog lessonId="G6.U4.L4" mode="reopen" pin={pin} open={open} onClose={onClose} />, "Send back or reopen"],
+  ["SendBackDialog", (open, onClose) => <SendBackDialog lessonId="G6.U4.L4" mode="reopen" pin={pin} open={open} onClose={onClose} />, "Reopen Lesson 4"],
 ];
 
 afterEach(cleanup);
