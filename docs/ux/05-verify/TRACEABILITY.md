@@ -63,7 +63,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-1 | US-37 | CON-1 | NL-24 | NL-90 | apps/web/e2e/sign-in/sign-in.spec.ts; apps/web/e2e/integration/con-1/ | axe + screenshots: e2e/__screenshots__/sign-in/; real stack: NL-90 apps/web/e2e/integration/con-1/ | planned |
 | SCR-2 | US-1, US-6, US-10 | CON-2, CON-6 | NL-55 | NL-93 | apps/web/e2e/units-home/units-home.spec.ts | axe + screenshots: e2e/__screenshots__/units-home/ | planned |
 | SCR-3 | US-1, US-2 | CON-2, CON-6 | NL-56 | NL-93 | apps/web/e2e/upload-outline/upload-outline.spec.ts | axe + screenshots: e2e/__screenshots__/upload-outline/ | planned |
-| SCR-4 | US-3, US-4, US-5 | CON-3, CON-4, CON-5 | NL-57 | NL-94 | apps/web/e2e/validation-report/validation-report.spec.ts | axe + screenshots: e2e/__screenshots__/validation-report/ | planned |
+| SCR-4 | US-3, US-4, US-5 | CON-3, CON-4, CON-5 | NL-57 | NL-94 | apps/web/e2e/validation-report/validation-report.spec.ts; apps/web/e2e/integration/con-3/ | axe + screenshots: e2e/__screenshots__/validation-report/; real stack: NL-94 apps/web/e2e/integration/con-3/ | planned |
 | SCR-5 | US-6 | CON-5, CON-24 | NL-58 | NL-95 | apps/web/e2e/start-run/start-run.spec.ts | axe + screenshots: e2e/__screenshots__/start-run/ | planned |
 | SCR-6 | US-7, US-8 | CON-6, CON-7, CON-8 | NL-59 | NL-96 | apps/web/e2e/progress/progress.spec.ts | axe + screenshots: e2e/__screenshots__/progress/ | planned |
 | SCR-7 | US-9 | CON-6, CON-7, CON-8 | NL-60 | NL-96 | apps/web/e2e/unit-plan/unit-plan.spec.ts | axe + screenshots: e2e/__screenshots__/unit-plan/ | planned |

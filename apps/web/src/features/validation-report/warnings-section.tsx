@@ -156,7 +156,9 @@ function ItemRow({ item, ...props }: Props & { item: WarningItem }) {
 }
 
 function EldRow({ item, canEdit, status, actions }: Props & { item: EldItem }) {
-  const st = status[item.code];
+  // The server stores an ELD choice per eld_mismatch finding; with none to name (older mocks) the code is the target.
+  const targets = item.finding_ids.length > 0 ? item.finding_ids : [item.code];
+  const st = status[targets[0]!];
   const value = st?.request.kind === "eld_remap" ? "remap" : st?.request.kind === "eld_keep" ? "keep" : item.choice;
   const remapLabel = item.suggested_remap ? `Re-map to ${item.suggested_remap}` : "Re-map";
   return (
@@ -177,18 +179,21 @@ function EldRow({ item, canEdit, status, actions }: Props & { item: EldItem }) {
               { value: "remap", label: remapLabel },
             ]}
             onChange={(v) =>
-              void actions.choose(
-                v === "remap"
-                  ? { target_id: item.code, kind: "eld_remap", value: item.suggested_remap }
-                  : { target_id: item.code, kind: "eld_keep" },
-              )
+              void (async () => {
+                for (const target_id of targets) {
+                  const ok = await actions.choose(
+                    v === "remap" ? { target_id, kind: "eld_remap", value: item.suggested_remap } : { target_id, kind: "eld_keep" },
+                  );
+                  if (!ok) break;
+                }
+              })()
             }
           />
         ) : (
           <p>{value === "remap" ? remapLabel : "Keep"}</p>
         )}
         <p className="text-small text-ink3 mt-1">Default</p>
-        <FailureLine status={st} targetId={item.code} actions={actions} />
+        <FailureLine status={st} targetId={targets[0]!} actions={actions} />
       </Td>
     </Tr>
   );
