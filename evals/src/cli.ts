@@ -10,12 +10,17 @@ import type { JsonValue } from "@ls/core/ports/common";
 import type { EvidenceRepo } from "@ls/core/ports/evidence";
 import { PrefixedIdGenerator } from "@ls/core/ports/ids";
 import { PgDatabase } from "@ls/db/pool";
+import type { IdGenerator } from "@ls/core/ports/ids";
 import { PgEvidenceRepo } from "@ls/db/repos/evidence";
 import { UnitId } from "@ls/schema/ids";
 import { EmptySuiteError, NotImplemented } from "./errors.ts";
 import { floor_met } from "./floors.ts";
 import { make_fixture_suite } from "./fixture-suite.ts";
 import { resolve_git_sha } from "./git-sha.ts";
+import { read_key } from "./seed/key.ts";
+import { plant_all } from "./seed/plant.ts";
+import { run_score } from "./seed/score.ts";
+import type { SeedDeps } from "./seed/deps.ts";
 import { default_suite_factory, resolve_suite } from "./registry.ts";
 import { EvalRunner } from "./runner.ts";
 import type { ProviderMode, SuiteFactory, SuiteName } from "./types.ts";
@@ -32,6 +37,7 @@ export interface CliDeps {
   env: Record<string, string | undefined>;
   out: (line: string) => void;
   err: (line: string) => void;
+  seed?: { db: PgDatabase; ids: IdGenerator; planter_email?: string }; // NL-92: only `seed --plan|--score` needs a database handle
 }
 
 export interface CliArgs {
@@ -40,12 +46,14 @@ export interface CliArgs {
   provider_mode: ProviderMode;
   unit: string | null;
   fixture: boolean;
+  plan: string | null;
+  score: string | null;
 }
 
 const FIXED: Record<string, SuiteName> = {
   grounding: "S4", faults: "S6", "full-run": "S9", seed: "S10", heldout: "S11", "judge-calibrate": "S12",
 };
-const USAGE = "usage: cli.ts golden --suite <name[,name]> | grounding | faults | full-run | seed | heldout | judge-calibrate [--repeat n] [--provider stub|real] [--unit G6-U4] [--fixture] [--plan path]";
+const USAGE = "usage: cli.ts golden --suite <name[,name]> | grounding | faults | full-run | seed | heldout | judge-calibrate [--repeat n] [--provider stub|real] [--unit G6-U4] [--fixture] [--plan key | --score run_id (seed only)]";
 
 export function parse_args(argv: string[]): CliArgs | string {
   const [sub, ...rest] = argv;
@@ -55,6 +63,8 @@ export function parse_args(argv: string[]): CliArgs | string {
   let provider_mode: ProviderMode = "stub";
   let unit: string | null = null;
   let fixture = false;
+  let plan: string | null = null;
+  let score: string | null = null;
   for (let i = 0; i < rest.length; i++) {
     const flag = rest[i] as string;
     const value = (): string | undefined => rest[++i];
@@ -74,7 +84,8 @@ export function parse_args(argv: string[]): CliArgs | string {
       const norm = m ? `G${m[1]}.U${m[2]}` : v;
       if (!UnitId.safeParse(norm).success) return USAGE;
       unit = norm;
-    } else if (flag === "--plan") value();
+    } else if (flag === "--plan") plan = value() ?? "";
+    else if (flag === "--score") score = value() ?? "";
     else return USAGE;
   }
   let suites: SuiteName[];
@@ -88,7 +99,9 @@ export function parse_args(argv: string[]): CliArgs | string {
     if (fixed === undefined) return USAGE;
     suites = [fixed];
   }
-  return { suites, repeat, provider_mode, unit, fixture };
+  if (plan === "" || score === "" || (plan !== null && score !== null)) return USAGE;
+  if (score !== null && sub !== "seed") return USAGE;
+  return { suites, repeat, provider_mode, unit, fixture, plan, score };
 }
 
 export async function run_cli(argv: string[], deps: CliDeps): Promise<number> {
@@ -97,6 +110,7 @@ export async function run_cli(argv: string[], deps: CliDeps): Promise<number> {
     deps.err(args);
     return 2;
   }
+  if (args.suites[0] === "S10" && (args.plan !== null || args.score !== null)) return run_seed(args, deps);
   const registered = deps.suite_factory(args.provider_mode);
   const suites = args.fixture ? registered.map((s) => (s.name === "S1" ? make_fixture_suite() : s)) : registered;
   const runner = new EvalRunner(deps.evidence, suites, deps.clock, {
@@ -121,6 +135,32 @@ export async function run_cli(argv: string[], deps: CliDeps): Promise<number> {
   return code;
 }
 
+// NL-92: `seed --plan <key>` plants; `seed --score <run_id>` scores. Exit 0 ok, 1 S10 verdict fails, 2 refused or bad input.
+async function run_seed(args: CliArgs, deps: CliDeps): Promise<number> {
+  if (deps.seed === undefined) {
+    deps.err("seed needs a database");
+    return 2;
+  }
+  const sd: SeedDeps = {
+    db: deps.seed.db, ids: deps.seed.ids, clock: deps.clock, evidence: deps.evidence, repo_root: deps.repo_root, git_sha: deps.git_sha, env: deps.env,
+    ...(deps.seed.planter_email !== undefined ? { planter_email: deps.seed.planter_email } : {}),
+  };
+  try {
+    if (args.plan !== null) {
+      const r = await plant_all(sd, await read_key(args.plan, deps.repo_root));
+      deps.out(`planted ${r.n} run_id=${r.eval_run_id}`);
+      return 0;
+    }
+    return await run_score(sd, args.score as string, deps.out);
+  } catch (e) {
+    if (e instanceof InvariantViolation) {
+      deps.err(e.message);
+      return 2;
+    }
+    throw e;
+  }
+}
+
 async function main(): Promise<number> {
   const env = process.env;
   const repo_root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -132,8 +172,9 @@ async function main(): Promise<number> {
     };
     db = new PgDatabase(settings, 2, 5000, "worker");
     const clock = new SystemClock();
+    const ids = new PrefixedIdGenerator();
     return await run_cli(process.argv.slice(2), {
-      evidence: new PgEvidenceRepo({ db, ids: new PrefixedIdGenerator(), clock }),
+      evidence: new PgEvidenceRepo({ db, ids, clock }),
       clock, suite_factory: default_suite_factory, git_sha: resolve_git_sha(env), repo_root, prompt_version_id: null,
       models: {
         generation: read_string(env, "MODEL_GENERATION_ID", { default: "claude-sonnet-5-5" }),
@@ -141,6 +182,7 @@ async function main(): Promise<number> {
         assist: read_string(env, "MODEL_ASSIST_ID", { default: "claude-sonnet-5-5" }),
         provider_mode_note: "stub runs make no model call",
       },
+      seed: { db, ids },
       env, out: (l) => process.stdout.write(`${l}\n`), err: (l) => process.stderr.write(`${l}\n`),
     });
   } catch (e) {
