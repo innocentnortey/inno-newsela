@@ -24,10 +24,15 @@ const SPIED = [wire_sessions, wire_outlines, wire_runs, wire_review, wire_metric
 describe("NL-06 container", () => {
   beforeEach(reset);
 
-  it("unbuilt_access_throws: reading an unset service names its owner", () => {
-    const s = build_web_services(settings());
+  it("unbuilt_access_throws: reading an unset service names its owner", async () => {
+    vi.resetModules();
+    vi.doMock("./wiring/exports.ts", () => ({ wire_exports: () => ({}) }));
+    const fresh = await import("./container.ts");
+    const s = fresh.build_web_services(settings());
     expect(() => s.exports).toThrow(/NOT BUILT: NL-102/);
     expect(s.logger).toBeDefined();
+    vi.doUnmock("./wiring/exports.ts");
+    vi.resetModules();
   });
 
   it("cached_once: the second call returns the same object", () => {

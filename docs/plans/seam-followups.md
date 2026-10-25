@@ -50,3 +50,12 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-115-4 | WP-1 can never be approved (rights_to_clear and missing sections are non-resolvable), so happy-path integration uses the WP-3 flex draft; links are only derived between `kind=lesson` outline rows, so con-18 relabels two copied flex rows | NL-115 | none; recorded for later joins | open |
 | S-30 | `wiring/assist.ts` in stub mode (only) reads a JSON control file named by `ASSIST_STUB_FILE` on every ASSIST call so real-stack specs can steer the stub model (text, delay, error). StubModelClient ignores `timeout_ms`, so a provider timeout is simulated as a delayed error item, not the real 20 s path | NL-116 | test-only seam; real mode scripts nothing (unit test `real mode scripts nothing`) | done |
 | S-31 | `support/users.ts` mints `usr_e2e_<hex>` ids that the web collab client (UserId in StoreAck.stored_by) refuses once such a user's edit is stored; con-17 mints ULID ids itself. Also: checks and Submit/Approve gates need a unit outline row (NL-99 `seedLesson`), else InvariantViolation | NL-116 | fix support/users.ts to mint ULIDs | open |
+
+## W7 review findings (2026-10-25, NL-102/110/113/114/115/116 merged)
+- S-36 (NL-114, Medium): finished candidate runs stay `planning`; `CLAIM_SQL` only looks at the first 3 active runs, so later jobs starve after three regenerates. Owner A9 worker/run machine.
+- S-37 (NL-114, Medium): `PgCandidateLookup.version_of_run` matches only `kind='candidate'`, so a `generation_failed` v1 never settles (expected-fail test marks it). Fix in `packages/db/src/repos/candidate-lookup.ts`.
+- S-38 (NL-110, Medium): `claim-loop.run_once` runs the judge call inside the claim transaction holding `FOR UPDATE` on up to 5 lesson_doc rows; claim in a short tx and run outside.
+- S-39 (NL-102): CHG-6 still `open` (LessonExportFile vs ExportBundleFile drift); AC-5 idempotence assertion weak; Download clipped at 390px.
+- S-40 (NL-113): AC-2 "Submit enabled after" half not asserted in con-13 pending.spec.
+- S-41 (NL-110): AC-10 "answer yes" activity not exercised in sent_equals_logged; NL-32 frozen price test re-hashed without owner sign-off.
+- S-42 (NL-115/116/102): risk::security freeze-first folded into the implementer run; security-privacy-agent wave read still due (NL-116 stub seam `wiring/assist.ts` 1-15).
