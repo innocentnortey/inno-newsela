@@ -1,0 +1,558 @@
+{
+  "header": {
+    "source": "docs/source/05-standards-referenced.md (quotes the CDE table); W.6.9.b read from the CDE PDF, grade 6 column, PDF p.66",
+    "official_documents": [
+      "https://www.cde.ca.gov/be/st/ss/documents/finalelaccssstandards.pdf"
+    ],
+    "derived": "2026-10-25",
+    "rule": "official text only, never the sheet's labels (GR-5)",
+    "set": "CA_CCSS_ELA_6",
+    "cde_pdf_checked": "W.6.9.b (PDF p.66), SL.6.4 and SL.6.4.a (PDF p.73: only sub-part a; both marked CA)"
+  },
+  "standards": [
+    {
+      "code": "RL.6.1",
+      "text": "Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.2",
+      "text": "Determine a theme or central idea of a text and how it is conveyed through particular details; provide a summary of the text distinct from personal opinions or judgments.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.3",
+      "text": "Describe how a particular story’s or drama’s plot unfolds in a series of episodes as well as how the characters respond or change as the plot moves toward a resolution.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.4",
+      "text": "Determine the meaning of words and phrases as they are used in a text, including figurative and connotative meanings; analyze the impact of a specific word choice on meaning and tone.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.5",
+      "text": "Analyze how a particular sentence, chapter, scene, or stanza fits into the overall structure of a text and contributes to the development of the theme, setting, or plot.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.6",
+      "text": "Explain how an author develops the point of view of the narrator or speaker in a text.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.7",
+      "text": "Compare and contrast the experience of reading a story, drama, or poem to listening to or viewing an audio, video, or live version of the text, including contrasting what they “see” and “hear” when reading the text to what they perceive when they listen or watch.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.9",
+      "text": "Compare and contrast texts in different forms or genres (e.g., stories and poems; historical novels and fantasy stories) in terms of their approaches to similar themes and topics.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RL.6.10",
+      "text": "By the end of the year, read and comprehend literature, including stories, dramas, and poems, in the grades 6–8 text complexity band proficiently, with scaffolding as needed at the high end of the range.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.1",
+      "text": "Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.2",
+      "text": "Determine a central idea of a text and how it is conveyed through particular details; provide a summary of the text distinct from personal opinions or judgments.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.3",
+      "text": "Analyze in detail how a key individual, event, or idea is introduced, illustrated, and elaborated in a text (e.g., through examples or anecdotes).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.4",
+      "text": "Determine the meaning of words and phrases as they are used in a text, including figurative, connotative, and technical meanings.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.7",
+      "text": "Integrate information presented in different media or formats (e.g., visually, quantitatively) as well as in words to develop a coherent understanding of a topic or issue.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "RI.6.9",
+      "text": "Compare and contrast one author’s presentation of events with that of another (e.g., a memoir written by and a biography on the same person).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2",
+      "text": "Write informative/explanatory texts to examine a topic and convey ideas, concepts, and information through the selection, organization, and analysis of relevant content.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.a",
+      "text": "Introduce a topic or thesis statement; organize ideas, concepts, and information, using strategies such as definition, classification, comparison/contrast, and cause/effect; include formatting (e.g., headings), graphics (e.g., charts, tables), and multimedia when useful to aiding comprehension.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.b",
+      "text": "Develop the topic with relevant facts, definitions, concrete details, quotations, or other information and examples.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.c",
+      "text": "Use appropriate transitions to clarify the relationships among ideas and concepts.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.d",
+      "text": "Use precise language and domain-specific vocabulary to inform about or explain the topic.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.e",
+      "text": "Establish and maintain a formal style.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.2.f",
+      "text": "Provide a concluding statement or section that follows from the information or explanation presented.",
+      "parent_code": "W.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3",
+      "text": "Write narratives to develop real or imagined experiences or events using effective technique, relevant descriptive details, and well-structured event sequences.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3.a",
+      "text": "Engage and orient the reader by establishing a context and introducing a narrator and/or characters; organize an event sequence that unfolds naturally and logically.",
+      "parent_code": "W.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3.b",
+      "text": "Use narrative techniques, such as dialogue, pacing, and description, to develop experiences, events, and/or characters.",
+      "parent_code": "W.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3.c",
+      "text": "Use a variety of transition words, phrases, and clauses to convey sequence and signal shifts from one time frame or setting to another.",
+      "parent_code": "W.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3.d",
+      "text": "Use precise words and phrases, relevant descriptive details, and sensory language to convey experiences and events.",
+      "parent_code": "W.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.3.e",
+      "text": "Provide a conclusion that follows from the narrated experiences or events.",
+      "parent_code": "W.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.4",
+      "text": "Produce clear and coherent writing in which the development, organization, and style are appropriate to task, purpose, and audience.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.5",
+      "text": "With some guidance and support from peers and adults, develop and strengthen writing as needed by planning, revising, editing, rewriting, or trying a new approach.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.6",
+      "text": "Use technology, including the Internet, to produce and publish writing as well as to interact and collaborate with others; demonstrate sufficient command of keyboarding skills to type a minimum of three pages in a single sitting.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.8",
+      "text": "Gather relevant information from multiple print and digital sources; assess the credibility of each source; and quote or paraphrase the data and conclusions of others while avoiding plagiarism and providing basic bibliographic information for sources.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.9",
+      "text": "Draw evidence from literary or informational texts to support analysis, reflection, and research.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.9.a",
+      "text": "Apply grade 6 Reading standards to literature (e.g., “Compare and contrast texts in different forms or genres [e.g., stories and poems; historical novels and fantasy stories] in terms of their approaches to similar themes and topics”).",
+      "parent_code": "W.6.9",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.9.b",
+      "text": "Apply grade 6 Reading standards to literary nonfiction (e.g., “Trace and evaluate the argument and specific claims in a text, distinguishing claims that are supported by reasons and evidence from claims that are not”).",
+      "parent_code": "W.6.9",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "W.6.10",
+      "text": "Write routinely over extended time frames (time for research, reflection, and revision) and shorter time frames (a single sitting or a day or two) for a range of discipline-specific tasks, purposes, and audiences.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.1",
+      "text": "Engage effectively in a range of collaborative discussions (one-on-one, in groups, and teacher-led) with diverse partners on grade 6 topics, texts, and issues, building on others’ ideas and expressing their own clearly.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.1.a",
+      "text": "Come to discussions prepared, having read or studied required material; explicitly draw on that preparation by referring to evidence on the topic, text, or issue to probe and reflect on ideas under discussion.",
+      "parent_code": "SL.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.1.b",
+      "text": "Follow rules for collegial discussions, set specific goals and deadlines, and define individual roles as needed.",
+      "parent_code": "SL.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.1.c",
+      "text": "Pose and respond to specific questions with elaboration and detail by making comments that contribute to the topic, text, or issue under discussion.",
+      "parent_code": "SL.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.1.d",
+      "text": "Review the key ideas expressed and demonstrate understanding of multiple perspectives through reflection and paraphrasing.",
+      "parent_code": "SL.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.2",
+      "text": "Interpret information presented in diverse media and formats (e.g., visually, quantitatively, orally) and explain how it contributes to a topic, text, or issue under study.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.4",
+      "text": "Present claims and findings (e.g., argument, narrative, informative, response to literature presentations), sequencing ideas logically and using pertinent descriptions, facts, and details and nonverbal elements to accentuate main ideas or themes; use appropriate eye contact, adequate volume, and clear pronunciation. [CA]",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": true
+    },
+    {
+      "code": "SL.6.4.a",
+      "text": "Plan and deliver an informative/explanatory presentation that: develops a topic with relevant facts, definitions, and concrete details; uses appropriate transitions to clarify relationships; uses precise language and domain specific vocabulary; and provides a strong conclusion.",
+      "parent_code": "SL.6.4",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": true
+    },
+    {
+      "code": "SL.6.5",
+      "text": "Include multimedia components (e.g., graphics, images, music, sound) and visual displays in presentations to clarify information.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "SL.6.6",
+      "text": "Adapt speech to a variety of contexts and tasks, demonstrating command of formal English when indicated or appropriate.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1",
+      "text": "Demonstrate command of the conventions of standard English grammar and usage when writing or speaking.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1.a",
+      "text": "Ensure that pronouns are in the proper case (subjective, objective, possessive).",
+      "parent_code": "L.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1.b",
+      "text": "Use all pronouns, including intensive pronouns (e.g., myself, ourselves), correctly.",
+      "parent_code": "L.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1.c",
+      "text": "Recognize and correct inappropriate shifts in pronoun number and person.",
+      "parent_code": "L.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1.d",
+      "text": "Recognize and correct vague pronouns (i.e., ones with unclear or ambiguous antecedents).",
+      "parent_code": "L.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.1.e",
+      "text": "Recognize variations from standard English in their own and others’ writing and speaking, and identify and use strategies to improve expression in conventional language.",
+      "parent_code": "L.6.1",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.2",
+      "text": "Demonstrate command of the conventions of standard English capitalization, punctuation, and spelling when writing.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.2.a",
+      "text": "Use punctuation (commas, parentheses, dashes) to set off nonrestrictive/parenthetical elements.",
+      "parent_code": "L.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.2.b",
+      "text": "Spell correctly.",
+      "parent_code": "L.6.2",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.3",
+      "text": "Use knowledge of language and its conventions when writing, speaking, reading, or listening.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.3.a",
+      "text": "Vary sentence patterns for meaning, reader/listener interest, and style.",
+      "parent_code": "L.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.3.b",
+      "text": "Maintain consistency in style and tone.",
+      "parent_code": "L.6.3",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.4",
+      "text": "Determine or clarify the meaning of unknown and multiple-meaning words and phrases based on grade 6 reading and content, choosing flexibly from a range of strategies.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.4.a",
+      "text": "Use context (e.g., the overall meaning of a sentence or paragraph; a word’s position or function in a sentence) as a clue to the meaning of a word or phrase.",
+      "parent_code": "L.6.4",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.4.b",
+      "text": "Use common, grade-appropriate Greek or Latin affixes and roots as clues to the meaning of a word (e.g., audience, auditory, audible).",
+      "parent_code": "L.6.4",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.4.c",
+      "text": "Consult reference materials (e.g., dictionaries, glossaries, thesauruses), both print and digital, to find the pronunciation of a word or determine or clarify its precise meaning or its part of speech.",
+      "parent_code": "L.6.4",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.4.d",
+      "text": "Verify the preliminary determination of the meaning of a word or phrase (e.g., by checking the inferred meaning in context or in a dictionary).",
+      "parent_code": "L.6.4",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.5",
+      "text": "Demonstrate understanding of figurative language, word relationships, and nuances in word meanings.",
+      "parent_code": null,
+      "is_leaf": false,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.5.a",
+      "text": "Interpret figures of speech (e.g., personification) in context.",
+      "parent_code": "L.6.5",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.5.b",
+      "text": "Use the relationship between particular words (e.g., cause/effect, part/whole, item/category) to better understand each of the words.",
+      "parent_code": "L.6.5",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.5.c",
+      "text": "Distinguish among the connotations (associations) of words with similar denotations (definitions) (e.g., stingy, scrimping, economical, unwasteful, thrifty).",
+      "parent_code": "L.6.5",
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "L.6.6",
+      "text": "Acquire and use accurately grade-appropriate general academic and domain-specific words and phrases; gather vocabulary knowledge when considering a word or phrase important to comprehension or expression.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    }
+  ]
+}

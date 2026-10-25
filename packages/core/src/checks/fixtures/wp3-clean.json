@@ -1,0 +1,290 @@
+{
+  "lesson_id": "G6.U4.FLEX-1a",
+  "schema_version": 1,
+  "title": "Flex Day: Meaning-Making Huddle",
+  "type": "Flex Day",
+  "front_matter": { "standards": [], "minutes_total": 50, "vocabulary": [] },
+  "text_cards": [],
+  "sections": [
+    {
+      "address": "G6.U4.FLEX-1a.Launch",
+      "name": "Launch",
+      "minutes": 5,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "routine_heading",
+            "attrs": { "icon": "academic_discussion" },
+            "content": [{ "type": "text", "text": "Turn and Talk" }]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "What do you notice about how the character reacts?"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "She felt uneasy but kept going.",
+                "marks": [{ "type": "sample_response" }]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "address": "G6.U4.FLEX-1a.LearninginAction",
+      "name": "Learning in Action",
+      "minutes": 40,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "collapsible",
+            "attrs": { "label": "Integrated ELD Instructions" },
+            "content": [
+              {
+                "type": "callout",
+                "attrs": { "variant": "purpose" },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Students explain tone with evidence."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "callout",
+                "attrs": { "variant": "say" },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      { "type": "text", "text": "The tone is ___ because ___." }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "callout",
+                "attrs": { "variant": "watch" },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Watch for students who point without explaining."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": { "icon": "graphic_organizer" },
+            "content": [{ "type": "text", "text": "Tone Tracker" }]
+          },
+          {
+            "type": "table",
+            "content": [
+              {
+                "type": "table_row",
+                "content": [
+                  {
+                    "type": "table_header",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "What occurred" }]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_header",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "Tone" }]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_header",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "How I know" }]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "table_row",
+                "content": [
+                  {
+                    "type": "table_cell",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "A door closes" }]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_cell",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [{ "type": "text", "text": "tense" }]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_cell",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "content": [
+                          { "type": "text", "text": "Short sentences" }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "teacher_tip",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  { "type": "text", "text": "Let pairs rehearse aloud first." }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": { "icon": "cfu" },
+            "content": [{ "type": "text", "text": "Pulse Check (RL.6.7)" }]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Which word best names the tone?" }
+            ]
+          },
+          {
+            "type": "ordered_list",
+            "attrs": { "order": 1, "type": "A" },
+            "content": [
+              {
+                "type": "list_item",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Tense" }]
+                  }
+                ]
+              },
+              {
+                "type": "list_item",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Joyful" }]
+                  }
+                ]
+              },
+              {
+                "type": "list_item",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Bored" }]
+                  }
+                ]
+              },
+              {
+                "type": "list_item",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Silly" }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Correct: short sentences build tension."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Incorrect: nothing suggests joy." }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Incorrect: the pace is not slow." }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Incorrect: nothing is funny here." }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "address": "G6.U4.FLEX-1a.LookBack",
+      "name": "Look Back",
+      "minutes": 5,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "routine_heading",
+            "attrs": { "icon": "writing" },
+            "content": [{ "type": "text", "text": "Quick Write" }]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              { "type": "text", "text": "Name one tone word and one proof." }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

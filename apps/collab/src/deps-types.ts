@@ -1,14 +1,15 @@
-// Local structural types (same reason as NL-06 section 4). NL-12 re-points db/ids/clock at the real ports.
 import type { Logger } from "@ls/obs/logger";
 import type { CollabSettings } from "@ls/config/settings";
+import type { TxRunner } from "@ls/core/ports/tx";
+import type { IdGenerator } from "@ls/core/ports/ids";
+import type { Clock } from "@ls/core/ports/clock";
 
-export interface DbHandle { readonly kind: "unwired" }
-export interface IdGenerator { next(prefix: string): string }
-export interface Clock { now(): Date }
+export type { TxRunner, IdGenerator, Clock };
+
 export interface CollabDeps {
   settings: CollabSettings;
   logger: Logger;
-  db: DbHandle;
+  db: TxRunner;
   ids: IdGenerator;
   clock: Clock;
 }
