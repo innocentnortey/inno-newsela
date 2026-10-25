@@ -1,6 +1,5 @@
 "use client";
-// Shell. Body owned by NL-66 after this ticket.
-import { DialogShell } from "@/components/ui/dialog-shell";
+import { ResolveBody } from "./resolve-body";
 
 export interface ResolveDialogProps {
   lessonId: string;
@@ -9,16 +8,10 @@ export interface ResolveDialogProps {
   flagId?: string;
   open: boolean;
   onClose: () => void;
+  /** Called after a successful call so the rail re-reads issues. */
+  onResolved?: () => void;
 }
 
-export function ResolveDialog(props: ResolveDialogProps) {
-  return (
-    <DialogShell
-      open={props.open}
-      onOpenChange={(o) => !o && props.onClose()}
-      title="Resolve or clear"
-    >
-      <p>Built by NL-66.</p>
-    </DialogShell>
-  );
+export function ResolveDialog({ open, ...rest }: ResolveDialogProps) {
+  return open ? <ResolveBody {...rest} /> : null;
 }
