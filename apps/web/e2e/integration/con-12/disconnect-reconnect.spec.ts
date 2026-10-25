@@ -24,7 +24,8 @@ test("disconnect-reconnect: held edits show the banner and Submit stays off, the
     await firstTextbox(page).click();
     await page.keyboard.type("HELD-OFFLINE");
     const submit = page.getByRole("button", { name: /Submit for approval/ });
-    if (await submit.count()) await expect(submit).toBeDisabled();
+    await expect(submit).toBeVisible();
+    await expect(submit).toBeDisabled();
     expect(JSON.stringify((await latestDoc(lesson.lessonId))!.derived_json)).not.toContain("HELD-OFFLINE");
 
     const t0 = Date.now();
