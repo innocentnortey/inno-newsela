@@ -14,7 +14,7 @@ type AxePage = ConstructorParameters<typeof AxeBuilder>[0]["page"];
 const axe = (page: Page) => new AxeBuilder({ page: page as unknown as AxePage });
 const SHOTS = "e2e/__screenshots__/workspace-read";
 
-async function open(page: Page, role: Role = "reviewer", url = URL4) {
+async function open(page: Page, role: Role = "author", url = URL4) {
   await signInAs(page, role);
   await passPageThrough(page);
   await page.goto(url);
@@ -62,7 +62,7 @@ test("jump: card focuses the span", async ({ page }) => {
 
 test("jump: deep links", async ({ page }) => {
   await serveLesson(page);
-  await open(page, "reviewer", `${URL4}?issue=iss-4-1`);
+  await open(page, "author", `${URL4}?issue=iss-4-1`);
   await focusedInPartA(page);
   await expect(page.getByRole("button", { name: /Go to issue 1/ })).toHaveAttribute("aria-current", "true");
   await page.goto(`${URL4}?at=${PART_A}`);
@@ -109,7 +109,7 @@ for (const state of ["submitted", "approved", "changes_requested", "reopened"] a
           ? { send_back: { tag: "standards" as const, note: "Re-check L.6.4.b.", by: "D. Park", at: "2026-10-25T16:00:00Z" } }
           : {};
     await serveLesson(page, { lesson: lessonWith(state, patch) });
-    await open(page);
+    await open(page, "reviewer");
     const banner = page.getByTestId("state-banner");
     await expect(banner).toBeVisible();
     if (state === "submitted") await expect(banner).toContainText("Submitted: waiting for approval");
@@ -165,11 +165,12 @@ test("no horizontal scroll at 390", async ({ page }) => {
   expect(overflow).toBe(0);
 });
 
+// The reviewer on an editable lesson gets the live editor (S-17); these specs read the lesson as an author.
 // ---- axe: one pass per state, size and theme (@axe) ----
 type Setup = (page: Page) => Promise<void>;
 const STATES: { name: string; role?: Role; url?: string; setup: Setup; ready: (p: Page) => Promise<void>; shot?: boolean }[] = [
   { name: "loading", setup: (p) => serveLesson(p, { delayMs: 60_000 }), ready: (p) => expect(p.getByTestId("workspace-skeleton")).toBeVisible() as Promise<void> },
-  { name: "in_review", setup: (p) => serveLesson(p), ready: (p) => expect(p.getByTestId("lesson-text")).toBeVisible() as Promise<void>, shot: true },
+  { name: "in_review", role: "author", setup: (p) => serveLesson(p), ready: (p) => expect(p.getByTestId("lesson-text")).toBeVisible() as Promise<void>, shot: true },
   { name: "generation_failed", setup: (p) => serveLesson(p, { lesson: lessonWith("generation_failed") }), ready: (p) => expect(p.getByTestId("state-banner")).toBeVisible() as Promise<void> },
   { name: "submitted", setup: (p) => serveLesson(p, { lesson: lessonWith("submitted") }), ready: (p) => expect(p.getByTestId("state-banner")).toBeVisible() as Promise<void> },
   { name: "approved", setup: (p) => serveLesson(p, { lesson: lessonWith("approved") }), ready: (p) => expect(p.getByTestId("state-banner")).toBeVisible() as Promise<void> },

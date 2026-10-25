@@ -5,6 +5,7 @@ import { PageSheet, TwoPane } from "@/components/layout";
 import { StatusPill } from "@/components/ui/status-pill";
 import { STATUS_SPECS } from "@/components/ui/status";
 import { Stepper } from "@/components/ui/stepper";
+import type { PresenceEntry } from "@/editor/presence";
 import { LessonEditor, type EditorClientState } from "@/editor/lesson-editor";
 import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
 import { StandardDecisionButtons } from "@/features/workspace/actions/standard-decision";
@@ -40,7 +41,7 @@ export function WorkspaceScreen(props: { unitKey: string; lessonKey: string }) {
 }
 
 function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: string }) {
-  const { role } = useSession();
+  const { role, user } = useSession();
   const lessonId = lessonIdFromKey(unitKey, lessonKey);
   const label = lessonLabel(lessonKey);
   const boardHref = `/units/${unitKey}/board`;
@@ -67,7 +68,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
     issuesPoll.retry();
   }, [retry, issuesPoll]);
   const readOnly = lesson ? isReadOnly(role, lesson.state) : true;
-  // SLOT NL-63: onClientState receives the editor's state (NL-63 may widen it to the report object); onPresence is passed to LessonEditor too.
+  const [presence, setPresence] = useState<PresenceEntry[]>([]);
   const [clientState, setClientState] = useState<EditorClientState>("connecting");
   const shownClientState: EditorClientState = readOnly ? "read_only" : clientState;
 
@@ -177,16 +178,25 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
             <p className="text-small text-ink2 mb-4">
               {`${lesson.type} · ${totalMinutes(lesson.sections)} min · ${STATUS_SPECS[`lesson.${lesson.state}`].label} · v${lesson.version_number}`}
             </p>
-            <LessonText ref={textRef} lesson={lesson} />
+            {readOnly ? (
+              <LessonText ref={textRef} lesson={lesson} />
+            ) : (
+              // S-17: the live editor replaces the read view for a reviewer on an editable lesson. Its section wrappers carry
+              // data-address and id="sec-<address>" like LessonText, so outline and issue jumps work; they focus the section.
+              <div ref={textRef} data-testid="editor-region" data-others-present={presence.length}>
+                <LessonEditor
+                  lessonId={lesson.lesson_id}
+                  lesson={lesson}
+                  readOnly={false}
+                  viewer={{ user_id: user.user_id, name: user.name, role }}
+                  onPresence={setPresence}
+                  onClientState={(r) => setClientState(r.state)}
+                />
+              </div>
+            )}
             {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} /> : null}
           </PageSheet>
         </div>
-        {readOnly ? null : (
-          // SLOT NL-63: replace this hidden mount with the live editor (un-hide it, pass onPresence/viewer).
-          <div hidden data-testid="editor-mount">
-            <LessonEditor lessonId={lesson.lesson_id} lesson={lesson} readOnly={false} onClientState={(r) => setClientState(r.state)} />
-          </div>
-        )}
       </div>
     </TwoPane>
   );
