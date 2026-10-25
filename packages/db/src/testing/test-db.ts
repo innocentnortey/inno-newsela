@@ -11,6 +11,12 @@ export const TEST_DATABASE_URL: string =
   process.env["TEST_DATABASE_URL"] ??
   "postgres://ls:ls_dev_only@127.0.0.1:55440/ls_test";
 
+// Test databases are created and dropped on this server, so it must be local (security review, 2026-10-25).
+const host = new URL(TEST_DATABASE_URL).hostname;
+if (!["127.0.0.1", "localhost", "::1", "[::1]"].includes(host)) {
+  throw new Error(`TEST_DATABASE_URL must point at a local database (found host ${host.length > 40 ? "<long>" : host})`);
+}
+
 export interface TestDb {
   db: PgDatabase;
   url: string;
