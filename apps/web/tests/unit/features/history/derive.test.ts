@@ -58,6 +58,15 @@ describe("audit helpers", () => {
     });
     expect(transitionFor(audit0, vs[0])).toBeNull();
   });
+  it("finds the transition in the real audit view's lesson.transition rows by to_state (NL-100)", () => {
+    const real: AuditRow[] = [
+      { at: "2026-10-25T11:00:00Z", user: "A", action: "lesson.transition", from_state: "in_review", to_state: "submitted", version_hash: hash(3), reason: "Ready" },
+      { at: "2026-10-25T12:00:00Z", user: "B", action: "lesson.transition", from_state: "submitted", to_state: "approved", version_hash: hash(3), reason: "OK" },
+    ];
+    expect(transitionFor(real, vs[2])).toEqual({ from_state: "in_review", to_state: "submitted", reason: "Ready" });
+    expect(transitionFor(real, { ...vs[2], kind: "approval" })).toEqual({ from_state: "submitted", to_state: "approved", reason: "OK" });
+    expect(transitionFor(real, { ...vs[2], kind: "reopen" })).toBeNull();
+  });
   it("formats the audit line", () => {
     expect(auditLine(audit[0])).toBe(
       "Safety flag cleared by J. Rivera: Image alt text checked · 10:42",

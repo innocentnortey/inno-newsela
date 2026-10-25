@@ -61,6 +61,12 @@ const KIND_ACTION: Partial<Record<VersionEntry["kind"], string>> = {
   approval: "approve",
   reopen: "reopen",
 };
+// The real audit view names every state change "lesson.transition" and carries the state in to_state (NL-100 found it).
+const KIND_TO_STATE: Partial<Record<VersionEntry["kind"], string>> = {
+  submit: "submitted",
+  approval: "approved",
+  reopen: "reopened",
+};
 
 export function transitionFor(
   audit: AuditRow[],
@@ -72,7 +78,9 @@ export function transitionFor(
 } | null {
   const action = KIND_ACTION[version.kind];
   if (!action) return null;
-  const row = auditFor(audit, version).find((r) => r.action === action);
+  const row = auditFor(audit, version).find(
+    (r) => r.action === action || (r.action === "lesson.transition" && r.to_state === KIND_TO_STATE[version.kind]),
+  );
   return row
     ? { from_state: row.from_state, to_state: row.to_state, reason: row.reason }
     : null;

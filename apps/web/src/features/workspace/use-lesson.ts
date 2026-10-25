@@ -44,6 +44,12 @@ export function useLesson(lessonId: string | null): { load: LessonLoad; retry: (
   }, [lessonId, key]);
 
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  // WF-8 / M-18: one "lesson-open" mark per lesson, set once its content has been committed to the page, so the load probe
+  // can compute p95 lesson open from the page and not only from the server log.
+  const readyId = fetched && fetched.load.kind === "ready" && fetched.lessonId === lessonId ? lessonId : null;
+  useEffect(() => {
+    if (readyId !== null) performance.mark("lesson-open", { detail: { lesson_id: readyId } });
+  }, [readyId]);
   if (lessonId === null) return { load: { kind: "not_found" }, retry };
   // A re-read (after Submit, a decision...) keeps showing the lesson already on screen instead of flashing the skeleton.
   const keep = fetched && fetched.lessonId === lessonId && fetched.load.kind === "ready";
