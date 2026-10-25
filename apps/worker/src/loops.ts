@@ -32,7 +32,17 @@ export function start_worker_loops(h: LoopHost): { done: Promise<void> } {
     });
   const generation = guard(async () => {
     // Orphan cleanup runs before any claim; the tracker counts the loop so the drain waits for the claimed job.
-    await h.generation.claim_loop.start();
+    // A database that is not reachable yet is waited for, not fatal: the process stays up and /healthz keeps reporting it (WF-39).
+    for (;;) {
+      try {
+        await h.generation.claim_loop.start();
+        break;
+      } catch (e) {
+        if (h.tracker.draining) return;
+        h.logger.warn("worker.start_retry", { extra: { name: e instanceof Error ? e.name : "unknown" } });
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
     const r = await h.generation.claim_loop.run_until(stop);
     if (r.reason === "fatal") throw new Error("claim_loop fatal");
   });
