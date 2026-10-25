@@ -1,0 +1,36 @@
+{
+  "ticket": "NL-54",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/units/[unitId]/board/route.security.test.ts": "a34ea46de135ba58db3f4ff0982173b26c61d9a99bcee7299e38546b56db739b",
+    "apps/web/app/api/units/[unitId]/metrics/route.test.ts": "624a8f498b9a2c7f6e924ec1019f14550097adee8c24ff76360cd58c78b2783e",
+    "apps/web/src/server/services/board-test-fakes.ts": "eb5da96ee79d25a93e849b24d7db6f5081d3a2041faf49c0a513cee46e9318ed"
+  },
+  "criteria": {
+    "AC-6": [
+      "apps/web/app/api/units/[unitId]/board/route.security.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-7": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-8": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-9": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-10": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/app/api/units/[unitId]/board/route.test.ts",
+    "apps/web/src/server/services/board-service.test.ts",
+    "apps/web/src/server/wiring/metrics.test.ts"
+  ]
+}
