@@ -78,3 +78,13 @@ export async function correlation(w: World, run_id: string): Promise<{ jobs: num
   const [m] = await w.query<{ n: string }>("select count(*) n from model_call c join lesson_job j on j.id=c.job_id where j.run_id=$1 and c.run_id is distinct from $1", [run_id]);
   return { jobs: Number(j!.n), calls: Number(c!.n), calls_without_run: Number(x!.n), call_run_mismatches: Number(m!.n) };
 }
+
+/** Open reservations, settled spend, and the cost of the completed calls, for one run (kill case: nothing held, nothing paid twice). */
+export async function spend_vs_calls(w: World, run_id: string): Promise<{ reserved_open: number; settled_usd: string; completed_cost_usd: string; equal: boolean }> {
+  const [r] = await w.query<{ open: string; settled: string; cost: string; eq: boolean }>(
+    `select (select count(*) from spend_reservation where run_id=$1 and status='reserved')::text open,
+            (select coalesce(sum(settled_usd),0) from spend_reservation where run_id=$1)::text settled,
+            (select coalesce(sum(cost_usd),0) from model_call where run_id=$1 and status='completed')::text cost,
+            (select coalesce(sum(settled_usd),0) from spend_reservation where run_id=$1) = (select coalesce(sum(cost_usd),0) from model_call where run_id=$1 and status='completed') eq`, [run_id]);
+  return { reserved_open: Number(r!.open), settled_usd: r!.settled, completed_cost_usd: r!.cost, equal: r!.eq };
+}

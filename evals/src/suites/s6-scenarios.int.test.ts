@@ -7,7 +7,7 @@ const checks = (r: ScenarioResult): Record<string, boolean> => (r.actual as { ch
 describe("fault scenarios", () => {
   it("kill_resumes_without_duplicates", async () => {
     const r = await run_kill();
-    expect(checks(r)).toMatchObject({ all_ready: true, no_duplicate_versions: true, no_repaid_call: true, lost_calls_counted_equal_in_flight: true, calls_in_flight_at_kill: true });
+    expect(checks(r)).toMatchObject({ all_ready: true, no_duplicate_versions: true, no_repaid_call: true, lost_calls_counted_equal_in_flight: true, calls_in_flight_at_kill: true, no_open_reservation: true, settled_equals_completed_costs: true });
     expect(r.passed, String(r.failure_category)).toBe(true);
   }, 300_000);
 
@@ -15,6 +15,13 @@ describe("fault scenarios", () => {
     const r = await run_rate_limit();
     expect(checks(r)).toMatchObject({ all_ready: true, none_lost_to_rate_limit: true, retries_visible: true });
     expect(r.passed, String(r.failure_category)).toBe(true);
+  }, 300_000);
+
+  // Seam S-28 (docs/plans/seam-followups.md): 8 consecutive 429s lose 2 lessons at PROVIDER_MAX_RETRIES=3. Expected to fail until the worker owner fixes it;
+  // when it starts passing, vitest reports it and this should become a plain `it`.
+  it.fails("rate_limit_burst_of_8_loses_no_lesson (S-28)", async () => {
+    const r = await run_rate_limit(true);
+    expect(checks(r)["none_lost_to_rate_limit"]).toBe(true);
   }, 300_000);
 
   describe("truncation", () => {

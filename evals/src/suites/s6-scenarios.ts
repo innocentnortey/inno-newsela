@@ -6,7 +6,7 @@ import path from "node:path";
 import { ProviderError } from "@ls/core/errors";
 import type { JsonValue } from "@ls/core/ports/common";
 import type { StubScriptItem } from "@ls/llm/stub";
-import { calls_in_status, correlation, duplicate_versions, job_counts, lesson_calls, ready_count, repaid_calls, spend_facts } from "./s6-assertions.ts";
+import { calls_in_status, correlation, duplicate_versions, job_counts, lesson_calls, ready_count, repaid_calls, spend_facts, spend_vs_calls } from "./s6-assertions.ts";
 import { make_healthy } from "./s6-drafts.ts";
 import { lesson_of, make_world, plan_for, type World } from "./s6-world.ts";
 
@@ -40,14 +40,20 @@ async function run_to_end(w: World, run_id: string): Promise<void> {
 }
 
 // 429: the first attempt of each of the first 8 lessons is answered rate_limited (retry-after 0), the retry is healthy.
-export async function run_rate_limit(): Promise<ScenarioResult> {
-  const w = await plain_world();
+// `burst` is the literal HP-7 reading: the first 8 model calls in a row are 429, one lesson at a time (seam S-28: loses 2 lessons).
+export async function run_rate_limit(burst = false): Promise<ScenarioResult> {
+  const w = await plain_world(burst ? { GENERATION_CONCURRENCY: "1" } : {});
   try {
     const healthy = make_healthy(w.rows);
     const limited = new Set<string>();
+    let answered = 0;
     const script = (req: Parameters<typeof healthy>[0]): StubScriptItem => {
       const id = lesson_of(req);
-      if (limited.size < 8 && !limited.has(id)) {
+      if (burst && answered < 8) {
+        answered += 1;
+        return { kind: "error", error: new ProviderError({ kind: "rate_limited", http_status: 429, retry_after_s: 0 }) };
+      }
+      if (!burst && limited.size < 8 && !limited.has(id)) {
         limited.add(id);
         return { kind: "error", error: new ProviderError({ kind: "rate_limited", http_status: 429, retry_after_s: 0 }) };
       }
@@ -67,7 +73,7 @@ export async function run_rate_limit(): Promise<ScenarioResult> {
         all_ready: jobs.total === LESSONS && jobs.ready === LESSONS,
         none_not_ready: jobs.not_ready === 0,
         none_lost_to_rate_limit: Number(lost!.n) === 0,
-        retries_visible: Number(retried!.rows) === 8 && Number(retried!.n) === 8,
+        ...(burst ? {} : { retries_visible: Number(retried!.rows) === 8 && Number(retried!.n) === 8 }),
         no_failed_call: Number(failed_calls!.n) === 0,
       },
       { run_id, lessons: jobs.total, ready: jobs.ready, lost_to_rate_limit: Number(lost!.n), rate_limited_first_attempts: 8, calls_with_retries: Number(retried!.rows), retries_recorded: Number(retried!.n) },
@@ -212,6 +218,7 @@ export async function run_kill(env: ScenarioEnv = {}): Promise<ScenarioResult> {
     const repaid = await repaid_calls(w, run_id);
     const lost = await calls_in_status(w, run_id, "lost");
     const [rest] = await w.query<{ n: string }>("select count(*) n from lesson_job where run_id=$1 and kind='lesson' and status in ('queued','running')", [run_id]);
+    const money = await spend_vs_calls(w, run_id);
     return verdict(
       {
         killed_at_or_after_threshold: ready_at_kill >= KILL_AFTER_READY,
@@ -221,8 +228,10 @@ export async function run_kill(env: ScenarioEnv = {}): Promise<ScenarioResult> {
         no_duplicate_versions: dup === 0,
         no_repaid_call: repaid === 0,
         lost_calls_counted_equal_in_flight: lost === in_flight,
+        no_open_reservation: money.reserved_open === 0,
+        settled_equals_completed_costs: money.equal,
       },
-      { run_id, lessons: jobs.total, ready: jobs.ready, terminal: jobs.total - Number(rest!.n), duplicates_found: dup, repaid_calls: repaid, kill_threshold: KILL_AFTER_READY, calls_in_flight_at_kill: in_flight, calls_lost_counted: lost, killed_at_or_after_threshold: ready_at_kill >= KILL_AFTER_READY, lost_calls_counted_equal_in_flight: lost === in_flight },
+      { run_id, lessons: jobs.total, ready: jobs.ready, terminal: jobs.total - Number(rest!.n), duplicates_found: dup, repaid_calls: repaid, kill_threshold: KILL_AFTER_READY, calls_in_flight_at_kill: in_flight, calls_lost_counted: lost, killed_at_or_after_threshold: ready_at_kill >= KILL_AFTER_READY, lost_calls_counted_equal_in_flight: lost === in_flight, reserved_open: money.reserved_open, settled_usd: money.settled_usd, completed_cost_usd: money.completed_cost_usd },
     );
   } finally {
     for (const c of children) if (c.exitCode === null && c.signalCode === null) c.kill("SIGKILL");

@@ -1,5 +1,6 @@
-// NL-107: the worker process the kill test SIGKILLs. Stand-in for apps/worker/src/main.ts, which does not start the claim loop
-// yet (seam S-8: its db and model_client are still `unbuilt`). Real PgDatabase, real wiring, StubModelClient. SIGTERM stops it cleanly.
+// NL-107: the worker process the kill test SIGKILLs. It runs the real worker pieces (S-8 is closed by RT-1): PgDatabase, wire_generation,
+// wire_checks, start_worker_loops and install_drain (SIGTERM drains, then exits 0). Only the model client is ours: main.ts cannot be the
+// child yet because MODEL_PROVIDER_MODE=stub cannot load a scripted stub from env or a fixture (seam S-28b), so the scripted stub is built here.
 // Env: DATABASE_URL, FAULT_OUTLINE_VERSION_ID, FAULT_DRAFT_DELAY_MS, plus the worker settings (GENERATION_CONCURRENCY, JOB_LEASE_MS ...).
 import { load_worker_settings } from "@ls/config/settings";
 import { SystemClock } from "@ls/core/ports/clock";
@@ -10,6 +11,9 @@ import { PgOutlineRepo } from "@ls/db/repos/outlines";
 import { StubModelClient } from "@ls/llm/stub";
 import { create_logger } from "@ls/obs/logger";
 import { wire_generation } from "../../../apps/worker/src/wiring/generation.ts";
+import { wire_checks } from "../../../apps/worker/src/wiring/checks.ts";
+import { create_inflight_tracker, install_drain } from "../../../apps/worker/src/drain.ts";
+import { start_worker_loops } from "../../../apps/worker/src/loops.ts";
 import type { WorkerDeps } from "../../../apps/worker/src/deps-types.ts";
 import { make_healthy } from "./s6-drafts.ts";
 import { plan_for, stub_prices } from "./s6-world.ts";
@@ -29,12 +33,12 @@ async function main(): Promise<void> {
   stub.script("REPAIR", "lesson_draft", healthy);
   const logger = create_logger({ service: "worker", build_id: "faults", level: "info", write: (l) => void process.stdout.write(l + "\n") });
   const deps: WorkerDeps = { settings, logger, db: db as never, ids, clock, model_client: stub };
-  const { claim_loop } = wire_generation(deps, { prices: stub_prices() });
-  const stop = { flag: false, is_set(): boolean { return this.flag; } };
-  process.on("SIGTERM", () => { stop.flag = true; });
-  await claim_loop.start();
-  await claim_loop.run_until(stop);
-  await db.close();
+  const generation = wire_generation(deps, { prices: stub_prices() });
+  const checks = wire_checks(deps);
+  const tracker = create_inflight_tracker();
+  const exit = (code: number): void => process.exit(code);
+  install_drain({ tracker, close: async () => { await db.close(); }, exit, logger });
+  start_worker_loops({ tracker, generation, checks, logger, settings, exit });
 }
 
 await main();
