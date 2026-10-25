@@ -1,0 +1,247 @@
+{
+  "lesson_id": "G6.U4.L5",
+  "title": "Lesson 5: Comparing Percy and Soongoora",
+  "blocks": [
+    {
+      "role": "routine_heading",
+      "section": "Launch",
+      "part": null,
+      "text": "Think-Pair-Share",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Ask: How are Percy and Soongoora treated by the people with more power?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "sample_response",
+      "section": "Launch",
+      "part": null,
+      "text": "Both characters are treated as trouble by the people with power.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "routine_heading",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Language Study",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "cfu_item",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "",
+      "standard_codes": [
+        "W.6.2"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "Which word best connects two ideas that are alike?",
+        "options": [
+          "similarly",
+          "however",
+          "until",
+          "because of"
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Similarly signals a comparison.",
+          "However signals a contrast.",
+          "Until signals time.",
+          "Because of signals a cause."
+        ],
+        "standard_code": "W.6.2"
+      },
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Watch for students who need the idea restated.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Purpose: students practise the skill.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "support_table",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Say: Reread “The Hare and the Lion” and look for how Soongoora is treated as “trouble” (Ch. 1, pp. 9-15).",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "excerpt_slot",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Reviewer to insert the excerpt from The Hare and the Lion",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "cfu_item",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "",
+      "standard_codes": [
+        "W.6.2"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "Which topic sentence best compares the two characters?",
+        "options": [
+          "Percy and Soongoora both face people with more power.",
+          "Percy likes school.",
+          "Soongoora is a lion.",
+          "The hare is fast."
+        ],
+        "key_index": 0,
+        "rationales": [
+          "It names the likeness the paragraph will explain.",
+          "It does not compare the two characters.",
+          "It leaves out Percy and the comparison.",
+          "It leaves out the comparison."
+        ],
+        "standard_code": "W.6.2"
+      },
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Watch for students who need the idea restated.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Purpose: students practise the skill.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "support_table",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "quick_write",
+      "section": "Look Back",
+      "part": null,
+      "text": "Percy and Soongoora both ___, because ___.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "sample_response",
+      "section": "Look Back",
+      "part": null,
+      "text": "Percy and Soongoora both face unfair treatment, because the adults and the lion have the power.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "homework",
+      "section": "Homework",
+      "part": null,
+      "text": "Read and annotate The Lightning Thief Ch. 2 (pp. 16-22).",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    }
+  ],
+  "text_cards": [
+    {
+      "title": "The Hare and the Lion",
+      "author": null,
+      "edition": null,
+      "chapter": null,
+      "pages": null,
+      "kind": "off-platform-text",
+      "content_available": false
+    }
+  ]
+}

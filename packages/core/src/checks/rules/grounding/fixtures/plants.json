@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "plants": [
+    {
+      "id": "P01",
+      "fixture": "wp1",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 3
+      },
+      "text": "Listen to how Percy opens: “Nobody at my school ever listened to me.”",
+      "needle": "Nobody at my school ever listened to me",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P02",
+      "fixture": "wp1",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "append_rationale",
+        "block": 16,
+        "index": 1
+      },
+      "text": "Percy says “my teachers always liked me best,” so he cannot be a problem figure.",
+      "needle": "my teachers always liked me best",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P03",
+      "fixture": "wp1",
+      "expected_scan": "page",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 1
+      },
+      "text": "Reread page 27 with a partner and mark one detail.",
+      "needle": "page 27",
+      "expected_kind": "page_out_of_range"
+    },
+    {
+      "id": "P04",
+      "fixture": "wp1",
+      "expected_scan": "name",
+      "code_detectable": true,
+      "op": {
+        "op": "append_rationale",
+        "block": 16,
+        "index": 3
+      },
+      "text": "Percy’s friend Grover also gets into trouble at school.",
+      "needle": "Grover",
+      "expected_kind": "proper_noun_unsourced"
+    },
+    {
+      "id": "P05",
+      "fixture": "wp1",
+      "expected_scan": "none",
+      "code_detectable": false,
+      "op": {
+        "op": "append_text",
+        "block": 22
+      },
+      "text": "Remind students that on the class trip Percy is blamed when a classmate falls into a fountain.",
+      "needle": "on the class trip Percy is blamed when a classmate falls into a fountain",
+      "expected_kind": null
+    },
+    {
+      "id": "P06",
+      "fixture": "wp2",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 1
+      },
+      "text": "As the hare tells the lion, “Trust me, friend.”",
+      "needle": "Trust me, friend",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P07",
+      "fixture": "wp2",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "append_rationale",
+        "block": 11,
+        "index": 0
+      },
+      "text": "It could quote Soongoora saying “the honey was never mine” as evidence.",
+      "needle": "the honey was never mine",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P08",
+      "fixture": "wp2",
+      "expected_scan": "name",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 9
+      },
+      "text": "In the tale, the elephant Tembo warns the hare about the lion.",
+      "needle": "Tembo",
+      "expected_kind": "proper_noun_unsourced"
+    },
+    {
+      "id": "P09",
+      "fixture": "wp2",
+      "expected_scan": "page",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 17
+      },
+      "text": "In Chapter 4, Percy runs away from the adults who punish him.",
+      "needle": "Chapter 4",
+      "expected_kind": "page_out_of_range"
+    },
+    {
+      "id": "P10",
+      "fixture": "wp4",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "append_text",
+        "block": 5
+      },
+      "text": "Homer calls Olympus “a hall of bronze where the gods feast forever.”",
+      "needle": "a hall of bronze where the gods feast forever",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P11",
+      "fixture": "wp4",
+      "expected_scan": "quote",
+      "code_detectable": true,
+      "op": {
+        "op": "insert_block",
+        "after": 6,
+        "block": {
+          "role": "sample_response",
+          "section": "Look Back",
+          "part": null,
+          "text": "Riordan’s narrator says the city of the gods “glows like a lantern above the busy streets.”",
+          "standard_codes": [],
+          "code_origins": [],
+          "cfu": null,
+          "minutes": null
+        }
+      },
+      "text": "Riordan’s narrator says the city of the gods “glows like a lantern above the busy streets.”",
+      "needle": "glows like a lantern above the busy streets",
+      "expected_kind": "quote_unmatched"
+    },
+    {
+      "id": "P12",
+      "fixture": "wp4",
+      "expected_scan": "name",
+      "code_detectable": true,
+      "op": {
+        "op": "insert_block",
+        "after": 5,
+        "block": {
+          "role": "cfu_item",
+          "section": "Learning in Action",
+          "part": "Part B",
+          "text": "",
+          "standard_codes": [],
+          "code_origins": [],
+          "cfu": {
+            "stem": "Which detail shows power?",
+            "options": [
+              "the throne",
+              "the cloud",
+              "the street",
+              "the door"
+            ],
+            "key_index": 0,
+            "rationales": [
+              "A throne shows rule.",
+              "A cloud shows height.",
+              "The palaces were built by Hephaestus in a single night.",
+              "A door shows entry."
+            ],
+            "standard_code": "W.6.2"
+          },
+          "minutes": null
+        }
+      },
+      "text": "The palaces were built by Hephaestus in a single night.",
+      "needle": "Hephaestus",
+      "expected_kind": "proper_noun_unsourced"
+    }
+  ]
+}

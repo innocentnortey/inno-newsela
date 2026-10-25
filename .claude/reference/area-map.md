@@ -73,5 +73,6 @@ All tables are created only by A1 in `packages/db/migrations/` (planned); the fu
 `probe_run`, `experiment_run`, `ops_event`, `schema_migrations`; view `audit_log_v`.
 
 Built (NL-20): `packages/core/src/checks/{types,policy,registry,gates}.ts`, 28 rule files at `rules/<group>/<kind>.ts` + 6 group `index.ts` + `rules/alignment/derive.ts` stub. Groups: structural (bodies, NL-20), alignment/safety/links (NL-39), grounding (NL-40), arc (NL-41); later tickets fill only their own group's files.
+Built (NL-40): `packages/core/src/checks/rules/grounding/{fields,sources,text,page-refs,name-scan,allow-list,finding}.ts` + 8 rule bodies, `fixtures/{build.ts,draft-wp2.json,plants.json}`, 8 `*.test.ts`; request for NL-46: editor schema lacks the `quote` node CON-15 inserts.
 
 Built (NL-07): `apps/{worker,collab}/src/{main,health,drain,deps,deps-types}.ts`, `apps/worker/src/wiring/{generation,checks,judge}.ts`, `apps/collab/src/wiring/{server,commands}.ts`, `apps/collab/src/commands/{routes,apply-edit,set-mode,lock-and-snapshot}.ts` shells.
