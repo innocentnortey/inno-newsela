@@ -117,7 +117,13 @@ export function StartRunForm({ outlineVersionId, onClose }: StartRunFormProps) {
         title = "Only authors can start a run.";
         break;
       case "DAY_CAP_REACHED":
-        title = "Daily spend cap reached. No run can start until tomorrow.";
+        {
+          const left = e.details.remaining_usd;
+          title =
+            typeof left === "number" && Number.isFinite(left)
+              ? `Daily spend cap reached. $${left.toFixed(2)} left today. No run can start until tomorrow.`
+              : "Daily spend cap reached. No run can start until tomorrow.";
+        }
         break;
       case "VALIDATION_INCOMPLETE": {
         const d = e.details.errors_unconfirmed;
