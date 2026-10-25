@@ -24,8 +24,12 @@ function reject(path: string, rule: "too_long" | "email" | "not_json"): never {
   throw new InvariantViolation("audit details must hold ids and codes only", { path, rule });
 }
 
+// NL-45: a standard decision stores the replaced entry so it can be undone; official standard text is public, up to 500 chars.
+const LONG_ALLOWED = new Set(["details.before_entry.official_text"]);
+const MAX_LONG_STRING = 500;
+
 function check_string(s: string, path: string): void {
-  if (s.length > MAX_STRING) reject(path, "too_long");
+  if (s.length > (LONG_ALLOWED.has(path) ? MAX_LONG_STRING : MAX_STRING)) reject(path, "too_long");
   if (EMAIL.test(s)) reject(path, "email");
 }
 
