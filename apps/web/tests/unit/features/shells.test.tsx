@@ -8,7 +8,6 @@ import { SendBackDialog } from "@/features/send-back/send-back-dialog";
 import { StartRunDialog } from "@/features/start-run/start-run-dialog";
 import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
 import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
-import { LessonEditor } from "@/editor/lesson-editor";
 
 const pin = { snapshotHash: "h", snapshotStateVector: "v" };
 const dialogs: Array<[string, (open: boolean, onClose: () => void) => React.ReactElement, string]> = [
@@ -40,11 +39,6 @@ describe("handed-over shells", () => {
     expect(screen.getByRole("region", { name: "AI assist" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it("LessonEditor placeholder", () => {
-    render(<LessonEditor lessonId="G6.U4.L4" lesson={{} as never} readOnly={false} onClientState={() => {}} />);
-    expect(screen.getByTestId("lesson-editor-placeholder")).toBeInTheDocument();
   });
 
   it("WorkspaceActionBar placeholder and heartbeat no-op", () => {

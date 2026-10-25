@@ -1,0 +1,74 @@
+/* Tokens only: no colour literals (NL-63 AC-9). Presence colours come from the slot number, never from awareness. */
+.ls-editor {
+  min-height: 6rem;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border: 1px solid var(--color-hair);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font-size: var(--text-reading);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  outline: none;
+}
+.ls-editor:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.ls-editor[aria-readonly="true"] {
+  background: var(--color-well);
+}
+.ls-editor p {
+  margin: 0 0 0.5rem;
+}
+.ls-editor ul,
+.ls-editor ol {
+  margin: 0 0 0.5rem;
+  padding-left: 1.5rem;
+}
+.ls-editor [data-role="teacher_talk"] {
+  background: var(--color-selected);
+}
+.ls-editor [data-role="sample_response"] {
+  background: var(--color-warn-tint);
+}
+
+.ls-caret {
+  position: relative;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 2px solid var(--color-presence-1);
+  pointer-events: none;
+  word-break: normal;
+}
+.ls-caret-flag {
+  position: absolute;
+  top: -1.4em;
+  left: -2px;
+  padding: 0 4px;
+  border-radius: 3px 3px 3px 0;
+  background: var(--color-presence-1);
+  color: var(--color-on-presence);
+  font-size: var(--text-label);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  user-select: none;
+}
+.ls-caret[data-presence-slot="2"] { border-color: var(--color-presence-2); }
+.ls-caret[data-presence-slot="3"] { border-color: var(--color-presence-3); }
+.ls-caret[data-presence-slot="4"] { border-color: var(--color-presence-4); }
+.ls-caret[data-presence-slot="2"] .ls-caret-flag { background: var(--color-presence-2); }
+.ls-caret[data-presence-slot="3"] .ls-caret-flag { background: var(--color-presence-3); }
+.ls-caret[data-presence-slot="4"] .ls-caret-flag { background: var(--color-presence-4); }
+
+.ls-selection { background: color-mix(in srgb, var(--color-presence-1) 20%, transparent); }
+.ls-selection[data-presence-slot="2"] { background: color-mix(in srgb, var(--color-presence-2) 20%, transparent); }
+.ls-selection[data-presence-slot="3"] { background: color-mix(in srgb, var(--color-presence-3) 20%, transparent); }
+.ls-selection[data-presence-slot="4"] { background: color-mix(in srgb, var(--color-presence-4) 20%, transparent); }
+
+[data-presence-slot="1"][data-slot="initials"] { color: var(--color-presence-1); }
+[data-presence-slot="2"][data-slot="initials"] { color: var(--color-presence-2); }
+[data-presence-slot="3"][data-slot="initials"] { color: var(--color-presence-3); }
+[data-presence-slot="4"][data-slot="initials"] { color: var(--color-presence-4); }
