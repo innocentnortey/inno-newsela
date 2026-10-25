@@ -104,6 +104,12 @@ describe("RunService.start", () => {
     expect(k.runs.inserted).toHaveLength(1);
     expect(k.queue.created).toHaveLength(48);
     expect(k.tx.locks[0]).toBe("run:start:usr_synthetic_authork1");
+    // A retry with a different body still returns the ORIGINAL run, scope included.
+    const changed = await k.service.start(user(), request({ scope: { kind: "rows", rows: [2] }, cap_usd: 1 }), "k1");
+    expect(changed.run_id).toBe(first.run_id);
+    expect(changed.scope).toEqual(first.scope);
+    expect(changed.cap_usd).toBe(first.cap_usd);
+    expect(k.runs.inserted).toHaveLength(1);
     const other = await k.service.start(user("author", "usr_other"), request(), "k1");
     expect(other.run_id).not.toBe(first.run_id);
     k.clock.advance(25 * 3_600_000);

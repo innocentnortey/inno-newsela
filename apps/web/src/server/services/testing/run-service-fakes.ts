@@ -138,6 +138,7 @@ export class MemJobQueue implements Pick<JobQueue, "create_run_jobs" | "jobs_for
   readonly by_run = new Map<string, JobRow[]>();
   async create_run_jobs(jobs: readonly NewJob[]): Promise<number> {
     this.created.push(...jobs);
+    for (const j of jobs) this.by_run.set(j.run_id, [...(this.by_run.get(j.run_id) ?? []), j as unknown as JobRow]);
     return jobs.length;
   }
   async jobs_for_run(run_id: string): Promise<JobRow[]> {

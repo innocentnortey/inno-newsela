@@ -65,6 +65,18 @@ export class RunService {
     private readonly settings: WebSettings,
   ) {}
 
+  // The scope of a stored run, rebuilt from the run and its jobs: a replay returns the original run, never the retry's body.
+  private async stored_scope(run: RunRow): Promise<StartRunRequest["scope"]> {
+    if (run.parent_run_id) return { kind: "unfinished_of_run", run_id: run.parent_run_id } as StartRunRequest["scope"];
+    const lesson_ids = new Set(
+      (await this.queue.jobs_for_run(run.run_id)).filter((j) => j.kind === "lesson" || j.kind === "candidate").map((j) => j.lesson_id),
+    );
+    const generatable = (await this.outlines.rows(run.outline_version_id)).map((r) => r.row).filter(is_lesson_row);
+    const picked = generatable.filter((r) => lesson_ids.has(r.lesson_id));
+    if (run.kind !== "trial" && picked.length === generatable.length) return { kind: "all" } as StartRunRequest["scope"];
+    return { kind: "rows", rows: picked.map((r) => r.row_number) } as StartRunRequest["scope"];
+  }
+
   async start(user: RequestUser, req: StartRunRequest, idempotency_key: string | null): Promise<Run> {
     if (user.role !== "author") throw new DomainRefusal("ROLE_FORBIDDEN", "Only authors can start a run.");
     const key = idempotency_key?.trim() || null;
@@ -75,7 +87,7 @@ export class RunService {
         const existing = await this.runs.find_by_idempotency_key(user.user_id, key, this.settings.idempotency_window_h);
         if (existing) {
           const spent = (await this.spend.run_totals(existing.run_id)).settled_usd;
-          return to_run(existing, req.scope, spent);
+          return to_run(existing, await this.stored_scope(existing), spent);
         }
       }
 
