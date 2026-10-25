@@ -421,6 +421,49 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | W4 | `apps/web/app/(dev)/harness/<name>/` leaves inside FW-4's `app/(dev)/**` | each dialog/panel ticket (NL-63, 64, 65, 66, 69, 72) owns only its own leaf; FW-4 owns the tree and its 404-in-production guard |
 | W0–W4 | new npm dependencies (ProseMirror, Yjs, Hocuspocus provider, etc.) | requested from A0: NL-01 pins them in the workspace manifests; later tickets never edit `package.json` or the lockfile |
 
+### Row changes made while writing specs (7b, 2026-10-25)
+
+The ticket files in `docs/plans/tickets/` are authoritative for each ticket's dependencies, WFs, metrics and kind; the
+table above is the 7a cut. These rows changed during 7b (the parallelism audit re-run at 7c is below the table):
+
+| Ticket(s) | Change | Raised by |
+|---|---|---|
+| NL-108 | WF-41 → **WF-46** (WF-41 was already taken); `eval:kickoff` npm alias requested from A0 | int2 |
+| NL-109 | depends_on + NL-49 (runs on the NL-49 runner) | int2 |
+| NL-118 | depends_on + NL-99 (probe sends CON-20 heartbeats) | int2 |
+| NL-125 | WFs → WF-43, WF-9, WF-15; depends_on + NL-49 | int2 |
+| NL-128, NL-129, NL-130 | depends_on + NL-109 (XPs score through its S3 suite; real-model spend ≈ $3.30 per XP, inside PD-29) | int2 |
+| NL-126 | depends_on NL-93…NL-101 expanded; CON/SCR/US = all core (CON-1…16, 18…21, 24; SCR-1…12, 14…17) | dh2 |
+| NL-93 … NL-104 | depends_on + NL-90 (NL-90 creates the shared real-stack Playwright harness `playwright.real.config.ts` + `e2e/integration/support/**`) | int1 |
+| NL-99 | depends_on + NL-53 (review wiring) | int1 |
+| NL-93 | WFs + WF-5; metrics M-21, M-39, M-40 | int1 |
+| NL-79, 95, 96, 97, 98, 99, 101, 102, 104 | metrics lists widened to every M-n their WF rows inherit (DO-6) | int1 |
+| NL-102 | fills DO-3's `wiring/exports.ts` (plan table said `export.ts`) | int1 |
+| NL-101 | no edge on NL-106: models the mid-session lock with `FrozenDocs.freeze` on an in-process collab server | int1 |
+| NL-44 | depends_on + NL-21 (`allowed_actions` uses `transition_roles` / `decide_transition`) | be3 |
+| NL-45 | WFs → WF-8, WF-11; metrics + M-18, M-38 | be3 |
+| NL-46 | metrics + M-26 | be3 |
+| NL-47 | metrics + M-28, M-29 | be3 |
+| NL-49 | kind backend → integration (serves no CON card; joins the runner pieces) | be3 |
+| NL-42 | `PgBoardReadRepo` file follows DO-4 §3.5 `repos/metrics.ts` (row said `repos/lessons.ts`) | be3 / orchestrator |
+| NL-105, NL-106 | WFs → WF-41 (collab internal command routes) instead of WF-11/12/13, WF-15; NL-106 keeps WF-9 | be4 |
+| NL-85 | WFs + WF-42 | be4 |
+| NL-82, NL-83 | cons + CON-1 (NL-82 also CON-3) — backend tickets must name a CON | be4 |
+| NL-91 | own `coverage-service.ts` + `wiring/coverage.ts` (DO-4 §5), not a method on `board-service.ts` | be4 |
+| NL-80, NL-105 | collab wiring split `wiring/server.ts` (NL-80) / `wiring/commands.ts` (NL-105) per the slice plan; DO-3 §2.5 / DO-4 §12 updated to match | be4 / orchestrator |
+| NL-27…NL-33, NL-35…NL-38 | Entry points: None (component-level capture ACs); their real WF captures are proven by the W4/W5 integration tickets (NL-78, NL-79, NL-80/105, NL-95, NL-107) | be2 |
+| NL-36 | owns `lesson-doc-reads.ts` (`PgLessonDocReader`) — it had no owner | be2 |
+| NL-33 | constructor + `CostMath` (same-wave import from NL-35 → build against the signature) | be2 |
+| NL-30 | `ClaimLoop` constructor + `TxRunner` | be2 |
+| NL-34 | adds `PgPromptRepo.sync_locked_layer` | be2 |
+| NL-17 | depends_on + NL-11 (report is an OpenAPI mirror) | be1 |
+| NL-23 | depends_on + NL-08 (`record_ops_event`, `db:migrate`) | be1 |
+| NL-01, 07, 12, 13, 14 | Entry points: None (they supply pieces; the service/integration tickets own the captures); NL-08 keeps WF-36, NL-23 keeps WF-38 | be1 |
+| NL-06, NL-07, NL-12 | wiring files named per DO-3 (`sessions.ts`, `outlines.ts`, `exports.ts`, `coverage.ts`); local structural `apps/*/src/**/deps-types.ts` created by NL-06/07 and re-pointed by NL-12 (collision-map addendum: NL-12 owns that one-file edit) | be1 |
+| NL-12 | ports one file per port `packages/core/src/ports/<port>.ts` (31 files), not one `ports.ts` | be1 |
+| NL-09 | also owns `content-hash.ts` and the three intake records (NL-12 re-exports them) | be1 |
+| NL-20 | writes all 28 rule files (3 structural bodies, 25 stubs) and the 6 group `index.ts` files; `vocabulary_word_missing` joins its structural set | be1 / resolver |
+
 ## Execution order for Phase B (Sonnet build loop)
 
 1. **Waves in order, pipelined.** A ticket starts when its own blockers are merged and it passes
