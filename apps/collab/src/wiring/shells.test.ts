@@ -2,13 +2,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { load_collab_settings } from "@ls/config/settings";
-import type { CollabDeps } from "../deps-types.ts";
 import { build_collab_runtime } from "../main.ts";
-import * as applyEdit from "../commands/apply-edit.ts";
 import * as lockSnap from "../commands/lock-and-snapshot.ts";
-import * as setMode from "../commands/set-mode.ts";
-import * as commands from "./commands.ts";
-import type * as server from "./server.ts";
 
 const ENV = {
   DATABASE_URL: "postgres://u:p@localhost:5432/d",
@@ -39,18 +34,8 @@ function forbidden_for(root: string, f: string): RegExp {
 describe("collab shells", () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it("shells return empty records and name fillers", () => {
-    const d = {} as CollabDeps;
-    const sw = {} as ReturnType<typeof server.wire_collab_server>;
-    expect(commands.wire_collab_commands(d, sw, { hocuspocus: null })).toEqual(
-      {},
-    );
-    expect([
-      commands.FILLER,
-      applyEdit.FILLER,
-      setMode.FILLER,
-      lockSnap.FILLER,
-    ]).toEqual(["NL-105", "NL-105", "NL-105", "NL-106"]);
+  it("the remaining shell names its filler", () => {
+    expect([lockSnap.FILLER]).toEqual(["NL-106"]);
   });
 
   it("collab starts with ANTHROPIC_API_KEY unset and no model settings", async () => {

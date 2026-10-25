@@ -352,7 +352,7 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | worker `wiring/checks.ts` | NL-07 | NL-81 (W4) |
 | worker `wiring/judge.ts` | NL-07 | NL-110 (W5) |
 | collab `wiring/server.ts` (auth, guard, persistence, acks) | NL-07 | NL-80 (W4) — built |
-| collab `wiring/commands.ts` (+ `commands/routes.ts`) | NL-07 | NL-105 (W5); NL-106 fills `lock-and-snapshot.ts` |
+| collab `wiring/commands.ts` (+ `commands/routes.ts`) | NL-07 | NL-105 (W5) — built; NL-106 fills `lock-and-snapshot.ts` |
 | worker/collab `health.ts`, web `app/api/healthz` | NL-07 (shells) | NL-83 (W4) (built NL-83) |
 
 ## Collision map (waves with more than one ticket)
