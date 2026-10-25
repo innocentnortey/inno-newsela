@@ -237,6 +237,18 @@ const nodes: Record<string, NodeSpec> = {
     },
     toDOM: block_dom("excerpt_slot"),
   },
+  // Added with NL-46 (CON-15 fillSlot): the node a reviewer's fill inserts. Plain text only (R-58).
+  quote: {
+    group: "block",
+    content: "text*",
+    marks: "",
+    attrs: {
+      slot_id: { validate: "string" },
+      source_ref: { default: "", validate: "string" },
+      rights: { default: "unset", validate: one_of("quote rights", RIGHTS) },
+    },
+    toDOM: block_dom("quote"),
+  },
   text: { group: "inline" },
   hard_break: {
     group: "inline",
