@@ -8,9 +8,12 @@ import * as applyEdit from "../commands/apply-edit.ts";
 import * as lockSnap from "../commands/lock-and-snapshot.ts";
 import * as setMode from "../commands/set-mode.ts";
 import * as commands from "./commands.ts";
-import * as server from "./server.ts";
+import type * as server from "./server.ts";
 
-const ENV = { DATABASE_URL: "postgres://u:p@localhost:5432/d", COLLAB_INTERNAL_TOKEN: "t-collab" };
+const ENV = {
+  DATABASE_URL: "postgres://u:p@localhost:5432/d",
+  COLLAB_INTERNAL_TOKEN: "t-collab",
+};
 
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
@@ -36,12 +39,16 @@ describe("collab shells", () => {
 
   it("shells return empty records and name fillers", () => {
     const d = {} as CollabDeps;
-    const sw = server.wire_collab_server(d, { hocuspocus: null });
-    expect(sw).toEqual({});
-    expect(commands.wire_collab_commands(d, sw, { hocuspocus: null })).toEqual({});
-    expect([server.FILLER, commands.FILLER, applyEdit.FILLER, setMode.FILLER, lockSnap.FILLER]).toEqual([
-      "NL-80", "NL-105", "NL-105", "NL-105", "NL-106",
-    ]);
+    const sw = {} as ReturnType<typeof server.wire_collab_server>;
+    expect(commands.wire_collab_commands(d, sw, { hocuspocus: null })).toEqual(
+      {},
+    );
+    expect([
+      commands.FILLER,
+      applyEdit.FILLER,
+      setMode.FILLER,
+      lockSnap.FILLER,
+    ]).toEqual(["NL-105", "NL-105", "NL-105", "NL-106"]);
   });
 
   it("collab starts with ANTHROPIC_API_KEY unset and no model settings", async () => {
@@ -51,7 +58,12 @@ describe("collab shells", () => {
     expect("model" in settings).toBe(false);
     const handlers = new Map<string, () => void>();
     const exit = vi.fn();
-    const rt = await build_collab_runtime(settings, { port: 0, log_write: () => {}, exit, signal_host: { on: (s, f) => void handlers.set(s, f) } });
+    const rt = await build_collab_runtime(settings, {
+      port: 0,
+      log_write: () => {},
+      exit,
+      signal_host: { on: (s, f) => void handlers.set(s, f) },
+    });
     expect(rt.port).toBeGreaterThan(0);
     await rt.stop();
   });
