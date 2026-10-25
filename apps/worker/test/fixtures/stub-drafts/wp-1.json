@@ -1,0 +1,668 @@
+{
+ "_source": "docs/data/worked-pairs.md WP-1 (Required output B); base packages/llm/src/fixtures/draft-wp1.json",
+ "_synthetic": true,
+ "first_draft": {
+  "lesson_id": "G6.U4.L4",
+  "title": "Lesson 4: The Lightning Thief, Chapter 1",
+  "text_cards": [
+   {
+    "title": "The Lightning Thief",
+    "author": "Rick Riordan",
+    "edition": null,
+    "chapter": null,
+    "pages": null,
+    "kind": "off-platform-text",
+    "content_available": false
+   }
+  ],
+  "blocks": [
+   {
+    "role": "routine_heading",
+    "section": "Launch",
+    "part": null,
+    "text": "Think-Pair-Share",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 5
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Launch",
+    "part": null,
+    "text": "Ask: How does a sarcastic voice change how you hear a story?",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "sample_response",
+    "section": "Launch",
+    "part": null,
+    "text": "A sarcastic voice can make a story feel funny or bitter.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Launch",
+    "part": null,
+    "text": "Say: Today we read how Percy tells his own story.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "routine_heading",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Introduce New Words Using Morphemes",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 10
+   },
+   {
+    "role": "cfu_item",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "",
+    "standard_codes": [
+     "L.6.4"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "If mort means death, what does immortal mean?",
+     "options": [
+      "able to live forever",
+      "very old",
+      "afraid of dying",
+      "dead for a long time"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: im- means not, so immortal means not able to die",
+      "Incorrect: the root is about death, not age",
+      "Incorrect: nothing in the word means fear",
+      "Incorrect: im- turns the meaning around: not dying"
+     ],
+     "standard_code": "L.6.4"
+    },
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Say: Listen as I read pages 1-8 and think aloud.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 15
+   },
+   {
+    "role": "text_evidence_needed",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Reviewer to insert: one sentence from Ch. 1, pp. 1-8, where Percy's sarcastic word choice sets the tone",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_watch",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Watch for students who need the idea restated.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "cfu_item",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "",
+    "standard_codes": [
+     "RL.6.1"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "Which detail from the opening best supports an inference about Percy?",
+     "options": [
+      "His informal, sarcastic voice",
+      "The chapter number",
+      "The page count",
+      "The book title"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: Correct: the voice shows how he sees the world.",
+      "Incorrect: Incorrect: a number is not a detail about Percy.",
+      "Incorrect: Incorrect: a count is not evidence.",
+      "Incorrect: Incorrect: a title is not evidence of voice."
+     ],
+     "standard_code": "RL.6.1"
+    },
+    "minutes": null
+   },
+   {
+    "role": "cfu_item",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "",
+    "standard_codes": [
+     "RL.6.2"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "Which idea does the opening start to build?",
+     "options": [
+      "Percy is a hero",
+      "Percy is a problem",
+      "Percy sees normal kids as boring",
+      "Percy is not telling the story"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: The narration frames him as a hero figure.",
+      "Incorrect: The narration does not frame him only as a problem.",
+      "Incorrect: The sheet does not say this.",
+      "Incorrect: The chapter is in first-person narration."
+     ],
+     "standard_code": "RL.6.2"
+    },
+    "minutes": 15
+   },
+   {
+    "role": "callout_watch",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Watch for students who need the idea restated.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "quick_write",
+    "section": "Look Back",
+    "part": null,
+    "text": "Percy's comments show that his world sees ordinary kids as _",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 5
+   },
+   {
+    "role": "sample_response",
+    "section": "Look Back",
+    "part": null,
+    "text": "Percy's comments show that his world sees normal kids as ordinary, because he says so.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "homework",
+    "section": "Homework",
+    "part": null,
+    "text": "Read and annotate The Lightning Thief Chapter 1 (pp. 9-15).",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "excerpt_slot",
+    "section": "Homework",
+    "part": null,
+    "text": "Reviewer to insert the excerpt from The Hare and the Lion",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   }
+  ]
+ },
+ "draft": {
+  "lesson_id": "G6.U4.L4",
+  "title": "Lesson 4: The Lightning Thief, Chapter 1",
+  "text_cards": [
+   {
+    "title": "The Lightning Thief",
+    "author": "Rick Riordan",
+    "edition": null,
+    "chapter": null,
+    "pages": null,
+    "kind": "off-platform-text",
+    "content_available": false
+   }
+  ],
+  "blocks": [
+   {
+    "role": "routine_heading",
+    "section": "Launch",
+    "part": null,
+    "text": "Think-Pair-Share",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 5
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Launch",
+    "part": null,
+    "text": "Ask: How does a sarcastic voice change how you hear a story?",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "sample_response",
+    "section": "Launch",
+    "part": null,
+    "text": "A sarcastic voice can make a story feel funny or bitter.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Launch",
+    "part": null,
+    "text": "Say: Today we read how Percy tells his own story.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "routine_heading",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Introduce New Words Using Morphemes",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 10
+   },
+   {
+    "role": "cfu_item",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "",
+    "standard_codes": [
+     "L.6.4"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "If mort means death, what does immortal mean?",
+     "options": [
+      "able to live forever",
+      "very old",
+      "afraid of dying",
+      "dead for a long time"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: im- means not, so immortal means not able to die",
+      "Incorrect: the root is about death, not age",
+      "Incorrect: nothing in the word means fear",
+      "Incorrect: im- turns the meaning around: not dying"
+     ],
+     "standard_code": "L.6.4"
+    },
+    "minutes": null
+   },
+   {
+    "role": "callout_watch",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Watch for students who need the idea restated.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Say: Listen as I read pages 1-8 and think aloud.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 15
+   },
+   {
+    "role": "text_evidence_needed",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Reviewer to insert: one sentence from Ch. 1, pp. 1-8, where Percy's sarcastic word choice sets the tone",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_watch",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Watch for students who need the idea restated.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "cfu_item",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "",
+    "standard_codes": [
+     "RL.6.1"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "Which detail from the opening best supports an inference about Percy?",
+     "options": [
+      "His informal, sarcastic voice",
+      "The chapter number",
+      "The page count",
+      "The book title"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: Correct: the voice shows how he sees the world.",
+      "Incorrect: Incorrect: a number is not a detail about Percy.",
+      "Incorrect: Incorrect: a count is not evidence.",
+      "Incorrect: Incorrect: a title is not evidence of voice."
+     ],
+     "standard_code": "RL.6.1"
+    },
+    "minutes": null
+   },
+   {
+    "role": "cfu_item",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "",
+    "standard_codes": [
+     "RL.6.2"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": {
+     "stem": "Which idea does the opening start to build?",
+     "options": [
+      "Percy is a hero",
+      "Percy is a problem",
+      "Percy sees normal kids as boring",
+      "Percy is not telling the story"
+     ],
+     "key_index": 0,
+     "rationales": [
+      "Correct: The narration frames him as a hero figure.",
+      "Incorrect: The narration does not frame him only as a problem.",
+      "Incorrect: The sheet does not say this.",
+      "Incorrect: The chapter is in first-person narration."
+     ],
+     "standard_code": "RL.6.2"
+    },
+    "minutes": 15
+   },
+   {
+    "role": "callout_watch",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Watch for students who need the idea restated.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_purpose",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Purpose: students practise the skill.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "callout_say",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Say: Tell your partner what you notice.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "support_table",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "quick_write",
+    "section": "Look Back",
+    "part": null,
+    "text": "Percy's comments show that his world sees ordinary kids as _",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": 5
+   },
+   {
+    "role": "sample_response",
+    "section": "Look Back",
+    "part": null,
+    "text": "Percy's comments show that his world sees normal kids as ordinary, because he says so.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "homework",
+    "section": "Homework",
+    "part": null,
+    "text": "Read and annotate The Lightning Thief Chapter 1 (pp. 9-15).",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "excerpt_slot",
+    "section": "Homework",
+    "part": null,
+    "text": "Reviewer to insert the excerpt from The Hare and the Lion",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   }
+  ]
+ }
+}
