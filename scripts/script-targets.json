@@ -1,0 +1,16 @@
+{
+  "test:e2e":             { "target": "apps/web/playwright.config.ts", "owner": "NL-06", "run": ["npx", "playwright", "test", "-c", "apps/web/playwright.config.ts"] },
+  "db:migrate":           { "target": "ops/migrate.ts",   "owner": "NL-08", "run": ["npx", "tsx", "ops/migrate.ts"] },
+  "db:seed":              { "target": "ops/seed.ts",      "owner": "NL-82", "run": ["npx", "tsx", "ops/seed.ts"] },
+  "schemas:emit":         { "target": "packages/schema/scripts/emit-json-schemas.ts", "owner": "NL-09", "run": ["npx", "tsx", "packages/schema/scripts/emit-json-schemas.ts"] },
+  "eval:golden":          { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "golden"] },
+  "eval:grounding":       { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "grounding"] },
+  "eval:faults":          { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "faults"] },
+  "eval:full-run":        { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "full-run"] },
+  "eval:seed":            { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "seed"] },
+  "eval:heldout":         { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "heldout"] },
+  "eval:judge-calibrate": { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "judge-calibrate"] },
+  "load:spike":           { "target": "load/spike.ts",    "owner": "NL-49", "run": ["npx", "tsx", "load/spike.ts"] },
+  "ops:backup":           { "target": "ops/backup.sh",    "owner": "NL-83", "run": ["bash", "ops/backup.sh"] },
+  "dev":                  { "target": "Dockerfile.node",  "owner": "NL-23", "run": ["docker", "compose", "up", "--build"] }
+}
