@@ -1,0 +1,1 @@
+{"id":"gen-synthetic-1","model":"judge-model-served","choices":[{"message":{"content":"{\"verdict\":\"yes\",\"rationale\":\"Students cite evidence as the standard asks.\"}"}}],"usage":{"prompt_tokens":123,"completion_tokens":45}}
