@@ -7,13 +7,14 @@ import { write_start_event } from "./start-event.ts";
 import { build_collab_deps } from "./deps.ts";
 import type { CollabDeps } from "./deps-types.ts";
 import { create_inflight_tracker, DrainingError, install_drain, type InflightTracker, type SignalHost } from "./drain.ts";
-import { handle_healthz, is_health_path } from "./health.ts";
+import { create_health_handler, is_health_path, open_health_db, type HealthDb } from "./health.ts";
 import { handle_internal, is_internal_path } from "./commands/routes.ts";
 import { wire_collab_server } from "./wiring/server.ts";
 import { wire_collab_commands } from "./wiring/commands.ts";
 
 export interface CollabRuntimeOptions {
   port?: number;
+  health_db?: HealthDb;
   log_write?: (line: string) => void;
   exit?: (code: number) => void;
   signal_host?: SignalHost;
@@ -37,6 +38,8 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
   });
   const deps = build_collab_deps(settings, logger);
   const tracker = create_inflight_tracker();
+  const health_db: HealthDb = opts.health_db ?? open_health_db(settings);
+  const healthz = create_health_handler(health_db, "collab", { build_id: settings.shared.build_id, logger });
 
   const server = new Server({
     port: opts.port ?? settings.collab_port,
@@ -46,7 +49,7 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
     // Hocuspocus convention: write the response, then `throw null` to stop the default "Welcome" reply.
     async onRequest({ request, response }) {
       if (is_health_path(request.url, request.method)) {
-        handle_healthz(response);
+        await healthz(request, response);
         throw null;
       }
       if (is_internal_path(request.url)) {
@@ -86,7 +89,11 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
     },
     off: (sig, fn) => upstream.off?.(sig, fn),
   };
-  install_drain({ tracker, close: () => server.destroy(), exit, logger, host });
+  install_drain({ tracker, close: async () => {
+      await server.destroy();
+      if (!opts.health_db && "close" in health_db) await (health_db as { close(): Promise<void> }).close().catch(() => undefined);
+    },
+    exit, logger, host });
   return {
     settings, deps, server, port, logger, tracker,
     stop() {
