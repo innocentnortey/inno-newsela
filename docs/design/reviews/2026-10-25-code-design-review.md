@@ -244,3 +244,55 @@ Blocking items to fix before §7 cuts tickets:
    `refused_from`, add the editor's drop-and-tell module.
 
 All three are edits to DO-3 §4/§2 and DO-4 §7/§12 (no new design questions). After those edits, a re-check needs only those sections.
+
+## Re-review 2026-10-25
+
+**Scope:** the sections named in the first review, as revised in `3f25be0` (DO-3/DO-4) and `e62fbb9` (CHG-1), checked by
+grep and section reads rather than a full re-read; then a skim of DO-3 §4 and DO-4 §7/§12 for anything new. Same
+reviewer, same rule (`code-design-solid-modularity`).
+
+### Prior findings
+
+| Finding | Status | Where it is now |
+|---|---|---|
+| **B1** wave order vs calls | **Resolved** | DO-3 §4 now says "strictly earlier" and keeps to it. New areas A12a lesson records, A9a queue and runs, A13a metrics records (wave 1); `PgPromptRepo` moved to A7 (wave 1); A11a lesson store, A6b check context, A7b paid calls, A11b collab client, A13b metrics writer (wave 2); every service, node, route area in wave 3. Every cross-area call I traced (A6b → A12a/A5/A4a, A9 → A7b/A9a/A11a/A12a, A11 → A11a/A6b, A12 → A11b/A13b) goes to an earlier wave. The cross-area column is generated from DO-4 constructors and the area map mirrors it. |
+| **B2** unowned workspace files, composition roots | **Resolved** | DO-3 §1 *Who owns the workspace files* and the §4 A0 row: every `*/package.json`, `*/tsconfig.json`, the one root lockfile, ESLint and Vitest configs, subpath `exports`, no barrel. DO-4 §12 *Per-area wiring*: A0 writes every wiring stub and the roots in wave 0; each stub passes to its area; roots never change. |
+| **B3** SP-2 result not carried | **Resolved** | DO-3 §2.5 (`frozen-docs.ts`, `permissions.ts` with `beforeHandleMessage`, `lock-and-snapshot.ts` freeze-first), §2.3 `refusals.ts` (A14), §5 option B as **don't**. DO-4 §1, §3.3, §7: `FrozenDocs`, `WriteGuard.on_update`, `AckBroadcaster.refused(…, refused_from)`, `apply_refusal`. No fallback text left in DO-3/DO-4; CHG-1 removed it from the cards. |
+| S1 concrete `PgDatabase` | Resolved | DO-4 §2 `TxRunner` port, `FakeTxRunner`; `PgDatabase` remains only in repo constructors, health, migrations, seed and `*Deps`. |
+| S2 store writes others' tables | Resolved | DO-4 §3.4 `PgLessonDocStore_ctor` takes `checks`, `states`, `audit`; DO-3 §2.2 row says "through their ports". |
+| S3 one `LessonRepo` for six areas | Resolved | DO-4 §3.5 split into state / version / graph; `BoardReadRepo` in A13a. |
+| S4 settings | Resolved | DO-4 §9 `ModelSettings` (web and worker only), `model_assist_id`, `outline_max_bytes` and the other web fields. |
+| S5 one `ports.ts` | Resolved | `packages/core/src/ports/<port>.ts`, all by A1 in wave 0. |
+| S6 money protocol ×5 | Resolved, better than asked | DO-4 §4 `PaidCaller`; the design went further and dropped the reserve/settle nodes (per-call reservation), so the lesson job uses the same protocol. Judge (cut #2) still uses the ledger by hand; acceptable while it is cut. |
+| C1 check registry | Resolved | DO-3 §4 A6a note: first ticket stubs all 28 rule files. |
+| C2 `TransitionService` | Resolved | `ApproveService` split out (DO-3 §2.3, §5). |
+| C3 `WriteGuard` state list | Resolved | `is_editable` in the lesson machine; DO-4 §7 says the guard keeps no state list. |
+| C4 dead references | Resolved | No `pydantic-ai-agents` citations; `code-structure.md` location stated in the DO-3 header. |
+
+### New findings
+
+**S7 · Should — wiring stub records name service types that do not exist in wave 0 (DO-4 §12 *Per-area wiring*).**
+A0's stubs "return the record with the area's services unset", but each record (`SessionWiring`, `OutlineWiring`, …) is
+typed by service classes that wave 3 creates. Written literally, A0's `container.ts` does not compile in wave 0, or the
+records get typed `any` and route handlers lose their types. *Change it makes expensive:* the first A0 ticket, and every
+wave-3 route that reads `services.<x>`. *Fix:* say in §12 that each record lives in its wiring file with optional fields
+(`sessions?: SessionService`) imported **type-only** from the service path the area will create, and that A0 writes a
+one-line placeholder service type per path; or that the stub record fields are `unknown` until the owning area narrows
+them in its own file. One sentence either way; a planner should not have to invent it.
+
+**C5 · Could — A14 integration tickets share wave 3 with the backends they join (DO-3 §4 A14 row).** The table says
+calls go strictly to earlier waves, but A14's wave-3 integration tickets call CON routes built in wave 3. The ticket
+readiness rule already handles this (integration tickets run once both sides merge), so state it in the row:
+"integration tickets depend on the route's area ticket; effectively wave 3b."
+
+**C6 · Could — stale open item (DO-4 §13 item 6a).** It still proposes removing the close-every-connection text from
+CON-12/CON-18 as a future CHG; CHG-1 did that. Mark it closed with `CHG-1`.
+
+### What's good in the revision
+
+The re-table is mechanical and checkable rather than argued, which is what makes it trustworthy: a planner can verify any
+row against a DO-4 constructor. The per-call `PaidCaller` is simpler than my S6 suggestion and removes a node pair; that
+is the right direction. The SP-2 rule now has one owner per end of the channel (A11 server, A14 editor) and a named field
+between them.
+
+**Verdict (re-review):** PASS

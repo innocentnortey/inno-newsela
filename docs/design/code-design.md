@@ -588,3 +588,4 @@ dependencies.
   wiring owners*).
 - **e2e ownership:** FW-4 keeps `apps/web/playwright.config.ts` and `apps/web/e2e/gallery/**`; each screen ticket owns
   `apps/web/e2e/<screen>/**`; NL-06 deletes FW-1's `apps/web/package-lock.json` (one root lockfile).
+- **Kickoff page (WF-46):** `evals/src/kickoff/cli.ts` (A20) writes `kickoff.html` as `docs/artifacts/<date>-experiment-kickoff.html`; a file, not a table (no Postgres needed).

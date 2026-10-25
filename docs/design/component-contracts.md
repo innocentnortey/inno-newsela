@@ -2887,7 +2887,7 @@ in the wiring files as `deps.model_client`); tests construct services with fakes
 `FakeSpendLedger`, `FakeCollabCommands`, `StubModelClient`, `FakeClock`).
 
 **Per-area wiring (Metz B2).** A0 creates every wiring file below as a stub in wave 0 (returning its record with the
-area's services unset) and the composition root that imports them all; after wave 0 each wiring file belongs to the
+area's services unset; in wave 0 each record field is typed by the area's **port Protocol** from `packages/core/src/ports/` (DO-4 §3–§4), never by a service class that does not exist yet, so the stubs compile before any service is built — Metz S7) and the composition root that imports them all; after wave 0 each wiring file belongs to the
 area named beside it, and the composition root never changes again. A wiring file builds the concrete repositories and
 adapters it needs from `deps` (repositories are stateless over the one `PgDatabase`, so two wiring files constructing
 `PgLessonRepo` share nothing but the pool).
@@ -3022,7 +3022,7 @@ def wire_collab(d: CollabDeps, hocuspocus: HocuspocusServerRef) -> CollabWiring:
 5. **Spike values are in.** SP-1 (model, effort, token caps, timeout, concurrency, prices, run cap), SP-2 (option A
    freeze) and SP-3 (quote span 3, name scan blocking in `cfu_item`s) replaced the `[A] → SP-N` defaults here and in
    DO-3 §7. None changed a card promise, so no `CHG-N` was needed.
-6. **Proposed card clean-ups (not required by this design, raised for the contract owner):** (a) CON-12 and CON-18 still
+6. **Proposed card clean-ups (raised for the contract owner):** (a) done — CHG-1 (2026-10-25) removed the SP-2 close-all-connections fallback from CON-12 and CON-18 (Metz C6). The rest of this item stands: (a) CON-12 and CON-18 still
    describe the SP-2 close-every-connection fallback, which SP-2 rejected; the promise is unchanged, so removing the text
    is a presentation-only `CHG`. (b) The OpenAPI `Approve` schema lists `rating` as required while CON-18 names
    `RATING_REQUIRED`; this design keeps the card's code reachable with `TransitionRequestInput` (§5) and a contract test,

@@ -72,6 +72,7 @@ table was first drafted; each is now inherited by at least one row (see *Metric 
 | WF-43 | Integrity invariants suite (S5), `npm run test:e2e -- integrity --trials 20` (Playwright, 3 browser contexts) | validation | Playwright runner, web app, collaboration server | `eval_run_id`; trial number | `eval_run`, `eval_case_result`. One result per assertion per trial, with the store p95 | `test_integrity_suite_records`: runs one trial of one assertion; asserts the case result with its trial number and the report path on the `eval_run` row | EV: S5; M-27, M-36, M-37 |
 | WF-44 | Heartbeat measurement suite (S8), `npm run test:e2e -- heartbeat`, plus Innocent's stopwatch sheet | validation | Playwright runner, web app | `eval_run_id`; each scripted review id | `eval_run`, `eval_case_result`, `heartbeat`. Computed against scripted minutes per case; scripted heartbeats carry the `synthetic` flag | `test_heartbeat_suite_records`: runs one scripted review; asserts computed and expected minutes on the case result and every scripted heartbeat flagged synthetic | EV: S8; M-1, M-43 |
 | WF-45 | JSON Schema emitter, `npm run schemas:emit` (`packages/schema/scripts/emit-json-schemas.ts`) | runtime-operation | operator script | the git SHA; each emitted file's hash | The emitted files `docs/contracts/schemas/*.schema.json` and `docs/contracts/lesson-export.schema.json`; no database record (a build step that runs without Postgres) | `test_schemas_emit_clean`: runs the emitter; asserts the output is byte-identical to the committed files and the export schema validates a fixture lesson | n/a — build artifact for CON-23 and the contracts; no metric or model output |
+| WF-46 | §9 experiment kickoff page generator, `npx tsx evals/src/kickoff/cli.ts` (npm alias `eval:kickoff`): writes `docs/artifacts/<date>-experiment-kickoff.html` from the code | development-experiment | operator script | the git SHA; the output file's SHA-256 | `kickoff.html` (the generated page `docs/artifacts/<date>-experiment-kickoff.html`). Its footer names the git SHA, prompt versions and generator version; there is no database record (a build step that runs without Postgres) | `test_kickoff_page_from_code`: generates the page from fixtures; asserts every prompt layer appears verbatim with its version, every pipeline node name appears, the FC rows of DO-5 appear, the footer names the SHA, the page is standalone HTML, and changing a prompt file changes the page | n/a — a reading aid for the error-analysis round (§9); no metric or model output |
 
 Workflow classes. Every class is present.
 
@@ -80,7 +81,7 @@ Workflow classes. Every class is present.
 | user-operation | yes | WF-1, WF-2, WF-3, WF-4, WF-5, WF-6, WF-7, WF-8, WF-9, WF-11, WF-12, WF-13, WF-14, WF-15, WF-16, WF-17, WF-18, WF-19, WF-20, WF-41 |
 | background-job | yes | WF-10, WF-21, WF-22, WF-23 |
 | validation | yes | WF-24, WF-25, WF-26, WF-27, WF-28, WF-29, WF-30, WF-31, WF-42, WF-43, WF-44 |
-| development-experiment | yes | WF-32, WF-33, WF-34 |
+| development-experiment | yes | WF-32, WF-33, WF-34, WF-46 |
 | runtime-operation | yes | WF-35, WF-36, WF-37, WF-38, WF-39, WF-40, WF-45 |
 
 **Metric coverage check** (every `M-n` in DO-7, M-1…M-44, has at least one workflow; reconciled 2026-10-25 after
