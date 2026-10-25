@@ -81,7 +81,7 @@ def compute():
         for wf in sorted(included, key=lambda w: int(w.split("-")[1])):
             proof = None
             cands = [(t["id"], acid) for t in coverers for acid, text in acs[t["id"]].items()
-                     if rid in covers(text) and wf in text.upper()]
+                     if rid in covers(text) and re.search(rf"\b{wf}\b", text.upper())]
             fresh = [c for c in cands if used.get((rid,) + c, wf) == wf]
             if fresh:
                 proof = fresh[0]

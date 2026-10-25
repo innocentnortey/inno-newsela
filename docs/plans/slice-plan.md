@@ -467,6 +467,16 @@ table above is the 7a cut. These rows changed during 7b (the parallelism audit r
 | NL-09 | also owns `content-hash.ts` and the three intake records (NL-12 re-exports them) | be1 |
 | NL-20 | writes all 28 rule files (3 structural bodies, 25 stubs) and the 6 group `index.ts` files; `vocabulary_word_missing` joins its structural set | be1 / resolver |
 
+### Parallelism audit re-run after 7c repairs (2026-10-25)
+
+Computed from the ticket files (`docs/plans/tickets/*.json`) after the 7b row changes and the 7c coverage repairs:
+**0 edges** point to a ticket in the same or a later wave; **critical path 13** (NL-01 → NL-08 → NL-12 → NL-25 → NL-80 →
+NL-105 → NL-113 → NL-126 → NL-133 → NL-137 → NL-138 → NL-141 → NL-143); widest wave still **W4 (38)**; wave sizes W0 6 ·
+W1 8 · W2 13 · W3 29 · W4 38 · W5 22 · W6 10 · W7 10 · W8 4 · W9 1 · W10 3 · W11 2 · W12 1. Final splits: kinds 4
+foundation · 23 frontend · 64 backend · 56 integration; lanes 122 build-loop · 17 direct · 8 human; **29**
+`risk::security` (the 7a estimate was 30; the spec writers' frozen-test notes settle it at 29). The 7c repairs added
+per-workflow coverage criteria to existing integration owners and no new edges.
+
 ## Execution order for Phase B (Sonnet build loop)
 
 1. **Waves in order, pipelined.** A ticket starts when its own blockers are merged and it passes
