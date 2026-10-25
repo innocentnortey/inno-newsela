@@ -20,6 +20,13 @@ function sources(dir: string): string[] {
   });
 }
 const FORBIDDEN = /from\s+"(@ls\/llm|@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
+// NL-23 (orchestrator decision, PD-32): the process-start event writers open their own one-connection PgDatabase to
+// write the process_start ops_event, so these two files, by exact path, may import @ls/db. Nothing else may.
+const DB_EXEMPT = new Set(["collab/src/start-event.ts", "worker/src/start-event.ts"]);
+function forbidden_for(root: string, f: string): RegExp {
+  const rel = f.slice(root.length + 1);
+  return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
+}
 
 describe("collab shells", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -50,12 +57,12 @@ describe("collab shells", () => {
     const here = join(import.meta.dirname, "..", "..", "..");
     for (const f of sources(join(here, "collab", "src"))) {
       const t = readFileSync(f, "utf8");
-      expect(t, f).not.toMatch(FORBIDDEN);
+      expect(t, f).not.toMatch(forbidden_for(here, f));
       expect(t, f).not.toMatch(/apps\/worker|ANTHROPIC_API_KEY/);
     }
     for (const f of sources(join(here, "worker", "src"))) {
       const t = readFileSync(f, "utf8");
-      expect(t, f).not.toMatch(FORBIDDEN);
+      expect(t, f).not.toMatch(forbidden_for(here, f));
       expect(t, f).not.toMatch(/apps\/collab/);
     }
   });
