@@ -136,6 +136,7 @@ export const Issue = z.object({
     "code_not_allowed",
     "minutes_out_of_range",
     "section_missing",
+    "schema_invalid",
     "quote_unmatched",
     "page_out_of_range",
     "proper_noun_unsourced",
