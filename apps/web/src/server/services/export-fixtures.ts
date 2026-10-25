@@ -114,7 +114,15 @@ interface State {
   state_writes: Array<{ lesson_id: string; to: LessonStateName }>;
 }
 
-const clone = <T>(v: T): T => structuredClone(v);
+const clone = <T>(v: T): T => deep(v) as T;
+function deep(v: unknown): unknown {
+  if (v instanceof Decimal) return v;
+  if (v instanceof Date) return new Date(v.getTime());
+  if (v instanceof Map) return new Map([...v].map(([k, x]) => [k, deep(x)]));
+  if (Array.isArray(v)) return v.map(deep);
+  if (v !== null && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deep(x)]));
+  return v;
+}
 
 export class World {
   states: State["states"] = new Map();
