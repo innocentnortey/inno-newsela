@@ -47,8 +47,9 @@ export async function run_fault_suite(opts: EvalOptions, deps: FaultDeps): Promi
   const suite = make_s6(opts.provider_mode, deps.only);
   // EV-R1: name the prompt version. The locked layer is stored (idempotent) and the stored prompt_version row's id goes in the report.
   const ids = new PrefixedIdGenerator();
-  const stored = await deps.db.with_tx((tx) => new PgPromptRepo({ db: deps.db as PgDatabase, ids, clock: deps.clock }).sync_locked_layer(locked_hash(LOCKED_DIR), tx));
-  if (stored === null) throw new Error("locked prompt layer not stored");
+  const prompts = new PgPromptRepo({ db: deps.db as PgDatabase, ids, clock: deps.clock });
+  await deps.db.with_tx((tx) => prompts.sync_locked_layer(locked_hash(LOCKED_DIR), tx)); // null when already stored
+  const stored = await prompts.current();
   const runner = new EvalRunner(deps.evidence, [suite], deps.clock, {
     repo_root: deps.repo_root ?? REPO_ROOT,
     ...(deps.reports_dir !== undefined ? { reports_dir: deps.reports_dir } : {}),
