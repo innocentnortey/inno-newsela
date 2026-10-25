@@ -32,11 +32,11 @@ describe("handed-over shells", () => {
     });
   }
 
-  it("AssistPanel is a labelled region with Close", async () => {
+  it("AssistPanel is a labelled region with a back button", async () => {
     const onClose = vi.fn();
     render(<AssistPanel lessonId="G6.U4.L4" selection={null} onClose={onClose} />);
     expect(screen.getByRole("region", { name: "AI assist" })).toBeInTheDocument();
-    await userEvent.click(screen.getAllByRole("button", { name: "Close" })[0]!);
+    await userEvent.click(screen.getByRole("button", { name: "Back to the rail" }));
     expect(onClose).toHaveBeenCalled();
   });
 });
