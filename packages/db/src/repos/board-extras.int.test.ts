@@ -16,7 +16,7 @@ const DONE = "G6.U4.L2";
 
 const w = <T>(fn: (tx: any) => Promise<T>): Promise<T> => t.db.with_tx(fn);
 const ev = (lesson_id: string, to_state: string, at: string, over: Record<string, unknown> = {}) =>
-  w((tx) => insert_row(tx, "review_event", { id: ids.new_id("evt"), lesson_id, from_state: "submitted", to_state, actor_id: USER, at, ...over }));
+  w((tx) => insert_row(tx, "review_event", { id: ids.new_id("ev"), lesson_id, from_state: "submitted", to_state, actor_id: USER, at, ...over }));
 
 beforeAll(async () => {
   t = await create_test_db();
