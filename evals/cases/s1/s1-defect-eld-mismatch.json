@@ -1,0 +1,24 @@
+{
+  "case_id": "s1-defect-eld-mismatch",
+  "provenance": "hand-written",
+  "source": "docs/data/samples issued sheet row 11 (ELD cell)",
+  "guards": "an ELD code whose label does not fit its strand is flagged",
+  "input": {
+    "grid": "rows",
+    "sheet_rows": [
+      11
+    ]
+  },
+  "expected": {
+    "defect_kinds": {
+      "malformed_code": 0,
+      "nonexistent_code": 0,
+      "unit_conflict": 1,
+      "bad_filename": 0,
+      "eld_mismatch": 1,
+      "duplicate_id": 0,
+      "missing_required_column": 0
+    }
+  },
+  "note": "every slice keeps one unit_conflict because the title says U4 and the filenames say U3; slice row numbers are slice positions"
+}

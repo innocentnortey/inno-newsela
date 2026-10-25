@@ -1,0 +1,16 @@
+{
+  "case_id": "s7-wp4-2-routed-to-tip",
+  "provenance": "hand-written",
+  "source": "docs/data/worked-pairs.md WP-4 (issued sheet row 39, lesson G6.U4.L31)",
+  "guards": "WP-4 check 2: a safety note needs a teacher tip carrying its id; without one the check blocks",
+  "input": {
+    "grid": "issued",
+    "sheet_row": 39
+  },
+  "expected": {
+    "findings_without_tip": 0,
+    "tip_carries_note_id": true,
+    "control_findings_without_tip": 1,
+    "control_is_blocking": true
+  }
+}

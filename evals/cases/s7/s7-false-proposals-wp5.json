@@ -1,0 +1,13 @@
+{
+  "case_id": "s7-false-proposals-wp5",
+  "provenance": "synthetic",
+  "source": "docs/data/worked-pairs.md WP-5; SYN-3 clean control (row 10)",
+  "guards": "the clean control row gets zero safety proposals",
+  "input": {
+    "grid": "syn3",
+    "sheet_row": 10
+  },
+  "expected": {
+    "false_proposals": 0
+  }
+}

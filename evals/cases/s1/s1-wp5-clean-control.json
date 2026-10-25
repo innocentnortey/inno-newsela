@@ -1,0 +1,27 @@
+{
+  "case_id": "s1-wp5-clean-control",
+  "provenance": "synthetic",
+  "source": "docs/data/worked-pairs.md WP-5; docs/data/samples SYN-3 clean control (row 10)",
+  "guards": "a clean row stays ok with no findings and gets no invented safety proposal",
+  "input": {
+    "grid": "syn3"
+  },
+  "expected": {
+    "row_report": {
+      "row_number": 10,
+      "level": "ok",
+      "finding_count": 0,
+      "lesson_id": "G6.U4.L6",
+      "lesson_type": "Reading",
+      "focus_codes": [
+        "RL.6.1"
+      ],
+      "vocabulary_count": 6,
+      "has_editor_note": false
+    },
+    "safety_proposals_on_row": {
+      "row_number": 10,
+      "count": 0
+    }
+  }
+}

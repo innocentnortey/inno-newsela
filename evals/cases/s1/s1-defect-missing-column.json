@@ -1,0 +1,25 @@
+{
+  "case_id": "s1-defect-missing-column",
+  "provenance": "hand-written",
+  "source": "docs/data/samples issued sheet row 4 with the ELD header blanked",
+  "guards": "a missing required column is flagged and the ELD findings go with it",
+  "input": {
+    "grid": "rows",
+    "sheet_rows": [
+      4
+    ],
+    "blank_header_prefix": "designated eld"
+  },
+  "expected": {
+    "defect_kinds": {
+      "malformed_code": 0,
+      "nonexistent_code": 0,
+      "unit_conflict": 1,
+      "bad_filename": 0,
+      "eld_mismatch": 0,
+      "duplicate_id": 0,
+      "missing_required_column": 1
+    }
+  },
+  "note": "every slice keeps one unit_conflict because the title says U4 and the filenames say U3; slice row numbers are slice positions"
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "s7-wp4-4-approve-refused-until-cleared",
+  "provenance": "hand-written",
+  "source": "docs/data/worked-pairs.md WP-4 (issued sheet row 39, lesson G6.U4.L31)",
+  "guards": "WP-4 check 4: approve is refused while the flag is open, a recorded resolution cannot clear it, only clearing the flag can",
+  "input": {
+    "grid": "issued",
+    "sheet_row": 39
+  },
+  "expected": {
+    "open_flag_blocking": 1,
+    "approve_allowed_while_open": false,
+    "approve_refusals_include_blocked": true,
+    "approve_allowed_with_recorded_resolution": false,
+    "cleared_flag_open_findings": 0,
+    "approve_allowed_when_cleared": true
+  }
+}

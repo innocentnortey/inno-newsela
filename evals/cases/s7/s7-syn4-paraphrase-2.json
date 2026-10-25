@@ -1,0 +1,12 @@
+{
+  "case_id": "s7-syn4-paraphrase-2",
+  "provenance": "synthetic",
+  "source": "SYN-4+ (HP-9; metrics-registry M-39), written by evals/cases/s7/build_syn4.py",
+  "guards": "measurement only: a paraphrased warning's miss is a stated limit (M-39), never a failure",
+  "input": {
+    "line": "Be aware that the closing scene is emotionally heavy for a number of children."
+  },
+  "expected": {
+    "measurement_only": true
+  }
+}
