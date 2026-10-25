@@ -1,0 +1,490 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Unit synthetic heading"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "align": "center"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Centered "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "strong"
+            }
+          ],
+          "text": "bold"
+        },
+        {
+          "type": "text",
+          "text": " and "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "em"
+            }
+          ],
+          "text": "italic"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "align": null
+      },
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "teacher_talk"
+            }
+          ],
+          "text": "Teacher says this."
+        },
+        {
+          "type": "hard_break"
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "sample_response"
+            }
+          ],
+          "text": "A sample answer."
+        }
+      ]
+    },
+    {
+      "type": "bullet_list",
+      "content": [
+        {
+          "type": "list_item",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "align": null
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "First bullet"
+                }
+              ]
+            },
+            {
+              "type": "ordered_list",
+              "attrs": {
+                "order": 1,
+                "type": null
+              },
+              "content": [
+                {
+                  "type": "list_item",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "attrs": {
+                        "align": null
+                      },
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Nested one"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list_item",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "align": null
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Second bullet"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ordered_list",
+      "attrs": {
+        "order": 3,
+        "type": "A"
+      },
+      "content": [
+        {
+          "type": "list_item",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "align": null
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Choice A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "list_item",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "align": null
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Choice B"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "content": [
+        {
+          "type": "table_row",
+          "content": [
+            {
+              "type": "table_header",
+              "attrs": {
+                "colspan": 1,
+                "rowspan": 1,
+                "colwidth": null
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": {
+                    "align": null
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Term"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_header",
+              "attrs": {
+                "colspan": 1,
+                "rowspan": 1,
+                "colwidth": null
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": {
+                    "align": null
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Meaning"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "table_row",
+          "content": [
+            {
+              "type": "table_cell",
+              "attrs": {
+                "colspan": 1,
+                "rowspan": 1,
+                "colwidth": null
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": {
+                    "align": null
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "ally"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_cell",
+              "attrs": {
+                "colspan": 1,
+                "rowspan": 2,
+                "colwidth": [120]
+              },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "attrs": {
+                    "align": null
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "a helper"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "cfu"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Check for understanding"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "notes_section"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Notes"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "writing"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Writing"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "graphic_organizer"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Organizer"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "academic_discussion"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Discussion"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "personal_dictionary"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Dictionary"
+        }
+      ]
+    },
+    {
+      "type": "routine_heading",
+      "attrs": {
+        "icon": "reading"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Reading"
+        }
+      ]
+    },
+    {
+      "type": "callout",
+      "attrs": {
+        "variant": "purpose"
+      },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "align": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Purpose of the lesson."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "callout",
+      "attrs": {
+        "variant": "say"
+      },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "align": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Say this aloud."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "callout",
+      "attrs": {
+        "variant": "watch"
+      },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "align": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Watch for confusion."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "collapsible",
+      "attrs": {
+        "label": "More support"
+      },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "align": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Hidden details."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "teacher_tip",
+      "attrs": {
+        "safety_note_id": null
+      },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": {
+            "align": null
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Tip for the teacher."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "quote_placeholder",
+      "attrs": {
+        "slot_id": "q-1",
+        "reason": "needs a short quote"
+      }
+    },
+    {
+      "type": "excerpt_slot",
+      "attrs": {
+        "slot_id": "x-1",
+        "rights": "unset",
+        "source_ref": null
+      }
+    }
+  ]
+}
