@@ -11,6 +11,9 @@ import { resolveLanding } from "./next-param";
 
 const MSG_NOT_LISTED = "This email is not on the staff list. Check the spelling or ask your content lead to add you.";
 const MSG_INVALID = "That email and password don't match.";
+// The live region must not repeat the inline sentence verbatim: a text query (or a screen-reader user browsing by text) would find two copies (NL-90 real-stack finding).
+const SAY_INVALID = "Sign-in failed. Check your email and password.";
+const SAY_NOT_LISTED = "Sign-in failed. That email is not on the staff list.";
 const MSG_NETWORK = "Couldn't reach Lesson Studio. Try again.";
 
 export function SignInForm({ next, onSignedIn }: { next?: string | null; onSignedIn?: (role: Role) => void }) {
@@ -40,12 +43,12 @@ export function SignInForm({ next, onSignedIn }: { next?: string | null; onSigne
       const code = isApiError(e) ? e.code : "NETWORK";
       if (code === "INVALID_CREDENTIALS") {
         setPasswordError(MSG_INVALID);
-        announce(MSG_INVALID);
+        announce(SAY_INVALID);
         passwordRef.current?.focus();
       } else {
         const msg = code === "NOT_ON_ALLOW_LIST" ? MSG_NOT_LISTED : MSG_NETWORK;
         setEmailError(msg);
-        announce(msg);
+        announce(code === "NOT_ON_ALLOW_LIST" ? SAY_NOT_LISTED : msg);
         emailRef.current?.focus();
       }
       setBusy(false);
