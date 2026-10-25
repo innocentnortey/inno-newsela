@@ -1,0 +1,44 @@
+
+Running 22 tests using 1 worker
+
+axe loading 1280x light: 0 serious, 0 critical
+axe loading 1280x dark: 0 serious, 0 critical
+axe loading 390x light: 0 serious, 0 critical
+axe loading 390x dark: 0 serious, 0 critical
+  ✓   1 e2e/integration/con-1/axe.spec.ts:15:5 › axe loading state @axe (1.5s)
+axe wrong-password 1280x light: 0 serious, 0 critical
+axe wrong-password 1280x dark: 0 serious, 0 critical
+axe wrong-password 390x light: 0 serious, 0 critical
+axe wrong-password 390x dark: 0 serious, 0 critical
+  ✓   2 e2e/integration/con-1/axe.spec.ts:26:5 › axe wrong-password state @axe (3.1s)
+axe unknown-email 1280x light: 0 serious, 0 critical
+axe unknown-email 1280x dark: 0 serious, 0 critical
+axe unknown-email 390x light: 0 serious, 0 critical
+axe unknown-email 390x dark: 0 serious, 0 critical
+  ✓   3 e2e/integration/con-1/axe.spec.ts:36:5 › axe unknown-email state @axe (3.1s)
+axe landing 1280x light: 0 serious, 0 critical
+axe landing 1280x dark: 0 serious, 0 critical
+axe landing 390x light: 0 serious, 0 critical
+axe landing 390x dark: 0 serious, 0 critical
+  ✓   4 e2e/integration/con-1/axe.spec.ts:45:5 › axe signed-in landing @axe (1.9s)
+  ✓   5 e2e/integration/con-1/copy.spec.ts:6:5 › copy: the self-check catches a banned sample (1ms)
+  ✓   6 e2e/integration/con-1/copy.spec.ts:12:5 › copy: /sign-in and the signed-in frame carry no banned phrase (479ms)
+  ✓   7 e2e/integration/con-1/landing.spec.ts:13:7 › landing: author signs in, gets an HttpOnly Strict cookie, one session and one audit event (418ms)
+  ✓   8 e2e/integration/con-1/landing.spec.ts:13:7 › landing: reviewer signs in, gets an HttpOnly Strict cookie, one session and one audit event (397ms)
+  ✓   9 e2e/integration/con-1/landing.spec.ts:13:7 › landing: approver signs in, gets an HttpOnly Strict cookie, one session and one audit event (544ms)
+  ✓  10 e2e/integration/con-1/not-on-list.spec.ts:12:5 › not-on-list: unknown email is refused with NOT_ON_ALLOW_LIST and writes nothing [refusal] (1.5s)
+  ✓  11 e2e/integration/con-1/secrets-absent.spec.ts:25:5 › secrets-absent: foreign Origin refused; canary password and raw unknown email appear nowhere [negative] (3.4s)
+  ✓  12 e2e/integration/con-1/session-round-trip.spec.ts:9:5 › session-round-trip: read, sign out, expire, sign in again lands on next (2.0s)
+  ✓  13 e2e/integration/con-1/signin-capture.spec.ts:10:5 › test_signin_capture: seeded roles leave a session and an audit event; an unknown email leaves only a hashed log line (4.0s)
+  ✓  14 e2e/integration/con-1/visual.spec.ts:5:5 › sign-in main state @visual (748ms)
+  ✓  15 e2e/integration/con-1/visual.spec.ts:15:5 › sign-in unknown-email state @visual (2.1s)
+  ✓  16 e2e/integration/con-1/wf-1-obligations.spec.ts:21:5 › GR-13: staff only, no student or teacher accounts or keys (565ms)
+  ✓  17 e2e/integration/con-1/wf-1-obligations.spec.ts:30:5 › OBS-11: the WF-1 row is registered and its capture test exists (1ms)
+  ✓  18 e2e/integration/con-1/wf-1-obligations.spec.ts:39:5 › GR-9: the restricted source folder is ignored, untracked and never referenced by integration specs (14ms)
+  ✓  19 e2e/integration/con-1/wf-1-obligations.spec.ts:49:5 › CON-G1: the role comes from the server; a tampered or missing cookie is UNAUTHENTICATED (731ms)
+  ✓  20 e2e/integration/con-1/wf-1-obligations.spec.ts:75:5 › CON-G8: no review or minutes keys and no person name beyond user.name (560ms)
+  ✓  21 e2e/integration/con-1/wf-1-obligations.spec.ts:94:5 › outline fixtures: the helper writes a CSV with a header and three lesson rows (26ms)
+  ✓  22 e2e/integration/con-1/wrong-password.spec.ts:6:5 › wrong-password: listed email, bad password waits >= 900 ms, INVALID_CREDENTIALS, nothing written [refusal] (1.6s)
+
+  22 passed (1.0m)
+EXIT 0

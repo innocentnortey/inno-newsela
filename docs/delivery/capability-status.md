@@ -1,12 +1,12 @@
 # Capability status — what a user can actually do
 
-Updated 2026-10-25 (main after NL-71). A ticket merging is **implementation** progress. A capability counts as **usable** only when a user can reach it through the intended action **and** its browser test passes on the connected stack (real routes, not only the Prism mock). Until the integration tickets run, no row below is "usable"; the columns say how far each is.
+Updated 2026-10-25 (main after NL-71 + first connected run). A ticket merging is **implementation** progress. A capability counts as **usable** only when a user can reach it through the intended action **and** its browser test passes on the connected stack (real routes, not only the Prism mock). Until the integration tickets run, no row below is "usable"; the columns say how far each is.
 
 Columns: **Built** (code merged) · **Tested on mock** (Playwright + axe against Prism) · **Reachable** (a user action leads to it in the app) · **Connected** (passes on the real stack).
 
 | Capability (who can do what) | Screens / tickets | Built | Tested on mock | Reachable | Connected |
 |---|---|---|---|---|---|
-| A staff member signs in | SCR-1 NL-24 | yes | yes | yes | no (NL-90 backend merged; web integration test pending) |
+| A staff member signs in | SCR-1 NL-24, CON-1 NL-90 | yes | yes | yes | **YES, verified 2026-10-25**: 22/22 real-stack specs (`playwright.real.config.ts`, real `next start`, Postgres 55440): listed staff sign in with an HttpOnly Strict cookie, one session and one audit event per role; unknown email refused `NOT_ON_ALLOW_LIST` with nothing written; wrong password waits ≥ 900 ms, `INVALID_CREDENTIALS`; foreign Origin refused; tampered cookie `UNAUTHENTICATED`; sign out / expiry / sign in lands on `next`; axe 0 serious/critical; log `evidence-con-1-real-stack-2026-10-25.log` |
 | A reviewer sees their units and uploads an outline | SCR-2/3 NL-55/56 | yes | yes | yes | no (NL-93) |
 | A reviewer reads the validation report and starts a run | SCR-4/5 NL-57/58 | yes | yes | yes | no (NL-94/95) |
 | A reviewer watches a run and reads the unit plan | SCR-6/7 NL-59/60 | yes | yes | yes | no (NL-96) |
