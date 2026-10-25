@@ -184,8 +184,11 @@ export function viewFromError(e: unknown): ApproveView {
     case "ROLE_FORBIDDEN": return { kind: "forbidden" };
     case "DEPENDENCY_UNAPPROVED": {
       // Contract (interface.openapi.yaml, DEPENDENCY_UNAPPROVED): details = { lesson_id } naming the unapproved source lesson.
-      const id = e.details.lesson_id;
-      return { kind: "dependency", lessonIds: typeof id === "string" ? [id] : [] };
+      // The server (gates.ts details_for, NL-115 join) names them as `source_lesson_ids`; `lesson_id` is the contract's older spelling.
+      const many = e.details.source_lesson_ids;
+      const one = e.details.lesson_id;
+      if (Array.isArray(many)) return { kind: "dependency", lessonIds: many.filter((x): x is string => typeof x === "string") };
+      return { kind: "dependency", lessonIds: typeof one === "string" ? [one] : [] };
     }
     case "BLOCKED": {
       const raw = e.details.issues;
