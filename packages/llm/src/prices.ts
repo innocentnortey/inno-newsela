@@ -16,6 +16,14 @@ const PRICES: ModelPrice[] = [
     cache_read_per_mtok: new Decimal("0.20"),
     cache_write_per_mtok: new Decimal("2.50"),
   },
+  // Stub only; synthetic numbers, not a quote of any provider (NL-110 judge_price_row).
+  {
+    model_id: "stub-judge",
+    input_per_mtok: new Decimal("1.00"),
+    output_per_mtok: new Decimal("5.00"),
+    cache_read_per_mtok: new Decimal("0.10"),
+    cache_write_per_mtok: new Decimal("1.25"),
+  },
 ];
 
 export const PRICE_TABLE: PriceTable = {

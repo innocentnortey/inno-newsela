@@ -95,6 +95,8 @@ export interface LessonOpts {
   title?: string;
   reviewer_id?: string | null;
   last_editor_id?: string | null;
+  /** NL-110: edit the lesson before it is stored, so its content_hash carries the edit. */
+  mutate?: (lesson: StoredLessonJson) => void;
 }
 
 export async function seedLesson(o: LessonOpts): Promise<SeededLesson> {
@@ -105,6 +107,7 @@ export async function seedLesson(o: LessonOpts): Promise<SeededLesson> {
   const base = flex ? (WP3) : WP1;
   const renamed = JSON.parse(JSON.stringify(base).replaceAll("G6.U4.FLEX-1a", lesson_id)) as StoredLessonJson; // addresses carry the lesson id
   const lesson = { ...renamed, lesson_id, title: o.title ?? `${base.title} (seed ${o.number})` };
+  o.mutate?.(lesson);
   const total = flex ? base.sections.reduce((n, sec) => n + words(sec.content), 0) : WP1_WORDS;
   const vid = `lv_e2e_${randomBytes(5).toString("hex")}`;
   await insert_row(q, "lesson", {

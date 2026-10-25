@@ -4,11 +4,13 @@ import type { Logger } from "@ls/obs/logger";
 import { DrainingError, type InflightTracker } from "./drain.ts";
 import type { GenerationWiring } from "./wiring/generation.ts";
 import type { CheckWiring } from "./wiring/checks.ts";
+import type { JudgeWiring } from "./wiring/judge.ts";
 
 export interface LoopHost {
   tracker: InflightTracker;
   generation: GenerationWiring;
   checks: CheckWiring;
+  judge?: JudgeWiring; // optional: the evals child host and older test hosts start no judge lane
   logger: Logger;
   settings: WorkerSettings;
   exit: (code: number) => void;
@@ -49,5 +51,7 @@ export function start_worker_loops(h: LoopHost): { done: Promise<void> } {
   const checks = guard(async () => {
     await h.checks.check_lane.run_until(stop);
   });
-  return { done: Promise.all([generation, checks]).then(() => undefined) };
+  const lane = h.judge?.lane ?? null;
+  const judge = lane ? guard(async () => { await lane.run_until(stop); }) : Promise.resolve();
+  return { done: Promise.all([generation, checks, judge]).then(() => undefined) };
 }

@@ -108,6 +108,7 @@ export class JudgeJob {
           activity_text: pair.activity_text,
           question: pair.question,
           rubric_version: this.config.rubric_version,
+          rendered_prompt: rendered.text,
         });
       } catch (e) {
         if (e instanceof ProviderError) {
@@ -127,28 +128,31 @@ export class JudgeJob {
       } catch {
         cost_usd = amount; // unpriced served model: settle at the reserved worst case, as PaidCaller does
       }
-      await this.calls.complete(id, {
-        raw_output: res.raw_text,
-        stop_reason: "end_turn",
-        usage: res.usage,
-        cost_usd,
-        served_model: res.served_model,
-        provider_request_id: res.provider_request_id,
-        latency_ms: Math.round(performance.now() - started),
-      });
-      await this.spend.settle(reservation_id, cost_usd, id);
-      await this.spend.release(reservation_id);
+      try {
+        await this.calls.complete(id, {
+          raw_output: res.raw_text,
+          stop_reason: "end_turn",
+          usage: res.usage,
+          cost_usd,
+          served_model: res.served_model,
+          provider_request_id: res.provider_request_id,
+          latency_ms: Math.round(performance.now() - started),
+        });
+        await this.spend.settle(reservation_id, cost_usd, id);
 
-      await this.verdicts.insert_verdict({
-        lesson_id,
-        content_hash,
-        address: pair.address,
-        code: pair.code,
-        question: pair.question,
-        verdict: res.verdict,
-        model_call_id: id,
-        served_model: res.served_model,
-      });
+        await this.verdicts.insert_verdict({
+          lesson_id,
+          content_hash,
+          address: pair.address,
+          code: pair.code,
+          question: pair.question,
+          verdict: res.verdict,
+          model_call_id: id,
+          served_model: res.served_model,
+        });
+      } finally {
+        await this.spend.release(reservation_id);
+      }
       if (res.verdict === "no") verdicts_no++;
       total = total.add(cost_usd);
     }

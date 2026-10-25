@@ -36,18 +36,21 @@ export class OpenRouterJudgeAdapter implements JudgeClient {
   async verdict(req: JudgeRequest): Promise<JudgeVerdictResult> {
     const body = {
       model: this.init.model_id,
-      messages: [
-        { role: "system", content: JUDGE_RUBRIC_V1 },
-        {
-          role: "user",
-          content: JSON.stringify({
-            rubric: JUDGE_RUBRIC_V1,
-            question: QUESTIONS[req.question],
-            standard_text: req.standard_text,
-            activity_text: req.activity_text,
-          }),
-        },
-      ],
+      messages:
+        req.rendered_prompt !== undefined
+          ? [{ role: "user", content: req.rendered_prompt }]
+          : [
+              { role: "system", content: JUDGE_RUBRIC_V1 },
+              {
+                role: "user",
+                content: JSON.stringify({
+                  rubric: JUDGE_RUBRIC_V1,
+                  question: QUESTIONS[req.question],
+                  standard_text: req.standard_text,
+                  activity_text: req.activity_text,
+                }),
+              },
+            ],
       temperature: 0,
       max_tokens: JUDGE_MAX_OUTPUT_TOKENS,
       response_format: { type: "json_object" },

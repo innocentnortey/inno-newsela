@@ -9,6 +9,8 @@ export interface JudgeRequest {
   activity_text: string;
   question: "teaches_standard" | "eld_keeps_task";
   rubric_version: string;
+  /** The exact rendered prompt logged as model_call.rendered_prompt (NL-110 AC-10); adapters send it when present. */
+  rendered_prompt?: string;
 }
 
 export interface JudgeVerdictResult {

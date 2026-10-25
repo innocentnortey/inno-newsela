@@ -84,7 +84,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   Promise.resolve()
     .then(() => build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) }))
     .then((rt) => {
-      start_worker_loops({ tracker: rt.tracker, generation: rt.generation, checks: rt.checks, logger: rt.logger, settings: rt.settings, exit: rt.exit });
+      start_worker_loops({ tracker: rt.tracker, generation: rt.generation, checks: rt.checks, judge: rt.judge, logger: rt.logger, settings: rt.settings, exit: rt.exit });
       void write_start_event(rt.settings, rt.logger);
     })
     .catch((e) => {

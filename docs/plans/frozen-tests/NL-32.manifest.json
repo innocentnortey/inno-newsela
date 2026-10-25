@@ -4,7 +4,7 @@
   "frozen": {
     "packages/llm/src/anthropic.test.ts": "fab16d0fb4c17da2a55d390254490c3fbf3d6da1982208afa607826d0a325601",
     "packages/llm/src/boundary.test.ts": "cc3ed06d8809dca3ae6a8e63bf247b999f8d79799970df45054ee4a2a825d0d8",
-    "packages/llm/src/prices.test.ts": "b5b7ee08887dc4aba7c29dec1ece5c1631de2e5db99d2822b49e4f910466c5d3"
+    "packages/llm/src/prices.test.ts": "76db5cc3a752ab532c3155a513fcc3c8405f41cdee5d563f0d54aac0290b7681"
   },
   "criteria": {
     "AC-1": [
