@@ -128,6 +128,10 @@ export class HttpCollabCommandClient implements CollabCommands {
   ): Promise<T> {
     const { lesson_id, request_id } = cmd;
     const unavailable = (): CollabUnavailable => new CollabUnavailable({ lesson_id, command });
+    if (lesson_id === "." || lesson_id === "..") {
+      // WHATWG URL parsing collapses %2E/%2E%2E as dot segments, so these can never be one path segment.
+      throw new InvariantViolation("lesson id is a dot segment", { command });
+    }
     const url = `${this.base}/lessons/${seg(lesson_id)}/${ROUTES[command]}`;
     const ac = new AbortController();
     let res: Response;

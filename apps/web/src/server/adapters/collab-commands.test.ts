@@ -191,16 +191,19 @@ describe("token_never_leaks_and_path_safe [negative, AC-11]", () => {
     expect(all_errors.every((e) => e instanceof Error)).toBe(true);
   });
 
-  it("a lesson id with / or .. stays one URL-encoded path segment", async () => {
+  it("a lesson id with / stays one URL-encoded path segment; . and .. are refused before any request", async () => {
+    // REFREEZE 2026-10-25 (PD-32): WHATWG URL collapses %2E%2E, so . and .. are refused instead.
     const { client, seen } = setup(() => Promise.reject(new TypeError("down")));
-    const ids = ["G6/../../admin", "..", ".", "a/b", "x?y#z"];
+    const ids = ["G6/../../admin", "a/b", "x?y#z"];
     for (const id of ids) await client.apply_edit(edit(id)).then(() => null, () => null);
+    for (const id of ["..", "."]) {
+      const err = await client.apply_edit(edit(id)).then(() => null, (e: unknown) => e);
+      expect(err).toBeInstanceOf(InvariantViolation);
+    }
     expect(seen).toHaveLength(ids.length);
     const paths = seen.map((s) => s.url);
     expect(paths[0]).toBe(`${BASE}/lessons/${encodeURIComponent("G6/../../admin")}/apply-edit`);
-    expect(paths[1]).toBe(`${BASE}/lessons/%2E%2E/apply-edit`);
-    expect(paths[2]).toBe(`${BASE}/lessons/%2E/apply-edit`);
-    expect(paths[3]).toBe(`${BASE}/lessons/a%2Fb/apply-edit`);
+    expect(paths[1]).toBe(`${BASE}/lessons/a%2Fb/apply-edit`);
     for (const p of paths) {
       const u = new URL(p);
       expect(u.origin).toBe(BASE);
