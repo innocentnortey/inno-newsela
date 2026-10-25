@@ -25,6 +25,7 @@ function ts_files(dir: string, out: string[] = []): string[] {
 const writers = (): string[] =>
   ["apps", "packages", "ops", "evals", "load"]
     .flatMap((d) => ts_files(path.join(root, d)))
+    .filter((f) => !f.includes(`${path.sep}e2e${path.sep}`)) // real-stack test seeds (NL-98/NL-100) write fixture rows by SQL; product code still has exactly one writer
     .filter((f) => INSERT.test(readFileSync(f, "utf8")))
     .map((f) => path.relative(root, f).split(path.sep).join("/"))
     .sort();

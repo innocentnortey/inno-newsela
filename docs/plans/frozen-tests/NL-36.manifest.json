@@ -5,7 +5,7 @@
     "apps/web/src/server/adapters/collab-commands.test.ts": "2fa81beb1689fc44e08f4bc171cf4a94105158f7f8a9dddd82b82a3d43f7b347",
     "packages/db/src/repos/lesson-docs.int.test.ts": "481bdd7dbcf3f2590aebe1e32eacf5b70b49d8ed7b2b58c997236ef727750537",
     "packages/db/src/repos/lesson-docs.test-support.ts": "90c47f2f362ed2c64d81f21c9f52a735954ee32a14d5a7b4829148d8fe2dbcfe",
-    "tests/platform/lesson-doc-single-writer.test.ts": "cf99c5f60f9f8d1bcbf5f079ab5d4bd417c10ec4f52171c2d9520107d192c322"
+    "tests/platform/lesson-doc-single-writer.test.ts": "1c8a2667345de38852be9a7c88f149fece203754dffd56aa6dbd3347f5c3ead7"
   },
   "criteria": {
     "AC-1, AC-2, AC-4": [
@@ -28,6 +28,12 @@
       "old_sha256": "cbbd9229f6cc84d0ed3a4a7cd82ddf60b0751c518872d8196bf3972494fa6f68",
       "new_sha256": "2fa81beb1689fc44e08f4bc171cf4a94105158f7f8a9dddd82b82a3d43f7b347",
       "approved_by": "orchestrator under PD-32"
+    },
+    {
+      "file": "tests/platform/lesson-doc-single-writer.test.ts",
+      "old_sha": "cf99c5f60f9f8d1bcbf5f079ab5d4bd417c10ec4f52171c2d9520107d192c322",
+      "new_sha": "1c8a2667345de38852be9a7c88f149fece203754dffd56aa6dbd3347f5c3ead7",
+      "note": "2026-10-25 (orchestrator, PD-32): real-stack e2e seeds under apps/*/e2e/ are excluded from the scan; they write fixture rows by SQL (NL-98 seed.ts, NL-100 frozen-reads spec). Product code still has exactly one writer."
     }
   ]
 }
