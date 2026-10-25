@@ -1,0 +1,53 @@
+{
+  "header": {
+    "source": "docs/source/05-standards-referenced.md (quotes the Model School Library Standards, Grade Six)",
+    "official_documents": [
+      "https://www.cde.ca.gov/be/st/ss/documents/librarystandards.pdf"
+    ],
+    "derived": "2026-10-25",
+    "rule": "official text only, never the sheet's labels (GR-5)",
+    "set": "MSLS_6"
+  },
+  "standards": [
+    {
+      "code": "MSLS 2.1a",
+      "text": "Analyze information from illustrations, photographs, charts, graphs, maps, tables, and captions.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "MSLS 2.1b",
+      "text": "Analyze evidence to support a research question.",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "MSLS 2.2a",
+      "text": "Identify how visual language creates an impression for the viewer (e.g., angle, lighting, special effects, camera movement).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "MSLS 3.3a",
+      "text": "Choose an appropriate format to produce, communicate, and present information (e.g., written report, multimedia presentation, graphic presentation).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    },
+    {
+      "code": "MSLS 4.3a",
+      "text": "Demonstrate a variety of methods to engage the audience when presenting information (e.g., voice modulation, gestures, questions).",
+      "parent_code": null,
+      "is_leaf": true,
+      "eld_strand": null,
+      "ca": false
+    }
+  ]
+}

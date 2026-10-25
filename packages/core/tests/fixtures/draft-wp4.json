@@ -1,0 +1,97 @@
+{
+  "lesson_id": "G6.U4.L31",
+  "title": "Lesson 31: The Lightning Thief, Chapter 21",
+  "text_cards": [],
+  "blocks": [
+    {
+      "role": "routine_heading",
+      "section": "Launch",
+      "part": null,
+      "text": "Think-Pair-Share",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Ask: How do the two cultures compare?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "routine_heading",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Language Study",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 10
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Say: Use transitions to compare.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "excerpt_slot",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Reviewer to insert: lines from Iliad Book 1, 488-611, describing Olympus; name the translation",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 30
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "Say: Compare the two portrayals.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "quick_write",
+      "section": "Look Back",
+      "part": null,
+      "text": "Compare the two portrayals in a paragraph.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "homework",
+      "section": "Homework",
+      "part": null,
+      "text": "Read and annotate The Lightning Thief Chapter 21 (pp. 344-353).",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_tip",
+      "section": "Homework",
+      "part": null,
+      "text": "These pages include references to domestic abuse. Let students know before they read, tell them they can talk privately with you or a counselor, and follow the school's policy on alternatives.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    }
+  ]
+}

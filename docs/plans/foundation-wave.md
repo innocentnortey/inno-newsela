@@ -40,7 +40,7 @@ When the first feature wave starts after §6, its screens are assembled from the
 | FW-1 | `apps/web/{package.json,package-lock.json,next.config.ts,tsconfig.json,postcss.config.mjs,eslint.config.mjs,vitest.config.ts,.gitignore,README.md}`, `apps/web/app/{layout.tsx,page.tsx,globals.css}`, `apps/web/src/styles/**`, `apps/web/scripts/build-tokens.mjs`, `apps/web/src/lib/cn.ts`, `apps/web/tests/unit/tokens/**` |
 | FW-2 | `apps/web/src/components/ui/**`, `apps/web/tests/unit/ui/**` |
 | FW-3 | `apps/web/src/components/layout/**`, `apps/web/tests/unit/layout/**` |
-| FW-4 | `apps/web/app/(dev)/**`, `apps/web/e2e/**`, `apps/web/playwright.config.ts` |
+| FW-4 | `apps/web/app/(dev)/**`, `apps/web/e2e/gallery/**`, `apps/web/playwright.config.ts` |
 
 No ticket edits another's files. FW-2 and FW-3 may only *read* FW-1's files.
 
@@ -103,17 +103,17 @@ Waves: **FW-1** → **FW-2 ∥ FW-3** → **FW-4**. Lane: all `lane::build-loop`
 - **Tests named:** `tests/unit/layout/*.test.tsx` (landmarks, skip link target, breadcrumb `aria-current`).
 
 ### FW-4 · Component gallery with accessibility and visual checks
-- **Kind:** foundation · **Lane:** `lane::build-loop` · **Owned files:** `app/(dev)/**`, `e2e/**`, `playwright.config.ts`
+- **Kind:** foundation · **Lane:** `lane::build-loop` · **Owned files:** `app/(dev)/**`, `e2e/gallery/**`, `playwright.config.ts`
 - **Story:** As the reviewer of this wave I need every component and state on one page in both themes, so that the look can be checked against the look sheet before features use it.
 - **Scope:** `/gallery` renders every FW-2 component in every state and every FW-3 primitive, in light and dark (a theme
   switch writes `data-theme`), using the look-sheet copy where text is shown (`docs/ux/02-concepts/LOOK_SHEET_COPY.md`).
   Playwright runs axe at 1280 × 900 and 390 × 844 in both themes and saves screenshots to `e2e/__screenshots__/`.
 - **Acceptance:** PE-10, PE-11.
-- **Tests named:** `e2e/gallery.spec.ts`.
+- **Tests named:** `e2e/gallery/gallery.spec.ts`.
 
 ## Review requirements
 - [ ] `code-review-agent` per ticket (findings fixed before the next wave)
-- [ ] accessibility: 0 serious or critical axe violations on the gallery at 1280 and 390, light and dark (PE-10)
+- [x] accessibility: 0 serious or critical axe violations on the gallery at 1280 and 390, light and dark (PE-10)
 - [ ] visual check: the gallery screenshot at 1280 light and dark compared with the D1 look sheet and `design.md` tokens by the orchestrator, result recorded in the dev log (PE-11)
 - [ ] `ticket_readiness.py` passes for each ticket before it starts (ticket files in `docs/plans/tickets/`)
 

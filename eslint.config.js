@@ -59,7 +59,7 @@ export default [
           checkAllOrigins: true,
           policies: [
             // core: pure domain. Only schema, editor-schema and itself.
-            ...forbid("core", ["schema", "editor-schema", "core"]),
+            ...forbid("core", ["schema", "editor-schema", "core", "config"]),
             forbid_external("core", [
               "pg",
               "@anthropic-ai/sdk",

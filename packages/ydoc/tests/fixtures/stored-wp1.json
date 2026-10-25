@@ -1,0 +1,338 @@
+{
+  "lesson_id": "G6.U4.L4",
+  "schema_version": 1,
+  "title": "Lesson 4: The Lightning Thief, Chapter 1",
+  "type": "Reading",
+  "front_matter": {
+    "standards": [
+      {
+        "code": "RL.6.1",
+        "role": "focus",
+        "origin": "outline",
+        "official_text": "Synthetic standard text.",
+        "asserted_by": "outline",
+        "confirmation": null
+      }
+    ],
+    "minutes_total": 50,
+    "vocabulary": [
+      "fable",
+      "hare",
+      "lion"
+    ]
+  },
+  "sections": [
+    {
+      "address": "launch",
+      "name": "Launch",
+      "minutes": 5,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "routine_heading",
+            "attrs": {
+              "icon": "reading"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Launch"
+              }
+            ]
+          },
+          {
+            "type": "callout",
+            "attrs": {
+              "variant": "say"
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Today we read a fable about a hare and a lion."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": {
+              "icon": "reading"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Literacy Lab"
+              }
+            ]
+          },
+          {
+            "type": "table",
+            "content": [
+              {
+                "type": "table_row",
+                "content": [
+                  {
+                    "type": "table_header",
+                    "attrs": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": null
+                    },
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "align": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Word"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_header",
+                    "attrs": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": null
+                    },
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "align": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Support"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "table_row",
+                "content": [
+                  {
+                    "type": "table_cell",
+                    "attrs": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": null
+                    },
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "align": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "bold"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "table_cell",
+                    "attrs": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": null
+                    },
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "align": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "brave, not afraid"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": {
+              "icon": "reading"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Learning in Action"
+              }
+            ]
+          },
+          {
+            "type": "excerpt_slot",
+            "attrs": {
+              "slot_id": "hare-lion",
+              "rights": "to-clear",
+              "source_ref": "https://example.test/hare-and-lion"
+            }
+          },
+          {
+            "type": "quote_placeholder",
+            "attrs": {
+              "slot_id": "q-hare",
+              "reason": "short quote pending"
+            }
+          },
+          {
+            "type": "teacher_tip",
+            "attrs": {
+              "safety_note_id": null
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "align": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Pause after the second paragraph and check predictions."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": {
+              "icon": "writing"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Look Back"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "align": null
+            },
+            "content": [
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "sample_response"
+                  }
+                ],
+                "text": "Sample: the hare learned to be careful."
+              }
+            ]
+          },
+          {
+            "type": "routine_heading",
+            "attrs": {
+              "icon": "notes_section"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Homework"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "align": null
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Reread the fable with a family member."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "address": "literacy_lab",
+      "name": "Literacy Lab",
+      "minutes": 35,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "align": null
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Synthetic literacy lab text."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "address": "wrap_up",
+      "name": "Wrap Up",
+      "minutes": 10,
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "align": null
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Synthetic wrap up text."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "text_cards": [
+    {
+      "title": "Synthetic Fable",
+      "author": "Synthetic Author",
+      "edition": null,
+      "chapter": "1",
+      "pages": null,
+      "kind": "public-domain",
+      "content_available": true
+    }
+  ]
+}

@@ -13,7 +13,7 @@ export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
 
 export function Table({ caption, captionHidden, className, children, ...rest }: TableProps) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto" role="region" aria-label={caption} tabIndex={0}>
       <table className={cn("w-full border-collapse", className)} {...rest}>
         <caption className={captionHidden ? "sr-only" : "text-label text-ink2 pb-2 text-left"}>{caption}</caption>
         {children}
