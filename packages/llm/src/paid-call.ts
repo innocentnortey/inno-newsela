@@ -16,6 +16,12 @@ export interface PaidCallRequest {
   run_id: RunId | null;
   job_id: JobId | null;
   user_id: UserId;
+  /** Aborted when the job lease is lost: the reservation is released and the call rejects with the abort reason. */
+  signal?: AbortSignal;
+}
+
+function abort_reason(s: AbortSignal): Error {
+  return s.reason instanceof Error ? s.reason : new Error("aborted");
 }
 
 const SETTLE_ATTEMPTS = 3;
@@ -31,6 +37,7 @@ export class PaidCaller {
   ) {}
 
   async call(p: PaidCallRequest): Promise<RecordedCall> {
+    if (p.signal?.aborted) throw abort_reason(p.signal);
     const price = this.prices.price_for(this.recorder.model_id_for(p.req.alias));
     const amount = this.cost.max_call_cost(price, p.rendered.input_tokens_estimate, p.req.max_output_tokens);
     const decision = await this.spend.reserve({ run_id: p.run_id, job_id: p.job_id, user_id: p.user_id, purpose: p.ctx.purpose, amount_usd: amount });
@@ -40,9 +47,24 @@ export class PaidCaller {
     if (decision.reservation_id === null) throw new InvariantViolation("allowed reservation has no id");
     const reservation_id = decision.reservation_id;
     let recorded: RecordedCall;
+    const signal = p.signal;
+    let on_abort: (() => void) | undefined;
+    const aborted = new Promise<never>((_, reject) => {
+      if (!signal) return; // never settles
+      on_abort = () => reject(abort_reason(signal));
+      signal.addEventListener("abort", on_abort, { once: true });
+    });
+    aborted.catch(() => undefined);
     try {
-      recorded = await this.recorder.call({ ...p.ctx, reservation_id }, p.req, p.rendered);
+      const pending = this.recorder.call({ ...p.ctx, reservation_id }, p.req, p.rendered);
+      pending.catch(() => undefined); // an orphaned call must not raise an unhandled rejection
+      recorded = await Promise.race([pending, aborted]);
     } catch (e) {
+      if (signal?.aborted) {
+        // Lease lost: never settle (another worker re-claims the job); release the hold.
+        await this.spend.release(reservation_id).catch(() => undefined);
+        throw e;
+      }
       if (e instanceof UnpricedModelError) {
         // Real spend with an unknown price: settle at the reserved worst case rather than release, then surface the error.
         await this.spend.settle(reservation_id, amount, e.model_call_id).catch(() => undefined);
@@ -51,6 +73,8 @@ export class PaidCaller {
       // The original error wins over a failing release.
       await this.spend.release(reservation_id).catch(() => undefined);
       throw e;
+    } finally {
+      if (signal && on_abort) signal.removeEventListener("abort", on_abort);
     }
     // The provider call completed: the money is spent. A settle failure must never release the reservation.
     await this.settle_held(reservation_id, recorded, p);

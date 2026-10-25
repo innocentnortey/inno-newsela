@@ -1,5 +1,6 @@
 // Worker entry point (NL-07). Never log settings or Error messages (may carry secrets): names only.
 import { pathToFileURL } from "node:url";
+import { ConfigError } from "@ls/config/errors";
 import { load_worker_settings, type WorkerSettings } from "@ls/config/settings";
 import { create_logger, type Logger } from "@ls/obs/logger";
 import { write_start_event } from "./start-event.ts";
@@ -70,12 +71,16 @@ export async function build_worker_runtime(settings: WorkerSettings, opts: Worke
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) })
+  // Inside the chain so a settings error reaches the catch below instead of escaping as an uncaught throw.
+  Promise.resolve()
+    .then(() => build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) }))
     .then((rt) => {
       void write_start_event(rt.settings, rt.logger);
     })
     .catch((e) => {
-    process.stderr.write(`worker failed to start: ${(e as Error).name}\n`);
+    // ConfigError.variable is a setting name, never a value; other errors print the class name only.
+    const variable = e instanceof ConfigError ? ` (${e.variable})` : "";
+    process.stderr.write(`worker failed to start: ${(e as Error).name}${variable}\n`);
     process.exit(1);
   });
 }
