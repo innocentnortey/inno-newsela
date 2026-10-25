@@ -12,3 +12,8 @@ Updated 2026-10-25 late (VPS, Phase B, Sonnet). Replace at each handoff; history
 - **Open follow-ups:** per-person heartbeat retention question (NL-08 devlog); NL-26 must pass `load_eld_verdicts()` and re-raise `IntakeError` as `DomainRefusal`; NL-77 id notes; NL-53 four-eyes test; NL-83 `/api/healthz`; disk ~91% used (clean worktrees after merges).
 - **Open for Innocent (human-only):** spike results, DO-1/DO-2/Stage 6 review; lane::human tickets NL-02/NL-03 (provider keys, voice key), UX-5b walkthrough, recording, portal submission.
 - **Data boundary:** `docs/source/restricted/` git-ignored; never quote into tracked files.
+
+## Usage-limit stop (2026-10-25, late)
+Merged and pushed through NL-66 (07269a6); NL-65 merged locally (not yet gated or pushed).
+In flight: NL-69 review (branch ticket/NL-69, 3ac5b0f; CHG for optional pin fields to log), NL-67 and NL-70 implementers, NL-71 unconfirmed.
+Next: gate main (npm install, eslint, typecheck, npm test), push, merge NL-69/67/70/71 as reviews pass, plan NL-87/88/89, S-22 (mount ResolveDialog), then W5+, delivery docs, checkpoint_b.py (not yet re-run).
