@@ -1,0 +1,1 @@
+{"id": "NL-52", "title": "docs: README run and Compose instructions", "kind": "integration", "lane": "direct", "wave": 3, "depends_on": ["NL-23"], "cons": [], "screens": [], "stories": [], "anchor": [], "wfs": [], "metrics": [], "risk_security": false, "area": "delivery", "cuttable": null, "scope": ["root README.md"], "phase": "plan", "gitlab_iid": null}
