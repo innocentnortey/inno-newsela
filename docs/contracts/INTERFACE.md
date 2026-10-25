@@ -364,7 +364,8 @@ Targets hold at the **200-concurrent-user spike** with ≤ 6 generation jobs in 
 - **Fields:**
   - Response:
     - `outline_version_id`, `version_number`, `sha256`, `same_as_version`.
-    - `unit`: `as_written` (text, "U4"), `filenames_say` (text, "U3"), `confirmed` (yes/no), `confirmed_by` (name or empty).
+    - `unit`: `as_written` (text, "U4"), `filenames_say` (text, "U3"), `confirmed` (yes/no), `confirmed_by` (name or empty),
+      `finding` (the unit-conflict finding, or empty when the sheet and filenames agree; confirm it with CON-4 `confirm_unit`).
     - `counts` (whole numbers): `teaching_days`, `lessons`, `flex_days`, `arc_headers`, `total_rows`, `errors`,
       `errors_unconfirmed`, `warnings`, `unit_conflicts`, `malformed_codes`, `rows_with_nonexistent_code`,
       `bad_filenames`, `eld_mismatches`.
@@ -379,7 +380,8 @@ Targets hold at the **200-concurrent-user spike** with ≤ 6 generation jobs in 
       - `segments`: the cell split. `segment_id`, `column`, `kind` (`content`, `writer_task`, `editor_note`,
         `unit_rule`, `safety_note`), `text`, `action` for notes (`apply`, `show_only`, `ignore`), `source`, `by`.
       - `eld`: `code`, `sheet_label`, `official_strand`, `verdict` (`fits`, `mismatch`, `not_checked`),
-        `suggested_remap`, `choice` (`keep` or `remap`).
+        `suggested_remap`, `choice` (`keep` or `remap`). `sheet_label` is the label on the sheet (empty when the
+        sheet line fitted); `official_strand` is the seeded CDE strand; `suggested_remap` is the stored proposal.
       - `flags`: e.g. `instruction_shaped` (kept as content).
     - `unit_rules`: `text`, `scope_rows` (list of whole numbers), `source`.
     - `runs_from_this_version` (System review, UXQ-9): `run_id`, `started_at`, `choices_hash` for each run started from

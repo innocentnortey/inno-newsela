@@ -30,7 +30,7 @@ test("confirm-flow: confirmed_at stays null until the last error, then Generate 
     expect(await confirmedAt(), `confirmed_at null after step ${i + 1}`).toBeNull();
     expect((await getReport(page, vid)).counts.errors_unconfirmed).toBe(ERRORS - 1 - i);
   }
-  // the sixth error (unit conflict) has no control on the screen: see the fixme below; it goes through the API
+  // the sixth error (unit conflict) has no control on the screen: the report now lists it (CHG-5, tested below); this flow confirms it through the API
   expect((await getReport(page, vid)).generate_allowed).toBe(false);
   await confirmUnitViaApi(page, vid);
   const stamp = await confirmedAt();
@@ -71,9 +71,7 @@ test("confirm-flow: confirmed_at stays null until the last error, then Generate 
   await expect(page.getByRole("button", { name: COPY.generate })).not.toHaveAttribute("aria-disabled", "true");
 });
 
-// DEFECT (report, not fixed here): the report lists no unit_conflict finding anywhere (rows[] omits the row-less finding,
-// unit has no finding_id), so SCR-4 cannot draw "Confirm U4 for the unit". Needs a CHG on CON-3 (e.g. unit.finding_id).
-test.fixme("confirm-flow: the unit conflict has a Confirm control on SCR-4", async ({ page }) => {
+test("confirm-flow: the unit conflict has a Confirm control on SCR-4", async ({ page }) => {
   const { up } = await authorWithUpload(page);
   await page.goto(screenUrl(up));
   await expect(page.getByRole("button", { name: "Confirm U4 for the unit" })).toBeVisible();

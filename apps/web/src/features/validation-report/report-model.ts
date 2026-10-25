@@ -27,7 +27,7 @@ export interface ReportActions {
 }
 
 export interface ErrorItem {
-  row: Row;
+  row: Row | null;
   finding: Finding;
   where: string;
   name: string;
@@ -74,11 +74,13 @@ function rowWhere(row: Row): string {
 export function errorItems(report: Report): ErrorItem[] {
   const rows = [...report.rows].sort((a, b) => a.row_number - b.row_number);
   const items: ErrorItem[] = [];
+  const unit = report.unit.finding;
+  if (unit) items.push({ row: null, finding: unit, where: "Unit", name: "the unit" });
   for (const row of rows) {
     const errs = row.findings.filter((f) => f.level === "error");
     for (const finding of errs) {
       if (finding.kind === "unit_conflict") {
-        items.push({ row, finding, where: "Unit", name: "the unit" });
+        if (!unit) items.push({ row, finding, where: "Unit", name: "the unit" });
       } else {
         items.push({
           row,

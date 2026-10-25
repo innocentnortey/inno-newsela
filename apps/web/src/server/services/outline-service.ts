@@ -5,7 +5,7 @@ import { IntakeError } from "@ls/core/intake/errors";
 import { compute_lesson_links } from "@ls/core/intake/lesson-links";
 import { normalize_outline } from "@ls/core/intake/normalize";
 import { parse_workbook } from "@ls/core/intake/parse-grid";
-import { build_validation_report, generate_gate } from "@ls/core/intake/report";
+import { build_validation_report, generate_gate, type EldLookup } from "@ls/core/intake/report";
 import type { AuditLog } from "@ls/core/ports/audit";
 import type { Clock } from "@ls/core/ports/clock";
 import type { RequestUser, UnitId } from "@ls/core/ports/common";
@@ -146,12 +146,20 @@ export class OutlineService {
     };
   }
 
+  // The StandardsIndex port has no strand lookup; the seeded rows carry the official CDE strand (CHG-5).
+  private async eld_lookup(outline: NormalizedOutline): Promise<EldLookup> {
+    const codes = [...new Set(outline.rows.flatMap((r) => r.eld_codes))];
+    const rows = codes.length === 0 ? [] : await this.standards.texts(codes);
+    const strands = new Map(rows.map((r) => [r.code, r.eld_strand]));
+    return { strand_of: (code) => strands.get(code) ?? null };
+  }
+
   async report(user: RequestUser, outline_version_id: string): Promise<ValidationReport> {
     void user; // every role reads
     const version = await this.outlines.version(outline_version_id);
     if (version === null) throw new DomainRefusal("NOT_FOUND", "Outline version not found.", { outline_version_id });
     const outline = await this.outlines.outline(outline_version_id);
-    const base = build_validation_report(version, outline, await this.outlines.choices(outline_version_id));
+    const base = build_validation_report(version, outline, await this.outlines.choices(outline_version_id), await this.eld_lookup(outline));
     const runs = await this.outlines.runs_from_version(outline_version_id);
     return { ...base, runs_from_this_version: runs };
   }
@@ -171,6 +179,7 @@ export class OutlineService {
       }
     }
     const stored = validate_choice(req, target, { outline, standards: await this.standards.index(), unit_id: version.unit_id });
+    const eld = await this.eld_lookup(outline);
 
     // The advisory lock serialises authors on one version, so the gate check and the once-only confirmed_at stay right.
     return this.tx.with_tx(async (tx) => {
@@ -207,7 +216,7 @@ export class OutlineService {
         },
         tx,
       );
-      const report = build_validation_report(current, outline, after);
+      const report = build_validation_report(current, outline, after, eld);
       const row_number = target.kind === "finding" ? target.finding.row_number : target.kind === "segment" ? target.row_number : null;
       const row = report.rows.find((r) => r.row_number === row_number) ?? report.rows[0];
       if (row === undefined) throw new DomainRefusal("NOT_FOUND", "That item is not in this outline.", { target_id: req.target_id });

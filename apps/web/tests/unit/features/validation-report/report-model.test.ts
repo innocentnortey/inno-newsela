@@ -43,7 +43,7 @@ describe("items", () => {
   const r = issuedShapeReport();
   it("errors are ordered by row, named by row", () => {
     const items = errorItems(r);
-    expect(items.map((i) => i.row.row_number)).toEqual([7, 8, 30, 34, 39]);
+    expect(items.map((i) => i.row!.row_number)).toEqual([7, 8, 30, 34, 39]);
     expect(items[0]).toMatchObject({ where: "Unit", name: "the unit" });
     expect(items[1]).toMatchObject({ where: "Row 8 · Lesson 4 · Column J", name: "row 8" });
   });
@@ -96,5 +96,22 @@ describe("applyChoiceResult", () => {
     expect(out.rows.find((x) => x.row_number === 41)).toBe(updated);
     expect(out.rows.find((x) => x.row_number === 53)!.eld.find((e) => e.code === code)!.choice).toBe("remap");
     expect(r.rows.find((x) => x.row_number === 53)!.eld[0]!.choice).toBe("keep");
+  });
+});
+
+describe("CHG-5 unit finding in errorItems", () => {
+  it("puts the unit item first when report.unit.finding is set and none is in rows", () => {
+    const r = issuedShapeReport();
+    const f = r.rows.flatMap((x) => x.findings).find((x) => x.kind === "unit_conflict")!;
+    const rows = r.rows.map((x) => ({ ...x, findings: x.findings.filter((y) => y.kind !== "unit_conflict") }));
+    const items = errorItems({ ...r, rows, unit: { ...r.unit, finding: f } });
+    expect(items[0]).toMatchObject({ where: "Unit", name: "the unit", row: null });
+    expect(items[0]!.finding.finding_id).toBe(f.finding_id);
+  });
+  it("does not duplicate when the finding is also on a row", () => {
+    const r = issuedShapeReport();
+    const f = r.rows.flatMap((x) => x.findings).find((x) => x.kind === "unit_conflict")!;
+    const items = errorItems({ ...r, unit: { ...r.unit, finding: f } });
+    expect(items.filter((i) => i.where === "Unit")).toHaveLength(1);
   });
 });

@@ -78,6 +78,14 @@ describe("NL-77 getValidationReport", () => {
     expect(before[0]).toBe(0);
   });
 
+  it("report_lists_unit_conflict_and_strand: the unit finding is listed and ELD entries carry the official strand", async () => {
+    const id = await s.uploads_issued();
+    const r = report_of(await s.report(id));
+    expect(r.unit.finding?.kind).toBe("unit_conflict");
+    expect(r.counts.unit_conflicts).toBe(1);
+    expect(r.rows.flatMap((x) => x.eld).some((e) => e.official_strand !== "")).toBe(true);
+  });
+
   it("runs_from_this_version: newest first, empty before", async () => {
     const id = await s.uploads_issued();
     expect(report_of(await s.report(id)).runs_from_this_version).toEqual([]);

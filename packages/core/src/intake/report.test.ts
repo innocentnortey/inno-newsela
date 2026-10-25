@@ -168,3 +168,105 @@ describe("text_verbatim", () => {
     );
   });
 });
+
+describe("chg5_unit_finding", () => {
+  it("unit_conflict_finding_is_listed", () => {
+    const o = issued_shape_outline();
+    const v = version_row();
+    const r = build_validation_report(v, o, []);
+    expect(r.unit.finding?.kind).toBe("unit_conflict");
+    expect(r.unit.finding?.finding_id).toBe("f01");
+    expect(r.unit.finding?.proposed_fix).toBe("U4");
+    expect(r.unit.finding?.choice.source).toBe("default");
+    const c = build_validation_report(v, o, [
+      choice("f01", "confirmed", "confirm_unit", T(1)),
+    ]);
+    expect(c.unit.finding?.choice.source).toBe("confirmed");
+    expect(c.unit.confirmed).toBe(true);
+  });
+
+  it("unit_finding_null_without_conflict", () => {
+    const r = build_validation_report(version_row(), clean_outline(), []);
+    expect(r.unit.finding).toBeNull();
+  });
+
+  it("report_is_byte_identical_twice", () => {
+    const o = issued_shape_outline();
+    const a = build_validation_report(version_row(), o, []);
+    const b = build_validation_report(version_row(), o, []);
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+});
+
+describe("chg5_eld_fields", () => {
+  const lookup = {
+    strand_of: (code: string): string | null =>
+      code === "ELD.PI.6.7" ? "Part I: Interpretive" : null,
+  };
+  const outline = () => {
+    const o = clean_outline();
+    o.rows = [
+      row(10, "lesson", "G6.U4.L6", {
+        number: 6,
+        eld_codes: ["ELD.PI.6.7", "ELD.PI.6.1"],
+      }),
+    ];
+    o.findings = [
+      finding(
+        "e1",
+        10,
+        "warning",
+        "eld_mismatch",
+        "ELD.PI.6.7 – Sheet label here",
+        "ELD.PII.6.2b",
+        "eld_keep",
+      ),
+    ];
+    return o;
+  };
+
+  it("eld_fields_filled_from_stored_data", () => {
+    const r = build_validation_report(version_row(), outline(), [], lookup);
+    const [bad, fit] = r.rows[0]!.eld;
+    expect(bad).toMatchObject({
+      code: "ELD.PI.6.7",
+      verdict: "mismatch",
+      sheet_label: "Sheet label here",
+      suggested_remap: "ELD.PII.6.2b",
+      official_strand: "Part I: Interpretive",
+    });
+    expect(fit).toMatchObject({
+      code: "ELD.PI.6.1",
+      verdict: "fits",
+      sheet_label: "",
+      suggested_remap: null,
+      official_strand: "",
+    });
+  });
+
+  it("eld_code_prefix_does_not_cross_match", () => {
+    const o = outline();
+    o.rows = [row(10, "lesson", "G6.U4.L6", { eld_codes: ["ELD.PI.6.6"] })];
+    o.findings = [
+      finding(
+        "e2",
+        10,
+        "warning",
+        "eld_mismatch",
+        "ELD.PI.6.66 – Other",
+        null,
+        "eld_keep",
+      ),
+    ];
+    const r = build_validation_report(version_row(), o, [], lookup);
+    expect(r.rows[0]!.eld[0]).toMatchObject({
+      verdict: "fits",
+      sheet_label: "",
+    });
+  });
+
+  it("eld_without_lookup_is_empty_strand", () => {
+    const r = build_validation_report(version_row(), outline(), []);
+    expect(r.rows[0]!.eld[0]!.official_strand).toBe("");
+  });
+});
