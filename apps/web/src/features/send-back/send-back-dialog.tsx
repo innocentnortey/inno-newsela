@@ -1,6 +1,7 @@
 "use client";
-// Shell. Body owned by NL-69 after this ticket.
 import { DialogShell } from "@/components/ui/dialog-shell";
+import { dialogTitle } from "./copy";
+import { SendBackForm } from "./send-back-form";
 
 export interface SendBackDialogProps {
   lessonId: string;
@@ -8,16 +9,14 @@ export interface SendBackDialogProps {
   pin: { snapshotHash: string; snapshotStateVector: string };
   open: boolean;
   onClose: () => void;
+  onDone?: (r: { kind: "sent_back" | "reopened"; versionNumber: number }) => void;
+  onStale?: () => void;
 }
 
 export function SendBackDialog(props: SendBackDialogProps) {
-  return (
-    <DialogShell
-      open={props.open}
-      onOpenChange={(o) => !o && props.onClose()}
-      title="Send back or reopen"
-    >
-      <p>Built by NL-69.</p>
-    </DialogShell>
+  return props.open ? (
+    <SendBackForm key={`${props.mode}:${props.lessonId}`} {...props} />
+  ) : (
+    <DialogShell open={false} title={dialogTitle(props.mode, props.lessonId)} />
   );
 }
