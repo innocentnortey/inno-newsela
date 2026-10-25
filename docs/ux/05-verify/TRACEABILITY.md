@@ -60,7 +60,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR | US | CON | FE ticket | INT ticket | TEST (planned) | UX-5a evidence | UX-5b link |
 |---|---|---|---|---|---|---|---|
 | SCR-1 | US-37 | CON-1 | NL-24 | NL-90 | apps/web/e2e/sign-in/sign-in.spec.ts | axe + screenshots: e2e/__screenshots__/sign-in/ | planned |
-| SCR-2 | US-1 | CON-2, CON-6 | NL-55 | NL-93 | planned | planned | planned |
+| SCR-2 | US-1, US-6, US-10 | CON-2, CON-6 | NL-55 | NL-93 | apps/web/e2e/units-home/units-home.spec.ts | axe + screenshots: e2e/__screenshots__/units-home/ | planned |
 | SCR-3 | US-1, US-2 | CON-2, CON-6 | NL-56 | NL-93 | planned | planned | planned |
 | SCR-4 | US-3, US-4, US-5 | CON-3, CON-4, CON-5 | NL-57 | NL-94 | planned | planned | planned |
 | SCR-5 | US-6 | CON-5, CON-24 | NL-58 | NL-95 | planned | planned | planned |

@@ -1,9 +1,7 @@
-// Placeholder from NL-24. Owner ticket NL-55 replaces this file.
+import { UnitsHomeScreen } from "@/features/units-home/units-home-screen";
+
+export const metadata = { title: "Units · Lesson Studio" };
+
 export default function Page() {
-  return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-page">Units</h1>
-      <p>Built by NL-55.</p>
-    </div>
-  );
+  return <UnitsHomeScreen />;
 }
