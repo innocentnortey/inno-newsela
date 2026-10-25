@@ -17,7 +17,9 @@ function var_string(s: string): number[] {
   return [...var_uint(b.length), ...b];
 }
 function read_var_uint(a: Uint8Array, pos: number): [number, number] {
-  let n = 0, mul = 1, p = pos;
+  let n = 0,
+    mul = 1,
+    p = pos;
   for (;;) {
     const b = a[p++] as number;
     n += (b & 127) * mul;
@@ -31,20 +33,41 @@ describe("collab main", () => {
     const handlers = new Map<string, () => void>();
     const exit = vi.fn();
     const rt = await build_collab_runtime(
-      load_collab_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", COLLAB_INTERNAL_TOKEN: "t-collab" }),
-      { port: 0, log_write: () => {}, exit, signal_host: { on: (s, f) => void handlers.set(s, f) } },
+      load_collab_settings({
+        DATABASE_URL: "postgres://u:p@localhost:5432/d",
+        COLLAB_INTERNAL_TOKEN: "t-collab",
+      }),
+      {
+        port: 0,
+        log_write: () => {},
+        exit,
+        signal_host: { on: (s, f) => void handlers.set(s, f) },
+      },
     );
     const health = await fetch(`http://127.0.0.1:${rt.port}/healthz`);
     expect(health.status).toBe(200);
 
-    const doc = "lesson-test";
-    const auth = Uint8Array.from([...var_string(doc), ...var_uint(2), ...var_uint(0), ...var_string("")]);
+    // NL-80: with the session check wired, an unauthenticated socket gets a refusal and never a Sync reply.
+    const doc = "lesson:G6.U4.L4";
+    const auth = Uint8Array.from([
+      ...var_string(doc),
+      ...var_uint(2),
+      ...var_uint(0),
+      ...var_string("cookie"),
+    ]);
     const sv = Y.encodeStateVector(new Y.Doc());
-    const sync = Uint8Array.from([...var_string(doc), ...var_uint(0), ...var_uint(0), ...var_uint(sv.length), ...sv]);
+    const sync = Uint8Array.from([
+      ...var_string(doc),
+      ...var_uint(0),
+      ...var_uint(0),
+      ...var_uint(sv.length),
+      ...sv,
+    ]);
 
     const ws = new WebSocket(`ws://127.0.0.1:${rt.port}`);
     ws.binaryType = "arraybuffer";
-    const reply = await new Promise<Uint8Array>((resolve, reject) => {
+    const seen: string[] = [];
+    const outcome = await new Promise<string>((resolve, reject) => {
       const t = setTimeout(() => reject(new Error("timeout")), 5000);
       ws.onopen = () => {
         ws.send(auth);
@@ -56,16 +79,23 @@ describe("collab main", () => {
         const name = new TextDecoder().decode(a.slice(p, p + len));
         if (name !== doc) return;
         const [type, q] = read_var_uint(a, p + len);
-        if (type !== 0) return; // wait for a Sync frame
-        const [sub] = read_var_uint(a, q);
-        if (sub === 0 || sub === 1) {
-          clearTimeout(t);
-          resolve(a);
+        if (type === 0) seen.push("sync");
+        if (type === 2) {
+          const [sub] = read_var_uint(a, q);
+          if (sub === 1) {
+            clearTimeout(t);
+            resolve("permission_denied");
+          }
         }
+      };
+      ws.onclose = () => {
+        clearTimeout(t);
+        resolve("closed");
       };
       ws.onerror = () => reject(new Error("ws error"));
     });
-    expect(reply.length).toBeGreaterThan(0);
+    expect(["permission_denied", "closed"]).toContain(outcome);
+    expect(seen).toEqual([]);
     ws.close();
     await rt.stop();
     expect(exit).toHaveBeenCalledExactlyOnceWith(0);
