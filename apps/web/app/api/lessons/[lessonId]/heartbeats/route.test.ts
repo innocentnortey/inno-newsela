@@ -5,7 +5,8 @@ import type { RequestUser } from "@ls/core/ports/common";
 import { describe, expect, it } from "vitest";
 import { make_deps, make_request } from "@/server/http/testing/route-fixtures";
 import { make_with_route, type HttpRequest, type SessionResolver } from "@/server/http/with-route";
-import { make_heartbeat_handlers, to_http_request, to_response } from "@/server/routes/heartbeat-routes";
+import { to_http_request, to_response } from "@/server/http/next-adapter";
+import { make_heartbeat_handlers } from "@/server/routes/heartbeat-routes";
 import { HeartbeatService } from "@/server/services/heartbeat-service";
 import { InMemoryMetricsRepo, known_lessons } from "@/server/services/metrics-test-fakes";
 
@@ -84,11 +85,12 @@ describe("heartbeat route", () => {
     expect(s.repo.heartbeats).toHaveLength(0);
   });
 
-  it("bridge_maps_request", () => {
+  it("bridge_maps_request", async () => {
     const r = new Request("https://app.example.test/api/lessons/G6.U4.L1/heartbeats?x=1", {
       method: "POST", headers: { cookie: "ls_session=abc%20d; other=1", Origin: "https://app.example.test" },
+      body: JSON.stringify({ a: 1 }),
     });
-    const h = to_http_request(r, { lessonId: "G6.U4.L1" }, { a: 1 });
+    const h = await to_http_request(r, { lessonId: "G6.U4.L1" });
     expect(h.cookies["ls_session"]).toBe("abc d");
     expect(h.headers["origin"]).toBe("https://app.example.test");
     expect(h.query).toEqual({ x: "1" });

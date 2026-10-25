@@ -1,0 +1,6 @@
+# NL-53 transitions, approval gate, review wiring (2026-10-25)
+
+**Changed.** Added `TransitionService`, `ApproveService`, the `transitionLesson` route (`transition-routes.ts`, `transition-default.ts`, `transitions/route.ts`) and filled `wire_review` with all six real services. Heartbeats route now uses the shared `next-adapter`; its test follows (not frozen). `wiring-stubs.test.ts` no longer lists `review`.
+**Why.** CON-18: every gate re-checked on the server from the stored submit snapshot (pin on hash and vector, four-eyes, suggestions, blocked, confirmations, dependencies); unfreezing moves call `set_mode` inside the open transaction. Decisions: `roles: null` (service answers `ROLE_FORBIDDEN`); collab timeout 5000 (no setting exists); rules applied directly instead of `run_checks` (it also derives alignment, needing a full context); `ListingLessonRepo` supplies `list_for_lesson` in the wiring because `packages/db` is not ours.
+**Checked.** Frozen security tests (27) green, hashes match the manifest; AC-19 and wiring tests; heartbeat, container, check and lifecycle tests; lint, typecheck.
+**Remaining.** DB-backed `route.test.ts` (real concurrency on Postgres) not written; add `list_for_lesson` to `PgLessonRepo`.
