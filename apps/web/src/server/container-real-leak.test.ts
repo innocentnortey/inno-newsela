@@ -42,7 +42,8 @@ describe("RT-1 web real mode", () => {
     const deps = captured.deps[0] as { model_client: { complete: unknown } };
     // A real client, not the "NOT BUILT" proxy: reading complete must not throw.
     expect(typeof deps.model_client.complete).toBe("function");
-    expect(JSON.stringify(deps)).not.toContain(CANARY);
+    // Refrozen RT-1: PrefixedIdGenerator holds a BigInt, which plain JSON.stringify rejects; stringify with a bigint-safe replacer.
+    expect(JSON.stringify(deps, (_k, v: unknown) => (typeof v === "bigint" ? v.toString() : v))).not.toContain(CANARY);
     expect(inspect(deps, { depth: 6, showHidden: true })).not.toContain(CANARY);
     expect(String(deps.model_client)).not.toContain(CANARY);
     expect(out.join("\n")).not.toContain(CANARY);

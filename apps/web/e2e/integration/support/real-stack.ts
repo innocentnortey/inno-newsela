@@ -95,8 +95,22 @@ async function kill(child: ChildProcess): Promise<void> {
   });
 }
 
+// The e2e worker always runs the stub model and never holds a provider key, even if the caller's shell does.
+export function workerEnv(base: NodeJS.ProcessEnv, port: string): NodeJS.ProcessEnv {
+  const out: NodeJS.ProcessEnv = {
+    ...base,
+    MODEL_PROVIDER_MODE: "stub",
+    WORKER_HEALTH_PORT: port,
+    JOB_POLL_MS: "200",
+    CHECK_POLL_MS: "200",
+    WORKER_ID: "e2e-worker",
+  };
+  delete out.ANTHROPIC_API_KEY;
+  delete out.OPENROUTER_API_KEY;
+  return out;
+}
+
 export async function startStack(opts: { web?: boolean; worker?: boolean; collab?: boolean }): Promise<Stack> {
-  if (opts.worker) throw new Error("worker entrypoint not built yet (apps/worker has no main); owner NL-8x");
   const port = process.env.E2E_PORT ?? "3121";
   const baseURL = `http://localhost:${port}`;
   mkdirSync(STATE_DIR, { recursive: true });
@@ -142,6 +156,13 @@ export async function startStack(opts: { web?: boolean; worker?: boolean; collab
       children.push(web);
       pipeLines(web, sink);
       await waitFor200(`${baseURL}/sign-in`, 90_000);
+    }
+    if (opts.worker) {
+      const workerPort = String(await freePort());
+      const worker = spawn("npx", ["tsx", "apps/worker/src/main.ts"], { cwd: ROOT, env: workerEnv(env, workerPort), detached: true });
+      children.push(worker);
+      pipeLines(worker, (l) => sink(`[worker] ${l}`));
+      await waitFor200(`http://127.0.0.1:${workerPort}/healthz`, 60_000);
     }
     if (opts.collab) {
       const collabPort = String(await freePort());

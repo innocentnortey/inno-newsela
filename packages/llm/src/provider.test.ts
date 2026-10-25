@@ -4,7 +4,7 @@ import { inspect } from "node:util";
 import { describe, expect, it } from "vitest";
 import { ConfigError } from "@ls/config/errors";
 import { SecretStr } from "@ls/config/secret";
-import { load_model_settings, type ModelSettings } from "@ls/config/settings";
+import { load_worker_settings, type ModelSettings } from "@ls/config/settings";
 import { SystemClock } from "@ls/core/ports/clock";
 import { AnthropicMessagesAdapter, map_error } from "./anthropic.ts";
 import { build_model_client } from "./provider.ts";
@@ -12,7 +12,7 @@ import { StubModelClient } from "./stub.ts";
 
 const MARKER = "sk-ant-TESTMARKER-9f3";
 const clock = new SystemClock();
-const model = (over: Partial<ModelSettings>): ModelSettings => ({ ...load_model_settings({}), ...over });
+const model = (over: Partial<ModelSettings>): ModelSettings => ({ ...load_worker_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", AUDIT_HASH_SALT: "s", COLLAB_INTERNAL_TOKEN: "t" }).model, ...over });
 
 describe("build_model_client", () => {
   it("stub_mode_gives_stub (invariant)", () => {

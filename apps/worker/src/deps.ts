@@ -2,24 +2,19 @@ import type { Logger } from "@ls/obs/logger";
 import type { WorkerSettings } from "@ls/config/settings";
 import { SystemClock } from "@ls/core/ports/clock";
 import { PrefixedIdGenerator } from "@ls/core/ports/ids";
+import { PgDatabase } from "@ls/db/pool";
+import { build_model_client } from "@ls/llm/provider";
 import type { WorkerDeps } from "./deps-types.ts";
 
-// Stub for a dependency whose adapter is not built yet: any use fails loudly with the owning ticket.
-function unbuilt<T extends object>(owner: string): T {
-  return new Proxy({} as T, {
-    get: () => () => {
-      throw new Error("NOT BUILT: " + owner);
-    },
-  });
-}
-
 export function build_worker_deps(settings: WorkerSettings, logger: Logger): WorkerDeps {
+  const clock = new SystemClock();
   return {
     settings,
     logger,
-    db: unbuilt("NL-83"),
+    // 2000 ms acquire timeout mirrors open_health_db; the pool connects lazily.
+    db: new PgDatabase(settings.shared, settings.shared.pg_pool_max, 2000, "worker"),
     ids: new PrefixedIdGenerator(),
-    clock: new SystemClock(),
-    model_client: unbuilt("NL-32"),
+    clock,
+    model_client: build_model_client(settings.model, clock),
   };
 }
