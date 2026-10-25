@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { WebDeps } from "./deps.ts";
 
 const CASES: [string, string, string[]][] = [
-  ["assist", "wire_assist", ["suggestions"]],
   ["exports", "wire_exports", ["exports"]],
 ];
 

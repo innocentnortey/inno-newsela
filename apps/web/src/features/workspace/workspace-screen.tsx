@@ -6,7 +6,9 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { STATUS_SPECS } from "@/components/ui/status";
 import { Stepper } from "@/components/ui/stepper";
 import type { PresenceEntry } from "@/editor/presence";
-import { LessonEditor, type EditorClientState } from "@/editor/lesson-editor";
+import { LessonEditor, type EditorClientState, type LessonEditorHandle } from "@/editor/lesson-editor";
+import type { AssistSelection } from "@/features/assist/assist-panel";
+import { assistEnabled } from "@/features/assist/cut";
 import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
 import { StandardDecisionButtons } from "@/features/workspace/actions/standard-decision";
 import { WorkspaceActionsProvider } from "@/features/workspace/actions/toast-host";
@@ -16,6 +18,7 @@ import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
 import { lessonIdFromKey } from "@/lib/keys";
 import type { components } from "@/lib/api-types";
+import { AssistHost } from "./assist-host";
 import { StateBanners } from "./banners";
 import { SchemaUnknownView } from "./error-views";
 import { jumpToAddress, preferNodeFor } from "./jump";
@@ -69,6 +72,15 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
   }, [retry, issuesPoll]);
   const readOnly = lesson ? isReadOnly(role, lesson.state) : true;
   const [presence, setPresence] = useState<PresenceEntry[]>([]);
+  // NL-116: the AI assist panel replaces the evidence rail while open; the selection is read when it opens.
+  const editorRef = useRef<LessonEditorHandle>(null);
+  const [assistOpen, setAssistOpen] = useState(false);
+  const [assistSelection, setAssistSelection] = useState<AssistSelection | null>(null);
+  const [, setAssistPending] = useState(false);
+  const openAssist = useCallback(() => {
+    setAssistSelection(editorRef.current?.getSelection() ?? null);
+    setAssistOpen(true);
+  }, []);
   const [clientState, setClientState] = useState<EditorClientState>("connecting");
   const shownClientState: EditorClientState = readOnly ? "read_only" : clientState;
 
@@ -141,9 +153,19 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
   }
 
   const off = offPathStatus(lesson.state);
+  const canAssist = assistEnabled() && !readOnly;
   return (
     <TwoPane
       rail={
+        assistOpen && canAssist ? (
+          <AssistHost
+            lessonId={lesson.lesson_id}
+            selection={assistSelection}
+            onClose={() => setAssistOpen(false)}
+            onPendingChange={setAssistPending}
+            onLessonChanged={reread}
+          />
+        ) : (
         <EvidenceRail
           lesson={lesson}
           issues={issues}
@@ -166,6 +188,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
             <StandardDecisionButtons lessonId={lesson.lesson_id} code={s.code} origin={s.origin} confirmation={s.confirmation ?? null} onChanged={reread} />
           )}
         />
+        )
       }
     >
       <div className="flex flex-col gap-4">
@@ -185,6 +208,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
               // data-address and id="sec-<address>" like LessonText, so outline and issue jumps work; they focus the section.
               <div ref={textRef} data-testid="editor-region" data-others-present={presence.length}>
                 <LessonEditor
+                  ref={editorRef}
                   lessonId={lesson.lesson_id}
                   lesson={lesson}
                   readOnly={false}
@@ -194,7 +218,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
                 />
               </div>
             )}
-            {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} /> : null}
+            {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} onOpenAssist={canAssist ? openAssist : undefined} /> : null}
           </PageSheet>
         </div>
       </div>

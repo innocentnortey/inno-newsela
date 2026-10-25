@@ -140,6 +140,16 @@ export async function startStack(opts: { web?: boolean; worker?: boolean; collab
     LOG_LEVEL: "info",
     PORT: port,
   } as unknown as NodeJS.ProcessEnv;
+  // NL-116: optional pass-through, set only when the E2E_* variable is present, so no other spec sees a changed value.
+  for (const [name, from] of [
+    ["COLLAB_INTERNAL_URL", "E2E_COLLAB_INTERNAL_URL"],
+    ["ASSIST_CALL_TIMEOUT_MS", "E2E_ASSIST_TIMEOUT_MS"],
+    ["ASSIST_STUB_FILE", "E2E_ASSIST_STUB_FILE"],
+    ["SUGGESTION_TTL_MIN", "E2E_SUGGESTION_TTL_MIN"],
+  ] as const) {
+    const v = process.env[from];
+    if (v !== undefined && v !== "") env[name] = v;
+  }
 
   const stop = async () => {
     for (const c of children.reverse()) await kill(c);
