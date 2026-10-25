@@ -94,12 +94,12 @@ reviews are recorded. An agreed card changes only through the change procedure (
 
 ## UX-3a · Shared contracts ★  (§4b) — Joint track
 - [x] `docs/contracts/INTERFACE.md`: one `CON-N` card per data step, each with operations, fields, states, permissions, named errors, recovery, guarantees, timing, the screens and stories that need it, the backend owner, and a status (`draft` → `proposed` → `agreed`, or `changing`) — CON-1…CON-24, all `proposed` (2026-10-25)
-- [ ] `docs/contracts/interface.openapi.yaml`: the same promises in machine form; each operation names its `CON-N`; lints; the Prism mock starts from it; types are generated from it — draft 0.1.0, 35 operations (CON-12 as `x-collaboration-channel`), `redocly lint` clean; Prism start and type generation not yet run; UXQ follow-ups (UXQ-2, 5, 7, 8, 9, 11) not yet in it
+- [x] `docs/contracts/interface.openapi.yaml`: the same promises in machine form; each operation names its `CON-N`; lints; the Prism mock starts from it; types are generated from it — v1.0.0, 36 operations each naming its CON-N; `redocly lint` 0 errors / 0 warnings; Prism mock started on :4010 and answered getLesson 200, approve 200, stale approve 409 `STALE_PIN`, board 503 `SERVICE_BUSY`; `openapi-typescript` → `docs/contracts/generated/api-types.ts` (`tsc --strict` clean); UXQ-2, 3, 5, 7, 8, 9, 11 folded in (2026-10-25; evidence `docs/contracts/reviews/2026-10-25-system-review.md`)
 - [x] `docs/contracts/CHANGES.md` opened; every change to an agreed card is a `CHG-N` with its aspect and presentation-only/behavioural, even when the OpenAPI file is unchanged — 0 CHG so far
-- [ ] Each card reviewed by both sides (UX needs, System support), each review named and dated; every `UXP-N` and product-behaviour question in it decided by Innocent — UX review done on all 24 (Claude, UX session, 2026-10-25); every UXP/UXQ decided 2026-10-25 (delegated, PD-31); **System review pending on all 24: the System track has not started**
+- [x] Each card reviewed by both sides (UX needs, System support), each review named and dated; every `UXP-N` and product-behaviour question in it decided by Innocent — UX review on all 24 (Claude, UX session, 2026-10-25); System review on all 24 (Claude, System track, Opus, 2026-10-25; `docs/contracts/reviews/2026-10-25-system-review.md`); every UXP/UXQ decided 2026-10-25 (delegated, PD-31)
 - [x] Older layout only: `docs/ux/03-structure/UI_CONTRACTS.md` is a pointer to `docs/contracts/` (or migrated) — n/a: Newsela never had `UI_CONTRACTS.md`; contracts went from the UX-1 draft table straight to `docs/contracts/`
-- [ ] `trace_check --upto CON` passes for the agreed cards
-- **Gate:** ☐ every card that something relies on is `agreed` (both reviews recorded; product behaviour decided) — Innocent ✓ ____ (repeat per card set; cards still `draft` or `proposed` listed: ____)
+- [x] `trace_check --upto CON` passes for the agreed cards — `trace_check --upto CON: 0 fail(s); 44 requirements in scope; US=37, FLOW=19, SCR=21, CON=24` (2026-10-25)
+- **Gate:** ☑ every card that something relies on is `agreed` (both reviews recorded; product behaviour decided) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25: CON-1…CON-24 all `agreed`; evidence `docs/contracts/reviews/2026-10-25-system-review.md`; 7 cards carry a *confirmed by SP-N* note, and a spike result that changes one goes through `CHG-N` (cards still `draft` or `proposed`: none). He has not read the cards
 
 ## UX-3b · Screens and tokens ★  (§4b) — UX track
 - [x] IA `docs/ux/03-structure/IA.md` — 2026-10-25
@@ -205,8 +205,8 @@ reviews are recorded. An agreed card changes only through the change procedure (
 | HP | `docs/design/hard-problems.md` | 10 (HP-1…HP-10, all chosen 2026-10-25) |
 | US | `docs/ux/01-planning/USER_STORIES.md` | 37 |
 | UXP / UXQ | `docs/ux/01-planning/USER_FLOWS.md`, `docs/ux/03-structure/SCREEN_SPECS.md`; routed in `docs/contracts/INTERFACE.md` | 10 / 11, all decided 2026-10-25 |
-| SCR | `docs/ux/03-structure/SCREEN_SPECS.md` | 21 (wave 1: 9 signed) |
-| CON | `docs/contracts/INTERFACE.md` | 24 (all `proposed`; System review pending) |
+| SCR | `docs/ux/03-structure/SCREEN_SPECS.md` | 21 (all signed: wave 1 nine, waves 2–3 twelve) |
+| CON | `docs/contracts/INTERFACE.md` | 24 (all `agreed` 2026-10-25) |
 | CHG | `docs/contracts/CHANGES.md` | 0 |
 | FW / PE | `docs/plans/foundation-wave.md` | 4 / 11 |
 | SP | defined in `docs/design/hard-problems.md`; results in `docs/analysis/spikes/` (§5) | 3 defined (SP-1…SP-3), 0 run |
