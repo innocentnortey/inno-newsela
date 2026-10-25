@@ -27,6 +27,15 @@ import { CollabAuthenticator } from "../auth.ts";
 import { FrozenDocs } from "../frozen-docs.ts";
 import { WriteGuard, type SocketContext } from "../permissions.ts";
 import { LessonPersistence, lesson_id_of } from "../persistence.ts";
+import {
+  SESSION_ENDED_CODE,
+  SESSION_ENDED_REASON,
+  SessionRecheck,
+  type LiveHashes,
+} from "../session-recheck.ts";
+
+/** How often open sockets are re-checked against their session. */
+const SESSION_RECHECK_MS = 1000;
 
 export type HocuspocusServerRef = { readonly hocuspocus: unknown };
 
@@ -35,6 +44,8 @@ export interface ServerPorts {
   states: LessonStateRepo;
   doc_store: LessonDocStore;
   doc_reader: LessonDocReader;
+  /** Batched session liveness for the S-9 sweep; falls back to one `sessions.resolve` per hash. */
+  live_hashes?: LiveHashes;
 }
 export interface CollabServerWiring {
   frozen: FrozenDocs;
@@ -52,6 +63,7 @@ interface LiveConnection {
   readOnly: boolean;
   context: { ctx?: SocketContext };
   sendStateless(payload: string): void;
+  close(event?: { code: number; reason: string }): void;
 }
 interface LiveDocument extends Y.Doc {
   getConnections(): LiveConnection[];
@@ -149,6 +161,7 @@ function default_ports(d: CollabDeps): {
     "collab",
   );
   const deps = { db, ids: d.ids, clock: d.clock };
+  const session_repo = new PgSessionRepo(deps);
   const states = new PgLessonRepo(deps);
   const doc_store = new PgLessonDocStore({
     ...deps,
@@ -158,7 +171,8 @@ function default_ports(d: CollabDeps): {
   });
   return {
     ports: {
-      sessions: new PgSessionRepo(deps),
+      sessions: session_repo,
+      live_hashes: (hashes, now) => session_repo.live_hashes(hashes, now),
       states,
       doc_store,
       doc_reader: new PgLessonDocReader({ db }),
@@ -296,6 +310,33 @@ export function wire_collab_server(
     h.hocuspocus.configuration.maxDebounce = d.settings.store_max_debounce_ms;
   }
 
+  // S-9: a socket authenticated once is re-checked against its session, so sign-out or expiry closes it.
+  let recheck_timer: ReturnType<typeof setInterval> | null = null;
+  if (is_hocuspocus(h.hocuspocus)) {
+    const live = h.hocuspocus;
+    const live_hashes: LiveHashes =
+      ports.live_hashes ??
+      (async (hashes, now) => {
+        const ok = new Set<string>();
+        for (const x of hashes)
+          if ((await ports.sessions.resolve(x, now)) !== null) ok.add(x);
+        return ok;
+      });
+    const recheck = new SessionRecheck(live_hashes, d.clock, d.logger);
+    recheck_timer = setInterval(() => {
+      void recheck.tick(() =>
+        [...live.documents.values()].flatMap((doc) =>
+          doc.getConnections().map((c) => ({
+            ctx: c.context?.ctx,
+            close: () =>
+              c.close({ code: SESSION_ENDED_CODE, reason: SESSION_ENDED_REASON }),
+          })),
+        ),
+      );
+    }, SESSION_RECHECK_MS);
+    recheck_timer.unref();
+  }
+
   return {
     frozen,
     guard,
@@ -303,6 +344,9 @@ export function wire_collab_server(
     persistence,
     acks,
     extension,
-    close: async () => void (await own?.close()),
+    close: async () => {
+      if (recheck_timer !== null) clearInterval(recheck_timer);
+      await own?.close();
+    },
   };
 }

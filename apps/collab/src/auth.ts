@@ -53,10 +53,8 @@ export class CollabAuthenticator {
     );
     if (token === null)
       throw new DomainRefusal("UNAUTHENTICATED", "Sign in again.");
-    const found = await this.sessions.resolve(
-      createHash("sha256").update(token).digest("hex"),
-      this.clock.now(),
-    );
+    const session_hash = createHash("sha256").update(token).digest("hex");
+    const found = await this.sessions.resolve(session_hash, this.clock.now());
     if (found === null)
       throw new DomainRefusal("UNAUTHENTICATED", "Sign in again.");
 
@@ -74,6 +72,7 @@ export class CollabAuthenticator {
       lesson_id,
       lesson_state: row.state,
       read_only: !decision.allowed,
+      session_hash,
     };
   }
 }

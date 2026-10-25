@@ -70,6 +70,19 @@ export class PgSessionRepo implements SessionRepo {
     });
   }
 
+  /** Which of these token hashes are still live sessions: one query for any number of hashes (collab S-9 sweep). */
+  async live_hashes(token_hashes: Sha256[], now: Date): Promise<Set<Sha256>> {
+    if (token_hashes.length === 0) return new Set();
+    return this.db.with_tx(async (tx) => {
+      const { rows } = await (tx as DbTx).query<{ token_hash: Sha256 }>(
+        `SELECT token_hash FROM app_session
+          WHERE token_hash = ANY($1::text[]) AND revoked_at IS NULL AND expires_at > $2`,
+        [token_hashes, now],
+      );
+      return new Set(rows.map((r) => r.token_hash));
+    });
+  }
+
   async revoke(token_hash: Sha256, now: Date): Promise<void> {
     await this.db.with_tx(async (tx) => {
       await (tx as DbTx).query("UPDATE app_session SET revoked_at = $2 WHERE token_hash = $1 AND revoked_at IS NULL", [
