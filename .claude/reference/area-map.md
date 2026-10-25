@@ -53,7 +53,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 4 | A16 prompts (save is cut #7) | `apps/web/src/server/services/prompt-service.ts`, `apps/web/app/api/prompt-versions/**`, `apps/web/src/server/wiring/prompts.ts` (list, current, v1 sync built by NL-34; save is NL-88) | built |
 | 4 | A17 export (cut #5) | `apps/web/src/server/services/export-service.ts`, `packages/db/src/repos/exports.ts`, `docs/contracts/lesson-export.schema.json`, `apps/web/app/api/{units/[unitId]/exports,exports}/**` (NL-51 built: `http.ts`, `default.ts`, two `route.ts`), `apps/web/src/server/wiring/exports.ts` (NL-102 owns) | NL-51 built; wiring planned |
 | 4 | A18 coverage (cut #4) | `apps/web/src/server/services/coverage-service.ts`, `apps/web/app/api/units/[unitId]/coverage/**`, `apps/web/src/server/wiring/coverage.ts` | planned |
-| 4 | A19 judge (cut #2) | `apps/worker/src/judge/**`, `packages/llm/src/openrouter-judge.ts`, `packages/db/src/repos/judge.ts`, `apps/worker/src/wiring/judge.ts` | planned |
+| 4 | A19 judge (cut #2) | `apps/worker/src/judge/**`, `packages/llm/src/openrouter-judge.ts`, `packages/db/src/repos/judge.ts`, `apps/worker/src/wiring/judge.ts` | planned; NL-89 built `packages/llm/src/openrouter-judge.ts`, `packages/db/src/repos/judge.ts` (migration 0014), `apps/worker/src/judge/**` (wiring/judge.ts stays NL-110) |
 
 ## Ports → adapters (DO-3 §3)
 

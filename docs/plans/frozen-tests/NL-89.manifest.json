@@ -38,5 +38,8 @@
   },
   "not_frozen": [
     "packages/llm/src/fixtures/openrouter-judge-*.json"
+  ],
+  "refreeze_notes": [
+    "NL-89 migration 0014 raised the migration count 14 -> 15 in packages/db/src/migrate.int.test.ts (NL-08 origin). That file is in no manifest's frozen hashes (checked NL-08 and all others), so no sha was amended; new sha de56d1ab2b5ef102a57a32276a47ccb78c6d1ef5735dea51280eca2e1138796c recorded here for the tamper check."
   ]
 }
