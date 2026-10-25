@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const LOCKED_DIR: string = fileURLToPath(new URL("../locked/", import.meta.url));
+export const LOCKED_DIR: string = join(dirname(fileURLToPath(import.meta.url)), "..", "locked");
 
 export const COMMON_FILES = ["content-rules.md", "data-delimiters.md", "grounding-rules.md", "lesson-shape.md"] as const;
 
