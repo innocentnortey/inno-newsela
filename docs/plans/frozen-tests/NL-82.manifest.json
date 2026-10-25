@@ -1,0 +1,42 @@
+{
+  "ticket": "NL-82",
+  "risk": "security",
+  "frozen": {
+    "ops/seed.test.ts": "da0cab238c79b1426046e25f87b0bd6444ded2da93d07bad295dcecd8ba0c533",
+    "ops/wf-37-obligations.test.ts": "9e09f9e640e8f1e5490a7a63c96bdd893b73b2980b6608e325b37999b0dd3e55",
+    "apps/web/src/server/http/seeded-accounts.int.test.ts": "380df3aa6febc301b9151f78d02e9c7e018cd0b22eaaa8b7cc668ad8cb29e7e0"
+  },
+  "criteria": {
+    "AC-1": [
+      "ops/seed.test.ts"
+    ],
+    "AC-2": [
+      "ops/seed.test.ts"
+    ],
+    "AC-3": [
+      "apps/web/src/server/http/seeded-accounts.int.test.ts"
+    ],
+    "AC-4": [
+      "ops/seed.test.ts"
+    ],
+    "AC-5": [
+      "ops/seed.test.ts"
+    ],
+    "AC-6": [
+      "ops/seed.test.ts"
+    ],
+    "AC-7": [
+      "ops/seed.test.ts"
+    ],
+    "AC-8": [
+      "ops/seed.test.ts"
+    ],
+    "AC-9": [
+      "ops/seed.test.ts"
+    ],
+    "AC-11": [
+      "ops/wf-37-obligations.test.ts"
+    ]
+  },
+  "not_frozen": []
+}
