@@ -1,0 +1,21 @@
+{
+  "ticket": "NL-21",
+  "risk": "security",
+  "frozen": {
+    "packages/core/src/lifecycle/lesson-machine.test.ts": "66b81fa80664ae2fff23897e4322843bddf0f5a7b6284745055998614b7eba7a"
+  },
+  "criteria": {
+    "AC-1": [
+      "packages/core/src/lifecycle/lesson-machine.test.ts"
+    ],
+    "AC-2": [
+      "packages/core/src/lifecycle/lesson-machine.test.ts"
+    ],
+    "AC-3": [
+      "packages/core/src/lifecycle/lesson-machine.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "AC-4, AC-5, AC-6 tests (decision_fields, transition_roles, is_editable): written by the implementer in a separate file"
+  ]
+}
