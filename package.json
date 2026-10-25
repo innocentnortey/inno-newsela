@@ -13,6 +13,7 @@
     "db:migrate": "node scripts/run-target.mjs db:migrate",
     "db:seed": "node scripts/run-target.mjs db:seed",
     "schemas:emit": "node scripts/run-target.mjs schemas:emit",
+    "gen:error-status": "tsx apps/web/scripts/gen-error-status.ts",
     "eval:golden": "node scripts/run-target.mjs eval:golden",
     "eval:grounding": "node scripts/run-target.mjs eval:grounding",
     "eval:faults": "node scripts/run-target.mjs eval:faults",
