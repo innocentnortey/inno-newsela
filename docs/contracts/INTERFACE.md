@@ -801,10 +801,9 @@ collaboration server (one Hocuspocus process)
   - *How the Submit lock reaches this process (System review; confirmed by SP-2):* the web app checks role and state, then
     calls the collaboration server's internal freeze call; it sets the document's lock (every later update is refused
     before it is applied), stores at once, compares the submitter's state vector, writes the snapshot and the state
-    change in one transaction, and broadcasts `mode: read_only`. **SP-2 fallback:** if refusing in place fails SP-2,
-    the server closes every connection to the document at the lock instead; clients see `DISCONNECTED`, reconnect within
-    10 s, receive `mode: read_only`, and any held edit not in the snapshot is reported as refused. The promise above is
-    the same either way.
+    change in one transaction, and broadcasts `mode: read_only`. SP-2 passed with refusing in place (option A: a per-update guard refuses every
+    update after the lock; the editor drops refused local edits and tells the typist via `refused` with `refused_from`),
+    so the close-every-connection fallback is not used ([CHG-1](CHANGES.md)).
   - No hosted Yjs vendor; persisted to our Postgres (PD-9).
 - **Timing:** store debounce ≤ 2 s [T] (R-26); store transaction p95 ≤ 500 ms [T] (HP-4; SP-2); remote edit visible
   p95 < 500 ms [T] and durably stored p95 < 3 s [T] at the 200-user spike (R-56 as amended by PD-33; cut #1: if cut, the
@@ -813,7 +812,7 @@ collaboration server (one Hocuspocus process)
 - **Reviews:**
   - UX review: Claude (UX session), 2026-10-25, done.
   - System review: Claude (System track, Opus), 2026-10-25 — agreed: `stored` is a stateless message; the Submit lock is an
-    internal freeze call into this process (SP-2 confirms; close-all-connections fallback described, same promise);
+    internal freeze call into this process (SP-2 confirmed option A, refusing in place; fallback dropped by CHG-1, same promise);
     reviewer-only writes decided from HP-5/R-54; timing moved to PD-33 targets; stores enqueue the `check_job`.
 - **Open behaviour questions:** none open. [UXP-7](#uxp-7) is recorded as following from HP-4 and HP-5.
 
@@ -1146,7 +1145,7 @@ standards, which live in the front matter)
     *System support (confirmed by SP-2):* the web app checks role and state, then the collaboration server's internal
     freeze call locks the document, stores at once, checks that `client_state_vector` is covered by the stored state
     vector (else `NOT_STORED`), re-runs the blocking checks on the stored row, and writes the snapshot, the state change
-    and the audit row in one transaction before broadcasting `mode: read_only` (CON-12, with its SP-2 fallback).
+    and the audit row in one transaction before broadcasting `mode: read_only` (CON-12; SP-2 option A, CHG-1).
   - Approve pins the snapshot's content hash and state vector, re-runs the blocking checks on it, and returns 409 on any
     mismatch with no change (R-33, HP-5). Read-only after. *System support:* the web app locks the lesson row, compares
     the pin, re-runs the checks on the snapshot, and writes the approval, the approval snapshot, the audit row and (at the

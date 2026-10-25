@@ -36,8 +36,9 @@ Cards still `draft` or `proposed` are edited in place without a `CHG-N`; their r
 
 | CHG | Date | CON | Aspect | Kind | What changed | Decided by | Sources updated | Waiting to reconcile (`reconcile: CHG-N`) | Status |
 |---|---|---|---|---|---|---|---|---|---|
+| CHG-1 | 2026-10-25 | CON-12, CON-18 | guarantee (System-support note) | presentation-only: no promise changes — "0 edits persisted after a lock; every keystroke in the snapshot or reported as refused" stands | SP-2 passed with option A (refuse in place via a per-update guard), so the cards' description of the close-every-connection fallback is removed and the guard path named | Claude (UX + System reviews, 2026-10-25) under PD-32; SP-2 record | `INTERFACE.md` CON-12, CON-18; OpenAPI unchanged; DO-4 already follows (§13 item 6a); no screen spec cites the fallback | none — no ticket was published citing the fallback; reconciled in the same change | reconciled |
 
-*No `CHG` yet. All 24 cards became `agreed` on 2026-10-25 (System review below); every change from now on is a `CHG-N`.*
+*All 24 cards became `agreed` on 2026-10-25 (System review below); every change from then on is a `CHG-N`.*
 
 ## UX-3a System review, 2026-10-25 (not `CHG` entries)
 
