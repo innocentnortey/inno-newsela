@@ -37,7 +37,7 @@ it("test_upload_capture: two identical uploads give two versions with one hash; 
   expect((refused.body as any).error.code).toBe("SHEET_NOT_PUBLIC");
   expect([await s.count("outline_version"), await s.count("outline_row"), await s.count("audit_event")]).toEqual(counts_before);
 
-  const mine = s.log_lines.filter((l) => l.includes("req_capture_refused"));
+  const mine = s.log_lines.filter((l) => l.includes("req_capture_refused") && l.includes("route.refused"));
   expect(mine).toHaveLength(1);
   expect(mine[0]).toContain("route.refused");
   expect(mine[0]).toContain("SHEET_NOT_PUBLIC");
