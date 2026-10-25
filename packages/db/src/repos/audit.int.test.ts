@@ -72,7 +72,7 @@ describe("PgAuditLog", () => {
   it("details_guard: before_entry.official_text may be 500 chars, no more; other strings stay at 120", async () => {
     const ok = { before_entry: { official_text: "o".repeat(500) } };
     await t.db.with_tx((tx) => audit.append(event({ target_id: "G6.U4.L6", details: ok }), tx));
-    for (const details of [{ before_entry: { official_text: "o".repeat(501) } }, { before_entry: { other: "o".repeat(121) } }]) {
+    for (const details of [{ before_entry: { official_text: "o".repeat(501) } }, { before_entry: { other: "o".repeat(121) } }] as never[]) {
       await expect(t.db.with_tx((tx) => audit.append(event({ target_id: "G6.U4.L6", details }), tx))).rejects.toBeInstanceOf(InvariantViolation);
     }
     expect(await count("target_id=$1", ["G6.U4.L6"])).toBe(1);
