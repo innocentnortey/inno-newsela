@@ -36,7 +36,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 1 | A13a metrics records | `packages/core/src/metrics/**`, `packages/db/src/repos/metrics.ts` (incl. `PgBoardReadRepo`) | planned |
 | 1–3 | A14 web-ui | `apps/web/app/(app)/**`, `apps/web/src/editor/**` (incl. `refusals.ts`), `apps/web/src/lib/api-client.ts`, `apps/web/src/features/**` | planned |
 | 2 | A11a lesson store | `packages/db/src/repos/lesson-docs.ts` | planned |
-| 2 | A6b check context | `packages/core/src/checks/context-loader.ts` | planned |
+| 2 | A6b check context | `packages/core/src/checks/context-loader.ts` | NL-38 built: context-loader.ts |
 | 2 | A7b paid calls | `packages/llm/src/{recorder,paid-call}.ts` | planned |
 | 2 | A11b collab client | `apps/web/src/server/adapters/collab-commands.ts` | planned |
 | 2 | A13b metrics writer | `apps/web/src/server/services/metrics-writer.ts` | planned |
