@@ -81,7 +81,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-13 | US-23 | CON-17 | NL-72 (cut #8) | NL-116 | planned | planned | planned |
 | SCR-14 | US-25, US-26, US-27, US-28, US-31 | CON-11, CON-13, CON-18, CON-20 | NL-68 | NL-99, NL-115 | apps/web/e2e/approval/approval.spec.ts | axe + screenshots: e2e/__screenshots__/approval/ | planned |
 | SCR-15 | US-26, US-28 | CON-18 | NL-69 | NL-115 | planned | planned | planned |
-| SCR-16 | US-29 | CON-11, CON-19 | NL-70 | NL-100 | planned | planned | planned |
+| SCR-16 | US-29 | CON-11, CON-19 | NL-70 | NL-100 | apps/web/e2e/history/history.spec.ts | axe + screenshots: e2e/__screenshots__/history/ | planned |
 | SCR-17 | US-32, US-36 | CON-21 | NL-71 | NL-97 | planned | planned | planned |
 | SCR-18 | US-33 | CON-22 | NL-73 (cut #4) | NL-117 | planned | planned | planned |
 | SCR-19 | US-34, US-36 | CON-10 | NL-74 (cut #6) | NL-104 | planned | planned | planned |
