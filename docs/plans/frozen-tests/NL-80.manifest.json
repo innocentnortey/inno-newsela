@@ -1,0 +1,69 @@
+{
+  "ticket": "NL-80",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/nl-80.fixtures.ts": "9c124b8c1ceb8ccdca7087962492cb1ec766b6e1793ce595235f84d80129da26",
+    "apps/collab/src/frozen-docs.test.ts": "4aa87446f90f6663a61b60f8dcbdb00a76b129c3056ef0d88aadcfcfb0db1899",
+    "apps/collab/src/permissions.test.ts": "81e0d96376f7dad51f04ec3fbf00377a7039a479e6231b44798b355155ff8801",
+    "apps/collab/src/auth.test.ts": "67854b8018f7ba85805f6ab5d223d6863c3a4d0b5ad81348a48b0e445e952961",
+    "apps/collab/src/persistence.test.ts": "d17abc93c809bf52655672cc640f3579e7536665884ad78f6a0e5d06098607d1",
+    "apps/collab/src/persistence.int.test.ts": "f51e820af6fb3057f25cef2429a5e24b808c6973680cc001b86d2f1f27c09862",
+    "apps/collab/src/wiring/server.test.ts": "89f40609936b1abdd8b5ddf2a2f002008b8bc5dd1200f80a209540b415d06f2b"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/auth.test.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/permissions.test.ts",
+      "apps/collab/src/auth.test.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/persistence.int.test.ts"
+    ],
+    "AC-4": [
+      "apps/collab/src/persistence.int.test.ts"
+    ],
+    "AC-5": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/persistence.int.test.ts",
+      "apps/collab/src/persistence.test.ts"
+    ],
+    "AC-6": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/persistence.int.test.ts",
+      "apps/collab/src/persistence.test.ts"
+    ],
+    "AC-7": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/persistence.test.ts"
+    ],
+    "AC-8": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/frozen-docs.test.ts"
+    ],
+    "AC-9": [
+      "apps/collab/src/persistence.int.test.ts"
+    ],
+    "AC-10": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/auth.test.ts",
+      "apps/collab/src/persistence.int.test.ts"
+    ],
+    "AC-11": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/wiring/server.test.ts"
+    ],
+    "AC-12": [
+      "apps/collab/src/nl-80.fixtures.ts",
+      "apps/collab/src/persistence.int.test.ts",
+      "apps/collab/src/wiring/server.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/collab/src/main.test.ts",
+    "apps/collab/src/wiring/shells.test.ts"
+  ]
+}
