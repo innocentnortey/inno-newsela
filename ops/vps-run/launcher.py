@@ -323,11 +323,17 @@ def run_once_bg(phase: str, st: dict) -> dict:
         return {"init_model": None, "model_usage": {}, "cost": 0.0, "subtype": "error_duplicate",
                 "detail": f"session {sid} is live elsewhere ({row.get('kind')}, {row.get('status')}, pid {row.get('pid')})"}
     cwd = session_cwd()
+    if row and row.get("id"):                             # our own session is still working (launcher restarted)
+        short, since = row["id"], st.get("bg_since") or now().rstrip("Z")
+        log(f"phase {phase}: re-attaching to running background session {short} (no new run started)")
+        started = time.time()
+        n = st["attempts"][phase]
+        return finish_bg(phase, st, cwd, sid, short, since, n, started)
     bgsession.retire(CLAUDE, sid, cwd, STATE_DIR / "transcript-backups", log)
     st["attempts"][phase] += 1
     n = st["attempts"][phase]
-    transcript = bgsession.transcript_dir(cwd) / f"{sid}.jsonl"
-    seen = transcript.exists() or (bgsession.transcript_dir(ROOT) / f"{sid}.jsonl").exists()
+    transcript = bgsession.find_transcript(sid, cwd)
+    seen = transcript.exists()
     session_args = ["--resume", sid] if seen else ["--session-id", sid]
     args = ["--model", cfg["model"], *session_args, "--name", cfg["name"], "--permission-mode", CONFIG["permission_mode"],
             "--settings", str(ROOT / ".claude/settings.json")]       # keeps Newsela's claudeMdExcludes from any cwd
@@ -345,14 +351,18 @@ def run_once_bg(phase: str, st: dict) -> dict:
     if real_sid != sid:                                   # fresh --bg sessions pick their own id
         log(f"phase {phase}: session id is {real_sid} (launcher had reserved {sid})")
         st["sessions"][phase] = sid = real_sid
-        transcript = bgsession.transcript_dir(cwd) / f"{sid}.jsonl"
-    st["bg_id"], st["child_pid"] = short, None
+        transcript = bgsession.find_transcript(sid, cwd)
+    st["bg_id"], st["child_pid"], st["bg_since"] = short, None, since
     st["status"] = f"running phase {phase} run {n} (background session {short}: `claude attach {cfg['name']}`)"
     save_state(st)
     (LOG_DIR / f"phase-{phase.lower()}-run-{n}.bg.json").write_text(json.dumps(
         {"bg_id": short, "session_id": sid, "started": since, "transcript": str(transcript)}, indent=2))
     log(f"phase {phase} run {n}: background session {short} ({cfg['model']}, session {sid}); "
         f"attach: claude attach {cfg['name']}")
+    return finish_bg(phase, st, cwd, sid, short, since, n, started)
+
+
+def finish_bg(phase: str, st: dict, cwd: Path, sid: str, short: str, since: str, n: int, started: float) -> dict:
     info = bgsession.wait(CLAUDE, cwd, short, sid, since,
                           max_hours=CONFIG.get("bg_max_hours_per_run", 10), forbid=("opus", "haiku") if phase == "B" else (),
                           poll_s=CONFIG.get("bg_poll_seconds", 60), log=log)

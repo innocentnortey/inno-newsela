@@ -51,10 +51,17 @@ def _rows(path: Path):
         return
 
 
+def find_transcript(session_id: str, cwd: Path) -> Path:
+    """The session's transcript wherever it lives: a resumed session keeps writing to the folder of the project it
+    was first run in (measured 2026-10-25), not to the folder of its current cwd."""
+    found = sorted((Path.home() / ".claude/projects").glob(f"*/{session_id}.jsonl"), key=lambda p: p.stat().st_mtime)
+    return found[-1] if found else transcript_dir(cwd) / f"{session_id}.jsonl"
+
+
 def usage_since(cwd: Path, session_id: str, since_iso: str) -> dict:
     """Models and estimated cost of assistant messages written at or after `since_iso` (main + subagents)."""
-    base = transcript_dir(cwd)
-    files = [base / f"{session_id}.jsonl"] + sorted((base / session_id / "subagents").glob("*.jsonl"))
+    main = find_transcript(session_id, cwd)
+    files = [main] + sorted((main.parent / session_id / "subagents").glob("*.jsonl"))
     replies: dict[str, tuple[str, dict]] = {}      # message id -> (model, max of each usage field)
     first_model = None
     for f in files:
@@ -63,6 +70,8 @@ def usage_since(cwd: Path, session_id: str, since_iso: str) -> dict:
                 continue
             m = e.get("message") or {}
             model = m.get("model") or "unknown"
+            if model == "<synthetic>":                      # Claude Code placeholder lines, not model replies
+                continue
             if f.name.startswith(session_id) and first_model is None:
                 first_model = model
             key = f.name + ":" + (m.get("id") or e.get("uuid") or "")   # one reply is written as several lines
@@ -112,7 +121,7 @@ def retire(claude: str, session_id: str, cwd: Path, backup_dir: Path, log) -> No
         if row.get("state") not in ("done", "stopped", "failed"):
             stop(claude, row["id"])
             time.sleep(5)
-        src = transcript_dir(cwd) / f"{session_id}.jsonl"
+        src = find_transcript(session_id, cwd)
         if src.exists():
             backup_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, backup_dir / f"{session_id}-{int(time.time())}.jsonl")
