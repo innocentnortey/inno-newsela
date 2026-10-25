@@ -1,0 +1,19 @@
+{
+  "name": "@ls/core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ls/schema": "*",
+    "@ls/editor-schema": "*",
+    "xlsx": "0.18.5",
+    "compromise": "14.19.0"
+  },
+  "devDependencies": {}
+}

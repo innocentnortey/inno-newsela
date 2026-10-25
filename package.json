@@ -1,0 +1,38 @@
+{
+  "name": "inno-newsela",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": { "node": ">=24", "npm": ">=11" },
+  "workspaces": ["apps/*", "packages/*", "evals", "load", "ops"],
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "node scripts/run-target.mjs test:e2e",
+    "db:migrate": "node scripts/run-target.mjs db:migrate",
+    "db:seed": "node scripts/run-target.mjs db:seed",
+    "schemas:emit": "node scripts/run-target.mjs schemas:emit",
+    "eval:golden": "node scripts/run-target.mjs eval:golden",
+    "eval:grounding": "node scripts/run-target.mjs eval:grounding",
+    "eval:faults": "node scripts/run-target.mjs eval:faults",
+    "eval:full-run": "node scripts/run-target.mjs eval:full-run",
+    "eval:seed": "node scripts/run-target.mjs eval:seed",
+    "eval:heldout": "node scripts/run-target.mjs eval:heldout",
+    "eval:judge-calibrate": "node scripts/run-target.mjs eval:judge-calibrate",
+    "load:spike": "node scripts/run-target.mjs load:spike",
+    "ops:backup": "node scripts/run-target.mjs ops:backup",
+    "dev": "node scripts/run-target.mjs dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "eslint": "10.13.0",
+    "eslint-plugin-boundaries": "7.3.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

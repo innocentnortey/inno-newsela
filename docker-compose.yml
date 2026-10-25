@@ -1,0 +1,17 @@
+name: ls
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ls
+      POSTGRES_PASSWORD: ls_dev_only
+      POSTGRES_DB: ls
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ls"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  pg_data:

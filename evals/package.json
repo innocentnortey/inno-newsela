@@ -1,0 +1,17 @@
+{
+  "name": "@ls/evals",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ls/core": "*",
+    "@ls/schema": "*",
+    "@ls/db": "*",
+    "@ls/config": "*",
+    "@ls/obs": "*"
+  },
+  "devDependencies": {}
+}
