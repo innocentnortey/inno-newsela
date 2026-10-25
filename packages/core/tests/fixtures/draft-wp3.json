@@ -1,0 +1,93 @@
+{
+  "lesson_id": "G6.U4.FLEX-1a",
+  "title": "Flex Day: Meaning-Making Huddle",
+  "text_cards": [],
+  "blocks": [
+    {
+      "role": "routine_heading",
+      "section": "Launch",
+      "part": null,
+      "text": "Turn and Talk",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Ask: What questions emerged from the texts you've read?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "routine_heading",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Graphic Organizer",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 40
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Choose small group or whole class from formative data.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_tip",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Choose clips that match the events students pick; preview them.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "cfu_item",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "",
+      "standard_codes": [
+        "RL.6.7"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "What do you see in the film that you hear in the text?",
+        "options": [
+          "the same event",
+          "a different event"
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Both show the event.",
+          "The huddle compares the same events."
+        ],
+        "standard_code": "RL.6.7"
+      },
+      "minutes": null
+    },
+    {
+      "role": "quick_write",
+      "section": "Look Back",
+      "part": null,
+      "text": "Based on what you've read so far, how do you feel retellings change across cultures and generations?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    }
+  ]
+}
