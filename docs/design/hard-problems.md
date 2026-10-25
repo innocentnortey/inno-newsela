@@ -176,6 +176,8 @@ The model never routes and never declares done. A lesson job returns a typed res
 
 **Status:** chosen — option A. Innocent ✓ 2026-10-25 (recommendation accepted: "finish stage 3 and 4 dont ask for my input ill follow your recommendations"). SP-1 confirms it; if SP-1 fails, option B (one call per section) is the decision.
 
+**Spike result (2026-10-25): proven (SP-1)** — option A passes ([SP-1](../analysis/spikes/SP-1-one-call-draft.md)): 3/3 valid, 0 truncations, ≤ 120 s and ≤ $0.26 per lesson, 47-entry `UnitPlan`. Mechanism change inside A: the API's schema-enforced output rejects the `LessonDraft` schema ("compiled grammar is too large"), so the draft call carries the schema in the prompt, Zod validates in code, and the one repair call handles failures (2 of 3 lessons used it). Innocent has not read it yet.
+
 ---
 
 <a id="hp-2"></a>
@@ -319,6 +321,8 @@ the same way. Time: ≤ 1.5 h, with no new model spend (it reuses SP-1's output)
 - **WP-1 / WP-2:** the distractor rule and the grounding line become golden tests (R-51).
 
 **Status:** chosen — option B. Innocent ✓ 2026-10-25 (recommendation accepted: "finish stage 3 and 4 dont ask for my input ill follow your recommendations"). SP-3 sets whether the name scan blocks everywhere or only in checks.
+
+**Spike result (2026-10-25): proven (SP-3)** — [SP-3](../analysis/spikes/SP-3-invention-scans.md) on SP-1's real drafts: every code-detectable plant caught (11/11); quote and page scans 0 false flags (block everywhere; quote span ≥ 3 words); the name scan (option B, heuristic + `compromise`) has 0 false flags in check items but 2–13 elsewhere, so it **blocks only in `cfu_item`s and is advisory elsewhere** (the pass line's fallback; CON-13's stated default). Innocent has not read it yet.
 
 ---
 
@@ -580,6 +584,8 @@ on a hand-written fixture using the custom nodes (`callout`, `collapsible`, a ta
 
 **Status:** chosen — option A, with the addendum below. Innocent ✓ 2026-10-25 (recommendation accepted: "finish stage 3 and 4 dont ask for my input ill follow your recommendations"). SP-2 confirms the round trip and store time.
 
+**Spike result (2026-10-25): proven (SP-2)** — round trip keeps the hash 20/20; store transaction p95 25 ms (PGlite; R-57 re-measures on Postgres) ([SP-2](../analysis/spikes/SP-2-freeze-at-submit.md)).
+
 ### Addendum to HP-4 (added at merge; system-design walk, gap 3)
 
 **The batch run comes before the editor.** The full 47-lesson run starts Sunday ~18:00 (PRD §6.3), but the editor's
@@ -731,6 +737,8 @@ GP-94 (the model never decides when a human is asked).
   source lesson is approved with the slot filled; the dependent approval records the source's hash."
 
 **Status:** chosen — option B, with the addendum below. Innocent ✓ 2026-10-25 (recommendation accepted: "finish stage 3 and 4 dont ask for my input ill follow your recommendations"). SP-2 confirms it; if SP-2 fails, freeze by closing all connections at Submit.
+
+**Spike result (2026-10-25): proven (SP-2)** — Submit freeze by a server-side read-only flip plus an update guard (SP-2 option A): 20/20 on every assertion, 0 edits after a lock, 0 silent losses, stale approve 409 with no change; the editor drops refused local edits and tells the typist ([SP-2](../analysis/spikes/SP-2-freeze-at-submit.md)). Innocent has not read it yet.
 
 ### Addendum to HP-5 (added at merge; system-design walk, gap 2)
 
@@ -979,6 +987,8 @@ PD-14 stands, now enforced by the reservation: the cap is the measured cost per 
 - **SD-7.2:** the proposed answer "a worker restart mid-run" goes to Innocent as the failure to survive. It is not recorded as decided until he answers.
 
 **Status:** chosen — option B. Innocent ✓ 2026-10-25 (recommendation accepted: "finish stage 3 and 4 dont ask for my input ill follow your recommendations"). SP-1's rate-limit headers and cost set the concurrency and spend caps.
+
+**Spike result (2026-10-25):** SP-1 sets the caps — concurrency **6** lesson jobs in flight [C] (rate limits 400k output tokens/min; a lesson ~11k output tokens), per-run spend cap **$13.00** [C] ($0.182 measured per lesson × 47 × 1.5 + plan call), per-call timeout 240 s [C] ([SP-1](../analysis/spikes/SP-1-one-call-draft.md)).
 
 ---
 
