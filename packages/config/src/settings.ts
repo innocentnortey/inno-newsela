@@ -134,7 +134,7 @@ function load_model_settings(env: Env): ModelSettings {
   };
 }
 
-function load_spend_settings(env: Env): SpendSettings {
+export function load_spend_settings(env: Env): SpendSettings {
   return {
     build_spend_ceiling_usd: read_decimal(env, "BUILD_SPEND_CEILING_USD", { default: "75" }),
     run_cap_default_usd: read_decimal(env, "RUN_CAP_DEFAULT_USD", { default: "13.00" }),
