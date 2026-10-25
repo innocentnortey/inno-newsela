@@ -93,6 +93,33 @@ export default [
     },
   },
   {
+    // NL-33: every paid model call goes through PaidCaller (reserve -> call -> settle | release). The raw
+    // recorder and provider client may be imported only inside packages/llm/src, composition roots and tests.
+    files: ["apps/**/*.{ts,tsx}", "packages/**/*.ts", "evals/**/*.ts", "load/**/*.ts", "ops/**/*.ts"],
+    ignores: [
+      "packages/llm/src/**",
+      "apps/*/src/wiring/**",
+      "apps/web/src/server/wiring/**",
+      "apps/web/src/server/container.ts",
+      "apps/*/src/main.ts",
+      "**/*.test.ts",
+      "**/test-support/**",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@ls/llm/recorder", "@ls/llm/anthropic", "**/llm/src/recorder", "**/llm/src/recorder.ts", "**/llm/src/anthropic", "**/llm/src/anthropic.ts"],
+              message: "NL-33: paid model calls go through PaidCaller; only packages/llm and wiring files may import the recorder or provider client.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ["packages/db/src/testing/**", "packages/**/*.test.ts", "packages/**/*.int.test.ts", "packages/**/test-support/**", "apps/**/*.test.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },

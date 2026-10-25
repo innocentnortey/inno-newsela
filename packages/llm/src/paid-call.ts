@@ -1,8 +1,9 @@
 import { InvariantViolation, SpendRefused } from "@ls/core/errors";
-import type { UserId, JobId, RunId } from "@ls/core/ports/common";
+import type { UserId, JobId, RunId, ReservationId } from "@ls/core/ports/common";
 import type { RecordedCall } from "@ls/core/ports/model-call-log";
 import type { StructuredCallRequest } from "@ls/core/ports/model-client";
 import type { SpendLedger } from "@ls/core/ports/spend";
+import type { Logger } from "@ls/obs/logger";
 import { UnpricedModelError } from "./recorder.ts";
 import type { CostMath, ModelCallContext, ModelCallRecorder, PriceLookup, RenderedPromptLike } from "./recorder.ts";
 
@@ -17,6 +18,8 @@ export interface PaidCallRequest {
   user_id: UserId;
 }
 
+const SETTLE_ATTEMPTS = 3;
+
 // The one reserve -> call -> settle | release protocol.
 export class PaidCaller {
   constructor(
@@ -24,6 +27,7 @@ export class PaidCaller {
     private readonly spend: SpendLedger,
     private readonly prices: PriceLookup,
     private readonly cost: CostMath,
+    private readonly logger?: Logger,
   ) {}
 
   async call(p: PaidCallRequest): Promise<RecordedCall> {
@@ -38,7 +42,6 @@ export class PaidCaller {
     let recorded: RecordedCall;
     try {
       recorded = await this.recorder.call({ ...p.ctx, reservation_id }, p.req, p.rendered);
-      await this.spend.settle(reservation_id, recorded.cost_usd, recorded.model_call_id);
     } catch (e) {
       if (e instanceof UnpricedModelError) {
         // Real spend with an unknown price: settle at the reserved worst case rather than release, then surface the error.
@@ -49,7 +52,24 @@ export class PaidCaller {
       await this.spend.release(reservation_id).catch(() => undefined);
       throw e;
     }
+    // The provider call completed: the money is spent. A settle failure must never release the reservation.
+    await this.settle_held(reservation_id, recorded, p);
     await this.spend.release(reservation_id); // no-op after settle
     return recorded;
+  }
+
+  private async settle_held(reservation_id: ReservationId, recorded: RecordedCall, p: PaidCallRequest): Promise<void> {
+    let last: unknown;
+    for (let attempt = 1; attempt <= SETTLE_ATTEMPTS; attempt++) {
+      try {
+        await this.spend.settle(reservation_id, recorded.cost_usd, recorded.model_call_id);
+        return;
+      } catch (e) {
+        last = e;
+      }
+    }
+    // Still failing: leave the reservation held (worst case stays counted) and surface the error. Ids only.
+    this.logger?.error("spend.settle_failed", { run_id: p.run_id, job_id: p.job_id, extra: { reservation_id, model_call_id: recorded.model_call_id } });
+    throw last;
   }
 }
