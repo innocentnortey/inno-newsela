@@ -23,6 +23,7 @@
     "@hocuspocus/provider": "4.7.1",
     "@ls/config": "*",
     "@ls/db": "*",
+    "@ls/llm": "*",
     "@ls/editor-schema": "*",
     "@ls/obs": "*",
     "@ls/schema": "*",
