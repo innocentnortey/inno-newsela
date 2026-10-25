@@ -56,7 +56,7 @@ describe("PgCheckQueue", () => {
     const r = await rows(l);
     expect(r).toHaveLength(1);
     expect(r[0]).toMatchObject({ status: "queued", content_hash: H3, store_id: "st_3" });
-    expect(new Date(r[0].enqueued_at).getTime()).toBe(T0.getTime());
+    expect(new Date(r[0]!.enqueued_at).getTime()).toBe(T0.getTime());
   });
 
   it("enqueue_joins_tx_and_notifies: rollback leaves nothing; commit notifies", async () => {
@@ -179,8 +179,8 @@ describe("PgCheckQueue", () => {
     expect(cur.issues.map((i) => i.issue_id)).toEqual(set.issues.map((i) => i.issue_id));
     expect(await q.pending_for(l)).toMatchObject({ pending: false, latest_stored_hash: H1 });
     const job = (await rows(l, "done"))[0];
-    expect(job.claimed_at).not.toBeNull();
-    expect(job.finished_at).not.toBeNull();
+    expect(job!.claimed_at).not.toBeNull();
+    expect(job!.finished_at).not.toBeNull();
     expect(await unchecked_stores(t.db, new Date(clock.now().getTime() + 3_600_000), 30).then((r) => r.some((x) => x.lesson_id === l))).toBe(false);
   });
 });
