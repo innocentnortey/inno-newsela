@@ -1,16 +1,17 @@
-// Local structural types (same reason as NL-06 section 4). NL-12 re-points db/ids/clock/model_client at the real ports.
 import type { Logger } from "@ls/obs/logger";
 import type { WorkerSettings } from "@ls/config/settings";
+import type { TxRunner } from "@ls/core/ports/tx";
+import type { IdGenerator } from "@ls/core/ports/ids";
+import type { Clock } from "@ls/core/ports/clock";
+import type { ModelClient } from "@ls/core/ports/model-client";
 
-export interface DbHandle { readonly kind: "unwired" }
-export interface IdGenerator { next(prefix: string): string }
-export interface Clock { now(): Date }
-export interface ModelClientHandle { readonly kind: "unwired" }
+export type { TxRunner, IdGenerator, Clock, ModelClient };
+
 export interface WorkerDeps {
   settings: WorkerSettings;
   logger: Logger;
-  db: DbHandle;
+  db: TxRunner;
   ids: IdGenerator;
   clock: Clock;
-  model_client: ModelClientHandle;
+  model_client: ModelClient;
 }
