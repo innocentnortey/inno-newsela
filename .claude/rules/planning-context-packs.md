@@ -81,16 +81,59 @@ model; the explorers cover only what the manifest cannot (current code, repo sta
 
 ## Evidence and limits
 
-Measured 2026-10-21 on the AEA Stage 8 build (token counts are from agent transcripts, re-reads included):
+Measured 2026-10-21 on the AEA Stage 8 build. The token figures are **tokens processed (mostly cache reads)**, from
+agent transcripts with re-reads included; they are not billed tokens:
 
 | Ticket | Old planner | New (pack) | Notes |
 |---|---|---|---|
-| AEA-40 | 100 turns, 29.3M tokens, final context 499k | 10 turns, 1.0M | single Haiku explorer, 5.7M; a reviewer judged the plan *sufficient with gaps* |
+| AEA-40 | 100 turns, 29.3M tokens processed, final context 499k | 10 turns, 1.0M | single Haiku explorer, 5.7M; a reviewer judged the plan *sufficient with gaps* |
 | AEA-53 | 89 turns, 24.0M, final context 453k | 14 turns, 2.5M | four Haiku explorers, 2.8M; plan found the same blocker as the old plan |
 
-Limits: only two tickets were measured; the AEA-40 job was smaller than the old plan's (a merge and re-verify, as the branch was
-already built); only AEA-40's plan was reviewed for quality; the AEA-53 pack was larger than it needs to be. Re-measure
-when changing the pack, and revise this file with the numbers.
+The same runs repriced at Opus/Haiku 5.5 list price (API-equivalent dollars; `artifacts/2026-10-25-claude-harness-tooling-review.md`
+§2.2). Dollars fall less than tokens because cache reads are cheap and the pack planner's bill is mostly the cache write
+of the pack itself:
+
+| Run | Turns | Peak context | USD |
+|---|---|---|---|
+| Old `plan:AEA-53` (Opus) | 89 | 453k | $7.72 |
+| Pack route, AEA-53 (4 Haiku explorers $0.09 + Opus planner $2.38) | 41 + 14 | 96k / 281k | $2.47 (−68%) |
+| Old `plan:AEA-40` (Opus) | 100 | 499k | $11.35 |
+| Pack route, AEA-40 (explorer brief + planner; a smaller job) | 48 | 214k | $1.20 (−89%) |
+| AEA-53 refresh (one re-plan) | 66 | 342k | $6.82 |
+
+**HX-R1 Step B (2026-10-25), a controlled replay:** 6 frozen AEA tickets × 2 reps × arms D (direct `fanout-planner`) and
+P (pack), at each ticket's historical base. The two arms used the same Opus planner and template, a Sonnet implementer
+on a fresh clone, held-out historical tests, and a blind Sonnet reviewer. Explorers were the built-in `Explore` type
+with an explicit `model: "haiku"`; without it they would inherit the session's model. All 119 agents were served the
+requested model. Full write-up: `artifacts/harness-experiments/aea/HX-R1/results.md`.
+
+| Measure (12 runs per arm) | D (direct) | P (pack) |
+|---|---|---|
+| Lifecycle $ (explorers + planner + implementer + ½ review) | $94.81 | $50.01 (−47.3%) |
+| Planning $ (explorers + planner) | $76.67 | $35.71 (−53%) |
+| Planner turns, median | 69 | 9.5 |
+| Tokens processed per planner (mostly cache reads) | 13.4M | 1.9M |
+| Implementer returns (stopped before building) | 1 | 3 |
+| Held-out behaviour failures: per test case / per distinct cause | 14 / 2 | 12 / 12 |
+| Blind review: pair judged the better hand-off | 10 of 12 | 2 of 12 |
+| Blind review: mean plan score (1–5) | 4.33 | 3.33 |
+
+The cost saving held. Hand-off quality was worse with the first pack recipe, and the decision rule did not adopt packs
+(inconclusive at best). The reviews name the two causes:
+- **Facts left as open items.** P plans left facts as numbered *Open items* for the implementer (rule 9's instruction).
+- **Blockers declared instead of resolved.** Two P plans declared a prerequisite that the ticket says to inject with a
+  double, or that does not exist on the base. Both of those implementers produced empty patches.
+
+On large tickets, most spans landed in `DEFERRED` (up to 113) and were rarely opened.
+
+Limits:
+- **2026-10-21 rows:** only two tickets were measured. The AEA-40 job was smaller than the old plan's (a merge and
+  re-verify, as the branch was already built), only AEA-40's plan was reviewed for quality, and the AEA-53 pack was
+  larger than it needs to be.
+- **HX-R1:** six tickets, a Sonnet reviewer, and held-out tests that could separate the arms on only four of the six
+  tickets.
+
+Re-measure when changing the pack, and revise this file with the numbers.
 
 ## How to apply
 

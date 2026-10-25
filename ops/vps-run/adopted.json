@@ -18,5 +18,15 @@
     "file": ".claude/rules/planning-context-packs.md",
     "md5": "27afa5a7334fe6649b4bbceb473bf184",
     "pinned": ".claude/rules/planning-context-packs.md"
+  },
+  "R-3": {
+    "at": "2026-10-25T14:49:48Z",
+    "backup": "ops/vps-run/state/adopt-backups/R-3",
+    "basis": "HX-R1 Step B final numbers (artifacts/harness-experiments/aea/HX-R1/results.md, step-b/analysis.json, decision.json; 24 runs, 119 agents, all served the requested model) plus the review section 2.2 repricing. Evidence section only: the old figures are labelled 'tokens processed (mostly cache reads)', the repriced USD rows and the HX-R1 D-vs-P table and its quality findings are added, and the note that Explore needs an explicit model: haiku. Rules 1-11 and How to apply are unchanged from R-2; packs are NOT adopted as the planner default (decision rule: not adopted / inconclusive; Innocent's call)",
+    "boundary": "after wave 0",
+    "existed": true,
+    "file": ".claude/rules/planning-context-packs.md",
+    "md5": "4d5b5904c936bf450a54629d12a3feeb",
+    "pinned": ".claude/rules/planning-context-packs.md"
   }
 }
