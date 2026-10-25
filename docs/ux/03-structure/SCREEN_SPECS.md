@@ -1,6 +1,6 @@
 # UX-3b · Screen specs — Newsela Lesson Studio
 
-> **Status:** proposed · **Date:** 2026-10-25 · **Direction:** D1 · Clear Ledger · **Design doc:**
+> **Status:** signed (waves 1–3) · **Date:** 2026-10-25 · **Direction:** D1 · Clear Ledger · **Design doc:**
 > [`design.md`](../../design/design.md) (tokens, components, layout primitives) · **IA:** [`IA.md`](IA.md)
 > **Built from:** [`SITEMAP.md`](../01-planning/SITEMAP.md), [`USER_FLOWS.md`](../01-planning/USER_FLOWS.md) (copy and
 > error codes), [`USER_STORIES.md`](../01-planning/USER_STORIES.md), [`LOOK_SHEET_COPY.md`](../02-concepts/LOOK_SHEET_COPY.md).
@@ -15,9 +15,11 @@ in number order. The five cut-order screens (SCR-13, SCR-18–SCR-21) are shorte
 
 **How sign-off works** (process revision 2026-10-25, UX-3b). Innocent signs specs **per wave**. A frontend feature
 ticket is ready only when every screen it builds says `**Status:** signed` and every contract it uses is `agreed`
-(`ticket_readiness.py`). Every spec below says `proposed`. Nothing is signed.
+(`ticket_readiness.py`). All 21 specs are signed: wave 1 on 2026-10-25 (delegated), waves 2 and 3 on 2026-10-25 under PD-32 (see *Wave sign-off*).
 
 ## Wave sign-off
+
+**Waves 2 and 3 signed 2026-10-25** (SCR-2, 3, 6, 7, 12, 16, 17; SCR-13, 18, 19, 20, 21 — the cut-order screens stay planned and are built only if their cut does not fire): Claude recommendation adopted under Innocent's standing authorization (PD-32). Basis: each spec lists every state, names its CONs, and its UXP/UXQ questions are decided (PD-31). He has not read them.
 
 **Wave 1 signed 2026-10-25** under Innocent, 2026-10-25: "take your recommendations to all decisions you need me for". He has not read the specs; anything he raises reopens the screen. Signing a screen does not make its contracts `agreed`: a frontend ticket for it still needs its CONs agreed and the §6 gate (`ticket_readiness.py`).
 
@@ -37,18 +39,18 @@ the agreed contracts, so wave 1 does not wait for upload or runs to exist (SCR-4
 | SCR-10 | Insert quote or excerpt (dialog) | **1** | CON-15 | signed | Innocent ✓ 2026-10-25 (delegated) |
 | SCR-11 | Resolve or clear (dialog) | **1** | CON-14 | signed | Innocent ✓ 2026-10-25 (delegated) |
 | SCR-15 | Send back or reopen (dialog) | **1** | CON-18 | signed | Innocent ✓ 2026-10-25 (delegated) |
-| SCR-2 | Units home | 2 | CON-2, CON-6 | proposed | — |
-| SCR-3 | Upload outline | 2 | CON-2 | proposed | — |
-| SCR-6 | Generation progress | 2 | CON-6, CON-7 | proposed | — |
-| SCR-7 | Unit plan | 2 | CON-8 | proposed | — |
-| SCR-12 | Candidate compare | 2 | CON-16 | proposed | — |
-| SCR-16 | History and provenance | 2 | CON-19 | proposed | — |
-| SCR-17 | Run summary | 2 | CON-21 | proposed | — |
-| SCR-18 | Coverage matrix (cut #4) | 3 | CON-22 | proposed | — |
-| SCR-20 | Export (cut #5) | 3 | CON-23 | proposed | — |
-| SCR-19 | Unit quality (cut #6) | 3 | CON-10 | proposed | — |
-| SCR-21 | Prompt guidance (cut #7) | 3 | CON-24, CON-5 | proposed | — |
-| SCR-13 | AI assist panel (cut #8) | 3 | CON-17 | proposed | — |
+| SCR-2 | Units home | 2 | CON-2, CON-6 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-3 | Upload outline | 2 | CON-2 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-6 | Generation progress | 2 | CON-6, CON-7 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-7 | Unit plan | 2 | CON-8 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-12 | Candidate compare | 2 | CON-16 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-16 | History and provenance | 2 | CON-19 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-17 | Run summary | 2 | CON-21 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-18 | Coverage matrix (cut #4) | 3 | CON-22 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-20 | Export (cut #5) | 3 | CON-23 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-19 | Unit quality (cut #6) | 3 | CON-10 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-21 | Prompt guidance (cut #7) | 3 | CON-24, CON-5 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
+| SCR-13 | AI assist panel (cut #8) | 3 | CON-17 | signed | PD-32 ✓ 2026-10-25 (Claude recommendation adopted) |
 
 **One dependency to watch:** SCR-9's live editor needs CON-12 (the collaboration socket), which is the hardest
 contract to mock. If CON-12 is not `agreed` when wave 1 starts, SCR-9 can be built first as a read view on CON-11 and
@@ -382,7 +384,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-2 · Units home
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** The author's start: the unit, its outline versions and the latest run, with the way to upload.
 - **Users:** P-2 (all can open). **Stories:** US-1, US-6 (entry), US-10 (entry). **Flows:** FLOW-1, FLOW-2.
@@ -407,7 +409,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-3 · Upload outline
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Bring in the unit outline as a file or a public Google Sheet link and store it as a numbered version.
 - **Users:** P-2. **Stories:** US-1, US-2. **Flows:** FLOW-2. **Contracts:** CON-2.
@@ -459,7 +461,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-6 · Generation progress
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Show every lesson job moving through its states, the cost against the cap, and the run's controls.
 - **Users:** P-2 (all can watch). **Stories:** US-7, US-8. **Flows:** FLOW-4, FLOW-5, FLOW-19. **Contracts:** CON-6
@@ -495,7 +497,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-7 · Unit plan
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Let people read the one-line plan for every teaching day, the hand-forwards and the links between
   lessons, before reading lessons one by one.
@@ -573,7 +575,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-12 · Candidate compare
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Show a regenerated candidate beside the current lesson, section by section, and let the reviewer adopt
   it whole, adopt one section, or leave it unadopted.
@@ -623,7 +625,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-16 · History and provenance
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Show every version of a lesson with its hash and provenance, and the audit log, so it can be defended to
   a state reviewer.
@@ -642,7 +644,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-17 · Run summary
-**Status:** proposed
+**Status:** signed (wave 2) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** One summary per run: what the batch cost and how clean it was.
 - **Users:** P-3, P-2 (read-only). **Stories:** US-32, US-36. **Flows:** FLOW-16, FLOW-19. **Contracts:** CON-21.
@@ -658,7 +660,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-13 · AI assist panel (cut #8)
-**Status:** proposed
+**Status:** signed (wave 3) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Rewrite a selected passage from the reviewer's note as a suggestion they accept or reject.
 - **Stories:** US-23. **Flows:** FLOW-15. **Contracts:** CON-17.
@@ -674,7 +676,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-18 · Coverage matrix (cut #4)
-**Status:** proposed
+**Status:** signed (wave 3) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** A read-only standard × lesson grid with I / P / A and who confirmed each link.
 - **Stories:** US-33. **Flows:** FLOW-16. **Contracts:** CON-22.
@@ -687,7 +689,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-19 · Unit quality (cut #6)
-**Status:** proposed
+**Status:** signed (wave 3) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Draft-quality, health and seeded-error numbers for the unit, each with its *n*.
 - **Stories:** US-34, US-36. **Flows:** FLOW-16, FLOW-19. **Contracts:** CON-10.
@@ -699,7 +701,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-20 · Export (cut #5)
-**Status:** proposed
+**Status:** signed (wave 3) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Write a versioned export of approved snapshots, holding back lessons whose linked lesson is not approved.
 - **Stories:** US-35, US-28. **Flows:** FLOW-13, FLOW-17. **Contracts:** CON-23.
@@ -712,7 +714,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 ---
 
 ## SCR-21 · Prompt guidance (cut #7)
-**Status:** proposed
+**Status:** signed (wave 3) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25 — basis: every state listed, every CON named, UXQ/UXP decided (PD-31); he has not read it; anything he raises reopens the screen
 
 - **Purpose:** Edit the guidance layer of the prompt as numbered versions with a reason, and try it on one lesson.
 - **Stories:** US-10. **Flows:** FLOW-18. **Contracts:** CON-24, CON-5.

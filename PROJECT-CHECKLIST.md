@@ -105,7 +105,7 @@ reviews are recorded. An agreed card changes only through the change procedure (
 - [x] IA `docs/ux/03-structure/IA.md` — 2026-10-25
 - [x] Screen specs `SCR-N` with every state (`docs/ux/03-structure/SCREEN_SPECS.md`); each names the `CON-N` it uses — all 21 screens; UXQ-1…UXQ-11 decided 2026-10-25
 - [x] `docs/design/design.md` (UI-2 template) in the chosen direction, with the design tokens — Clear Ledger; 59 contrast pairs per theme computed, all pass; DQ-1…DQ-4 decided 2026-10-25
-- **Gate:** ☑ screen specs signed for wave **1** (SCR-1, SCR-4, SCR-5, SCR-8, SCR-9, SCR-10, SCR-11, SCR-14, SCR-15) — Innocent ✓ 2026-10-25, delegated: "take your recommendations to all decisions you need me for" (he has not read them; anything he raises reopens the screen). Later waves: ____
+- **Gate:** ☑ screen specs signed for wave **1** (SCR-1, SCR-4, SCR-5, SCR-8, SCR-9, SCR-10, SCR-11, SCR-14, SCR-15) — Innocent ✓ 2026-10-25, delegated: "take your recommendations to all decisions you need me for" (he has not read them; anything he raises reopens the screen). Later waves: **2** (SCR-2, 3, 6, 7, 12, 16, 17) and **3** (SCR-13, 18, 19, 20, 21) signed 2026-10-25 — Claude recommendation adopted under Innocent's standing authorization (PD-32); basis: every state listed, every CON named, UXP/UXQ decided (PD-31); evidence `docs/ux/03-structure/SCREEN_SPECS.md` *Wave sign-off*. He has not read them
 
 ## FW · Early frontend foundation wave  (§4b) — UX track
 - [x] Preconditions: UX-2 direction picked and `design.md` tokens written (the §6 gate is **not** needed: presentation only)
