@@ -20,7 +20,7 @@ describe("prices [invariant AC-8]", () => {
 
   it("was confirmed on 2026-10-25", () => {
     expect(PRICE_TABLE.confirmed_on).toBe("2026-10-25");
-    expect(PRICE_TABLE.prices.map((x) => x.model_id)).toEqual(["claude-sonnet-5-5"]);
+    expect(PRICE_TABLE.prices.map((x) => x.model_id)).toEqual(["claude-sonnet-5-5", "stub-judge"]);
   });
 
   it("[boundary] an unknown model id throws InvariantViolation, never a zero price", () => {
