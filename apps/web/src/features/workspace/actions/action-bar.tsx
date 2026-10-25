@@ -39,6 +39,7 @@ export function WorkspaceActionBar(props: WorkspaceActionBarProps) {
   );
 }
 
+export const NOT_STORED_HOLD_MS = 3000;
 const SUBMITTABLE = ["draft", "in_review", "changes_requested", "reopened"];
 
 function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, onOpenAssist }: WorkspaceActionBarProps) {
@@ -50,9 +51,15 @@ function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, 
   const [withdrawing, setWithdrawing] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
-  // The server said "not stored yet" for this editor state; it holds until the editor reports something new.
+  // The server said "not stored yet" for this editor state. The state is often a bare string that does not change,
+  // so the hold also ends after a short wait (the lesson is re-read meanwhile) and Submit can be tried again.
   const [notStoredFor, setNotStoredFor] = useState<ClientStateInput | null>(null);
   const serverNotStored = notStoredFor !== null && Object.is(notStoredFor, clientState);
+  useEffect(() => {
+    if (notStoredFor === null) return;
+    const t = setTimeout(() => setNotStoredFor(null), NOT_STORED_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [notStoredFor]);
   const [startedNote, setStartedNote] = useState(false);
   const attempted = useRef<string | null>(null);
 
@@ -67,7 +74,7 @@ function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, 
         setStartedNote(true);
         announce(REVIEWER_NOTE);
       })
-      .catch(() => {})
+      .catch((e: unknown) => setRefusal(isApiError(e) ? refusalMessage(e) : COLLAB_DOWN))
       .finally(() => onLessonChanged?.());
     // Fired once per lesson; the ref guard makes the StrictMode double effect harmless.
     // eslint-disable-next-line react-hooks/exhaustive-deps

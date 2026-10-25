@@ -2,7 +2,7 @@ import { cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
+import { NOT_STORED_HOLD_MS, WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
 import { COLLAB_DOWN, DISCLOSURE, DRAFTING, REGEN_CAP, REGEN_LOCKED, REVIEWER_NOTE } from "@/features/workspace/actions/copy";
 import { ApiError } from "@/lib/api-client";
 import type { components } from "@/lib/api-types";
@@ -84,6 +84,28 @@ describe("action bar", () => {
     await waitFor(() => expect(screen.getByText("Saving")).toBeTruthy());
     expect(submitBtn().getAttribute("aria-disabled")).toBe("true");
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("refusals: NOT_STORED hold ends after a short wait so Submit can be retried", async () => {
+    m.post.mockRejectedValue(new ApiError({ status: 409, code: "NOT_STORED", message: "x" }));
+    show();
+    await userEvent.click(submitBtn());
+    await waitFor(() => expect(screen.getByText("Saving")).toBeTruthy());
+    await waitFor(() => expect(screen.queryByText("Saving")).toBeNull(), { timeout: NOT_STORED_HOLD_MS + 1500 });
+    expect(submitBtn().getAttribute("aria-disabled")).not.toBe("true");
+  }, 10_000);
+
+  it("start review failure shows the refusal and re-reads", async () => {
+    m.post.mockRejectedValue(new ApiError({ status: 409, code: "INVALID_TRANSITION", message: "That move is not allowed now." }));
+    const changed = vi.fn();
+    show({ l: { state: "draft" }, changed });
+    expect((await screen.findByRole("alert")).textContent).toContain("That move is not allowed now.");
+    expect(changed).toHaveBeenCalled();
+    expect(screen.queryByTestId("reviewer-note")).toBeNull();
+    cleanup();
+    m.post.mockRejectedValue(new ApiError({ status: 503, code: "COLLAB_UNAVAILABLE", message: "x" }));
+    show({ l: { state: "draft" } });
+    expect((await screen.findByRole("alert")).textContent).toContain(COLLAB_DOWN);
   });
 
   it("refusals: COLLAB_UNAVAILABLE says nothing changed", async () => {

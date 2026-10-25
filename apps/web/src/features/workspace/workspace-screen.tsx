@@ -59,8 +59,9 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
   const applied = useRef(false);
 
   const lesson = load.kind === "ready" ? load.lesson : null;
-  // The lesson carries no version id; the version number stands in until the contract adds one.
-  useReviewHeartbeat({ lessonId: lessonId ?? "", versionId: `lv-${lesson?.version_number ?? 0}` });
+  // The lesson carries no version id (S-18); the version number stands in until the contract adds one.
+  // Nothing is sent until the lesson has loaded, so no invented id ever reaches the server.
+  useReviewHeartbeat({ lessonId: lesson?.lesson_id ?? "", versionId: `lv-${lesson?.version_number ?? 0}`, enabled: lesson !== null });
   const reread = useCallback(() => {
     retry();
     issuesPoll.retry();

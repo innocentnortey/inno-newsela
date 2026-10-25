@@ -23,10 +23,10 @@ function tabId(): string {
   }
 }
 
-export function useReviewHeartbeat(args: { lessonId: string; versionId: string }): void {
+export function useReviewHeartbeat(args: { lessonId: string; versionId: string; enabled?: boolean }): void {
   const { role } = useSession();
-  const active = role === "reviewer" || role === "approver";
-  const { lessonId, versionId } = args;
+  const { lessonId, versionId, enabled = true } = args;
+  const active = enabled && (role === "reviewer" || role === "approver");
 
   useEffect(() => {
     if (!active) return;

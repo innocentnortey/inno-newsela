@@ -94,4 +94,17 @@ describe("useReviewHeartbeat", () => {
     await vi.advanceTimersByTimeAsync(60_000);
     expect(post).not.toHaveBeenCalled();
   });
+
+  it("sends nothing while disabled (lesson not ready), then starts once enabled", async () => {
+    const { rerender } = renderHook(
+      ({ enabled }) => useReviewHeartbeat({ lessonId: enabled ? "G6.U4.L4" : "", versionId: "lv-1", enabled }),
+      { wrapper: wrap("reviewer"), initialProps: { enabled: false } },
+    );
+    await vi.advanceTimersByTimeAsync(45_000);
+    expect(post).not.toHaveBeenCalled();
+    rerender({ enabled: true });
+    await vi.advanceTimersByTimeAsync(15_000);
+    expect(post).toHaveBeenCalledTimes(1);
+    expect(post.mock.calls[0]![1].params.path.lessonId).toBe("G6.U4.L4");
+  });
 });
