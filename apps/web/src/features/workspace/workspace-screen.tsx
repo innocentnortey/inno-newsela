@@ -121,7 +121,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
   if (load.kind === "schema_unknown") {
     return (
       <div className="p-6">
-        <SchemaUnknownView lessonLabel={label} schemaVersion={load.schemaVersion} boardHref={boardHref} />
+        <SchemaUnknownView lessonLabel={label} schemaVersion={load.schemaVersion} unknownNodes={load.unknownNodes} boardHref={boardHref} />
       </div>
     );
   }

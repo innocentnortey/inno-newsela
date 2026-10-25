@@ -17,6 +17,9 @@ export interface VersionListProps {
   onSelect: (n: number) => void;
 }
 
+// The version row carries the author as an id for human-made versions; the matching audit row carries the name.
+const byName = (created_by: string, name: string | undefined): string => (/^usr_/.test(created_by) && name ? name : created_by);
+
 export function VersionList({
   versions,
   audit,
@@ -46,7 +49,7 @@ export function VersionList({
             >
               {`v${n} · ${kindLabel(v)}`}
             </button>
-            <p className="text-small text-ink2">{`By ${v.created_by} · ${formatWhen(v.created_at)}`}</p>
+            <p className="text-small text-ink2">{`By ${byName(v.created_by, t?.user)} · ${formatWhen(v.created_at)}`}</p>
             <p className="text-small text-ink2">
               {t
                 ? `${stateWord(t.from_state)} → ${stateWord(t.to_state)}`
