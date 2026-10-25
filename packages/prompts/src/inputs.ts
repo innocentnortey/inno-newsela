@@ -1,12 +1,10 @@
 import type { LessonLinkRecord, NormalizedRow, UnitRuleRecord } from "@ls/schema/outline";
 import type { UnitPlanEntryDraft } from "@ls/schema/unit-plan";
 
-// Local structural types: the DO-4 records satisfy these. NL-32 swaps PromptBlock for the core port type.
-export interface PromptBlock {
-  text: string;
-  cacheable: boolean;
-  label: "locked" | "guidance" | "schema" | "examples" | "context" | "data" | "instruction";
-}
+import type { PromptBlock } from "@ls/core/ports/model-client";
+export type { PromptBlock };
+
+// Local structural types: the DO-4 records satisfy these.
 export interface PromptVersionRow {
   prompt_version_id: string;
   number: number;
