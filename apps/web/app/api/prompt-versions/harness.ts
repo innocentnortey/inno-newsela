@@ -66,3 +66,15 @@ export const get = (path: string, token: string | null, extra: Record<string, st
     method: "GET",
     headers: { ...(token === null ? {} : { cookie: `ls_session=${token}` }), ...extra },
   });
+
+export const post = (path: string, token: string | null, body: unknown, extra: Record<string, string> = {}) =>
+  new Request("https://app.example.test" + path, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      origin: "https://app.example.test",
+      ...(token === null ? {} : { cookie: `ls_session=${token}` }),
+      ...extra,
+    },
+    body: JSON.stringify(body),
+  });
