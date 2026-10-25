@@ -111,6 +111,13 @@ export class SeedSql {
   async send_back_notes(lesson_id: string): Promise<string[]> {
     return (await this.q<{ note: string | null }>("SELECT note FROM review_event WHERE lesson_id=$1 AND to_state='changes_requested'", [lesson_id])).map((r) => r.note ?? "");
   }
+  async already_scored(eval_run_id: string): Promise<boolean> {
+    const r = await this.q(
+      "SELECT 1 FROM eval_run WHERE id=$1 AND finished_at IS NOT NULL UNION ALL SELECT 1 FROM eval_case_result WHERE eval_run_id=$1",
+      [eval_run_id],
+    );
+    return r.length > 0;
+  }
   async lesson_state(lesson_id: string): Promise<string | null> {
     return (await this.q<{ state: string }>("SELECT state FROM lesson WHERE id=$1", [lesson_id]))[0]?.state ?? null;
   }

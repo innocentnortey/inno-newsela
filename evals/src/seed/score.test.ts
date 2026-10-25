@@ -47,7 +47,30 @@ describe("WF-26 scoring", () => {
     expect(report).toContain("abc123def456");
     expect(report).toContain("n: 4");
     expect(report).toContain("3/4");
+
+    // a second score of the same run is refused before any write
+    const before = await w.t.db.with_tx(async (tx) => (await tx.query("SELECT 1 FROM eval_case_result")).rowCount);
+    w.errs.length = 0;
+    expect(await run_cli(["seed", "--score", run_id], w.deps())).toBe(2);
+    expect(w.errs).toEqual(["invariant violated: run already scored"]);
+    expect(await w.t.db.with_tx(async (tx) => (await tx.query("SELECT 1 FROM eval_case_result")).rowCount)).toBe(before);
   });
+
+  it("generic_section_mention_is_not_a_catch", async () => {
+    const w3 = await make_world();
+    try {
+      expect(await run_cli(["seed", "--plan", w3.write_key("seed-key-g.json", 2)], w3.deps())).toBe(0);
+      const run_id = run_id_of(w3);
+      const [a, b] = read_state(w3, run_id).plants as unknown as [{ lesson_id: string; content_hash: string; kind: string }, { lesson_id: string }];
+      await raise_issue(w3, a.lesson_id, a.content_hash, "code_not_allowed");
+      await send_back(w3, b.lesson_id, "The launch section needs work.");
+      expect(await run_cli(["seed", "--score", run_id], w3.deps())).toBe(1); // 1/2 is below the guard
+      const report = fs.readFileSync(path.join(w3.root, `evals/reports/seeded-${run_id}.md`), "utf8");
+      expect(report).toContain("| seed-2 | invented_quote | no | missed (our reviewers mentioned the section only) |");
+    } finally {
+      await w3.close();
+    }
+  }, 60_000);
 
   it("a missed wrong-code plant exits 1", async () => {
     const w2 = await make_world();

@@ -7,14 +7,14 @@ import { s10_floor_met, verdict, type S10Verdict } from "../suites/s10-verdict.t
 import { make_s10, seed_case_id } from "../suites/s10.ts";
 import type { EvalOptions } from "../types.ts";
 import { SeedSql, type SeedDeps } from "./deps.ts";
-import { KIND_CHECKS, naming_hints, planted_in } from "./mutations.ts";
+import { KIND_CHECKS, naming_hints, planted_in, section_hints } from "./mutations.ts";
 import { state_path, type SeedState } from "./plant.ts";
 
 export interface PlantResult {
   n: number;
   kind: string;
   caught: boolean;
-  how: "check" | "reviewer" | "missed";
+  how: "check" | "reviewer" | "mentioned_section" | "missed"; // mentioned_section: a send-back that only named the section; not caught
 }
 
 export async function read_state(repo_root: string, run_id: string): Promise<SeedState> {
@@ -33,12 +33,18 @@ export async function score_plants(deps: SeedDeps, state: SeedState): Promise<Pl
     const later = await sql.later_versions(p.lesson_id);
     const edited_out = later.some((l) => !planted_in(l, p));
     const names = naming_hints(p);
-    const sent_back = (await sql.send_back_notes(p.lesson_id)).some((note) => names.some((s) => note.toLowerCase().includes(s)));
-    const how = by_check ? "check" : edited_out || sent_back ? "reviewer" : "missed";
-    out.push({ n: i + 1, kind: p.kind, caught: how !== "missed", how });
+    const notes = (await sql.send_back_notes(p.lesson_id)).map((n) => n.toLowerCase());
+    const sent_back = notes.some((note) => names.some((s) => note.includes(s)));
+    const mentioned = notes.some((note) => section_hints(p).some((s) => note.includes(s)));
+    const how = by_check ? "check" : edited_out || sent_back ? "reviewer" : mentioned ? "mentioned_section" : "missed";
+    out.push({ n: i + 1, kind: p.kind, caught: how === "check" || how === "reviewer", how });
   }
   return out;
 }
+
+const REPORT_BY: Record<PlantResult["how"], string> = {
+  check: "check", reviewer: "our reviewers", mentioned_section: "missed (our reviewers mentioned the section only)", missed: "missed",
+};
 
 export function render_seeded_report(state: SeedState, git_sha: string, results: PlantResult[], v: S10Verdict): string {
   return [
@@ -54,7 +60,7 @@ export function render_seeded_report(state: SeedState, git_sha: string, results:
     "",
     "| plant | kind | caught before approval | by |",
     "|---|---|---|---|",
-    ...results.map((r) => `| ${seed_case_id(r.n)} | ${r.kind} | ${r.caught ? "yes" : "no"} | ${r.how === "missed" ? "missed" : r.how === "check" ? "check" : "our reviewers"} |`),
+    ...results.map((r) => `| ${seed_case_id(r.n)} | ${r.kind} | ${r.caught ? "yes" : "no"} | ${REPORT_BY[r.how]} |`),
     "",
   ].join("\n");
 }
@@ -62,6 +68,7 @@ export function render_seeded_report(state: SeedState, git_sha: string, results:
 // `eval:seed --score <run_id>`: exit 0 floors met, 1 verdict is a fail.
 export async function run_score(deps: SeedDeps, run_id: string, out: (l: string) => void): Promise<number> {
   const state = await read_state(deps.repo_root, run_id);
+  if (await new SeedSql(deps).already_scored(state.eval_run_id)) throw new InvariantViolation("run already scored"); // before any write
   const guard = make_leak_guard(deps.env);
   let memo: Promise<PlantResult[]> | null = null;
   const scored = (): Promise<PlantResult[]> => (memo ??= score_plants(deps, state));

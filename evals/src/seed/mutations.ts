@@ -75,8 +75,13 @@ export function planted_in(lesson: StoredLesson, plant: Plant): boolean {
   return lesson.sections.some((sec) => texts(sec.content).some((t) => t.includes(plant.marker)));
 }
 
-// What a send-back note may quote to count as "naming" the plant: the marker, the locator, the section's name, or a number in the marker.
+// What a send-back note must quote to count as naming the plant: the marker, or a number in the marker.
 export function naming_hints(plant: Plant): string[] {
   const digits = plant.marker.match(/\d{3,}/g) ?? [];
-  return [plant.marker, plant.locator, plant.locator.replace(/_/g, " "), ...digits].map((h) => h.toLowerCase());
+  return [plant.marker, ...digits].map((h) => h.toLowerCase());
+}
+
+// A generic mention of the plant's section: weaker than naming the error, and never counted as caught.
+export function section_hints(plant: Plant): string[] {
+  return [plant.locator, plant.locator.replace(/_/g, " ")].map((h) => h.toLowerCase());
 }
