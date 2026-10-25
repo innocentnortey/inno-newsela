@@ -1,0 +1,50 @@
+{
+  "ticket": "NL-33",
+  "risk": "security",
+  "frozen": {
+    "packages/db/src/repos/model-calls.int.test.ts": "17dd3edf56d224b372b067af868eee15050639c73322417c3d904dd8f3f3cc2c",
+    "packages/llm/src/paid-call.test.ts": "ed3eae15ff9ca5e3b95dd882c0754667c3b496085208f4578b952d51a7f4d881",
+    "packages/llm/src/recorder.test.ts": "f0bf0609e1b83e1c946d1f7818c68d6d38190a3e2bfba10f4de71bef57028554",
+    "packages/llm/src/test-support/fixtures.ts": "17041309ff7eb6612119faca8b2dac30e4083a2f9488da5e74d75159301af20a",
+    "packages/llm/src/test-support/memory-log.ts": "4f43dbe134e4cb8fba1dc51590d42513ec2ee518f2fdf8b455c27b8a971ba4a3",
+    "packages/llm/src/test-support/scripted-client.ts": "fc87927c54b1cd83faac948391044093f14f9d7c3fd7ec5147c0145ea3a2e9d2"
+  },
+  "criteria": {
+    "AC-1": [
+      "packages/llm/src/recorder.test.ts (row_exists_before_send)",
+      "packages/db/src/repos/model-calls.int.test.ts (sent_then_completed)"
+    ],
+    "AC-2": [
+      "packages/llm/src/recorder.test.ts (raw_saved_before_parse)"
+    ],
+    "AC-4": [
+      "packages/llm/src/recorder.test.ts (retry_policy)"
+    ],
+    "AC-5": [
+      "packages/llm/src/recorder.test.ts (timeout_and_truncation_not_retried)"
+    ],
+    "AC-6": [
+      "packages/llm/src/paid-call.test.ts (refused_sends_nothing)"
+    ],
+    "AC-7": [
+      "packages/llm/src/paid-call.test.ts (reserve_call_settle_or_release)"
+    ],
+    "AC-9": [
+      "packages/llm/src/recorder.test.ts (no_secrets_or_text_in_logs)"
+    ],
+    "also frozen (extra coverage)": [
+      "AC-3 cost_from_usage",
+      "AC-8 lost_and_totals",
+      "AC-10 completed_for_ordinal",
+      "AC-11 correlation_ids"
+    ]
+  },
+  "support_frozen": [
+    "packages/llm/src/test-support/fixtures.ts",
+    "packages/llm/src/test-support/memory-log.ts",
+    "packages/llm/src/test-support/scripted-client.ts"
+  ],
+  "not_frozen": [
+    "tests/platform/model-call-capture.test.ts (AC-12, implementer)"
+  ]
+}
