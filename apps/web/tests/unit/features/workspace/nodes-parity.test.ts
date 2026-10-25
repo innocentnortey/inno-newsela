@@ -3,7 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { READ_VIEW_MARKS, READ_VIEW_NODES } from "@/features/workspace/read-view/nodes";
 
-const src = readFileSync(path.resolve(process.cwd(), "../../packages/editor-schema/src/schema.ts"), "utf8");
+const src = readFileSync(path.resolve(import.meta.dirname, "../../../../../../packages/editor-schema/src/schema.ts"), "utf8");
 const names = (block: string) => [...block.matchAll(/^ {2}([a-z_]+): \{/gm)].map((m) => m[1]!).sort();
 
 describe("read view allowlist", () => {

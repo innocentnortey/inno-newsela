@@ -20,3 +20,4 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-13 | SCR-4 blur validation against a standards list needs the list on the report (CON-3) | NL-57 / CHG | spec not fully met | open |
 | S-14 | NL-59 gates run controls with a literal `role !== "author"` instead of `can(role, "control_run")` in src/lib/roles.ts; one hook lint warning (use-run-progress.ts:62) | NL-59 | move into the shared permission table | open |
 | S-15 | SCR-8 failed-row note needs a failure reason, and "Approved · v2"/"Standard proposed" notes need data, but `BoardRow` has none of these fields; NL-61 shows fixed text "Generation failed" | NL-61 / CHG on CON-9 | contract gap, accepted for now (PD-32) | open |
+| S-16 | `apps/worker/src/wiring/generation.int.test.ts` concurrency_and_fair_share is timing-sensitive: failed once in a full run under heavy machine load, passes alone | NL-79 | make it event-driven (barriers) instead of time-based | open |

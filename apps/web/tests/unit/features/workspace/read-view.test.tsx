@@ -58,7 +58,7 @@ describe("read view", () => {
         const p = path.join(dir, f);
         return statSync(p).isDirectory() ? walk(p) : [p];
       });
-    const files = walk(path.resolve(process.cwd(), "src/features/workspace")).filter((f) => /\.(ts|tsx)$/.test(f));
+    const files = walk(path.resolve(import.meta.dirname, "../../../../src/features/workspace")).filter((f) => /\.(ts|tsx)$/.test(f));
     for (const f of files) expect(readFileSync(f, "utf8"), f).not.toContain("innerHTML");
   });
 });
