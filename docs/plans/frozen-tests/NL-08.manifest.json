@@ -1,0 +1,30 @@
+{
+  "ticket": "NL-08",
+  "risk": "security",
+  "frozen": {
+    "packages/db/src/constraints.int.test.ts": "68cc5b91791051f3f833ed5f826f0d07ff5c1a9e82b21f19386d433f52c41c8f",
+    "packages/db/src/schema-shape.int.test.ts": "5e1095b4335037963610b63d9985cecfba146aee7f42d8faa78818f20ba11f81",
+    "packages/db/src/testing/insert-row.ts": "b57523f6b59c178e1db4b4fea4e4016c750e7d0df7dc9a0529118b1b21e9a704",
+    "packages/db/src/triggers.int.test.ts": "c6d8ca6a314ceb14813dbaa402744c32b7618402bac92e41a231dbca5fb893e1",
+    "packages/db/src/tx.int.test.ts": "d3ca239482730c16f2098945956a1a8f384a3d423c6e78da7c4b34fdb054a246"
+  },
+  "criteria": {
+    "AC-4": [
+      "packages/db/src/triggers.int.test.ts",
+      "packages/db/src/testing/insert-row.ts"
+    ],
+    "AC-5": [
+      "packages/db/src/constraints.int.test.ts",
+      "packages/db/src/testing/insert-row.ts"
+    ],
+    "AC-7 (no_person_minutes, no_plain_secret_columns; money_and_time_types also frozen)": [
+      "packages/db/src/schema-shape.int.test.ts"
+    ],
+    "AC-8": [
+      "packages/db/src/tx.int.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/db/src/testing/test-db.ts"
+  ]
+}
