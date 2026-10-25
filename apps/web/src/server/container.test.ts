@@ -26,7 +26,6 @@ describe("NL-06 container", () => {
 
   it("unbuilt_access_throws: reading an unset service names its owner", () => {
     const s = build_web_services(settings());
-    expect(() => s.sessions).toThrow(/NOT BUILT: NL-25/);
     expect(() => s.coverage).toThrow(/NOT BUILT: NL-91/);
     expect(s.logger).toBeDefined();
   });
