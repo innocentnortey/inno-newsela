@@ -1,12 +1,20 @@
 {
-  "note": "Budgets are API-equivalent dollars from Claude Code's own estimate (total_cost_usd); billing is a subscription, so they act as a usage cap. Claude recommendation adopted under Innocent's standing authorization (PRD PD-35), 2026-10-25. Change only with a dev-log entry.",
+  "note": "No dollar caps: Innocent, 2026-10-25, \"we dont need to worry about a budget im on a subscription\". Usage is still logged per run (API-equivalent estimate) for measurement. Bounds that remain: max_runs per phase, bg_max_hours_per_run, the served-model check.",
   "gitlab_host": "labs.gauntletai.com",
   "gitlab_project_id": 2346,
   "permission_mode": "bypassPermissions",
   "tmux_session": "newsela-run",
   "min_free_gb": 2.5,
   "phases": {
-    "A": {"per_run_budget_usd": 150, "total_budget_usd": 300, "max_runs": 4},
-    "B": {"per_run_budget_usd": 200, "total_budget_usd": 600, "max_runs": 8}
-  }
+    "A": {
+      "max_runs": 4
+    },
+    "B": {
+      "max_runs": 8
+    }
+  },
+  "session_mode": "bg",
+  "bg_poll_seconds": 60,
+  "bg_max_hours_per_run": 16,
+  "note_session_mode": "bg (2026-10-25, Innocent asked for the run to be a real session): each run is a `claude --bg` session, attachable with `claude attach newsela-phase-b`; cost is a transcript estimate (bgsession.py). \"print\" restores the old `claude -p` runs."
 }

@@ -14,11 +14,12 @@ starts on `--model sonnet` with its own fixed session id. Phase B ends the same 
 `checks/checkpoint_b.py`.
 
 Nothing advances on a process exit or a completion sentence alone: only a passing checkpoint
-moves the state forward. A budget stop, a served-model mismatch or exhausted attempts stop the
+moves the state forward. A served-model mismatch, a duplicate live session or exhausted attempts stop the
 launcher with the state preserved and an exact resume path in `state/RESUME.md`.
 
 Commands: preflight, lock, run, status, stop, verify-model. Python 3.10+, standard library only.
-Decisions behind it: PRD PD-32 (standing authorization), PD-34 (VPS, Opus → Sonnet), PD-35 (budgets).
+Decisions behind it: PRD PD-32 (standing authorization), PD-34 (VPS, Opus → Sonnet), PD-35 (budgets; dollar caps removed 2026-10-25, subscription). Runs are `claude --bg`
+background sessions by default (attach with `claude attach newsela-phase-b`); `session_mode: print` restores `-p`.
 """
 from __future__ import annotations
 
@@ -36,6 +37,8 @@ import sys
 import time
 import uuid
 from pathlib import Path
+
+import bgsession
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]                      # inno-newsela/
@@ -275,7 +278,74 @@ def pin_agents_to_sonnet() -> None:
     write_lock("Phase B transition: agent models pinned to sonnet (PD-34)")
 
 
+def turn_prompt(phase: str, n: int) -> str:
+    if n == 1:
+        return (PROMPTS / PHASES[phase]["prompt"]).read_text()
+    ck = CKPT_DIR / f"phase-{phase.lower()}.json"
+    last = json.loads(ck.read_text()) if ck.exists() else {}
+    failing = "\n".join(f"- {c}" for c in last.get("failed", [])) or "- (the previous run ended before the checkpoint could run)"
+    return (PROMPTS / "resume.md").read_text().replace("{PHASE_LOWER}", phase.lower()).replace("{PHASE}", phase).replace("{FAILING}", failing)
+
+
+def phase_env(phase: str) -> dict:
+    env = dict(os.environ)
+    if phase == "B":
+        env["CLAUDE_CODE_SUBAGENT_MODEL"] = "sonnet"
+        env["CLAUDE_CODE_SUBAGENT_MODEL_FORCE"] = "1"
+    return env
+
+
+def run_once_bg(phase: str, st: dict) -> dict:
+    """One run as a background session: attachable with `claude attach <name>`; same checks as print mode."""
+    cfg = PHASES[phase]
+    sid = st["sessions"][phase]
+    row = bgsession.live_with_session(CLAUDE, sid)
+    if row and row.get("kind") != "background":
+        return {"init_model": None, "model_usage": {}, "cost": 0.0, "subtype": "error_duplicate",
+                "detail": f"session {sid} is live elsewhere ({row.get('kind')}, {row.get('status')}, pid {row.get('pid')})"}
+    bgsession.retire(CLAUDE, sid, ROOT, STATE_DIR / "transcript-backups", log)
+    st["attempts"][phase] += 1
+    n = st["attempts"][phase]
+    transcript = bgsession.transcript_dir(ROOT) / f"{sid}.jsonl"
+    session_args = ["--resume", sid] if transcript.exists() else ["--session-id", sid]
+    args = ["--model", cfg["model"], *session_args, "--name", cfg["name"], "--permission-mode", CONFIG["permission_mode"]]
+    since = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    started = time.time()
+    try:
+        short, real_sid = bgsession.start(CLAUDE, ROOT, phase_env(phase), args, turn_prompt(phase, n))
+    except Exception as exc:                              # noqa: BLE001 - reported, then the loop's bounded retry
+        log(f"phase {phase} run {n}: background start failed: {exc}")
+        return {"init_model": None, "model_usage": {}, "cost": 0.0, "subtype": "error_start", "detail": str(exc)}
+    if real_sid != sid:                                   # fresh --bg sessions pick their own id
+        log(f"phase {phase}: session id is {real_sid} (launcher had reserved {sid})")
+        st["sessions"][phase] = sid = real_sid
+        transcript = bgsession.transcript_dir(ROOT) / f"{sid}.jsonl"
+    st["bg_id"], st["child_pid"] = short, None
+    st["status"] = f"running phase {phase} run {n} (background session {short}: `claude attach {cfg['name']}`)"
+    save_state(st)
+    (LOG_DIR / f"phase-{phase.lower()}-run-{n}.bg.json").write_text(json.dumps(
+        {"bg_id": short, "session_id": sid, "started": since, "transcript": str(transcript)}, indent=2))
+    log(f"phase {phase} run {n}: background session {short} ({cfg['model']}, session {sid}); "
+        f"attach: claude attach {cfg['name']}")
+    info = bgsession.wait(CLAUDE, ROOT, short, sid, since,
+                          max_hours=CONFIG.get("bg_max_hours_per_run", 10), forbid=("opus", "haiku") if phase == "B" else (),
+                          poll_s=CONFIG.get("bg_poll_seconds", 60), log=log)
+    st["spend_usd"][phase] = round(st["spend_usd"][phase] + info["cost"], 2)
+    rec = {"phase": phase, "run": n, "mode": "bg", "bg_id": short, "subtype": info["subtype"], "detail": info.get("detail"),
+           "init_model": info["init_model"], "model_usage": list(info["model_usage"].keys()),
+           "cost_usd_estimate": info["cost"], "minutes": round((time.time() - started) / 60, 1), "ended": now()}
+    st["history"].append(rec)
+    with (STATE_DIR / "metrics.jsonl").open("a") as f:
+        f.write(json.dumps(rec) + "\n")
+    save_state(st)
+    log(f"phase {phase} run {n}: {info['subtype']} ({info.get('detail')}), model {info['init_model']}, "
+        f"usage estimate ${info['cost']:.2f}, models used {rec['model_usage']}")
+    return info
+
+
 def run_once(phase: str, st: dict) -> dict:
+    if CONFIG.get("session_mode", "bg") == "bg":
+        return run_once_bg(phase, st)
     cfg = PHASES[phase]
     st["attempts"][phase] += 1
     n = st["attempts"][phase]
@@ -290,15 +360,13 @@ def run_once(phase: str, st: dict) -> dict:
         failing = "\n".join(f"- {c}" for c in last.get("failed", [])) or "- (the previous run ended before the checkpoint could run)"
         prompt = (PROMPTS / "resume.md").read_text().replace("{PHASE_LOWER}", phase.lower()).replace("{PHASE}", phase).replace("{FAILING}", failing)
         session_args = ["--resume", sid]
-    budget = CONFIG["phases"][phase]["per_run_budget_usd"]
     cmd = [CLAUDE, "-p", prompt, "--model", cfg["model"], *session_args, "--name", cfg["name"],
-           "--output-format", "stream-json", "--verbose",
-           "--permission-mode", CONFIG["permission_mode"], "--max-budget-usd", str(budget)]
+           "--output-format", "stream-json", "--verbose", "--permission-mode", CONFIG["permission_mode"]]
     env = dict(os.environ)
     if phase == "B":
         env["CLAUDE_CODE_SUBAGENT_MODEL"] = "sonnet"
         env["CLAUDE_CODE_SUBAGENT_MODEL_FORCE"] = "1"
-    log(f"phase {phase} run {n}: starting ({cfg['model']}, session {sid}, budget ${budget})")
+    log(f"phase {phase} run {n}: starting ({cfg['model']}, session {sid})")
     started = time.time()
     with out.open("w") as fo, err.open("w") as fe:
         proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=fo, stderr=fe, start_new_session=True)
@@ -308,6 +376,10 @@ def run_once(phase: str, st: dict) -> dict:
         rc = proc.wait()
     st["child_pid"] = None
     info = parse_stream(out)
+    cum = st.setdefault("reported_cumulative_usd", {})       # -p reports a resumed session's running total
+    run_cost = max(0.0, info["cost"] - cum.get(sid, 0.0))
+    cum[sid] = info["cost"]
+    info["cost"] = round(run_cost, 2)
     st["spend_usd"][phase] = round(st["spend_usd"][phase] + info["cost"], 2)
     rec = {"phase": phase, "run": n, "rc": rc, "subtype": info["subtype"], "init_model": info["init_model"],
            "model_usage": list(info["model_usage"].keys()), "cost_usd": info["cost"],
@@ -337,7 +409,7 @@ def write_resume(st: dict, reason: str) -> None:
 
 **Reason:** {reason}
 **Phase:** {ph} · **attempts used:** {st['attempts'][ph]} of {CONFIG['phases'][ph]['max_runs']} ·
-**spend so far (API-equivalent):** A ${st['spend_usd']['A']}, B ${st['spend_usd']['B']}
+**usage so far (API-equivalent estimate; subscription, no cap):** A ${st['spend_usd']['A']}, B ${st['spend_usd']['B']}
 **Session ids:** A {st['sessions']['A']} · B {st['sessions']['B']}
 **Last checkpoint:** `ops/vps-run/checkpoints/phase-{ph.lower()}.json`
 
@@ -348,7 +420,7 @@ cd {ROOT}
 python3 ops/vps-run/launcher.py status
 bash ops/vps-run/run.sh            # restarts the launcher in tmux; it continues from this state
 ```
-To allow more attempts or budget, edit `ops/vps-run/config.json` first (record why in the dev log).
+To allow more attempts, edit `ops/vps-run/config.json` first (record why in the dev log).
 To continue the session by hand instead: `{CLAUDE} --resume {st['sessions'][ph]} --model {PHASES[ph]['model']}`.
 """
     (STATE_DIR / "RESUME.md").write_text(text)
@@ -389,11 +461,6 @@ def cmd_run(args) -> int:
                 save_state(st)
                 write_resume(st, f"phase {phase} used all {cfg['max_runs']} runs without passing its checkpoint")
                 return 1
-            if st["spend_usd"][phase] >= cfg["total_budget_usd"]:
-                st["status"] = f"phase {phase} budget reached"
-                save_state(st)
-                write_resume(st, f"phase {phase} reached its total budget ${cfg['total_budget_usd']}")
-                return 1
             info = run_once(phase, st)
             bad = model_ok(phase, info)
             if bad:
@@ -407,10 +474,10 @@ def cmd_run(args) -> int:
                 save_state(st)
                 log(f"phase {phase} checkpoint PASSED")
                 break
-            if info["subtype"] == "error_max_budget_usd":
-                st["status"] = f"phase {phase} run budget reached"
+            if info["subtype"] in ("error_duplicate", "error_model"):
+                st["status"] = f"phase {phase} {info['subtype']}"
                 save_state(st)
-                write_resume(st, f"a phase {phase} run hit its per-run budget before the checkpoint passed")
+                write_resume(st, info.get("detail") or info["subtype"])
                 return 1
             if info["subtype"] is None or info["subtype"].startswith("error"):
                 wait = 60 * st["attempts"][phase]
@@ -446,6 +513,9 @@ def cmd_stop(args) -> int:
             log(f"stop requested: SIGTERM sent to the Claude process group {pid}")
         except ProcessLookupError:
             log("stop requested: recorded child already gone")
+    if st.get("bg_id"):
+        bgsession.stop(CLAUDE, st["bg_id"])
+        log(f"stop requested: background session {st['bg_id']} stopped")
     subprocess.run(["tmux", "kill-session", "-t", CONFIG["tmux_session"]], capture_output=True)
     st["child_pid"] = None
     st["status"] = f"stopped during phase {st['phase']}"
