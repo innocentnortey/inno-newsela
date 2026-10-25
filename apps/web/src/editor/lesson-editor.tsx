@@ -207,7 +207,7 @@ export function LessonEditor(props: LessonEditorProps) {
           ) : null}
           {doc
             ? sections.map((s) => (
-                <div key={`${doc.guid}:${s.address}`} className="flex flex-col gap-1">
+                <div key={`${doc.guid}:${s.address}`} id={`sec-${s.address}`} data-address={s.address} className="flex flex-col gap-1">
                   <h3 className="text-label text-ink2">{s.name}</h3>
                   <SectionEditor
                     address={s.address}
