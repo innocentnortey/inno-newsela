@@ -16,3 +16,4 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-10 | `RunSummary.trace_incomplete` extra field; SCR-4 ELD number (16 findings vs 7 codes) | CHG requests | contract wording | open |
 | S-11 | `trace_check.py` accepts only `TEST-N` ids; SCR rows hold spec paths | TRACEABILITY | UX-5a evidence check fails by format | open |
 | S-12 | `apiGlob("/units")` (src/test-utils/sign-in-as.ts) resolves to `**/units` with an empty API prefix and swallows page navigations; NL-55 spec works around it with a port-4010 filter | NL-24 helper | fix the helper to anchor to the API origin, then drop the workaround in NL-55 (and any later spec copying it) | open |
+| S-13 | SCR-4 Edit blur cannot validate against a standards list: the report carries none (CHG against CON-3, raised in NL-57) | NL-57 | blur is a shape check only; server INVALID_CHOICE is the real check | open |
