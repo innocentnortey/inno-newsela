@@ -11,6 +11,7 @@ export interface ApproveAction {
   result: { name: string; short: string; ratingLabel: string; on: string; thanks: string[] } | null;
   approve: () => Promise<void>;
   clearView: () => void;
+  markStale: () => void;
   firstRadioRef: RefObject<HTMLInputElement | null>;
 }
 
@@ -79,5 +80,5 @@ export function useApproveAction(a: { client: ApiClient; lesson: Lesson; userNam
     }
   }, [client, lesson, rating, result, userName, onApproved]);
 
-  return { rating, setRating, view, submitting, result, approve, clearView: () => setView(null), firstRadioRef };
+  return { rating, setRating, view, submitting, result, approve, clearView: () => setView(null), markStale: () => setView({ kind: "stale" }), firstRadioRef };
 }

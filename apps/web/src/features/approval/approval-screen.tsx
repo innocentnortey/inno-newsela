@@ -74,6 +74,7 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
   }, [announce, n]);
   const action = useApproveAction({ client, lesson, userName: user.name, onApproved });
   const reloadRef = useRef<HTMLButtonElement>(null);
+  const staleFromDialog = useRef(false);
   const view = action.view;
   const stale = view?.kind === "stale";
   useEffect(() => {
@@ -196,7 +197,13 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
           open={dialog !== null}
           onClose={() => {
             setDialog(null);
-            void data.reload();
+            // A stale pin keeps the old snapshot on screen until Reload, so the SCR-14 stale banner can show.
+            if (staleFromDialog.current) staleFromDialog.current = false;
+            else void data.reload();
+          }}
+          onStale={() => {
+            staleFromDialog.current = true;
+            action.markStale();
           }}
         />
       ) : null}

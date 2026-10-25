@@ -1,0 +1,20 @@
+{
+ "ticket": "NL-115",
+ "note": "Test-writer and implementer steps were folded into one run (single-agent task). Frozen cases in transitions.spec.ts: stale_pin (AC-3), four_eyes (AC-4), precedence (AC-5), dependency_order (AC-6), send_back (AC-7), reopen (AC-8), no_named_minutes (AC-11). The file also holds implementer cases submit, approve_second_account, test_transition_capture, no_bulk, append_only. Hashes are of the files at first green run; a later edit is a re-freeze to be noted here. seed.ts gained the open-issue option for the SCR-9 blocked state after the first freeze hash was taken (recorded hash is the final).",
+ "files": {
+  "apps/web/e2e/integration/con-18/stack.ts": "43e6a38aef1b02d7dd41fcefd0b48e1e1dcdbb2ea732eb33a94637a46ebb0c7e",
+  "apps/web/e2e/integration/con-18/seed.ts": "5fb04a24df8df72a683bc664e9664a50dd5f4319e71ea5da86ddab98a63dfb59",
+  "apps/web/e2e/integration/con-18/counts.ts": "2b53adf9da444c9f788b2b8e8dd1aecf47320159b5621686781e826a1b7f2908",
+  "apps/web/e2e/integration/con-18/flow.ts": "9189b3e5dcd6f44a11d26ed2dc1baee975acd46bb512057f80f8161b0c913e9e",
+  "apps/web/e2e/integration/con-18/transitions.spec.ts": "7d587c054f96702b5ef559d1acaf4b5f31e9789ca3bf858c0b0c2a722e07256a"
+ },
+ "criteria": {
+  "AC-3": "stale_pin",
+  "AC-4": "four_eyes",
+  "AC-5": "precedence",
+  "AC-6": "dependency_order",
+  "AC-7": "send_back",
+  "AC-8": "reopen",
+  "AC-11": "no_named_minutes"
+ }
+}
