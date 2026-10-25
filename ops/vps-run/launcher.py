@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import fcntl
+import fnmatch
 import hashlib
 import json
 import os
@@ -99,15 +100,44 @@ def lock_targets() -> list[Path]:
     for base in (ROOT / ".claude/skills", ROOT / ".claude/workflow", ROOT / ".claude/agents", ROOT / ".claude/rules"):
         t += sorted(p for p in base.rglob("*") if p.is_file() and "__pycache__" not in p.parts
                     and ".pytest_cache" not in p.parts)
-    t += [ROOT / "CLAUDE.md"]
+    t += [ROOT / "CLAUDE.md", ROOT / ".claude/settings.json"]   # settings.json holds the claudeMdExcludes
     # Inherited from outside the repo: parent rules and CLAUDE.md load into every Newsela session.
-    t += sorted((WORKSPACE / ".claude/rules").glob("*.md"))
+    # Parent rules listed in Newsela's `claudeMdExcludes` do not load (Newsela pins its own copy), so they
+    # are not part of its workflow; shared edits reach Newsela only through adopt_updates.py.
+    t += sorted(p for p in (WORKSPACE / ".claude/rules").glob("*.md") if not excluded(p))
     t += [WORKSPACE / "CLAUDE.md", Path.home() / ".claude/settings.json",
           Path.home() / ".claude/hooks/zero-to-hero-guard.py"]
     icm = Path.home() / ".claude/skills/icm-project"
     if icm.exists():
         t += sorted(p for p in icm.resolve().rglob("*") if p.is_file() and "__pycache__" not in p.parts)
     return t
+
+
+def excluded(p: Path) -> bool:
+    try:
+        pats = json.loads((ROOT / ".claude/settings.json").read_text()).get("claudeMdExcludes", [])
+    except (FileNotFoundError, json.JSONDecodeError):
+        pats = []
+    return any(fnmatch.fnmatch(str(p), pat) for pat in pats)
+
+
+def adopt_released(phase: str) -> None:
+    """Phase boundary: copy released shared-workflow updates into the pinned copies, commit them, re-lock."""
+    r = subprocess.run([sys.executable, str(HERE / "adopt_updates.py"), "apply", "--boundary", f"phase {phase} start"],
+                       capture_output=True, text=True)
+    out = (r.stdout + r.stderr).strip()
+    for line in out.splitlines():
+        log(f"adopt: {line}")
+    adopted = [l.split(": ", 1)[1] for l in out.splitlines() if l.startswith("ADOPTED ")]
+    if r.returncode != 0 or not adopted:
+        return
+    write_lock(f"phase {phase} start: adopted released updates {', '.join(adopted)}")
+    paths = adopted + ["ops/vps-run/adopted.json", "ops/vps-run/WORKFLOW-UPDATES.md", "ops/vps-run/workflow-lock.json"]
+    subprocess.run(["git", "add", "--", *paths], cwd=ROOT)
+    c = subprocess.run(["git", "commit", "-m", f"Adopt released workflow updates at phase {phase} start",
+                        "-m", "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>", "--", *paths],
+                       cwd=ROOT, capture_output=True, text=True)
+    log(f"adopt: commit {'ok' if c.returncode == 0 else 'failed: ' + c.stderr.strip()[:200]}")
 
 
 def rel(p: Path) -> str:
@@ -344,6 +374,8 @@ def cmd_run(args) -> int:
             pin_agents_to_sonnet()
             st["transitioned"] = True
             save_state(st)
+        if st["attempts"][phase] == 0:          # a true phase start, not a resume inside the phase
+            adopt_released(phase)
         probs = preflight(phase, accept_drift=args.accept_drift)
         if probs:
             st["status"] = f"blocked before phase {phase}"

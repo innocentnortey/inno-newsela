@@ -11,7 +11,8 @@ error analysis, validate capacity, and finish Stage 10. A non-AI launcher starte
 2. `CLAUDE.md`, `.claude/README.md`, `PROJECT-CHECKLIST.md` (zero-to-hero 2.0.0), `docs/plans/slice-plan.md`,
    `docs/plans/tickets/`, `docs/contracts/INTERFACE.md`, `docs/design/capacity-and-workload.md`.
 3. The pinned workflow: `.claude/skills/zero-to-hero/`, `.claude/skills/ux-pipeline/`, `.claude/workflow/to-tickets/`
-   (2.2.0), `.claude/rules/` (build-loop-test-scope, fanout-plan-then-implement, ticket-lanes …).
+   (2.2.0, read by path: **never invoke the `to-tickets` skill**, which is an older frozen user-level copy),
+   `.claude/rules/` (build-loop-test-scope, fanout-plan-then-implement, ticket-lanes, planning-context-packs …).
 
 ## Standing decisions (do not reopen)
 - D1 Clear Ledger; capacity **500 users/day, spike of 200 concurrent users, no 200-day requirement** (PD-33); the
@@ -50,9 +51,13 @@ error analysis, validate capacity, and finish Stage 10. A non-AI launcher starte
   committed). Write `docs/delivery/demo-script.md`, `docs/delivery/demo-decision-inventory.md`,
   `docs/delivery/operating-instructions.md`, walk `SUBMISSION.md`, the retro. Recording the video and the walkthrough are
   Innocent's; prepare them and leave them labelled as his.
-- **Workflow changes** only at a wave or stage boundary, and only if compatible with this Sonnet policy: note the change and
-  rollback in the dev log, then `python3 ops/vps-run/launcher.py lock --note "<why>"`. Never adopt experimental changes
-  mid-wave. Do not edit `ops/vps-run/` otherwise.
+- **Workflow changes** only at a wave or stage boundary. After each wave's batch merge and before the next wave's
+  planners, run `python3 ops/vps-run/adopt_updates.py status`; if anything is PENDING, run
+  `python3 ops/vps-run/adopt_updates.py apply --boundary "after wave <N>"`, re-read every file it lists (your loaded
+  copy is the old one), keep this Sonnet policy where they differ, record the change and its rollback command in the dev
+  log, then `python3 ops/vps-run/launcher.py lock --note "adopted <ids> after wave <N>"` and commit. Only released
+  entries in the shared manifest are adoptable; never copy an unreleased or experimental shared edit, and never edit
+  the shared files. Do not edit `ops/vps-run/` otherwise.
 - Keep context true (router, checklist, ICM rows, dev log, `.claude/state/resume.md`). Commit on `main` in clear commits
   and push to `origin` (factory mode); never another remote.
 

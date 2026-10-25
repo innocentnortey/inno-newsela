@@ -1,0 +1,10 @@
+{
+  "claudeMdExcludes": [
+    "/home/linuxuser/workspaces/.claude/rules/build-loop-test-scope.md",
+    "/home/linuxuser/workspaces/.claude/rules/code-design-solid-modularity.md",
+    "/home/linuxuser/workspaces/.claude/rules/fanout-plan-then-implement.md",
+    "/home/linuxuser/workspaces/.claude/rules/html-files-not-artifacts.md",
+    "/home/linuxuser/workspaces/.claude/rules/planning-context-packs.md",
+    "/home/linuxuser/workspaces/.claude/rules/ticket-lanes.md"
+  ]
+}

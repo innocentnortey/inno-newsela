@@ -1,0 +1,22 @@
+{
+  "R-1": {
+    "at": "2026-10-25T11:33:40Z",
+    "backup": "ops/vps-run/state/adopt-backups/R-1",
+    "basis": "HX-R1 transcript evidence (artifacts/2026-10-25-claude-harness-tooling-review.md section 3 C3; SYNC-NOTES section 4, 11:28 UTC): the 2026-10-21 haiku sweeps did run on Haiku; check the served model from transcripts",
+    "boundary": "pre-launch, before Phase A (2026-10-25)",
+    "existed": true,
+    "file": ".claude/rules/fanout-plan-then-implement.md",
+    "md5": "784157f97092d47588c7074fe5e69287",
+    "pinned": ".claude/rules/fanout-plan-then-implement.md"
+  },
+  "R-2": {
+    "at": "2026-10-25T11:33:40Z",
+    "backup": "ops/vps-run/state/adopt-backups/R-2",
+    "basis": "same transcript evidence as R-1 (review section 3 C3), plus: Explore inherits the session model unless model: haiku is set. The evidence-table update still to come is NOT part of this release",
+    "boundary": "pre-launch, before Phase A (2026-10-25)",
+    "existed": false,
+    "file": ".claude/rules/planning-context-packs.md",
+    "md5": "27afa5a7334fe6649b4bbceb473bf184",
+    "pinned": ".claude/rules/planning-context-packs.md"
+  }
+}

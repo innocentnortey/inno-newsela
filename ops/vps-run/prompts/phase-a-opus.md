@@ -13,8 +13,11 @@ You may run that script yourself at any time: `python3 ops/vps-run/checks/checkp
 5. The pinned workflow (read by path; these are Newsela's versions, recorded in `ops/vps-run/workflow-lock.json`):
    `.claude/skills/zero-to-hero/` (SKILL.md, ARTIFACT-MAP.md, `proposals/2026-10-25-concurrent-frontend.md`),
    `.claude/skills/ux-pipeline/`, `.claude/workflow/to-tickets/SKILL.md` (**2.2.0** — not the user-level
-   `~/.claude/skills/to-tickets`, which is an older copy frozen for an unrelated experiment),
-   `.claude/workflow/system-design-readiness/`, `.claude/workflow/prd-interview/`.
+   `~/.claude/skills/to-tickets`, which is an older copy frozen for an unrelated experiment: it appears in your skill
+   list, but **never invoke the `to-tickets` skill**; read the pinned file by path),
+   `.claude/workflow/system-design-readiness/`, `.claude/workflow/prd-interview/`. Shared-workflow updates reach Newsela
+   only through `ops/vps-run/adopt_updates.py` at boundaries (the launcher runs it at each phase start); don't copy
+   shared files into `.claude/` yourself.
 
 ## Standing decisions (do not reopen)
 - Visual direction: **D1 Clear Ledger** (Innocent, 2026-10-25).

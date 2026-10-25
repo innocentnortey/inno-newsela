@@ -68,9 +68,11 @@ the default for all fan-out coding.
   | Implementers, code review, security and other audits | Sonnet |
 
   Set `model:` explicitly on every Agent call; never rely on inheritance. **Check the model actually ran**
-  before relying on it: on 2026-10-21 five `model: haiku` sweeps ran on another model (likely fast mode or the
-  session default overriding the call). Split long lists by topic so each shared item has one owner; never hand
-  one agent a list that parallel agents could split.
+  before relying on it. On 2026-10-21 the five `model: haiku` sweeps were reported as not Haiku, but their
+  transcripts record `message.model = claude-haiku-5-5`. Check the served model from the transcript
+  (`message.model` vs `requestedModel`) or the `PostToolUse(Agent)` `resolvedModel`, never the agent's
+  self-report. Split long lists by topic so each shared item has one owner; never hand one agent a list that
+  parallel agents could split.
 
 ## What this rule does not cover
 

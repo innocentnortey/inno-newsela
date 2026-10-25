@@ -50,4 +50,20 @@ API-equivalent estimate). Checkpoints: `checks/checkpoint_a.py`, `checks/checkpo
 | Pinned workflow and its lock | `.claude/skills/`, `.claude/workflow/`, `.claude/agents/`, `.claude/rules/`; `ops/vps-run/workflow-lock.json` |
 | Phase B handoff (written by Phase A) | `docs/plans/HANDOFF-PHASE-B.md` |
 
+| Workflow updates adopted from shared files | `ops/vps-run/WORKFLOW-UPDATES.md`, `adopted.json`; script `adopt_updates.py` |
+
 `state/`, `logs/` and `checkpoints/` are git-ignored.
+
+## Shared workflow updates (HX-R1 and others)
+
+Newsela loads only its own pinned copies. Its `.claude/settings.json` uses `claudeMdExcludes` to stop the six
+workspace rules it duplicates from loading; a smoke test on 2026-10-25 counted one copy of each. A shared change
+reaches Newsela only when its owner lists it as **released** (finished and data-backed, not an experiment) in
+`/home/linuxuser/workspaces/.claude/releases/workflow-releases.json`. Then:
+
+- the launcher adopts it at the next phase start (and commits and re-locks); Phase B adopts at wave boundaries;
+- an entry is skipped if the shared file changed after it was released (a newer, unreleased edit);
+- `python3 ops/vps-run/adopt_updates.py status` shows what is pending; `rollback <id>` restores the previous pinned copy.
+
+Any other change to a file in the lock (a parent rule that still loads, `~/.claude/settings.json`, the guard hook)
+stops the next phase start until someone reviews it and runs `launcher.py lock --note "<why>"`.
