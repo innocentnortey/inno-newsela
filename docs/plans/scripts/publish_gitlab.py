@@ -96,7 +96,10 @@ def main():
         lines = md.split("\n")
         if lines and lines[0].startswith("## ["):
             lines = lines[1:]
-        body = {"title": f"[{t['id']}] {t['title']}", "description": "\n".join(lines).strip(),
+        title = f"[{t['id']}] {t['title']}"
+        if len(title) > 250:   # GitLab's limit is 255; the full title stays in the ticket JSON and spec heading
+            title = title[:247].rstrip() + "…"
+        body = {"title": title, "description": "\n".join(lines).strip(),
                 "labels": ",".join(labels_for(t))}
         iid = existing.get(t["id"])
         if dry:

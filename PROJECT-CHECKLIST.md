@@ -141,16 +141,16 @@ reviews are recorded. An agreed card changes only through the change procedure (
 - **Gate:** ☑ `design_outputs.py check … --gate tickets` passes ("register holds at the tickets gate"); `signature_check.py` exits 0 (2026-10-25); `docs/design/spec-dry-run.md` filed with no open gap; coverage sweep clean; DO-4 links and agrees with the agreed `CON-N` cards (CHG-1 reconciled); code-design review PASS (re-review) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25. **Innocent has not yet reviewed DO-1/DO-2 or the Stage 6 page** (`docs/artifacts/2026-10-25-system-design.html`); anything he raises reopens §6
 
 ## 7 · Tickets — four passes ★  (§7)
-- [ ] Readiness per ticket (`ARTIFACT-MAP.md` §7): backend = §6 + its CONs agreed; frontend = §6 + its `SCR-N` signed + its CONs agreed; integration = planned any time, executed once its FE and BE tickets are merged against the same agreed CON; foundation = UX-2 pick + tokens + readiness record
-- [ ] 7a–7c run on Opus with `to-tickets` invoked explicitly; Haiku only for fast evidence sweeps; Sonnet only from §8
-- [ ] 7a **Product-wide** slice plan `docs/plans/slice-plan.md`, cut along DO-3's module boundaries; every ticket has a kind (backend / frontend / integration / foundation) and its `CON-N` and `SCR-N` links; every integration ticket names the tickets it joins — Innocent ✓ ____
-- [ ] 7a parallelism audit in the slice plan (`to-tickets` §2a): edges removed and why, human gates in wave 0, critical-path length, widest wave, collision map per wave; re-run after 7c repairs
-- [ ] Every ticket has exactly one lane (`ticket-lanes`: build-loop / direct / human / spike); lane split stated in the slice plan; `risk::security` on every security ticket (count stated)
-- [ ] 7b Spec one wave at a time; each issue opens with its user story (US-N), has an example pair (WP-N, or PE-N for presentation work), cites its `CON-N` and (UI work) its signed `SCR-N`, and links its HP card
-- [ ] Each ticket passes `ticket_readiness.py check <ticket.json> --root <repo>` before it is marked ready
-- [ ] 7c Coverage audit clean (product-wide: every story, screen and agreed CON covered)
-- [ ] 7d Published to GitLab, waves, kinds and lanes labelled
-- **Gate:** ☐ all four passes done for the waves cut so far — Innocent ✓ ____ (slice plan)
+- [x] Readiness per ticket (`ARTIFACT-MAP.md` §7): backend = §6 + its CONs agreed; frontend = §6 + its `SCR-N` signed + its CONs agreed; integration = planned any time, executed once its FE and BE tickets are merged against the same agreed CON; foundation = UX-2 pick + tokens + readiness record — all 147 `ticket_readiness.py` READY (2026-10-25)
+- [x] 7a–7c run on Opus with `to-tickets` invoked explicitly; Haiku only for fast evidence sweeps; Sonnet only from §8 — 7a slicing, §4b gap resolution and the design passes on Opus; the pinned `.claude/workflow/to-tickets/SKILL.md` 2.2.0 read by path (the user-level skill is never invoked, per the Phase A instructions). **Deviation:** 131 of 147 specs (7b) were written by Sonnet from Opus-written exemplars because of the Phase A budget (PD-35); recorded in the dev log, adopted under PD-32
+- [x] 7a **Product-wide** slice plan `docs/plans/slice-plan.md`, cut along DO-3's module boundaries; every ticket has a kind (backend / frontend / integration / foundation) and its `CON-N` and `SCR-N` links; every integration ticket names the tickets it joins — Innocent ✓ ____ — `docs/plans/slice-plan.md` (147 tickets, W0–W12) — Claude recommendation adopted under PD-32, 2026-10-25; Innocent has not read it
+- [x] 7a parallelism audit in the slice plan (`to-tickets` §2a): edges removed and why, human gates in wave 0, critical-path length, widest wave, collision map per wave; re-run after 7c repairs — in the slice plan; re-run after 7c: 0 same/later-wave edges, critical path 13, widest W4 (38)
+- [x] Every ticket has exactly one lane (`ticket-lanes`: build-loop / direct / human / spike); lane split stated in the slice plan; `risk::security` on every security ticket (count stated) — 122 build-loop · 17 direct · 8 human · 0 spike; 29 `risk::security`
+- [x] 7b Spec one wave at a time; each issue opens with its user story (US-N), has an example pair (WP-N, or PE-N for presentation work), cites its `CON-N` and (UI work) its signed `SCR-N`, and links its HP card — this project specs **every** wave in Phase A (PD-34 override); each issue opens with *Story*, has an acceptance anchor (WP-N / PE-N / SCR states), cites its CON-N / SCR-N and HP cards; 22 spec gaps resolved in DO-3/DO-4 (§4b, DO-4 §13)
+- [x] Each ticket passes `ticket_readiness.py check <ticket.json> --root <repo>` before it is marked ready — 147/147 READY
+- [x] 7c Coverage audit clean (product-wide: every story, screen and agreed CON covered) — `coverage_audit.py … --stage publish`: "coverage holds at the publish stage" (919 rows; 187 requirements; 46 workflows)
+- [x] 7d Published to GitLab, waves, kinds and lanes labelled — 147 issues in private project 2346 (#1…#147), labels `wave::N`, `kind::…`, `lane::…`, `slice::<area>`, `risk::security`, `gate::human`, `cuttable`; each ticket JSON records its `gitlab_iid` (`docs/plans/scripts/publish_gitlab.py`, 2026-10-25). Blockers are listed in each body (no native issue links)
+- **Gate:** ☑ all four passes done for **every** wave (W0–W12; PD-34 override of one-wave-at-a-time) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25: slice plan with parallelism audit and collision maps; 147 specs, all READY; coverage audit passes at publish; 147 issues published. Innocent has not read the slice plan; anything he raises reopens it
 
 ## 8 · Build  (§8)
 - [ ] Frontend tickets built from signed `SCR-N` and `design.md` tokens, on Prism mocks generated from `docs/contracts/interface.openapi.yaml`, while the backend is built alongside
@@ -207,7 +207,7 @@ reviews are recorded. An agreed card changes only through the change procedure (
 | UXP / UXQ | `docs/ux/01-planning/USER_FLOWS.md`, `docs/ux/03-structure/SCREEN_SPECS.md`; routed in `docs/contracts/INTERFACE.md` | 10 / 11, all decided 2026-10-25 |
 | SCR | `docs/ux/03-structure/SCREEN_SPECS.md` | 21 (all signed: wave 1 nine, waves 2–3 twelve) |
 | CON | `docs/contracts/INTERFACE.md` | 24 (all `agreed` 2026-10-25) |
-| CHG | `docs/contracts/CHANGES.md` | 0 |
+| CHG | `docs/contracts/CHANGES.md` | 1 (CHG-1, reconciled) |
 | FW / PE | `docs/plans/foundation-wave.md` | 4 / 11 |
 | SP | defined in `docs/design/hard-problems.md`; results in `docs/analysis/spikes/` (§5) | 3 run 2026-10-25, all pass (SP-3 with its fallback scope) |
 | FT | `docs/testing/error-analysis/` | 0 (§9) |

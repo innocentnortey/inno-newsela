@@ -59,3 +59,19 @@ Project: Newsela Lesson Studio · Writer: Claude (Opus 5.5, main session) · Hos
   with honest `depends_on` (artifacts/gates for wave-0 items).
 - `checkpoint_a.py` requires local ticket files while to-tickets §6 says GitLab is the only record; Newsela keeps both
   (local files are the publish source; GitLab owns status).
+- `checkpoint_a.py` tests `bool(t.get("wave"))`, so wave `0` reads as "not set"; Newsela stores wave 0 as the string
+  `"0"` in the six wave-0 ticket JSONs (every script does `int(wave)`). Proposal: test `t.get("wave") is not None`.
+
+## §6 gate, §7 ticketing complete, published; Phase A checkpoint passes (run 2)
+
+- **Changed:** 29 dry-run gaps closed; Metz re-review PASS; CHG-1 (SP-2 fallback text removed; promise unchanged);
+  Stage 6 page; §6 gate ticked under PD-32. 147 ticket specs (16 Opus, 131 Sonnet); 22 spec gaps resolved additively in
+  DO-3/DO-4 (DO-4 §13 R-1…R-22); 7c coverage repairs (per-workflow `[coverage]` ACs; WF-44 → NL-99, WF-45 → NL-09;
+  WF-46 kickoff page registered); 147 GitLab issues (#1…#147, private project 2346); handoff
+  `docs/plans/HANDOFF-PHASE-B.md`; resume checkpoint rewritten.
+- **Why:** Phase A exit (complete ticketing for every wave, then the Sonnet handoff).
+- **Checked:** `checkpoint_a.py`: PASS. `signature_check.py` exit 0; `design_outputs.py --gate tickets` exit 0;
+  `coverage_audit.py --stage publish`: coverage holds (919 rows); 147/147 `ticket_readiness.py` READY; parallelism
+  re-run: 0 same/later-wave edges, critical path 13, widest W4 (38).
+- **Remaining:** Phase B (Sonnet) from the handoff's *Next action*. Human-only, open: Innocent reading SP-1…3, reviewing
+  DO-1/DO-2 and the Stage 6 page, the slice plan; UX-5b walkthrough; the recording; portal submission.
