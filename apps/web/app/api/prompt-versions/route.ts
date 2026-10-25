@@ -1,6 +1,9 @@
-// NL-34: GET /api/prompt-versions (listPromptVersions). Read only: this file exports GET and nothing else.
+// NL-34 GET (listPromptVersions), NL-88 POST (saveGuidance). This file exports GET and POST and nothing else;
+// no path here reaches the locked layer.
 import { getServices } from "@/server/container.ts";
+import { make_post } from "@/server/services/run-start-route.ts";
 import { with_route, type HttpRequest, type JsonValue } from "@/server/http/with-route.ts";
+import type { SaveGuidanceRequest } from "@ls/schema/api/prompts";
 
 const handler = with_route(
   async (user) => (await getServices().prompts.list(user)) as unknown as JsonValue,
@@ -37,3 +40,10 @@ export async function GET(request: Request): Promise<Response> {
   const res = await handler(to_http_request(request));
   return new Response(JSON.stringify(res.body), { status: res.status, headers: res.headers });
 }
+
+// The OpenAPI saveGuidance response is 201 (the plan guessed 200); the contract wins.
+const save_handler = with_route(
+  async (user, request) => (await getServices().prompts.save_guidance(user, request.body as unknown as SaveGuidanceRequest)) as unknown as JsonValue,
+  { operation_id: "saveGuidance", roles: ["author"], request_schema: "SaveGuidanceRequest", success_status: 201 },
+);
+export const POST = make_post(save_handler);

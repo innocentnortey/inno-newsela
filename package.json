@@ -24,6 +24,7 @@
     "eval:judge-calibrate": "node scripts/run-target.mjs eval:judge-calibrate",
     "load:spike": "node scripts/run-target.mjs load:spike",
     "ops:backup": "node scripts/run-target.mjs ops:backup",
+    "ops:import-spike": "node scripts/run-target.mjs ops:import-spike",
     "dev": "node scripts/run-target.mjs dev"
   },
   "devDependencies": {

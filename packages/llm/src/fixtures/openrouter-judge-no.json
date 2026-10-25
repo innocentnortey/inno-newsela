@@ -1,0 +1,1 @@
+{"id":"gen-synthetic-1","model":"judge-model-served","choices":[{"message":{"content":"{\"verdict\":\"no\",\"rationale\":\"The activity never asks for textual evidence.\"}"}}],"usage":{"prompt_tokens":123,"completion_tokens":45}}
