@@ -31,7 +31,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates,types}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | checks kernel actual (NL-20); `check-queue.ts` planned |
 | 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**` (built by NL-14), `packages/db/src/repos/{model-calls,prompts}.ts` | planned |
 | 1 | A8 spend | `packages/core/src/spend/**`, `packages/db/src/repos/spend.ts` | planned |
-| 1 | A9a queue and runs | `packages/db/src/repos/{runs,job-queue}.ts`, `packages/core/src/lifecycle/run-machine.ts` | planned |
+| 1 | A9a queue and runs | `packages/db/src/repos/{runs,job-queue}.ts`, `packages/core/src/lifecycle/run-machine.ts` | NL-27 built: `run-machine.ts`, `repos/runs.ts` (`PgRunRepo`, optional idempotency-window ctor arg) with tests; `job-queue.ts` planned |
 | 1 | A12a lesson records | `packages/db/src/repos/{lessons,review-extras}.ts`, `packages/core/src/lifecycle/lesson-machine.ts` | `lesson-machine.ts` built (NL-21); repos planned |
 | 1 | A13a metrics records | `packages/core/src/metrics/**`, `packages/db/src/repos/metrics.ts` (incl. `PgBoardReadRepo`) | planned |
 | 1–3 | A14 web-ui | `apps/web/app/(app)/**`, `apps/web/src/editor/**` (incl. `refusals.ts`), `apps/web/src/lib/api-client.ts`, `apps/web/src/features/**` | planned |
@@ -43,7 +43,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 3 | A4 intake service | `apps/web/src/server/services/outline-service.ts`, `apps/web/src/server/adapters/google-sheets.ts`, `apps/web/app/api/units/route.ts`, `apps/web/app/api/outline-versions/**`, `apps/web/src/server/wiring/outlines.ts` | planned |
 | 3 | A6 check runner | `apps/worker/src/checks/**`, `apps/worker/src/wiring/checks.ts` | planned |
 | 3 | A9 generation | `apps/worker/src/{queue,generation}/**`, `packages/core/src/pipeline/**` (built, NL-22), `apps/worker/src/wiring/generation.ts` | planned |
-| 3 | A10 runs | `apps/web/src/server/services/run-service.ts`, `apps/web/app/api/runs/**`, `apps/web/src/server/wiring/runs.ts` | planned |
+| 3 | A10 runs | `apps/web/src/server/services/run-service.ts`, `apps/web/app/api/runs/**`, `apps/web/src/server/wiring/runs.ts` | NL-27 built: `run-service.ts` (`start`; other methods `NotBuiltYet`, NL-78), `run-start-route.ts`, `app/api/runs/route.ts`, `services/testing/run-service-fakes.ts`; `wiring/runs.ts` planned |
 | 3 | A11 collab server | `apps/collab/**` (except `main.ts`, `health.ts`; incl. `frozen-docs.ts`, `wiring/collab.ts`) | planned |
 | 3 | A12 review | `apps/web/src/server/services/{lesson-read,issue,slot,candidate,transition,approve}-service.ts`, `apps/web/app/api/lessons/**` (except suggestions, heartbeats), `apps/web/src/server/wiring/review.ts` | planned |
 | 3 | A13 metrics | `apps/web/src/server/services/{heartbeat,board}-service.ts`, `apps/web/app/api/units/[unitId]/{board,metrics}/**`, `apps/web/app/api/lessons/[lessonId]/heartbeats/**`, `apps/web/src/server/wiring/metrics.ts` | planned |
