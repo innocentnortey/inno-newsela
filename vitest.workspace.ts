@@ -7,6 +7,7 @@ export const projects = [
       exclude: ["**/node_modules/**"],
       include: [
         "packages/*/src/**/*.test.ts",
+        "packages/*/tests/**/*.test.ts",
         "apps/worker/src/**/*.test.ts",
         "apps/collab/src/**/*.test.ts",
         "evals/**/*.test.ts",
