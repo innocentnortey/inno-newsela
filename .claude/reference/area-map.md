@@ -28,7 +28,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 1 | A3 auth | `apps/web/src/server/http/**`, `packages/core/src/auth/passwords.ts`, `apps/web/src/server/services/session-service.ts`, `packages/db/src/repos/sessions.ts`, `apps/web/app/api/session/**`, `apps/web/middleware.ts`, `apps/web/src/server/wiring/sessions.ts` | planned |
 | 1 | A4a intake core | `packages/core/src/intake/**`, `packages/db/src/repos/outlines.ts` | NL-15 built: `intake/standards-index.ts`, `packages/core/data/standards/**`; rest planned ; `intake/report.ts` built (NL-17); rest planned |
 | 1 | A5 compile | `packages/core/src/compile/**`, `packages/ydoc/{src/convert.ts,src/hash.ts,tests/fixtures/}` (built, NL-19), `packages/ydoc/**` (rest), `packages/db/src/repos/lesson-doc-reads.ts` | planned ; planned (ydoc convert/hash built) |
-| 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | planned |
+| 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates,types}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | checks kernel actual (NL-20); `check-queue.ts` planned |
 | 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**`, `packages/db/src/repos/{model-calls,prompts}.ts` | planned |
 | 1 | A8 spend | `packages/core/src/spend/**`, `packages/db/src/repos/spend.ts` | planned |
 | 1 | A9a queue and runs | `packages/db/src/repos/{runs,job-queue}.ts`, `packages/core/src/lifecycle/run-machine.ts` | planned |
@@ -71,5 +71,7 @@ All tables are created only by A1 in `packages/db/migrations/` (planned); the fu
 `lesson_doc`, `check_job`, `issue`, `alignment_link`, `safety_flag`, `suggestion`, `review_event`, `audit_event`,
 `heartbeat`, `review_session`, `lesson_metrics`, `export_bundle`, `judge_verdict`, `eval_run`, `eval_case_result`,
 `probe_run`, `experiment_run`, `ops_event`, `schema_migrations`; view `audit_log_v`.
+
+Built (NL-20): `packages/core/src/checks/{types,policy,registry,gates}.ts`, 28 rule files at `rules/<group>/<kind>.ts` + 6 group `index.ts` + `rules/alignment/derive.ts` stub. Groups: structural (bodies, NL-20), alignment/safety/links (NL-39), grounding (NL-40), arc (NL-41); later tickets fill only their own group's files.
 
 Built (NL-07): `apps/{worker,collab}/src/{main,health,drain,deps,deps-types}.ts`, `apps/worker/src/wiring/{generation,checks,judge}.ts`, `apps/collab/src/wiring/{server,commands}.ts`, `apps/collab/src/commands/{routes,apply-edit,set-mode,lock-and-snapshot}.ts` shells.
