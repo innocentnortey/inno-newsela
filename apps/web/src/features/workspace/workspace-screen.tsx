@@ -8,6 +8,7 @@ import { Stepper } from "@/components/ui/stepper";
 import type { PresenceEntry } from "@/editor/presence";
 import { LessonEditor, type EditorClientState } from "@/editor/lesson-editor";
 import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
+import { IssueActions } from "@/features/workspace/actions/standards/issue-actions";
 import { StandardDecisionButtons } from "@/features/workspace/actions/standard-decision";
 import { WorkspaceActionsProvider } from "@/features/workspace/actions/toast-host";
 import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
@@ -161,7 +162,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
           }}
           selectedCode={selectedCode}
           onSelectCode={setSelectedCode}
-          // SLOT NL-65 / NL-66: renderIssueActions (Resolve, Clear flag, Insert quote dialogs mount here).
+          renderIssueActions={issues ? (issue) => <IssueActions issue={issue} lesson={lesson} issues={issues} onChanged={reread} /> : undefined}
           renderStandardActions={(s) => (
             <StandardDecisionButtons lessonId={lesson.lesson_id} code={s.code} origin={s.origin} confirmation={s.confirmation ?? null} onChanged={reread} />
           )}
