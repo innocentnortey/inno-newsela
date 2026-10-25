@@ -71,7 +71,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-9 | US-13, US-14, US-15, US-16, US-18, US-19, US-20, US-22, US-24 | CON-11, CON-12, CON-13, CON-14, CON-15, CON-16, CON-18, CON-19, CON-20 | NL-62, NL-63, NL-64 | NL-99, NL-100, NL-101, NL-113, NL-114, NL-115 | apps/web/e2e/workspace-read/workspace-read.spec.ts; apps/web/e2e/workspace-actions/workspace-actions.spec.ts; apps/web/e2e/workspace-editor/workspace-editor.spec.ts | axe + screenshots: e2e/__screenshots__/workspace-read/; axe + screenshots: e2e/__screenshots__/workspace-actions/; axe + screenshots (NL-63): e2e/__screenshots__/workspace-editor/ | planned |
 | SCR-10 | US-17, US-18 | CON-13, CON-14, CON-15 | NL-65 | NL-113 | apps/web/e2e/insert-quote/insert-quote.spec.ts | axe + screenshots: e2e/__screenshots__/insert-quote/ | planned |
 | SCR-11 | US-20, US-21 | CON-13, CON-14, CON-15 | NL-66 | NL-113 | apps/web/e2e/resolve/resolve.spec.ts | axe + screenshots: e2e/__screenshots__/resolve/ | planned |
-| SCR-12 | US-22 | CON-16 | NL-67 | NL-114 | planned | planned | planned |
+| SCR-12 | US-22 | CON-16 | NL-67 | NL-114 | apps/web/e2e/candidate/candidate.spec.ts | axe + screenshots: e2e/__screenshots__/candidate/ | planned |
 | SCR-13 | US-23 | CON-17 | NL-72 (cut #8) | NL-116 | planned | planned | planned |
 | SCR-14 | US-25, US-26, US-27, US-28, US-31 | CON-11, CON-13, CON-18, CON-20 | NL-68 | NL-99, NL-115 | apps/web/e2e/approval/approval.spec.ts | axe + screenshots: e2e/__screenshots__/approval/ | planned |
 | SCR-15 | US-26, US-28 | CON-18 | NL-69 | NL-115 | apps/web/e2e/send-back/send-back.spec.ts | axe + screenshots: e2e/__screenshots__/send-back/ | planned |
