@@ -81,7 +81,7 @@ describe("SendBackDialog request changes", () => {
     expect(POST).toHaveBeenCalledTimes(1);
     expect(POST).toHaveBeenCalledWith("/lessons/{lessonId}/transitions", {
       params: { path: { lessonId: ID } },
-      body: { action: "request_changes", tag: "ai_spans", note: "Fix the quote" },
+      body: { action: "request_changes", tag: "ai_spans", note: "Fix the quote", snapshot_hash: pin.snapshotHash, snapshot_state_vector: pin.snapshotStateVector },
     });
     expect(showToast).toHaveBeenCalledWith("Sent back to J. Rivera.");
     expect(onDone).toHaveBeenCalledWith({ kind: "sent_back", versionNumber: 3 });
@@ -224,7 +224,7 @@ describe("SendBackDialog reopen", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(POST).toHaveBeenCalledWith("/lessons/{lessonId}/transitions", {
       params: { path: { lessonId: ID } },
-      body: { action: "reopen", reason: "Quote needs rights check" },
+      body: { action: "reopen", reason: "Quote needs rights check", snapshot_hash: pin.snapshotHash, snapshot_state_vector: pin.snapshotStateVector },
     });
     expect(showToast).toHaveBeenCalledWith("Lesson 5 reopened as version 3.");
     expect(onDone).toHaveBeenCalledWith({ kind: "reopened", versionNumber: 3 });

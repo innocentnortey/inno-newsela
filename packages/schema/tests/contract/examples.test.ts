@@ -5,8 +5,8 @@ import { collectExamples, loadSpec, mirrors } from "./oracle.ts";
 const examples = collectExamples(loadSpec());
 
 describe("openapi examples", () => {
-  it("finds 63 examples", () => {
-    expect(examples.map((e) => e.where).length, examples.map((e) => e.where).join("\n")).toBe(63);
+  it("finds 65 examples", () => {
+    expect(examples.map((e) => e.where).length, examples.map((e) => e.where).join("\n")).toBe(65);
   });
   it.each(examples.map((e) => [e.where, e] as const))("%s parses", (_where, e) => {
     const mirror = mirrors[e.schemaName];

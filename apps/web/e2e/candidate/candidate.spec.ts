@@ -4,7 +4,7 @@ import path from "node:path";
 import type { Role } from "../../src/lib/roles";
 import { respondWithError } from "../../src/test-utils/respond-with-error";
 import { signInAs } from "../../src/test-utils/sign-in-as";
-import { CAND_FAILED, CAND_ID, SECTION_LOOK_BACK } from "./fixtures";
+import { CAND_FAILED, CAND_ID, CAND_READY, SECTION_LOOK_BACK } from "./fixtures";
 import { serveCandidate, type ServeOpts } from "./serve";
 
 // Playwright compiles specs to CommonJS, where import.meta is a syntax error, so the screenshot folder comes from the
@@ -111,6 +111,14 @@ test("roles: author and approver see no adopt control", async ({ page }) => {
 test("roles: reviewer sees the HP-5 note", async ({ page }) => {
   await open(page);
   await expect(page.getByTestId("hp5-note")).toHaveText("Copying text by hand from the candidate is not tracked as an adoption.");
+});
+
+test("header: shows the regenerate note when present, nothing when null (CHG-4)", async ({ page }) => {
+  await open(page);
+  await expect(page.getByText("note: Make the Look Back Quick Write more open-ended.")).toBeVisible();
+  await open(page, { candidate: { ...CAND_READY, note: null } });
+  await expect(page.getByText("From the run's stored plan and pinned prompt")).toBeVisible();
+  await expect(page.getByText(/note:/)).toHaveCount(0);
 });
 
 type State = "ready" | "drafting" | "failed" | "error-locked" | "readonly";

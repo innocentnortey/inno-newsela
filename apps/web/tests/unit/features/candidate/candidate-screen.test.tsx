@@ -65,6 +65,17 @@ describe("candidate screen", () => {
     expect(screen.getByText("Drafting")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /Adopt/ })).toBeNull();
   });
+  it("header: shows the regenerate note when present (CHG-4)", async () => {
+    serve(cand({ note: "Make the Look Back Quick Write more open-ended." }));
+    show();
+    expect(await screen.findByText(/note: Make the Look Back Quick Write more open-ended\./)).toBeTruthy();
+  });
+  it("header: no note label when the note is null or absent (CHG-4)", async () => {
+    serve(cand({ note: null }));
+    show();
+    await screen.findByText(/From the run's stored plan/);
+    expect(screen.queryByText(/note:/)).toBeNull();
+  });
   it("failed: shows the Look Back sentence", async () => {
     serve(cand({ status: "failed", sections: [], failure_reasons: [{ check: "check_failed", message: "Look Back is 3 minutes (needs 5)" }] }));
     show();

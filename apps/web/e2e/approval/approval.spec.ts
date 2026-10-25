@@ -4,7 +4,7 @@ import { respondWithError } from "../../src/test-utils/respond-with-error";
 import { apiGlob, signInAs } from "../../src/test-utils/sign-in-as";
 import type { Role } from "../../src/lib/roles";
 import {
-  HASH_A, HASH_B, SV_A, issuesNone, lesson4InReview, lesson4Submitted, lesson5Approved, lesson5Changed,
+  HASH_A, HASH_B, SV_A, issuesNone, lesson4InReview, lesson4Submitted, lesson5Approved, lesson5Changed, lesson5Submitted,
 } from "./fixtures";
 import { errorReply, stubApproval, type Ctl } from "./stubs";
 
@@ -225,3 +225,71 @@ for (const state of STATES) {
     }
   }
 }
+
+// CHG-3: the approver path SCR-14 -> SCR-15 sends the pin it read; the server may refuse it as STALE_PIN.
+const moved = (from: string, to: string, n: number, audit: string) => ({
+  status: 200,
+  json: { lesson_id: "G6.U4.L5", from_state: from, to_state: to, version: { version_id: `lv-5-${n}`, version_number: n, content_hash: HASH_A, state_vector: SV_A }, audit_id: audit },
+});
+const sendBackDlg = (page: Page, name: string) => page.getByRole("dialog", { name });
+
+test("approver requests changes from the decision card, pin included", async ({ page }) => {
+  const ctl = await open(page);
+  await page.getByRole("button", { name: "Request changes", exact: true }).click();
+  const d = sendBackDlg(page, "Request changes to Lesson 5");
+  await expect(d).toBeVisible();
+  await d.getByLabel("Standards").check();
+  await d.getByLabel("Note").fill("Check the standards codes in Look Back.");
+  ctl.transition = () => {
+    ctl.lesson = { ...lesson5Submitted(), state: "changes_requested" };
+    return moved("submitted", "changes_requested", 2, "aud-0151");
+  };
+  await d.getByRole("button", { name: "Send back" }).click();
+  await expect(page.getByText("Sent back to J. Rivera.")).toBeVisible();
+  expect(ctl.posted).toEqual([
+    { action: "request_changes", tag: "standards", note: "Check the standards codes in Look Back.", snapshot_hash: HASH_A, snapshot_state_vector: SV_A },
+  ]);
+  await expect(page.getByText(/Writing · Changes requested/)).toBeVisible();
+});
+
+test("approver reopens an approved lesson from the decision card, pin included", async ({ page }) => {
+  const ctl = await open(page, { lesson: lesson5Approved() });
+  await page.getByRole("button", { name: "Reopen…" }).click();
+  const d = sendBackDlg(page, "Reopen Lesson 5");
+  await expect(d).toBeVisible();
+  await d.getByLabel("Reason").fill("A rights question came up.");
+  ctl.transition = () => {
+    ctl.lesson = { ...lesson5Approved(), state: "reopened" };
+    return moved("approved", "reopened", 3, "aud-0152");
+  };
+  await d.getByRole("button", { name: "Reopen", exact: true }).click();
+  await expect(page.getByText("Lesson 5 reopened as version 3.")).toBeVisible();
+  expect(ctl.posted).toEqual([{ action: "reopen", reason: "A rights question came up.", snapshot_hash: HASH_A, snapshot_state_vector: SV_A }]);
+  await expect(page.getByText(/Writing · Reopened/)).toBeVisible();
+});
+
+test("a stale pin on send back is refused: server answer and client pre-check", async ({ page }) => {
+  const ctl = await open(page);
+  await page.getByRole("button", { name: "Request changes", exact: true }).click();
+  let d = sendBackDlg(page, "Request changes to Lesson 5");
+  await d.getByLabel("Other").check();
+  await d.getByLabel("Note").fill("x");
+  ctl.transition = () => errorReply("STALE_PIN");
+  await d.getByRole("button", { name: "Send back" }).click();
+  await expect(d).toBeHidden();
+  await expect(page.getByText("This lesson changed since you opened it. Reload.").first()).toBeVisible();
+  expect(ctl.posted).toHaveLength(1);
+  expect(ctl.lesson.state).toBe("submitted");
+
+  // Pre-check path: the lesson changes after the screen opened; nothing is posted.
+  const ctl2 = await open(page);
+  await page.getByRole("button", { name: "Request changes", exact: true }).click();
+  d = sendBackDlg(page, "Request changes to Lesson 5");
+  await d.getByLabel("Other").check();
+  await d.getByLabel("Note").fill("x");
+  ctl2.lesson = lesson5Changed();
+  await d.getByRole("button", { name: "Send back" }).click();
+  await expect(d).toBeHidden();
+  await expect(page.getByText("This lesson changed since you opened it. Reload.").first()).toBeVisible();
+  expect(ctl2.posted).toHaveLength(0);
+});

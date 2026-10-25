@@ -28,11 +28,25 @@ export const Approve = z
 export type Approve = z.infer<typeof Approve>;
 
 export const RequestChanges = z
-  .object({ action: z.literal("request_changes"), tag: SendBackTag, note: z.string() })
+  .object({
+    action: z.literal("request_changes"),
+    tag: SendBackTag,
+    note: z.string(),
+    // CHG-3: optional pin; both or neither (the service answers INVALID_REQUEST for one alone).
+    snapshot_hash: Sha256.optional(),
+    snapshot_state_vector: StateVector.optional(),
+  })
   .strict();
 export type RequestChanges = z.infer<typeof RequestChanges>;
 
-export const Reopen = z.object({ action: z.literal("reopen"), reason: z.string() }).strict();
+export const Reopen = z
+  .object({
+    action: z.literal("reopen"),
+    reason: z.string(),
+    snapshot_hash: Sha256.optional(),
+    snapshot_state_vector: StateVector.optional(),
+  })
+  .strict();
 export type Reopen = z.infer<typeof Reopen>;
 
 export const TransitionRequest = z.discriminatedUnion("action", [

@@ -1139,6 +1139,7 @@ paths:
                     cost_usd: 0
                     current_content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
                     sections: []
+                    note: Make the Look Back Quick Write more open-ended.
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
@@ -1176,6 +1177,7 @@ paths:
                     current_content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
                     sections:
                       - { address: G6.U4.L4.LookBack, name: Look Back, minutes: 5, content: { type: doc, content: [] } }
+                    note: Make the Look Back Quick Write more open-ended.
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
         '400': { $ref: '#/components/responses/BadRequest' }
@@ -1357,7 +1359,10 @@ paths:
         any mismatch with no change. Only a reviewer's start_review starts a review (UXP-1, UXQ-11); only an
         approver reopens (UXP-4); tags per UXP-6; withdraw needs no reason (UXP-10). BLOCKED wins over
         CONFIRMATION_OPEN and lists both kinds in details.issues. Moves that freeze or unfreeze the document return
-        COLLAB_UNAVAILABLE when the collaboration server cannot be reached.
+        COLLAB_UNAVAILABLE when the collaboration server cannot be reached. CHG-3: request_changes and reopen may
+        carry the same pin (both fields or neither; one alone is INVALID_REQUEST); when supplied it is checked in the
+        locked transaction after INVALID_TRANSITION, NOTE_REQUIRED and REASON_REQUIRED, and a mismatch is 409 STALE_PIN
+        with no change. Absent pin: unchanged.
       requestBody:
         required: true
         content:
@@ -1370,6 +1375,19 @@ paths:
                   snapshot_hash: c300000000000000000000000000000000000000000000000000000000000501
                   snapshot_state_vector: AQLE9qQEBwA=
                   rating: usable_with_edits
+              requestChangesPinned:
+                value:
+                  action: request_changes
+                  tag: standards
+                  note: Check the standards codes in Look Back.
+                  snapshot_hash: c300000000000000000000000000000000000000000000000000000000000501
+                  snapshot_state_vector: AQLE9qQEBwA=
+              reopenPinned:
+                value:
+                  action: reopen
+                  reason: A rights question came up after approval.
+                  snapshot_hash: c300000000000000000000000000000000000000000000000000000000000501
+                  snapshot_state_vector: AQLE9qQEBwA=
       responses:
         '200':
           description: The move is done; Submit, Approve and Reopen write an immutable snapshot.
@@ -2456,6 +2474,7 @@ components:
         cost_usd: { type: number }
         current_content_hash: { $ref: '#/components/schemas/Sha256' }
         sections: { type: array, items: { $ref: '#/components/schemas/Section' } }
+        note: { type: [string, 'null'], description: 'CHG-4: the optional note given to regenerateLesson for this candidate, trimmed; null when none. Not in required: the server always sends it.' }
     AdoptRequest:
       type: object
       required: [scope]
@@ -2559,12 +2578,18 @@ components:
         action: { type: string, const: request_changes }
         tag: { $ref: '#/components/schemas/SendBackTag' }
         note: { type: string }
+        snapshot_hash: { $ref: '#/components/schemas/Sha256' }
+        snapshot_state_vector: { $ref: '#/components/schemas/StateVector' }
+      dependentRequired: { snapshot_hash: [snapshot_state_vector], snapshot_state_vector: [snapshot_hash] }
     Reopen:
       type: object
       required: [action, reason]
       properties:
         action: { type: string, const: reopen }
         reason: { type: string }
+        snapshot_hash: { $ref: '#/components/schemas/Sha256' }
+        snapshot_state_vector: { $ref: '#/components/schemas/StateVector' }
+      dependentRequired: { snapshot_hash: [snapshot_state_vector], snapshot_state_vector: [snapshot_hash] }
     VersionRef:
       type: object
       required: [version_id, version_number, content_hash, state_vector]

@@ -1578,6 +1578,8 @@ class RouteSpec:
 # empty one then reaches decide_transition, which raises the card's RATING_REQUIRED / NOTE_REQUIRED / REASON_REQUIRED in
 # CON-18's precedence (after ROLE_FORBIDDEN, NOT_FOUND, INVALID_TRANSITION) instead of an INVALID_REQUEST from the parse.
 # A contract test asserts it accepts every valid TransitionRequest and differs from it only in those three fields.
+# CHG-3: RequestChanges and Reopen also carry optional snapshot_hash / snapshot_state_vector (both or neither, enforced
+# in TransitionService, not in the parse).
 
 class RouteHandler(Protocol):
     async def __call__(self, request: HttpRequest) -> HttpResponse: ...
@@ -1743,7 +1745,9 @@ class TransitionService:
     async def transition(self, user: RequestUser, lesson_id: LessonId, req: TransitionRequest) -> TransitionResult: ...
     # CON-18 precedence: transition_roles(action) (ROLE_FORBIDDEN) → states.get (NOT_FOUND) → decide_transition(action,
     # role, from_state, note, reason, tag, rating) (INVALID_TRANSITION, NOTE_REQUIRED / REASON_REQUIRED / RATING_REQUIRED)
-    # → per action:
+    # → per action (CHG-3: request_changes and reopen take an optional pin, snapshot_hash AND snapshot_state_vector; inside
+    #   the locked tx after the locked decide_transition and before any write, one without the other → INVALID_REQUEST, a
+    #   pin that differs from versions.latest_snapshot (or no snapshot) → STALE_PIN, absent → unchanged):
     #   start_review: one tx, set_state(in_review, reviewer) + review_event
     #   submit: collab.lock_and_snapshot (freeze first, store, cover check, blocking checks on the stored row, snapshot +
     #           state + review_event); COLLAB_UNAVAILABLE if it cannot be reached; its refusals pass through unchanged

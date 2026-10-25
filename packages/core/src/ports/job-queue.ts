@@ -59,6 +59,7 @@ export interface JobRow {
   retries: number;
   calls_lost: number;
   cost_usd: Usd;
+  reviewer_note?: string | null; // CHG-4: kind "candidate" only; never a log line
 }
 
 export interface RequeueReport {

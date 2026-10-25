@@ -25,12 +25,12 @@ function to_job_row(r: Record<string, any>): JobRow {
     tile_state: r["tile_state"], attempt: r["attempt"], queued_at: r["queued_at"], started_at: r["started_at"],
     finished_at: r["finished_at"], failure_reasons: r["failure_reasons_json"], brakes_fired: r["brakes_fired"],
     repairs: r["repairs"], truncation_retries: r["truncation_retries"], retries: r["retries"],
-    calls_lost: r["calls_lost"], cost_usd: new Decimal(r["cost_usd"]),
+    calls_lost: r["calls_lost"], cost_usd: new Decimal(r["cost_usd"]), reviewer_note: r["reviewer_note"] ?? null,
   };
 }
 
 const JOB_COLUMNS = `id, run_id, kind, lesson_id, status, tile_state, attempt, queued_at, started_at, finished_at,
-  failure_reasons_json, brakes_fired, repairs, truncation_retries, retries, calls_lost, cost_usd`;
+  failure_reasons_json, brakes_fired, repairs, truncation_retries, retries, calls_lost, cost_usd, reviewer_note`;
 
 const CLAIM_SQL = `
 WITH active AS (

@@ -82,7 +82,7 @@ test("submit: send back posts request_changes once and toasts", async ({ page })
   await d.getByRole("button", { name: "Send back" }).dblclick();
   await expect(page.getByText("Sent back to J. Rivera.")).toBeVisible();
   await expect(d).toBeHidden();
-  expect(ctl.posted).toEqual([{ action: "request_changes", tag: "ai_spans", note: "Fix the quote" }]);
+  expect(ctl.posted).toEqual([{ action: "request_changes", tag: "ai_spans", note: "Fix the quote", snapshot_hash: HASH_A, snapshot_state_vector: SV_A }]);
   expect(gets.length).toBeGreaterThanOrEqual(2);
 });
 
@@ -94,7 +94,7 @@ test("submit: reopen posts reopen once and toasts the version", async ({ page })
   await d.getByRole("button", { name: "Reopen" }).dblclick();
   await expect(page.getByText("Lesson 5 reopened as version 3.")).toBeVisible();
   await expect(d).toBeHidden();
-  expect(ctl.posted).toEqual([{ action: "reopen", reason: "Quote needs rights check" }]);
+  expect(ctl.posted).toEqual([{ action: "reopen", reason: "Quote needs rights check", snapshot_hash: HASH_A, snapshot_state_vector: SV_A }]);
 });
 
 test("errors: NOTE_REQUIRED shows the sentence and keeps the text", async ({ page }) => {

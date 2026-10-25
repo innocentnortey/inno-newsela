@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { RoleNote } from "@/features/frame/conventions";
-import { ADOPT_WHOLE, BACK, LEAVE, META, ONLY_REVIEWERS } from "./copy";
+import { ADOPT_WHOLE, BACK, LEAVE, META, NOTE, ONLY_REVIEWERS } from "./copy";
 
 export interface CandidateHeaderProps {
   versionLabel: string;
+  /** The regenerate note for this candidate (CHG-4); nothing is shown when empty. */
+  note?: string | null;
   adopted: boolean;
   lessonHref: string;
   lessonLabel: string;
@@ -34,6 +36,7 @@ export function CandidateHeader(p: CandidateHeaderProps) {
       meta={
         <>
           {META}
+          {p.note ? ` · ${NOTE(p.note)}` : null}
           {p.notReviewer ? <RoleNote>{ONLY_REVIEWERS}</RoleNote> : null}
         </>
       }
