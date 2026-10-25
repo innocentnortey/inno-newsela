@@ -27,6 +27,10 @@ import { CollabAuthenticator } from "../auth.ts";
 import { FrozenDocs } from "../frozen-docs.ts";
 import { WriteGuard, type SocketContext } from "../permissions.ts";
 import { LessonPersistence, lesson_id_of } from "../persistence.ts";
+import { SessionRecheck } from "../session-recheck.ts";
+
+/** How often open sockets are re-checked against their session. */
+const SESSION_RECHECK_MS = 1000;
 
 export type HocuspocusServerRef = { readonly hocuspocus: unknown };
 
@@ -52,6 +56,7 @@ interface LiveConnection {
   readOnly: boolean;
   context: { ctx?: SocketContext };
   sendStateless(payload: string): void;
+  close(event?: { code: number; reason: string }): void;
 }
 interface LiveDocument extends Y.Doc {
   getConnections(): LiveConnection[];
@@ -296,6 +301,25 @@ export function wire_collab_server(
     h.hocuspocus.configuration.maxDebounce = d.settings.store_max_debounce_ms;
   }
 
+  // S-9: a socket authenticated once is re-checked against its session, so sign-out or expiry closes it.
+  let recheck_timer: ReturnType<typeof setInterval> | null = null;
+  if (is_hocuspocus(h.hocuspocus)) {
+    const live = h.hocuspocus;
+    const recheck = new SessionRecheck(ports.sessions, d.clock, d.logger);
+    recheck_timer = setInterval(() => {
+      void recheck.sweep(
+        [...live.documents.values()].flatMap((doc) =>
+          doc.getConnections().map((c) => ({
+            ctx: c.context?.ctx,
+            close: () =>
+              c.close({ code: 4401, reason: "Session ended. Sign in again." }),
+          })),
+        ),
+      );
+    }, SESSION_RECHECK_MS);
+    recheck_timer.unref();
+  }
+
   return {
     frozen,
     guard,
@@ -303,6 +327,9 @@ export function wire_collab_server(
     persistence,
     acks,
     extension,
-    close: async () => void (await own?.close()),
+    close: async () => {
+      if (recheck_timer !== null) clearInterval(recheck_timer);
+      await own?.close();
+    },
   };
 }

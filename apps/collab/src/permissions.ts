@@ -21,6 +21,8 @@ export interface SocketContext {
   lesson_id: LessonId;
   lesson_state: LessonStateName;
   read_only: boolean;
+  /** sha256 of the session token this socket authenticated with; used to re-check the session after connect (S-9). */
+  session_hash?: string;
 }
 
 const ALLOWED: WriteDecision = { allowed: true, refusal: null };
