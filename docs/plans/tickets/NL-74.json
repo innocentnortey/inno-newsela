@@ -1,0 +1,1 @@
+{"id": "NL-74", "title": "web-ui: SCR-19 Unit quality", "kind": "frontend", "lane": "build-loop", "wave": 4, "depends_on": ["NL-24"], "cons": ["CON-10"], "screens": ["SCR-19"], "stories": ["US-34", "US-36"], "anchor": ["SCR-19 states"], "wfs": [], "metrics": [], "risk_security": false, "area": "A14", "cuttable": 6, "scope": ["SCR-19 screen"], "phase": "plan", "gitlab_iid": null}

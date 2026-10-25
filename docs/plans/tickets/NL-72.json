@@ -1,0 +1,1 @@
+{"id": "NL-72", "title": "web-ui: SCR-13 AI assist panel", "kind": "frontend", "lane": "build-loop", "wave": 4, "depends_on": ["NL-24"], "cons": ["CON-17"], "screens": ["SCR-13"], "stories": ["US-23"], "anchor": ["SCR-13 states"], "wfs": [], "metrics": [], "risk_security": false, "area": "A14", "cuttable": 8, "scope": ["SCR-13 panel"], "phase": "plan", "gitlab_iid": null}

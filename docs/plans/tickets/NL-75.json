@@ -1,0 +1,1 @@
+{"id": "NL-75", "title": "web-ui: SCR-20 Export", "kind": "frontend", "lane": "build-loop", "wave": 4, "depends_on": ["NL-24"], "cons": ["CON-23"], "screens": ["SCR-20"], "stories": ["US-28", "US-35"], "anchor": ["SCR-20 states"], "wfs": [], "metrics": [], "risk_security": false, "area": "A14", "cuttable": 5, "scope": ["SCR-20 screen"], "phase": "plan", "gitlab_iid": null}

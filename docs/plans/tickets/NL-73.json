@@ -1,0 +1,1 @@
+{"id": "NL-73", "title": "web-ui: SCR-18 Coverage matrix", "kind": "frontend", "lane": "build-loop", "wave": 4, "depends_on": ["NL-24"], "cons": ["CON-22"], "screens": ["SCR-18"], "stories": ["US-33"], "anchor": ["SCR-18 states"], "wfs": [], "metrics": [], "risk_security": false, "area": "A14", "cuttable": 4, "scope": ["SCR-18 screen"], "phase": "plan", "gitlab_iid": null}

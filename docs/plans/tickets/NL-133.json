@@ -1,0 +1,1 @@
+{"id": "NL-133", "title": "UX-5b: final acceptance sign-off", "kind": "integration", "lane": "human", "wave": 8, "depends_on": ["NL-126"], "cons": [], "screens": [], "stories": [], "anchor": [], "wfs": [], "metrics": [], "risk_security": false, "area": "A14", "cuttable": null, "scope": ["Innocent signs the UX-5b gate line"], "phase": "plan", "gitlab_iid": null}

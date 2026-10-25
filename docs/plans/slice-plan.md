@@ -413,6 +413,14 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | W10 | `docs/artifacts/*-demo-video.mp4`, `.demo/**` NL-138 · `docs/ARCHITECTURE.md`, `README.md`, `docs/AI-USAGE.md` NL-139 · `.claude/reference/area-map.md`, `.claude/README.md`, `.claude/state/icm-progress.md` NL-140 | as listed |
 | W11 | `SUBMISSION.md` NL-141 · `docs/delivery/*-retro.md` NL-142 | as listed |
 
+### Collision-map addenda from 7b (2026-10-25)
+
+| Wave | Shared surface | Rule |
+|---|---|---|
+| W4 | `docs/ux/05-verify/TRACEABILITY.md` row SCR-9 | NL-62 creates the row; NL-63 and NL-64 append their ticket id and spec file (append-style; a merge conflict there keeps both sides) |
+| W4 | `apps/web/app/(dev)/harness/<name>/` leaves inside FW-4's `app/(dev)/**` | each dialog/panel ticket (NL-63, 64, 65, 66, 69, 72) owns only its own leaf; FW-4 owns the tree and its 404-in-production guard |
+| W0–W4 | new npm dependencies (ProseMirror, Yjs, Hocuspocus provider, etc.) | requested from A0: NL-01 pins them in the workspace manifests; later tickets never edit `package.json` or the lockfile |
+
 ## Execution order for Phase B (Sonnet build loop)
 
 1. **Waves in order, pipelined.** A ticket starts when its own blockers are merged and it passes
