@@ -80,14 +80,20 @@ function ActionCell({ item, report, canEdit, status, actions, firstId }: Props &
   }
   if (!canEdit) return <span className="text-small text-ink2">Not confirmed</span>;
   if (editing) {
+    // Server sentences show inside the editor; any other failure (network, 5xx) gets the generic line with Try again.
     return (
-      <FixEditor
-        label={`Corrected code for ${item.name}`}
-        initial={f.proposed_fix ?? f.original_text}
-        serverError={st?.phase === "failed" && st.request.kind === "edit_fix" ? st.message : null}
-        onSave={(value) => actions.choose({ target_id: f.finding_id, kind: "edit_fix", value })}
-        onCancel={() => setEditing(false)}
-      />
+      <>
+        <FixEditor
+          label={`Corrected code for ${item.name}`}
+          initial={f.proposed_fix ?? f.original_text}
+          serverError={st?.phase === "failed" && st.request.kind === "edit_fix" ? st.message : null}
+          onSave={(value) => actions.choose({ target_id: f.finding_id, kind: "edit_fix", value })}
+          onCancel={() => setEditing(false)}
+        />
+        {st?.phase === "failed" && st.request.kind === "edit_fix" && st.message === null ? (
+          <FailureLine status={st} targetId={f.finding_id} actions={actions} />
+        ) : null}
+      </>
     );
   }
   const req = isUnit
