@@ -381,7 +381,7 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | W1 | `packages/schema/src/{ids,outline,unit-plan,lesson-draft,lesson,export}.ts`, emitter, `docs/contracts/schemas/**`, `docs/contracts/lesson-export.schema.json` | NL-09 |
 | W1 | `packages/schema/src/api/**`, `packages/schema/tests/contract/**` | NL-11 |
 | W1 | `packages/schema/package.json` | NL-01 (wildcard export map, so NL-09/11 never edit it) |
-| W1 | `apps/web/src/server/{container.ts,wiring/**}` | NL-06 · `apps/{worker,collab}/src/{main.ts,wiring/**,health.ts,commands/**}` shells: NL-07 |
+| W1 | `apps/web/src/server/{container.ts,wiring/**}` | NL-06 · `apps/{worker,collab}/src/{main.ts,wiring/**,health.ts,commands/**}` shells: NL-07; NL-12 owns the one-file edit of `apps/web/src/server/deps-types.ts` (re-point the four interfaces to the real files) |
 | W2 | `packages/core/src/intake/`: `standards-index.ts` + `packages/core/data/standards/**` NL-15; `{parse-grid,normalize,lesson-links}.ts` + `tests/fixtures/outline/**` (issued sheet, SYN) NL-16; `report.ts` + `tests/fixtures/report/**` NL-17 | as listed |
 | W2 | `packages/core/src/checks/{registry,policy,gates,types}.ts`, `rules/structural/**`, the empty `rules/{alignment,safety,links,grounding,arc}/index.ts` shells | NL-20 |
 | W2 | `docker-compose.yml`, Dockerfiles, `render.yaml`, `.dockerignore` | NL-23 |
