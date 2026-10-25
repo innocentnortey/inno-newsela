@@ -5,7 +5,7 @@
   "schemas:emit":         { "target": "packages/schema/scripts/emit-json-schemas.ts", "owner": "NL-09", "run": ["npx", "tsx", "packages/schema/scripts/emit-json-schemas.ts"] },
   "eval:golden":          { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "golden"] },
   "eval:grounding":       { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "grounding"] },
-  "eval:faults":          { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "faults"] },
+  "eval:faults":          { "target": "ops/faults/run-faults.ts", "owner": "NL-107", "run": ["npx", "tsx", "ops/faults/run-faults.ts"] },
   "eval:full-run":        { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "full-run"] },
   "eval:seed":            { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "seed"] },
   "eval:heldout":         { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "heldout"] },
