@@ -1,0 +1,23 @@
+{
+  "ticket": "NL-36",
+  "risk": "security",
+  "frozen": {
+    "apps/web/src/server/adapters/collab-commands.test.ts": "cbbd9229f6cc84d0ed3a4a7cd82ddf60b0751c518872d8196bf3972494fa6f68",
+    "packages/db/src/repos/lesson-docs.int.test.ts": "481bdd7dbcf3f2590aebe1e32eacf5b70b49d8ed7b2b58c997236ef727750537",
+    "packages/db/src/repos/lesson-docs.test-support.ts": "90c47f2f362ed2c64d81f21c9f52a735954ee32a14d5a7b4829148d8fe2dbcfe",
+    "tests/platform/lesson-doc-single-writer.test.ts": "cf99c5f60f9f8d1bcbf5f079ab5d4bd417c10ec4f52171c2d9520107d192c322"
+  },
+  "criteria": {
+    "AC-1, AC-2, AC-4": [
+      "packages/db/src/repos/lesson-docs.int.test.ts",
+      "packages/db/src/repos/lesson-docs.test-support.ts"
+    ],
+    "AC-7": [
+      "tests/platform/lesson-doc-single-writer.test.ts"
+    ],
+    "AC-9, AC-10, AC-11": [
+      "apps/web/src/server/adapters/collab-commands.test.ts"
+    ]
+  },
+  "not_frozen": []
+}
