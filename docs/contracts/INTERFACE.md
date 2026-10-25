@@ -834,7 +834,7 @@ collaboration server (one Hocuspocus process)
     empty).
   - **Issue kinds (System owns the list; a new kind is a `CHG-N`):** `quote_placeholder_open`, `excerpt_slot_open`,
     `cross_lesson_link`, `standard_not_taught`, `standard_not_checked`, `code_not_allowed`, `minutes_out_of_range`,
-    `section_missing`, `quote_unmatched`, `page_out_of_range`, `proper_noun_unsourced`, `quote_without_source`,
+    `section_missing`, `schema_invalid`, `quote_unmatched`, `page_out_of_range`, `proper_noun_unsourced`, `quote_without_source`,
     `quote_too_long`, `rights_to_clear`, `suggestion_pending`, `safety_flag_open`, `safety_note_without_tip`,
     `safety_text_in_student_block`, `disclosure_prompt`, `standard_confirmation`, `standard_add_suggestion`,
     `eld_label_mismatch`, `arc_repeat`, `vocabulary_over_cap`, `vocabulary_word_missing`, `linked_text_changed`,
