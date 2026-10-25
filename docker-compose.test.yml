@@ -3,4 +3,4 @@ services:
     environment:
       POSTGRES_DB: ls_test
     ports:
-      - "127.0.0.1:55434:5432"
+      - "127.0.0.1:55440:5432"
