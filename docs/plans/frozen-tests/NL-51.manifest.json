@@ -1,0 +1,34 @@
+{
+  "ticket": "NL-51",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/units/[unitId]/exports/route.security.test.ts": "577415e33ec3d199e8a51210d57653adc6085db1b755f6dfecefd1532807d215",
+    "apps/web/src/server/services/export-fixtures.ts": "80d87a1d037ac84230a4dc7b491cb37c06c7a7d8b6b9cbd6e874f5c6c14cf181",
+    "apps/web/src/server/services/export-service.security.test.ts": "96d621e54a856f00b25a096cd7d88f99440c249c010b553b45025ba500c3435e"
+  },
+  "criteria": {
+    "AC-2": [
+      "apps/web/src/server/services/export-service.security.test.ts",
+      "apps/web/src/server/services/export-fixtures.ts"
+    ],
+    "AC-6": [
+      "apps/web/src/server/services/export-service.security.test.ts",
+      "apps/web/src/server/services/export-fixtures.ts"
+    ],
+    "AC-7": [
+      "apps/web/app/api/units/[unitId]/exports/route.security.test.ts",
+      "apps/web/src/server/services/export-fixtures.ts",
+      "apps/web/src/server/services/export-service.security.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/src/server/services/export-service.test.ts",
+    "apps/web/app/api/units/[unitId]/exports/route.test.ts",
+    "packages/db/src/repos/exports.int.test.ts"
+  ],
+  "notes": [
+    "ajv 8.20.0 devDependency of apps/web is added by the implementer; the AC-6 schema test loads ajv/dist/2020.js dynamically",
+    "download returns ExportBundleFile; mismatch with OpenAPI LessonExportFile recorded (plan R3)",
+    "ExportService takes graph and units constructor args beyond DO-4 seven"
+  ]
+}
