@@ -55,7 +55,7 @@ describe("run-faults", () => {
     expect(report.duplicates_found).toBe(0);
     const text = readFileSync(path.join(reports_dir, "faults-abc123def456.md"), "utf8");
     expect(text).toContain("- git_sha: abc123def456");
-    expect(text).toMatch(/- prompt_version: locked-layer [0-9a-f]{12}/);
+    expect(text).toMatch(/- prompt_version: pr_[0-9A-Z]+/);
     expect(text).toContain('"generation":"stub-model"');
     expect(text).toContain("- n: 2");
     expect(text).toContain("- provider_mode: stub");
