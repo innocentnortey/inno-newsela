@@ -1,0 +1,39 @@
+{
+  "ticket": "NL-13",
+  "risk": "security",
+  "frozen": {
+    "apps/web/src/server/http/testing/route-fixtures.ts": "d7310e8d80889a4d5b3e6a6f2e61f0ba77f4c55f11ba3af263d4a09164a16733",
+    "apps/web/src/server/http/with-route.security.test.ts": "645bc7ddcc46189efe7793e34748f3352da8d86e8cd994c030b5078fb1187d99"
+  },
+  "criteria": {
+    "AC-1 (precedence)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-2 (origin_check)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-3 (session_and_secrets)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ],
+    "AC-4 (request_id)": [
+      "apps/web/src/server/http/with-route.security.test.ts",
+      "apps/web/src/server/http/testing/route-fixtures.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/src/server/http/with-route.test.ts (implementer: AC-5..AC-9)",
+    "apps/web/src/server/http/refusal.test.ts"
+  ],
+  "refreeze": [
+    {
+      "date": "2026-10-25",
+      "file": "apps/web/src/server/http/testing/route-fixtures.ts",
+      "reason": "type-only annotation (headers: Record<string, string | undefined>) to match loosened HttpRequest.headers; no assertion or behaviour change; approved by orchestrator under PD-32",
+      "old_sha256": "154fbacfc089fd72f26537bed55c37824deb056f1b7a93cbecebb4e96e9cb97e",
+      "new_sha256": "d7310e8d80889a4d5b3e6a6f2e61f0ba77f4c55f11ba3af263d4a09164a16733"
+    }
+  ]
+}
