@@ -107,6 +107,7 @@ export class TransitionService implements TransitionApi {
         from_state = locked.state;
         const d = this.decide(user, locked.state, req, lesson_id);
         const to_state = d.to_state!;
+        if (req.action === "request_changes" || req.action === "reopen") await this.check_pin(user, lesson_id, req);
 
         let version: LessonVersionRow;
         if (req.action === "reopen") {
@@ -182,6 +183,28 @@ export class TransitionService implements TransitionApi {
         }
       }
       throw e;
+    }
+  }
+
+  // CHG-3: an optional pin on request_changes / reopen, checked after the locked decide (same slot as Approve's).
+  private async check_pin(
+    user: RequestUser,
+    lesson_id: LessonId,
+    req: { snapshot_hash?: string | undefined; snapshot_state_vector?: string | undefined },
+  ): Promise<void> {
+    const has_hash = req.snapshot_hash !== undefined;
+    const has_vector = req.snapshot_state_vector !== undefined;
+    if (!has_hash && !has_vector) return;
+    if (has_hash !== has_vector) {
+      throw new DomainRefusal("INVALID_REQUEST", "The request is not valid.", {
+        fields: [has_hash ? "body.snapshot_state_vector" : "body.snapshot_hash"],
+      });
+    }
+    const snap = await this.versions.latest_snapshot(lesson_id);
+    if (snap === null || snap.content_hash !== req.snapshot_hash || snap.state_vector !== req.snapshot_state_vector) {
+      throw new DomainRefusal("STALE_PIN", "The lesson changed since you opened it. Reload and read it again.", {
+        request_id: user.request_id,
+      });
     }
   }
 

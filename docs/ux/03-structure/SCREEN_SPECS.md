@@ -582,7 +582,7 @@ banner is an alert and receives focus. One action approves one lesson; there is 
 - **Users:** P-1 (P-2 for a guidance trial). **Stories:** US-22, US-10 (trial). **Flows:** FLOW-14, FLOW-18.
   **Contracts:** CON-16.
 - **Layout:** page with breadcrumb *… › Lesson 4 › Candidate v4*. Header: `h1` "Candidate v4 · not adopted", meta "From
-  the run's stored plan and pinned prompt · note: <note>". Two page sheets side by side (current | candidate), aligned
+  the run's stored plan and pinned prompt · note: <note>" (the note part only when the candidate has one: CON-16 `note`, CHG-4). Two page sheets side by side (current | candidate), aligned
   by section; each section row has **Adopt this section** (secondary). Header actions: **Adopt whole candidate**
   (primary), **Leave unadopted** (ghost, returns to SCR-9). Under `lg` the two sheets become tabs *Current · Candidate*.
 - **States:**
@@ -619,6 +619,8 @@ banner is an alert and receives focus. One action approves one lesson; there is 
   - Error, network: text kept, "Try again."
   - Loading / empty / partial / frozen: as the dialog shell.
   - Role-forbidden: only approvers see these actions.
+- **Pin (CHG-3):** the dialog sends the snapshot hash and state vector SCR-14 holds with the request; it also keeps its
+  own pre-check against a fresh read. If the server answers `STALE_PIN` the result is the same as the pre-check.
 - **Accessibility:** the tag group is a `fieldset` with `legend` "Reason"; focus starts on it.
 - **Depends on:** UXP-4, UXP-6.
 

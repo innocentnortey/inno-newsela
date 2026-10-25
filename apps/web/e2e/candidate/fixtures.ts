@@ -20,6 +20,7 @@ const changed: Section[] = LESSON4.sections.map((s) => (NEW_TEXT[s.address] ? { 
 export const CAND_READY: Candidate = {
   candidate_id: CAND_ID, version_number: 4, status: "ready", adopted: false, failure_reasons: [], cost_usd: 0.12,
   current_content_hash: LESSON4.content_hash, sections: changed,
+  note: "Make the Look Back Quick Write more open-ended.",
 };
 export const CAND_DRAFTING: Candidate = { ...CAND_READY, status: "drafting", sections: [] };
 export const CAND_FAILED: Candidate = {

@@ -57,10 +57,17 @@ export function dialogTitle(mode: "request_changes" | "reopen", lessonId: string
   return mode === "reopen" ? `Reopen ${label}` : `Request changes to ${label}`;
 }
 
-// The one place request bodies are built (contract CON-18 RequestChanges / Reopen: no pin fields; see plan Risks 1).
-export function buildRequestChanges(tag: SendBackTag, note: string) {
-  return { action: "request_changes" as const, tag, note: note.trim() };
+// The one place request bodies are built (contract CON-18 RequestChanges / Reopen; CHG-3 adds the optional pin).
+// The pin is the snapshot the person was reading; the dialog always passes it, so the server can refuse a stale send-back.
+export interface SendBackPin {
+  snapshotHash: string;
+  snapshotStateVector: string;
 }
-export function buildReopen(reason: string) {
-  return { action: "reopen" as const, reason: reason.trim() };
+const pinFields = (pin?: SendBackPin) =>
+  pin === undefined ? {} : { snapshot_hash: pin.snapshotHash, snapshot_state_vector: pin.snapshotStateVector };
+export function buildRequestChanges(tag: SendBackTag, note: string, pin?: SendBackPin) {
+  return { action: "request_changes" as const, tag, note: note.trim(), ...pinFields(pin) };
+}
+export function buildReopen(reason: string, pin?: SendBackPin) {
+  return { action: "reopen" as const, reason: reason.trim(), ...pinFields(pin) };
 }

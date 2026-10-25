@@ -997,7 +997,8 @@ standards, which live in the front matter)
     `section_address` (text, for a section).
   - Response: `candidate_id`, `version_number`, `status` (`queued`, `drafting`, `ready`, `failed`), `adopted` (no until
     adopted), `failure_reasons` (CON-6 vocabulary), `cost_usd`, `current_content_hash` (unchanged), `sections` (when
-    ready). `adoptCandidate` returns `candidate_id`, `audit_id`, the lesson's `last_editor` and its new `content_hash`.
+    ready), `note` (text or null: the optional note given to `regenerateLesson` for this candidate, trimmed; null if none;
+    CHG-4; `getCandidate` and `regenerateLesson` both return it). `adoptCandidate` returns `candidate_id`, `audit_id`, the lesson's `last_editor` and its new `content_hash`.
 - **States:** writes a candidate `lesson_version` marked "not adopted". Adopting is an edit; the current lesson state does
   not change. **`generation_failed` case (System review):** a lesson with no v1 has nothing to protect, so a successful
   regenerate stores its v1 directly and the lesson moves `generation_failed → draft` (the shared state table).
@@ -1019,7 +1020,7 @@ standards, which live in the front matter)
     SP-1), reserved and settled like any call, and counted against the requesting reviewer's day cap and the project
     ceiling (PD-29). It never draws on the original run's cap.
   - At most one candidate job per lesson is in flight: a second `regenerateLesson` while one is queued or drafting returns
-    that candidate (202) and spends nothing.
+    that candidate (202) and spends nothing; that candidate carries its own stored `note`, not the new one.
   - Adopting (whole or a section) is a logged `candidate-adopt` edit by a named person, applied through the collaboration
     server; the adopter becomes the last editor (R-29 as amended, HP-4, HP-5).
   - Copying text by hand from the candidate pane is not tracked: a known provenance gap, stated in the limits (HP-5).
@@ -1031,6 +1032,8 @@ standards, which live in the front matter)
   - System review: Claude (System track, Opus), 2026-10-25 — agreed: regenerate has its own per-lesson cap and counts
     against the day cap, not the run cap; `generation_failed` → v1 stored directly; one job in flight per lesson; added
     `INVALID_TRANSITION`, `COLLAB_UNAVAILABLE`, `cost_usd`.
+  - Change CHG-4, 2026-10-25 (orchestrator under PD-32): `note` added to the response so SCR-12 can show "note: <note>";
+    additive, no promise removed. See [`CHANGES.md`](CHANGES.md).
 - **Behaviour questions:** [UXP-3](#uxp-3) — decided 2026-10-25 (recommendation adopted under PD-31).
 
 <a id="con-17"></a>
@@ -1105,8 +1108,9 @@ standards, which live in the front matter)
     - `withdraw`: `note` (text, optional, UXP-10).
     - `approve`: `snapshot_hash` (text), `snapshot_state_vector` (base64), `rating` (`usable_as_drafted`,
       `usable_with_edits`, `rewritten`).
-    - `request_changes`: `tag` (one of the UXP-6 tags), `note` (text).
-    - `reopen`: `reason` (text).
+    - `request_changes`: `tag` (one of the UXP-6 tags), `note` (text), and optionally `snapshot_hash`,
+      `snapshot_state_vector` (CHG-3: the pin the person was reading; both or neither, one alone is `INVALID_REQUEST`).
+    - `reopen`: `reason` (text), and optionally the same pair (CHG-3).
   - Response: `lesson_id`, `from_state`, `to_state`, `version` (`version_id`, `version_number`, `content_hash`,
     `state_vector`), `audit_id`, and for `approve`: `dependency_record` (`lesson_id`, `approved_hash` of each lesson it
     links to) and `metrics_row_written` (yes/no).
@@ -1120,8 +1124,8 @@ standards, which live in the front matter)
   - `CONFIRMATION_OPEN` [422] — a `narrowed` or `added` code is unconfirmed and no other blocking issue stands. Unchanged.
   - `SUGGESTION_PENDING` [422] — an AI suggestion is pending. Unchanged.
   - `NOT_STORED` [409] — the submitter's editor holds edits the server never received. Unchanged.
-  - `STALE_PIN` [409] — the pinned hash or state vector does not match the current snapshot. Unchanged; reload shows the
-    new snapshot.
+  - `STALE_PIN` [409] — the pinned hash or state vector does not match the current snapshot (Approve always; Request
+    changes and Reopen when they carry a pin, CHG-3). Reload shows the new snapshot.
   - `FOUR_EYES` [422] — the approver was the last stored editor. Unchanged.
   - `RATING_REQUIRED` [422] — Approve without a rating. Unchanged.
   - `DEPENDENCY_UNAPPROVED` [422] — a lesson this one links to is not approved; `details` names it ("Lesson 5 must be
@@ -1134,10 +1138,10 @@ standards, which live in the front matter)
     `reopen`) could not reach the collaboration server. Unchanged; retry is safe.
   - `ROLE_FORBIDDEN` [403], `NOT_FOUND` [404].
 - **Error precedence (System review):** `ROLE_FORBIDDEN` → `NOT_FOUND` → `INVALID_TRANSITION` → `NOTE_REQUIRED` /
-  `REASON_REQUIRED` / `RATING_REQUIRED` → `NOT_STORED` (submit) → `STALE_PIN` (approve) → `FOUR_EYES` (approve) →
+  `REASON_REQUIRED` / `RATING_REQUIRED` → `NOT_STORED` (submit) → `STALE_PIN` (approve; request_changes and reopen when a pin is supplied) → `FOUR_EYES` (approve) →
   `SUGGESTION_PENDING` → `BLOCKED` → `CONFIRMATION_OPEN` → `DEPENDENCY_UNAPPROVED` (approve). `BLOCKED` wins over
   `CONFIRMATION_OPEN` and lists both kinds.
-- **Recovery:** each refusal names what to fix. On `STALE_PIN` the approver reloads SCR-14 and reads the new snapshot. On
+- **Recovery:** each refusal names what to fix. On `STALE_PIN` the approver (or the sender of a send-back) reloads SCR-14 and reads the new snapshot. On
   `FOUR_EYES` another approver approves. On `DEPENDENCY_UNAPPROVED` the source lesson is approved first. On
   `INVALID_TRANSITION` the screen reloads the lesson (CON-11) and shows its real state.
 - **Guarantees:**
@@ -1151,6 +1155,10 @@ standards, which live in the front matter)
     the pin, re-runs the checks on the snapshot, and writes the approval, the approval snapshot, the audit row and (at the
     first approval) the frozen metrics row in one transaction. The document is already frozen, so Approve needs no
     collaboration hop.
+  - Request changes and Reopen may carry the pin the person was reading (CHG-3). If supplied it is compared to the
+    latest snapshot inside the same locked transaction as Approve's, after `INVALID_TRANSITION`, `NOTE_REQUIRED` and
+    `REASON_REQUIRED`, so a send-back can never act on text the person did not see. Absent pin: unchanged. Approve is
+    unchanged.
   - Withdraw, Request changes and Reopen unfreeze through the same internal call; Reopen writes a new version from the
     approved snapshot. `exported` lessons can be reopened (FLOW-13).
   - Four-eyes on by default: "last editor" includes AI accepts, candidate adoption and standard decisions (PD-10, HP-5,
@@ -1174,6 +1182,8 @@ standards, which live in the front matter)
   - System review: Claude (System track, Opus), 2026-10-25 — agreed: `withdrawn` is a logged move, not a state;
     `NOT_STORED` via state-vector cover check inside the freeze; statuses fixed; full error precedence (`BLOCKED` beats
     `CONFIRMATION_OPEN`); `exported` can be reopened; added `COLLAB_UNAVAILABLE`; freeze mechanics confirmed by SP-2.
+  - Change CHG-3, 2026-10-25 (orchestrator under PD-32): optional pin on `request_changes` and `reopen`, checked as
+    Approve's is; absent pin unchanged. See [`CHANGES.md`](CHANGES.md).
 - **Behaviour questions:** [UXP-1](#uxp-1), [UXP-2](#uxp-2), [UXP-4](#uxp-4), [UXP-6](#uxp-6),
   [UXP-10](#uxp-10), [GAP-2](#gap-2), UXQ-11; [UXP-7](#uxp-7) follows from HP-4 and HP-5 — decided 2026-10-25
   (recommendation adopted under PD-31).

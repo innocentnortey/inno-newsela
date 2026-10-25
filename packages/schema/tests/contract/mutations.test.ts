@@ -65,6 +65,8 @@ describe("unknown keys on requests", () => {
     ["Approve", { action: "approve", snapshot_hash: "a".repeat(64), snapshot_state_vector: "AQID", rating: "rewritten" }],
     ["RequestChanges", { action: "request_changes", tag: "other", note: "n" }],
     ["Reopen", { action: "reopen", reason: "r" }],
+    ["RequestChanges", { action: "request_changes", tag: "other", note: "n", snapshot_hash: "a".repeat(64), snapshot_state_vector: "AQID" }],
+    ["Reopen", { action: "reopen", reason: "r", snapshot_hash: "a".repeat(64), snapshot_state_vector: "AQID" }],
   ] as const)("TransitionRequest variant %s rejects __unknown", (name, body) => {
     expect(transition[name].safeParse(body).success).toBe(true);
     expect(transition[name].safeParse({ ...body, __unknown: 1 }).success).toBe(false);

@@ -620,7 +620,10 @@ export interface paths {
          *     any mismatch with no change. Only a reviewer's start_review starts a review (UXP-1, UXQ-11); only an
          *     approver reopens (UXP-4); tags per UXP-6; withdraw needs no reason (UXP-10). BLOCKED wins over
          *     CONFIRMATION_OPEN and lists both kinds in details.issues. Moves that freeze or unfreeze the document return
-         *     COLLAB_UNAVAILABLE when the collaboration server cannot be reached.
+         *     COLLAB_UNAVAILABLE when the collaboration server cannot be reached. CHG-3: request_changes and reopen may
+         *     carry the same pin (both fields or neither; one alone is INVALID_REQUEST); when supplied it is checked in the
+         *     locked transaction after INVALID_TRANSITION, NOTE_REQUIRED and REASON_REQUIRED, and a mismatch is 409 STALE_PIN
+         *     with no change. Absent pin: unchanged.
          */
         post: operations["transitionLesson"];
         delete?: never;
@@ -1343,6 +1346,8 @@ export interface components {
             cost_usd: number;
             current_content_hash: components["schemas"]["Sha256"];
             sections: components["schemas"]["Section"][];
+            /** @description CHG-4: the optional note given to regenerateLesson for this candidate, trimmed; null when none. Not in required: the server always sends it. */
+            note?: string | null;
         };
         AdoptRequest: {
             /** @enum {string} */
@@ -1432,6 +1437,8 @@ export interface components {
             action: "request_changes";
             tag: components["schemas"]["SendBackTag"];
             note: string;
+            snapshot_hash?: components["schemas"]["Sha256"];
+            snapshot_state_vector?: components["schemas"]["StateVector"];
         };
         Reopen: {
             /**
@@ -1440,6 +1447,8 @@ export interface components {
              */
             action: "reopen";
             reason: string;
+            snapshot_hash?: components["schemas"]["Sha256"];
+            snapshot_state_vector?: components["schemas"]["StateVector"];
         };
         VersionRef: {
             version_id: string;

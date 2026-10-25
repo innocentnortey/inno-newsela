@@ -22,6 +22,21 @@ function actionOf(v: JsonObj): string {
   return a!.const!;
 }
 
+describe("CHG-3 optional pin on request_changes and reopen", () => {
+  const pin = { snapshot_hash: hash, snapshot_state_vector: "AQID" };
+  it.each([
+    ["request_changes", { action: "request_changes", tag: "other", note: "n" }],
+    ["reopen", { action: "reopen", reason: "r" }],
+  ] as const)("%s parses with and without the pair; unknown keys still fail", (_a, body) => {
+    for (const schema of [TransitionRequest, TransitionRequestInput]) {
+      expect(schema.safeParse(body).success).toBe(true);
+      expect(schema.safeParse({ ...body, ...pin }).success).toBe(true);
+      expect(schema.safeParse({ ...body, ...pin, extra: 1 }).success).toBe(false);
+      expect(schema.safeParse({ ...body, snapshot_hash: "nope", snapshot_state_vector: "AQID" }).success).toBe(false);
+    }
+  });
+});
+
 describe("TransitionRequestInput", () => {
   it("has transition examples", () => {
     expect(transitionExamples.length).toBeGreaterThan(0);

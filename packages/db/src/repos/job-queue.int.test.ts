@@ -254,6 +254,7 @@ describe("PgJobQueue", () => {
     expect(c?.job_id).toBe(row1.job_id);
     expect(c?.reviewer_note).toBe("make it shorter");
     expect(c?.schema_version).toBe(3);
+    expect((await q.jobs_for_run(r)).find((j) => j.kind === "candidate")?.reviewer_note).toBe("make it shorter");
     await run((tx) => q.create_run_jobs([new_job(r, { lesson_id: "N.2" })], tx));
     const l = await q.claim("w1", 3, 1000);
     expect(l?.reviewer_note).toBeNull();

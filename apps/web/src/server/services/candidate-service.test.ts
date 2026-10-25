@@ -67,6 +67,16 @@ describe("CandidateService.regenerate", () => {
     expect(w.reservations).toBe(0);
   });
 
+  it("regenerate_returns_trimmed_note", async () => {
+    const out = await make_service(make_world()).regenerate(reviewer, lid, { note: "  Make it open-ended. " });
+    expect(out.note).toBe("Make it open-ended.");
+  });
+
+  it("regenerate_without_note_returns_null", async () => {
+    const svc = make_service(make_world());
+    expect((await svc.regenerate(reviewer, lid, {})).note).toBeNull();
+  });
+
   it("second_call_returns_inflight", async () => {
     const w = make_world();
     const id = seed_inflight(w);
@@ -131,6 +141,20 @@ describe("CandidateService.regenerate", () => {
 });
 
 describe("CandidateService.get", () => {
+  it("get_returns_stored_note", async () => {
+    const w = make_world();
+    const svc = make_service(w);
+    const id = (await svc.regenerate(reviewer, lid, { note: "Shorter please" })).candidate_id;
+    expect((await svc.get(reviewer, lid, id)).note).toBe("Shorter please");
+  });
+
+  it("in_flight_returns_existing_note", async () => {
+    const w = make_world();
+    const svc = make_service(w);
+    await svc.regenerate(reviewer, lid, { note: "First note" });
+    expect((await svc.regenerate(reviewer, lid, { note: "Second note" })).note).toBe("First note");
+  });
+
   it("get_status_progression", async () => {
     const w = make_world();
     const svc = make_service(w);

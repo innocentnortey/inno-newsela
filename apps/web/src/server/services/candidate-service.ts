@@ -277,6 +277,7 @@ export class CandidateService implements CandidateApi {
       cost_usd: 0,
       current_content_hash: hash,
       sections: [],
+      note,
     } as Candidate;
   }
 
@@ -326,6 +327,7 @@ export class CandidateService implements CandidateApi {
       ).toNumber(),
       current_content_hash: await this.current_hash(row),
       sections: version !== null ? sections_of(version) : [],
+      note: job.reviewer_note ?? null,
     } as Candidate;
     return { candidate, version };
   }

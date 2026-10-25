@@ -7,8 +7,9 @@ export const ADOPT_SECTION = "Adopt this section";
 export const ADOPT_WHOLE = "Adopt whole candidate";
 export const LEAVE = "Leave unadopted";
 export const BACK = (label: string): string => `Back to ${label}`;
-// CON-16 has no `note` on Candidate, so the spec's "note: <note>" cannot be filled (CHG note in the devlog).
 export const META = "From the run's stored plan and pinned prompt";
+// CHG-4: Candidate.note is the regenerate note given for this candidate; shown only when present.
+export const NOTE = (n: string): string => `note: ${n}`;
 export const DAY_CAP = "Daily spend cap reached. No candidate was made.";
 export const COLLAB = "Nothing changed. Try again.";
 export const NETWORK = "Couldn't reach Lesson Studio. Try again.";

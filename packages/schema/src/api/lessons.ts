@@ -252,6 +252,8 @@ export const Candidate = z.object({
   cost_usd: z.number(),
   current_content_hash: Sha256,
   sections: z.array(Section),
+  // CHG-4: the regenerate note given for this candidate (trimmed), or null.
+  note: z.string().nullable().optional(),
 });
 export type Candidate = z.infer<typeof Candidate>;
 

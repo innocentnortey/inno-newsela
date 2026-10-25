@@ -96,6 +96,7 @@ function Content({ unitKey, lessonKey, candidateId, lessonId }: CandidateScreenP
   const header = (
     <CandidateHeader
       versionLabel={vLabel}
+      note={candidate.note ?? null}
       adopted={candidate.adopted}
       lessonHref={lessonHref}
       lessonLabel={label}

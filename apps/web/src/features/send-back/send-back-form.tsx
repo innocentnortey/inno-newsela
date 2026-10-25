@@ -115,7 +115,7 @@ export function SendBackForm(props: SendBackDialogProps) {
         handleStale();
         return;
       }
-      const body = mode === "reopen" ? buildReopen(reason) : buildRequestChanges(tag as SendBackTag, note);
+      const body = mode === "reopen" ? buildReopen(reason, pin) : buildRequestChanges(tag as SendBackTag, note, pin);
       const { data: result } = await api.POST("/lessons/{lessonId}/transitions", { params: { path: { lessonId } }, body });
       const versionNumber = result!.version.version_number;
       const text = mode === "reopen" ? reopenedToast(lessonId, versionNumber) : sentBackToast(whoSeesIt(fresh));
