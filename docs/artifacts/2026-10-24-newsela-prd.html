@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newsela Lesson Studio — Stage 1 review</title>
+<!--
+  Zero-to-hero Stage 1 visual review page, built from templates/visual-review-page.html
+  (references/visual-review-pages.md). The Markdown sources own every fact; this page is a synthesis.
+  Re-stamp and re-check after any source change:
+    python3 -I ../.claude/skills/zero-to-hero/scripts/stamp_review_page.py docs/artifacts/2026-10-24-newsela-prd.html --root . --date YYYY-MM-DD
+    python3 -I ../.claude/skills/zero-to-hero/scripts/check_review_page.py docs/artifacts/2026-10-24-newsela-prd.html --root .
+-->
+<meta name="review-stage" content="Zero-to-hero Stage 1 · Frame">
+<meta name="review-status" content="DRAFT — not approved; awaiting Innocent's Stage 1 review (audit + framing)">
+<meta name="review-date" content="2026-10-24">
+<meta name="review-source" content="docs/prd/newsela-prd.md|acaac03812b0b1fa24de579de0fb320cdaac5be6e2e98fff1d0fb6713fa9eef4">
+<meta name="review-source" content="docs/analysis/2026-10-24-brief-audit.md|c4322222aa51bd62c5eaa0623bf1c037b7f31ffceadf46434e95a20502c2bb16">
+<meta name="review-source" content="docs/delivery/2026-10-24-angle-and-demo-framing.md|448d1dfe81f09b37f97708ed73cd299ffeeab353195ec55e0bbcf701d69129f4">
+<meta name="review-source" content="docs/analysis/2026-10-24-product-direction.md|3e3715fe78244c175b55481de65817f3861ad39e0b4bbdd487eeb04d882a2f4b">
+<meta name="review-source" content="docs/analysis/2026-10-24-newsela-company-profile.md|aed840de19bbfa4b4a0556c610b5e01056498aff03037fcb4284ca72d9d82bd0">
+<meta name="review-source" content="docs/source/01-project-brief.md|09818b9bf21b6bb48ff7734eb32b42243af40bde137c20154e0538be5ca4e822">
+<style>
+:root{
+  --bg:#f6f4ee;--surface:#fffdf8;--surface-2:#f0ece2;--ink:#1c1b19;--muted:#5b584f;--line:#d9d2c3;
+  --accent:#1f5f5b;--focus:#b8541e;
+  --fact:#1f6a5f;--fact-bg:#e3f1ee;
+  --decision:#2b4f8f;--decision-bg:#e6ecf8;
+  --proposal:#7a4f00;--proposal-bg:#fbf0d9;
+  --unknown:#55524a;--unknown-bg:#ecebe6;
+  --awaiting:#a3361c;--awaiting-bg:#fbe7e1;
+  --lane-family:#f3efe6;--lane-assistant:#e9f2f0;--lane-staff:#ecebf5;
+  --space-1:4px;--space-2:8px;--space-3:16px;--space-4:24px;--space-5:40px;--radius:10px;
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-body:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161513;--surface:#1f1e1b;--surface-2:#2a2824;--ink:#ece8df;--muted:#b5afa1;--line:#3b3832;
+  --accent:#7cc4bd;--focus:#f0a070;
+  --fact:#7fd0c3;--fact-bg:#17302c;--decision:#a9c1f2;--decision-bg:#1d2740;
+  --proposal:#f1c879;--proposal-bg:#3a2d12;--unknown:#c9c5ba;--unknown-bg:#2c2b27;
+  --awaiting:#f6a58f;--awaiting-bg:#3d1f17;
+  --lane-family:#24221e;--lane-assistant:#1b2a28;--lane-staff:#22212d}}
+:root[data-theme="dark"]{
+  --bg:#161513;--surface:#1f1e1b;--surface-2:#2a2824;--ink:#ece8df;--muted:#b5afa1;--line:#3b3832;
+  --accent:#7cc4bd;--focus:#f0a070;
+  --fact:#7fd0c3;--fact-bg:#17302c;--decision:#a9c1f2;--decision-bg:#1d2740;
+  --proposal:#f1c879;--proposal-bg:#3a2d12;--unknown:#c9c5ba;--unknown-bg:#2c2b27;
+  --awaiting:#f6a58f;--awaiting-bg:#3d1f17;
+  --lane-family:#24221e;--lane-assistant:#1b2a28;--lane-staff:#22212d}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-ui)}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--surface);padding:8px 16px}
+.skip:focus{left:16px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--space-3)}
+header.top{background:var(--surface);border-bottom:1px solid var(--line);padding:var(--space-4) 0}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:var(--space-2) 0 var(--space-3)}
+h2{font-size:clamp(21px,2.6vw,26px);line-height:1.25;margin:0 0 var(--space-2)}
+h3{font-size:17px;margin:0 0 var(--space-2)}
+p{margin:0 0 var(--space-3)}
+.lede{font:18px/1.55 var(--font-body);max-width:72ch}
+.status-banner{display:flex;gap:var(--space-3);align-items:flex-start;background:var(--awaiting-bg);
+  border:1px solid var(--awaiting);border-radius:var(--radius);padding:var(--space-3);margin-bottom:var(--space-3)}
+.status-banner strong{color:var(--awaiting)}
+.meta{display:grid;grid-template-columns:max-content 1fr;gap:4px var(--space-3);font-size:14px;color:var(--muted);margin:0}
+.meta dt{font-weight:600;color:var(--ink)}
+.meta dt{grid-column:1}.meta dd{grid-column:2;margin:0;overflow-wrap:anywhere}
+.meta ul{margin:0;padding-left:18px}
+code{font:0.88em var(--font-mono);background:var(--surface-2);padding:1px 5px;border-radius:5px;overflow-wrap:anywhere}
+section{padding:var(--space-5) 0 var(--space-3);border-bottom:1px solid var(--line)}
+.section-sub{color:var(--muted);max-width:75ch}
+/* status badges */
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;
+  padding:2px 9px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap;vertical-align:middle}
+.st::before{font-size:11px}
+.st.fact{color:var(--fact);background:var(--fact-bg)} .st.fact::before{content:"●"}
+.st.decision{color:var(--decision);background:var(--decision-bg)} .st.decision::before{content:"◆"}
+.st.proposal{color:var(--proposal);background:var(--proposal-bg)} .st.proposal::before{content:"▲"}
+.st.unknown{color:var(--unknown);background:var(--unknown-bg);border-style:dashed} .st.unknown::before{content:"?"}
+.st.awaiting{color:var(--awaiting);background:var(--awaiting-bg);border-width:2px} .st.awaiting::before{content:"⧗"}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-3);list-style:none;padding:var(--space-3);margin:var(--space-3) 0 0;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:14px}
+.legend li{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* cards */
+.grid{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--radius);padding:var(--space-3);min-width:0}
+.card[data-status="fact"]{border-left-color:var(--fact)}
+.card[data-status="decision"]{border-left-color:var(--decision)}
+.card[data-status="proposal"]{border-left-color:var(--proposal)}
+.card[data-status="unknown"]{border-left-color:var(--unknown);border-left-style:dashed}
+.card[data-status="awaiting"]{border-left-color:var(--awaiting);border-color:var(--awaiting)}
+.card h3{display:flex;justify-content:space-between;gap:var(--space-2);align-items:flex-start;flex-wrap:wrap}
+.card p:last-child,.card ul:last-child{margin-bottom:0}
+.src,.card .src{font-size:13px;color:var(--muted)}
+.badges{display:inline-flex;gap:6px;flex-wrap:wrap}
+.big{font-size:20px;font-weight:700;line-height:1.25;margin:var(--space-1) 0 var(--space-2)}
+ul.tight{margin:0 0 var(--space-2);padding-left:20px} ul.tight li{margin:2px 0}
+.sub-h{font-size:18px;margin:var(--space-4) 0 var(--space-2)}
+/* diagrams */
+figure{margin:var(--space-3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:var(--space-3)}
+figcaption{font-size:14px;color:var(--muted);margin-top:var(--space-2)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll svg{min-width:760px}
+.scroll.wide svg{min-width:980px}
+.scroll:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.scroll-hint{display:none;font-size:13px;color:var(--muted);margin:0 0 var(--space-2)}
+svg{display:block;width:100%;height:auto;font-family:var(--font-ui)}
+svg .lane-family{fill:var(--lane-family)} svg .lane-assistant{fill:var(--lane-assistant)} svg .lane-staff{fill:var(--lane-staff)}
+svg .lane-label{fill:var(--muted);font-size:13px;font-weight:700}
+svg .node{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg .node.fact{stroke:var(--fact)} svg .node.decision{stroke:var(--decision);stroke-width:2}
+svg .node.proposal{stroke:var(--proposal);stroke-dasharray:6 3} svg .node.unknown{stroke:var(--unknown);stroke-dasharray:3 3}
+svg .node.awaiting{stroke:var(--awaiting);stroke-width:2.5}
+svg text{fill:var(--ink);font-size:13px} svg .small{font-size:11.5px;fill:var(--muted)} svg .strong{font-weight:700}
+svg .tag-t{font-size:11px;font-weight:700}
+svg .tag-t.fact{fill:var(--fact)} svg .tag-t.decision{fill:var(--decision)} svg .tag-t.proposal{fill:var(--proposal)}
+svg .tag-t.unknown{fill:var(--unknown)} svg .tag-t.awaiting{fill:var(--awaiting)}
+svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none} svg .arrow.dash{stroke-dasharray:5 4}
+svg .link{stroke:var(--muted);stroke-width:1.2;fill:none;opacity:.75}
+svg .head{fill:var(--muted)} svg .band{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:2 4}
+svg .band-label{fill:var(--accent);font-weight:700;font-size:12.5px}
+svg .axis{stroke:var(--line);stroke-width:3}
+svg .seg-sleep{fill:var(--unknown-bg);stroke:var(--unknown)} svg .seg-gates{fill:var(--decision-bg);stroke:var(--decision)}
+svg .seg-build{fill:var(--fact-bg);stroke:var(--fact)} svg .seg-core{fill:var(--proposal-bg);stroke:var(--proposal);stroke-dasharray:6 3}
+svg .seg-over{fill:var(--awaiting-bg);stroke:var(--awaiting);stroke-width:2}
+.words{font-size:14px;color:var(--muted);margin:var(--space-2) 0 0;padding-left:20px}
+.words li{margin:3px 0}
+/* traps */
+.trap dl{margin:0;display:grid;gap:var(--space-2)}
+.trap dt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.trap dd{margin:0}
+.trap dd.quote{font:15px/1.5 var(--font-body);font-style:italic}
+.sev{font-size:12px;color:var(--muted);font-weight:600}
+/* lists of IDs */
+.idlist{display:grid;gap:6px var(--space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));list-style:none;padding:0;margin:0}
+.idlist li{font-size:14px;padding-left:0}
+.idlist b{font-family:var(--font-mono);font-size:12.5px;margin-right:6px}
+/* cut order */
+.cuts{list-style:none;margin:0;padding:0;display:grid;gap:var(--space-2)}
+.cuts li{display:grid;grid-template-columns:56px 1fr;gap:var(--space-3);align-items:start;background:var(--surface);
+  border:1px solid var(--line);border-left:5px solid var(--decision);border-radius:var(--radius);padding:10px var(--space-3)}
+.cuts .n{font:700 20px/1.2 var(--font-mono);color:var(--decision)}
+.cuts p{margin:0;font-size:14px}
+.cuts p.say{color:var(--muted)}
+.cutline{display:flex;align-items:center;gap:var(--space-3);margin:var(--space-4) 0;color:var(--awaiting);font-weight:700}
+.cutline::before,.cutline::after{content:"";flex:1;border-top:2px dashed var(--awaiting)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{background:var(--surface-2)}
+td .st{margin-top:2px}
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.table-scroll table{min-width:720px}
+.table-scroll:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+/* example (input → process → output) */
+.io{display:grid;gap:var(--space-2);grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));margin:var(--space-3) 0}
+.io > div{background:var(--surface-2);border-radius:var(--radius);padding:var(--space-3);font-size:14px}
+.io h4{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.io ol{margin:0;padding-left:20px}
+/* story parts (context → problem → why-hard → why-asked) */
+.part{border-left:3px solid var(--line);padding:2px 0 2px var(--space-3);margin:var(--space-3) 0}
+.part h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 4px}
+.part p{max-width:78ch}
+.part[data-part="context"]{border-left-color:var(--accent)}
+.part[data-part="problem"]{border-left-color:var(--decision)}
+.part[data-part="why-hard"]{border-left-color:var(--awaiting)}
+.part[data-part="why-asked"]{border-left-color:var(--proposal)}
+.ask{background:var(--awaiting-bg);border:2px solid var(--awaiting);border-radius:var(--radius);padding:var(--space-4)}
+.ask h2{color:var(--awaiting)}
+.ask .card{background:var(--surface)}
+footer{padding:var(--space-4) 0 var(--space-5);font-size:13px;color:var(--muted)}
+@media (max-width:640px){
+  .status-banner{flex-direction:column;gap:var(--space-2)}
+  .meta{grid-template-columns:1fr}
+  .meta dt,.meta dd{grid-column:1}
+  .meta dt:not(:first-child){margin-top:var(--space-2)}
+  figure{padding:var(--space-2)}
+  .scroll-hint{display:block}
+  .cutline{flex-direction:column;gap:var(--space-2);text-align:center}
+  .cutline::before,.cutline::after{flex:none;width:100%}
+  .ask{padding:var(--space-3)}
+  .cuts li{grid-template-columns:40px 1fr;gap:var(--space-2)}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{
+  html,body{background:#fff;color:#000}
+  .skip{display:none}
+  section{break-inside:auto;padding:16px 0}
+  figure,.card,.day,.cuts li{break-inside:avoid}
+  h2,h3,.section-sub{break-after:avoid}
+  .scroll,.table-scroll{overflow:visible} .scroll svg,.scroll.wide svg{min-width:0} .scroll-hint{display:none}
+  .table-scroll table{min-width:0}
+  a{color:#000}
+  a[href^="../"]::after{content:" (" attr(href) ")";font-size:10px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Zero-to-hero Stage 1 · Frame · local visual review · Markdown is the source of truth</p>
+    <h1>Newsela Lesson Studio — what Stage 1 found</h1>
+    <div class="status-banner" role="status">
+      <span class="st awaiting">Awaiting your review</span>
+      <div><strong>DRAFT — not approved.</strong> Nothing is approved by being on this page. You are asked to sign off the <strong>brief audit and the framing</strong> for the Stage 1 gate. The PRD itself is approved later, at §4.</div>
+    </div>
+    <dl class="meta">
+      <dt>Review date</dt><dd>2026-10-24 (built after the Markdown sources were written)</dd>
+      <dt>Deadline</dt><dd>Tue 2026-10-27 03:00 CT (Innocent: "Monday night at 3 am") · proposed internal cutoff Mon 2026-10-26 18:00 CT</dd>
+      <dt>Sources (full documents)</dt>
+      <dd><ul>
+        <li><a href="../prd/newsela-prd.md"><code>docs/prd/newsela-prd.md</code></a> — PRD, Draft v0.1 · SHA-256 <code data-sha-for="docs/prd/newsela-prd.md">acaac03812b0</code></li>
+        <li><a href="../analysis/2026-10-24-brief-audit.md"><code>docs/analysis/2026-10-24-brief-audit.md</code></a> — brief audit (legal, ethical, engineering, merged) · <code data-sha-for="docs/analysis/2026-10-24-brief-audit.md">c4322222aa51</code></li>
+        <li><a href="../delivery/2026-10-24-angle-and-demo-framing.md"><code>docs/delivery/2026-10-24-angle-and-demo-framing.md</code></a> — two layers, metrics tree, demo · <code data-sha-for="docs/delivery/2026-10-24-angle-and-demo-framing.md">448d1dfe81f0</code></li>
+        <li><a href="../analysis/2026-10-24-product-direction.md"><code>docs/analysis/2026-10-24-product-direction.md</code></a> — personas, frictions, features · <code data-sha-for="docs/analysis/2026-10-24-product-direction.md">3e3715fe7824</code></li>
+        <li><a href="../analysis/2026-10-24-newsela-company-profile.md"><code>docs/analysis/2026-10-24-newsela-company-profile.md</code></a> — company and market research · <code data-sha-for="docs/analysis/2026-10-24-newsela-company-profile.md">aed840de19bb</code></li>
+        <li><a href="../source/01-project-brief.md"><code>docs/source/01-project-brief.md</code></a> — the ISSUED brief, word for word (wins every disagreement) · <code data-sha-for="docs/source/01-project-brief.md">09818b9bf21b</code></li>
+      </ul></dd>
+      <dt>Refresh</dt><dd>If any source changes, this page is rebuilt and re-checked before you are asked to sign off.</dd>
+    </dl>
+    <ul class="legend" data-legend aria-label="Status legend">
+      <li><span class="st fact" data-legend-item="fact">Fact</span> a cited source says it</li>
+      <li><span class="st decision" data-legend-item="decision">Your decision</span> decided by you, or under your 2026-10-24 pre-approval; ID given</li>
+      <li><span class="st proposal" data-legend-item="proposal">Proposal</span> Claude proposes; not decided</li>
+      <li><span class="st unknown" data-legend-item="unknown">Unknown</span> not established; question ID or owner given</li>
+      <li><span class="st awaiting" data-legend-item="awaiting">Awaiting approval</span> asked of you at this gate</li>
+    </ul>
+    <p class="section-sub" style="margin:var(--space-2) 0 0;font-size:14px">In diagrams, the border style shows the status, and each node also says it in words.</p>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+<section aria-labelledby="sum-h" data-visual="summary">
+  <h2 id="sum-h">At a glance</h2>
+  <div class="grid">
+    <article class="card" data-status="fact">
+      <h3>What we found <span class="st fact">Fact</span></h3>
+      <p class="big">The brief asks for a lesson generator. The slow part is review.</p>
+      <p>Newsela already drafts lessons with freelancers and AI. Staff then prove each one meets California's bar, by hand.</p>
+      <p class="src">Audit §1–§2; product direction §1.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>North star <span class="st decision">Your decision</span></h3>
+      <p class="big">Reviewer minutes per approved lesson</p>
+      <p>Lower is better. Never shown without its guard against skimming. There is no baseline yet.</p>
+      <p class="src">PD-1, under your pre-approval of 2026-10-24 · baseline: AQ-14.</p>
+    </article>
+    <article class="card" data-status="proposal">
+      <h3>Scope vs time <span class="st proposal">Proposal</span></h3>
+      <p class="big">Core work ≈ 30.5 h. Build time left ≈ 27 h.</p>
+      <p>So the core alone fills the window. Eight extras sit in a cut order. All hours are estimates.</p>
+      <p class="src">PRD §6.1, §6.3 [A] · the 3-lesson trial (SP-1) replaces the guesses.</p>
+    </article>
+    <article class="card" data-status="awaiting">
+      <h3>Asked of you now <span class="st awaiting">Awaiting approval</span></h3>
+      <p class="big">Sign off the audit and the framing.</p>
+      <p>Not the PRD (that is §4). Not the hosting spend. Not sending questions to Newsela.</p>
+      <p class="src">Section 9 below says what each answer changes.</p>
+    </article>
+  </div>
+</section>
+
+<section aria-labelledby="story-h" data-visual="story">
+  <h2 id="story-h">1 · The story so far</h2>
+  <p class="lede">Newsela is known for one thing teachers love: the same news article at five reading levels. This year it is moving into "core" instruction for California. That means a full year of daily lessons that a district adopts for every teacher to follow.</p>
+  <p>Its first core program already exists. <em>Threads &amp; Themes</em> covers grades 6–8 in English (ELA) and English Language Development (ELD, teaching for students still learning English). It is 4 units of about 45 lessons per grade: 180 days. The content was frozen on 2026-05-15. State review panels recommended both versions in summer 2026, and the State Board votes on 2026-11-12/13. <span class="st fact">Fact</span> <span class="src">Profile §6; audit §1.</span></p>
+  <p>It was made by freelancers and AI drafts, with staff checking the drafts. A 2026 job post says the content designer will "own the review of contributor- and AI-generated lessons". <span class="st fact">Fact</span> <span class="src">Audit §1 [Site §5.1].</span></p>
+  <p><strong>So why write this brief?</strong> The next programs need the same production line, faster. Grades 9–12 are "coming 2027". A 60-day package of corrections follows the vote. Other states may follow. Each new program needs about 1,000 lessons, every one proven to the state's bar. <span class="st fact">Fact</span> for the dates · <span class="st proposal">Proposal</span> for "about 1,000" (an assumption from [CA §4]). <span class="src">Framing §1.</span></p>
+  <p><strong>Our user</strong> is the content reviewer: a Learning Experience Designer (LXD), one of the brief's "20+ reviewers".</p>
+
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll" tabindex="0" aria-label="Timeline diagram, scrolls sideways">
+    <svg viewBox="0 0 1000 175" role="img" aria-labelledby="tl-t tl-d">
+      <title id="tl-t">Timeline from the program freeze to the State Board vote</title>
+      <desc id="tl-d">Six dates on one line, from the 2026-05-15 freeze to the 2026-11-12/13 State Board vote; the list below the diagram gives each one.</desc>
+      <line class="axis" x1="40" y1="70" x2="960" y2="70"/>
+      <g data-status="fact"><circle class="node fact" cx="80" cy="70" r="9"/><text x="80" y="45" text-anchor="middle" class="strong">2026-05-15</text><text x="80" y="100" text-anchor="middle">Content of</text><text x="80" y="117" text-anchor="middle">6–8 program frozen</text><text x="80" y="136" text-anchor="middle" class="tag-t fact">● fact</text></g>
+      <g data-status="fact"><circle class="node fact" cx="250" cy="70" r="9"/><text x="250" y="45" text-anchor="middle" class="strong">Summer 2026</text><text x="250" y="100" text-anchor="middle">State panels</text><text x="250" y="117" text-anchor="middle">recommend it</text><text x="250" y="136" text-anchor="middle" class="tag-t fact">● fact</text></g>
+      <g data-status="fact"><circle class="node fact" cx="420" cy="70" r="9"/><text x="420" y="45" text-anchor="middle" class="strong">2026-10-19</text><text x="420" y="100" text-anchor="middle">Brief v1</text><text x="420" y="117" text-anchor="middle">last updated</text><text x="420" y="136" text-anchor="middle" class="tag-t fact">● fact</text></g>
+      <g data-status="awaiting"><circle class="node awaiting" cx="590" cy="70" r="11"/><text x="590" y="45" text-anchor="middle" class="strong">2026-10-24 · today</text><text x="590" y="100" text-anchor="middle">Brief received;</text><text x="590" y="117" text-anchor="middle">Stage 1 review</text><text x="590" y="136" text-anchor="middle" class="tag-t awaiting">⧗ awaiting you</text></g>
+      <g data-status="fact"><circle class="node fact" cx="760" cy="70" r="9"/><text x="760" y="45" text-anchor="middle" class="strong">Tue 10-27 03:00 CT</text><text x="760" y="100" text-anchor="middle">Our submission</text><text x="760" y="117" text-anchor="middle">deadline</text><text x="760" y="136" text-anchor="middle" class="tag-t fact">● fact (your words)</text></g>
+      <g data-status="fact"><circle class="node fact" cx="925" cy="70" r="9"/><text x="925" y="45" text-anchor="middle" class="strong">2026-11-12/13</text><text x="925" y="100" text-anchor="middle">State Board</text><text x="925" y="117" text-anchor="middle">votes</text><text x="925" y="136" text-anchor="middle" class="tag-t fact">● fact</text></g>
+    </svg>
+    </div>
+    <figcaption>Dates from the company profile §6, the brief and the PRD header. Spacing is not to scale.</figcaption>
+    <ol class="words">
+      <li>2026-05-15: the grades 6–8 program's content is frozen.</li>
+      <li>Summer 2026: state panels recommend both versions.</li>
+      <li>2026-10-19: the brief (v1) is last updated. 2026-10-24: we receive it and run Stage 1.</li>
+      <li>Tue 2026-10-27 03:00 CT: our deadline. 2026-11-12/13: the State Board votes.</li>
+    </ol>
+  </figure>
+
+  <h3 class="sub-h">What Stage 1 did</h3>
+  <p class="section-sub">You pre-approved our recommended options on 2026-10-24: <em>"if you have any questions, just do the recommended option."</em> Choices made that way are marked <span class="st decision">Your decision</span> with their ID. Spend, sending questions and gate skips were left for you.</p>
+  <div class="grid">
+    <article class="card" data-status="fact">
+      <h3>1 · Attacked the brief <span class="st fact">Fact</span></h3>
+      <p>Three audits read the brief as an adversary would: <strong>legal</strong>, <strong>ethical</strong>, <strong>engineering</strong>. Then we merged them.</p>
+      <p class="src">Result: 26 traps (T-1…T-26), 40 requirements, 16 questions, 20 decisions. <a href="../analysis/2026-10-24-brief-audit.md">Brief audit</a>.</p>
+    </article>
+    <article class="card" data-status="fact">
+      <h3>2 · Studied the company <span class="st fact">Fact</span></h3>
+      <p>Four research files (California market, business, website, reviews), pulled together in one profile.</p>
+      <p class="src"><a href="../analysis/2026-10-24-newsela-company-profile.md">Company profile</a>.</p>
+    </article>
+    <article class="card" data-status="fact">
+      <h3>3 · Set a product direction <span class="st fact">Fact</span></h3>
+      <p>Six personas, 19 friction points (F-1…F-19) and 43 features (FE-1…FE-43), 34 of them in the MVP.</p>
+      <p class="src"><a href="../analysis/2026-10-24-product-direction.md">Product direction</a>.</p>
+    </article>
+    <article class="card" data-status="fact">
+      <h3>4 · Framed success, drafted the PRD <span class="st fact">Fact</span></h3>
+      <p>The two layers of success and a metrics tree. Then a PRD draft (v0.1) with 59 requirements.</p>
+      <p class="src"><a href="../delivery/2026-10-24-angle-and-demo-framing.md">Framing</a> · <a href="../prd/newsela-prd.md">PRD</a>.</p>
+    </article>
+  </div>
+</section>
+
+<section aria-labelledby="prob-h">
+  <h2 id="prob-h">2 · The problem</h2>
+  <p class="section-sub">First the money (layer 2: why Newsela wrote the brief). Then the chain of "why" that leads to the part we can change (layer 1).</p>
+
+  <h3 class="sub-h">Layer 2: the business value</h3>
+  <div class="grid">
+    <article class="card" data-status="fact">
+      <h3>The prize <span class="st fact">Fact</span></h3>
+      <p class="big">"ARR … 10's of millions market for us."</p>
+      <p>ARR is annual recurring revenue. A core deal covers a whole district: Orange Unified approved $3.68M for K–6 English.</p>
+      <p class="src">Brief, Impact Metrics; audit §7 [CA §4].</p>
+    </article>
+    <article class="card" data-status="fact">
+      <h3>The obstacle <span class="st fact">Fact</span></h3>
+      <p class="big">"prohibitively enormous manual authoring work"</p>
+      <p>Freelance writing "is slow", needs "enormous coordination" and means "fighting quality issues".</p>
+      <p class="src">Brief, PRD and Business Context.</p>
+    </article>
+    <article class="card" data-status="fact">
+      <h3>The bar <span class="st fact">Fact</span></h3>
+      <p>The state does not read every lesson. It grades evidence the publisher writes: standards maps that cite lesson parts, like "G6.U3.L18: Learning in Action, Part B". Standards alignment (Category 1) is the gate.</p>
+      <p class="src">Audit §1; framing §1 [CA §3].</p>
+    </article>
+    <article class="card" data-status="awaiting">
+      <h3>Success at this layer <span class="st awaiting">Awaiting approval</span></h3>
+      <p>Newsela gets its next program to buyers on the adoption calendar, with evidence a state or district accepts. Its review staff stops being what limits how fast it enters a market.</p>
+      <p class="src">Framing §1. We work one level down, on the production line: a 2.5-day build cannot move ARR itself (GP-125).</p>
+    </article>
+  </div>
+
+  <h3 class="sub-h">Layer 1: the why-chain</h3>
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll wide" tabindex="0" aria-label="Why-chain diagram, scrolls sideways">
+    <svg viewBox="0 0 1110 250" role="img" aria-labelledby="wc-t wc-d">
+      <title id="wc-t">Why-chain from the brief's request to the cause we can change</title>
+      <desc id="wc-d">Five boxes, each answering "why" for the one before; the list below gives each answer.</desc>
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <g data-status="fact"><rect class="node fact" x="10" y="20" width="200" height="200" rx="8"/>
+        <text x="22" y="44" class="small strong">WHY 1 · build an AI tool?</text>
+        <text x="22" y="70">Hand authoring is slow,</text><text x="22" y="88">needs huge coordination</text><text x="22" y="106">and has quality issues.</text>
+        <text x="22" y="200" class="tag-t fact">● fact · Brief</text></g>
+      <g data-status="fact"><rect class="node fact" x="232" y="20" width="200" height="200" rx="8"/>
+        <text x="244" y="44" class="small strong">WHY 2 · why now?</text>
+        <text x="244" y="70">Each new program needs</text><text x="244" y="88">~180 lessons per grade:</text><text x="244" y="106">9–12 in 2027, then other</text><text x="244" y="124">states and revisions.</text>
+        <text x="244" y="200" class="tag-t fact">● fact · [Site §1], [CA §4]</text></g>
+      <g data-status="fact"><rect class="node fact" x="454" y="20" width="200" height="200" rx="8"/>
+        <text x="466" y="44" class="small strong">WHY 3 · still slow with AI?</text>
+        <text x="466" y="70">Every lesson must be</text><text x="466" y="88">proven to the state's bar,</text><text x="466" y="106">by hand. The outline is</text><text x="466" y="124">dirty too: 7 of 12 ELD</text><text x="466" y="142">labels name the wrong</text><text x="466" y="160">strand.</text>
+        <text x="466" y="200" class="tag-t fact">● fact · [Sheet §5–§6]</text></g>
+      <g data-status="fact"><rect class="node fact" x="676" y="20" width="200" height="200" rx="8"/>
+        <text x="688" y="44" class="small strong">WHY 4 · why by hand?</text>
+        <text x="688" y="70">Drafts arrive as prose.</text><text x="688" y="88">A standard is named, not</text><text x="688" y="106">mapped to an activity.</text><text x="688" y="124">Quotes have no source.</text><text x="688" y="142">Nothing records checks.</text>
+        <text x="688" y="200" class="tag-t fact">● fact · N-4, N-5, [Struct §4]</text></g>
+      <g data-status="awaiting"><rect class="node awaiting" x="898" y="20" width="202" height="200" rx="8"/>
+        <text x="910" y="44" class="small strong">WHY 5 · cause we can change</text>
+        <text x="910" y="70">Drafts arrive without</text><text x="910" y="88">the evidence that proves</text><text x="910" y="106">them. So: drafts that carry</text><text x="910" y="124">their evidence, and a</text><text x="910" y="142">review that approves only</text><text x="910" y="160">what it can show.</text>
+        <text x="910" y="200" class="tag-t awaiting">⧗ awaiting · audit §2 row 5</text></g>
+      <path class="arrow" d="M210,120 L230,120" marker-end="url(#ah)"/>
+      <path class="arrow" d="M432,120 L452,120" marker-end="url(#ah)"/>
+      <path class="arrow" d="M654,120 L674,120" marker-end="url(#ah)"/>
+      <path class="arrow" d="M876,120 L896,120" marker-end="url(#ah)"/>
+    </svg>
+    </div>
+    <figcaption>From the audit §2. The last box is the framing you are asked to sign off.</figcaption>
+    <ol class="words">
+      <li>Why build it? Hand authoring is slow and full of quality issues (brief).</li>
+      <li>Why now? Each new program needs about 180 lessons per grade.</li>
+      <li>Why still slow with AI drafts? People must prove every lesson by hand, and the outline itself is dirty.</li>
+      <li>Why by hand? Drafts name standards but don't map them; quotes have no source; no record of checks.</li>
+      <li>The cause we can change: drafts arrive without their evidence. Make drafts carry it, and approve only what can be shown.</li>
+    </ol>
+  </figure>
+
+  <article class="card" data-status="fact">
+    <h3>One lesson, before and after <span class="badges"><span class="st fact">Fact</span> <span class="st proposal">Proposal</span></span></h3>
+    <p>Take Lesson 4 (sheet row 8), <em>The Lightning Thief</em>. The sheet lists its standards as <code>RL.6.1, 6.2 L.6.4</code>. "6.2" is not a real code.</p>
+    <div class="io">
+      <div data-status="fact"><h4>Today (fact)</h4><p style="margin:0">A reviewer gets a prose draft. They spot that "6.2" is broken. They look up what each standard says. They hunt for the activity that teaches it. They check every quote against the book. Then they retype the lesson into Newsela's system.</p></div>
+      <div data-status="proposal"><h4>In our tool (proposal)</h4><ol>
+        <li>The validation report flags <code>6.2</code> before any money is spent.</li>
+        <li>The draft arrives in Newsela's own lesson shape: Launch 5 → Literacy Lab 10 → Learning in Action 30 → Look Back 5 minutes.</li>
+        <li>Each standard links to the part that teaches it and the question that checks it.</li>
+        <li>A quote with no source becomes a "Reviewer to insert" box, which blocks Approve.</li>
+      </ol></div>
+    </div>
+    <p class="src">Framing §2 "Concrete example"; PRD §13 (WP-1 is row 8).</p>
+  </article>
+
+  <article class="card" data-status="decision" style="margin-top:var(--space-3)">
+    <h3>Branches we rejected <span class="st decision">Your decision</span></h3>
+    <ul class="tight">
+      <li><strong>Generate faster.</strong> The brief allows "a few minutes per lesson"; generation is not the slow step.</li>
+      <li><strong>Auto-approve when checks pass.</strong> The state credits only people "who actually contributed" (5 CCR §9517(i)).</li>
+      <li><strong>A Google-Docs-grade editor.</strong> Nothing asks for it; Yjs (live co-editing) stays minimal (AD-6).</li>
+      <li><strong>Fine-tune on their lessons.</strong> Newsela's Terms §9(b) forbid it.</li>
+    </ul>
+    <p class="src">Audit §2 "Rejected branches"; adopted under pre-approval 2026-10-24.</p>
+  </article>
+</section>
+
+<section aria-labelledby="who-h">
+  <h2 id="who-h">3 · Who it's for, and what gets in their way</h2>
+  <p class="section-sub">The tool is for Newsela's staff only. No student or teacher data enters it (GR-13). Three personas use it; three only judge what it makes.</p>
+  <div class="grid">
+    <article class="card" data-status="decision">
+      <h3>P-1 · Content reviewer (LXD) — primary <span class="st decision">Your decision</span></h3>
+      <p>Edits drafts, fixes or resolves each issue, then submits. "Done" means they would defend the lesson to a state reviewer.</p>
+      <p class="src">PD-1 · role <code>reviewer</code> · direction §2.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>P-2 · Instructional designer <span class="st decision">Your decision</span></h3>
+      <p>Writes the outline, uploads it, confirms the validation report, starts runs. Wants their plan followed faithfully.</p>
+      <p class="src">AD-11 · role <code>author</code>.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>P-3 · Content lead / approver <span class="st decision">Your decision</span></h3>
+      <p>Approves one pinned version, or sends it back with a reason. By default must not be the last editor ("four-eyes").</p>
+      <p class="src">AD-11 · role <code>approver</code>.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>P-4–P-6 · Never users <span class="st decision">Your decision</span></h3>
+      <p>The teacher, the district adoption committee and the state reviewer. They judge the output: a coherent day, a standards map they can sign, Category 1 met.</p>
+      <p class="src">GR-13; PRD §3.</p>
+    </article>
+  </div>
+
+  <h3 class="sub-h">The worst frictions, and the features that answer them</h3>
+  <p class="section-sub">Six of the 19 frictions. Lines show which feature resolves which. The full 19 × 43 matrix is in the <a href="../analysis/2026-10-24-product-direction.md">product direction</a>, "Traceability matrix".</p>
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll" tabindex="0" aria-label="Friction to feature map, scrolls sideways">
+    <svg viewBox="0 0 1000 440" role="img" aria-labelledby="ff-t ff-d">
+      <title id="ff-t">Six friction points linked to the features that solve them</title>
+      <desc id="ff-d">Six frictions on the left linked to eight feature groups on the right; the list below gives every link.</desc>
+      <g>
+        <path class="link" d="M310,43 C470,43 480,35 640,35"/>
+        <path class="link" d="M310,113 C470,113 480,88 640,88"/>
+        <path class="link" d="M310,113 C470,113 480,141 640,141"/>
+        <path class="link" d="M310,113 C470,113 480,247 640,247"/>
+        <path class="link" d="M310,113 C470,113 480,300 640,300"/>
+        <path class="link" d="M310,183 C470,183 480,35 640,35"/>
+        <path class="link" d="M310,183 C470,183 480,141 640,141"/>
+        <path class="link" d="M310,183 C470,183 480,194 640,194"/>
+        <path class="link" d="M310,183 C470,183 480,247 640,247"/>
+        <path class="link" d="M310,183 C470,183 480,406 640,406"/>
+        <path class="link" d="M310,253 C470,253 480,247 640,247"/>
+        <path class="link" d="M310,253 C470,253 480,300 640,300"/>
+        <path class="link" d="M310,323 C470,323 480,353 640,353"/>
+        <path class="link" d="M310,393 C470,393 480,194 640,194"/>
+        <path class="link" d="M310,393 C470,393 480,406 640,406"/>
+      </g>
+      <g data-status="fact"><rect class="node fact" x="10" y="20" width="300" height="46" rx="8"/><text x="22" y="40" class="strong">F-1 · The outline is dirty</text><text x="22" y="57" class="small">U4 vs U3, a fake code, 47 days not ~40</text></g>
+      <g data-status="fact"><rect class="node fact" x="10" y="90" width="300" height="46" rx="8"/><text x="22" y="110" class="strong">F-3 · Invented quotes, copyright</text><text x="22" y="127" class="small">no source texts supplied; novel in copyright</text></g>
+      <g data-status="fact"><rect class="node fact" x="10" y="160" width="300" height="46" rx="8"/><text x="22" y="180" class="strong">F-4 · "Aligned" can't be proven</text><text x="22" y="197" class="small">codes sit in the header, mapped to nothing</text></g>
+      <g data-status="fact"><rect class="node fact" x="10" y="230" width="300" height="46" rx="8"/><text x="22" y="250" class="strong">F-5 · Rubber-stamp approval</text><text x="22" y="267" class="small">50+ lessons per reviewer invites "approve all"</text></g>
+      <g data-status="fact"><rect class="node fact" x="10" y="300" width="300" height="46" rx="8"/><text x="22" y="320" class="strong">F-9 · Long runs, no visibility</text><text x="22" y="337" class="small">~2 hours serially; one failure kills the run</text></g>
+      <g data-status="fact"><rect class="node fact" x="10" y="370" width="300" height="46" rx="8"/><text x="22" y="390" class="strong">F-13 · Evidence maps built by hand</text><text x="22" y="407" class="small">a 134-page criteria map, row by row</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="15" width="350" height="40" rx="8"/><text x="652" y="32" class="strong">FE-1–FE-4 · Intake + validation report</text><text x="652" y="48" class="small">normalize rows, check every code, Generate waits</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="68" width="350" height="40" rx="8"/><text x="652" y="85" class="strong">FE-10 · Grounding by construction</text><text x="652" y="101" class="small">cite texts; "Reviewer to insert" for quotes</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="121" width="350" height="40" rx="8"/><text x="652" y="138" class="strong">FE-16 · Check suite + one repair</text><text x="652" y="154" class="small">blocking rules run by code on every save</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="174" width="350" height="40" rx="8"/><text x="652" y="191" class="strong">FE-17 + FE-32 · Alignment map + addresses</text><text x="652" y="207" class="small">standard → part that teaches it, "asserted by"</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="227" width="350" height="40" rx="8"/><text x="652" y="244" class="strong">FE-22 · Evidence pane beside the text</text><text x="652" y="260" class="small">outline row, official standard text, issues</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="280" width="350" height="40" rx="8"/><text x="652" y="297" class="strong">FE-25 + FE-26 · Pinned approval + checklist</text><text x="652" y="313" class="small">one lesson, one version, no bulk approve</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="333" width="350" height="40" rx="8"/><text x="652" y="350" class="strong">FE-14 + FE-15 · Durable jobs + live progress</text><text x="652" y="366" class="small">queue, retries, resume, spend cap; a tile per lesson</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="640" y="386" width="350" height="40" rx="8"/><text x="652" y="403" class="strong">FE-33 · Unit coverage matrix</text><text x="652" y="419" class="small">standard × lesson; in the cut order (#4)</text></g>
+    </svg>
+    </div>
+    <figcaption><span class="st fact">Fact</span> frictions, each with evidence in direction §3. <span class="st proposal">Proposal</span> features: their tiers sit in the PRD, approved at §4.</figcaption>
+    <ol class="words">
+      <li>F-1 dirty outline → FE-1–FE-4 (intake, normalizer, standards check, validation report).</li>
+      <li>F-3 invented quotes → FE-10 grounding, FE-16 checks, FE-22 evidence pane, FE-26 approval checklist.</li>
+      <li>F-4 "aligned" unproven → FE-3 standards check, FE-16, FE-17 + FE-32 alignment map, FE-22, FE-33 coverage matrix.</li>
+      <li>F-5 rubber-stamping → FE-22 evidence pane, FE-25 + FE-26 pinned approval and checklist.</li>
+      <li>F-9 long runs → FE-14 + FE-15 durable jobs and live progress.</li>
+      <li>F-13 evidence maps by hand → FE-17 + FE-32 alignment map, FE-33 coverage matrix.</li>
+    </ol>
+  </figure>
+</section>
+
+<section aria-labelledby="jour-h">
+  <h2 id="jour-h">4 · The user journey: what the product does, what a person decides</h2>
+  <p class="section-sub">The rule underneath (PRD §5.1): the product does everything that can be written as code or one bounded model call. A person makes every choice that changes what a classroom sees or what Newsela claims.</p>
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll wide" tabindex="0" aria-label="User journey swimlane, scrolls sideways">
+    <svg viewBox="0 0 1240 372" role="img" aria-labelledby="uj-t uj-d">
+      <title id="uj-t">User journey in two lanes: the product and the person</title>
+      <desc id="uj-d">Eight steps in two lanes, product above and person below, with the approval step highlighted; the list below gives each step.</desc>
+      <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <rect class="lane-assistant" x="0" y="8" width="1240" height="168" rx="8"/>
+      <rect class="lane-staff" x="0" y="184" width="1240" height="180" rx="8"/>
+      <text class="lane-label" x="10" y="30">PRODUCT</text><text class="lane-label" x="10" y="46">DOES</text>
+      <text class="lane-label" x="10" y="206">PERSON</text><text class="lane-label" x="10" y="222">DECIDES</text>
+
+      <g data-status="decision"><rect class="node decision" x="120" y="40" width="128" height="124" rx="8"/><text x="130" y="60" class="strong">1 Outline</text><text x="130" y="80" class="small">Snapshot + hash;</text><text x="130" y="96" class="small">sort rows; check</text><text x="130" y="112" class="small">every code</text><text x="130" y="154" class="tag-t decision">◆ AD-1, AD-9</text></g>
+      <g data-status="decision"><rect class="node decision" x="260" y="40" width="128" height="124" rx="8"/><text x="270" y="60" class="strong">2 Validated</text><text x="270" y="80" class="small">OK / warning /</text><text x="270" y="96" class="small">error per row;</text><text x="270" y="112" class="small">Generate stays off</text><text x="270" y="154" class="tag-t decision">◆ AD-1 (R-5)</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="400" y="40" width="128" height="124" rx="8"/><text x="410" y="60" class="strong">3 Unit plan</text><text x="410" y="80" class="small">One typed call</text><text x="410" y="96" class="small">plans all 47 days</text><text x="410" y="112" class="small">and the arc</text><text x="410" y="154" class="tag-t proposal">▲ PD-4, §3</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="540" y="40" width="128" height="124" rx="8"/><text x="550" y="60" class="strong">4 Drafts</text><text x="550" y="80" class="small">Capped fan-out;</text><text x="550" y="96" class="small">typed draft,</text><text x="550" y="112" class="small">compiled by code</text><text x="550" y="154" class="tag-t proposal">▲ PD-4, §3</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="680" y="40" width="128" height="124" rx="8"/><text x="690" y="60" class="strong">5 Checks</text><text x="690" y="80" class="small">Codes, minutes,</text><text x="690" y="96" class="small">mapped standards,</text><text x="690" y="112" class="small">sourced quotes;</text><text x="690" y="128" class="small">one repair</text><text x="690" y="154" class="tag-t proposal">▲ PD-5, PD-6</text></g>
+      <g data-status="decision"><rect class="node decision" x="820" y="40" width="128" height="124" rx="8"/><text x="830" y="60" class="strong">6 Review</text><text x="830" y="80" class="small">ProseMirror + Yjs</text><text x="830" y="96" class="small">editor, evidence</text><text x="830" y="112" class="small">pane; re-check</text><text x="830" y="128" class="small">on save</text><text x="830" y="154" class="tag-t decision">◆ PD-8, PD-9</text></g>
+      <g data-status="decision"><rect class="node decision" x="960" y="40" width="128" height="124" rx="8"/><text x="970" y="60" class="strong">7 Approve gate</text><text x="970" y="80" class="small">Off while any</text><text x="970" y="96" class="small">block stands;</text><text x="970" y="112" class="small">pins the version</text><text x="970" y="128" class="small">(pinning: PD-7 ▲)</text><text x="970" y="154" class="tag-t decision">◆ PD-10</text></g>
+      <g data-status="decision"><rect class="node decision" x="1100" y="40" width="128" height="124" rx="8"/><text x="1110" y="60" class="strong">8 Evidence</text><text x="1110" y="80" class="small">JSON export;</text><text x="1110" y="96" class="small">coverage matrix</text><text x="1110" y="112" class="small">(cuts #5, #4)</text><text x="1110" y="154" class="tag-t decision">◆ PD-22</text></g>
+
+      <path class="arrow" d="M248,102 L258,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M388,102 L398,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M528,102 L538,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M668,102 L678,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M808,102 L818,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M948,102 L958,102" marker-end="url(#ah2)"/>
+      <path class="arrow" d="M1088,102 L1098,102" marker-end="url(#ah2)"/>
+
+      <g data-status="decision"><rect class="node decision" x="260" y="216" width="128" height="124" rx="8"/><text x="270" y="236" class="strong">Confirm it</text><text x="270" y="256" class="small">Accept each fix;</text><text x="270" y="272" class="small">confirm U4; keep</text><text x="270" y="288" class="small">or re-map ELD</text><text x="270" y="304" class="small">labels</text><text x="270" y="330" class="tag-t decision">◆ AD-9, DIR-5</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="400" y="216" width="128" height="124" rx="8"/><text x="410" y="236" class="strong">Start a run</text><text x="410" y="256" class="small">Scope, prompt</text><text x="410" y="272" class="small">version, spend</text><text x="410" y="288" class="small">cap; read the plan</text><text x="410" y="330" class="tag-t proposal">▲ PD-14 [A]</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="540" y="216" width="128" height="124" rx="8"/><text x="550" y="236" class="strong">Watch</text><text x="550" y="256" class="small">Cancel, or</text><text x="550" y="272" class="small">retry failed</text><text x="550" y="288" class="small">lessons</text><text x="550" y="330" class="tag-t proposal">▲ R-16, R-17</text></g>
+      <g data-status="decision"><rect class="node decision" x="820" y="216" width="128" height="124" rx="8"/><text x="830" y="236" class="strong">Edit</text><text x="830" y="256" class="small">Every change;</text><text x="830" y="272" class="small">accept or reject</text><text x="830" y="288" class="small">each AI idea; fix</text><text x="830" y="304" class="small">or resolve issues</text><text x="830" y="330" class="tag-t decision">◆ GR-7</text></g>
+      <g data-status="decision"><rect class="node decision" x="960" y="216" width="128" height="124" rx="8"/><text x="970" y="236" class="strong">Approve one</text><text x="970" y="256" class="small">One lesson, one</text><text x="970" y="272" class="small">version, a named</text><text x="970" y="288" class="small">person; or send</text><text x="970" y="304" class="small">back with a reason</text><text x="970" y="330" class="tag-t decision">◆ PD-10, GR-6</text></g>
+      <g data-status="decision"><rect class="node decision" x="1100" y="216" width="128" height="124" rx="8"/><text x="1110" y="236" class="strong">Export, reopen</text><text x="1110" y="256" class="small">When to export;</text><text x="1110" y="272" class="small">why to reopen</text><text x="1110" y="288" class="small">(makes a new</text><text x="1110" y="304" class="small">version)</text><text x="1110" y="330" class="tag-t decision">◆ PD-22</text></g>
+      <text x="690" y="270" class="small">no person here:</text><text x="690" y="286" class="small">checks run by code</text>
+
+      <path class="arrow dash" d="M324,164 L324,214" marker-end="url(#ah2)"/>
+      <path class="arrow dash" d="M464,164 L464,214" marker-end="url(#ah2)"/>
+      <path class="arrow dash" d="M604,164 L604,214" marker-end="url(#ah2)"/>
+      <path class="arrow dash" d="M884,164 L884,214" marker-end="url(#ah2)"/>
+      <path class="arrow dash" d="M1024,164 L1024,214" marker-end="url(#ah2)"/>
+      <path class="arrow dash" d="M1164,164 L1164,214" marker-end="url(#ah2)"/>
+      <rect class="band" x="952" y="208" width="144" height="140" rx="10"/>
+      <text class="band-label" x="960" y="360">✓ the human gate</text>
+    </svg>
+    </div>
+    <figcaption>From PRD §5.1 and direction §4. Solid thick nodes are decided under your pre-approval; dashed nodes wait for §3 (hard problems) or are assumptions.</figcaption>
+    <ol class="words">
+      <li><strong>Product does:</strong> 1 store and check the outline → 2 mark each row OK / warning / error, Generate off → 3 plan the unit in one call → 4 draft each lesson (typed, compiled by code) → 5 run the checks, one repair → 6 the editor with evidence → 7 keep Approve off while any block stands, pin the version → 8 export and the coverage matrix.</li>
+      <li><strong>Person decides:</strong> at 2, accept each fix, confirm U4, re-map ELD labels · at 3–4, scope, prompt version, spend cap, cancel or retry · at 5, nobody · at 6, every change and each AI suggestion · at 7, approve one version or send it back · at 8, when to export and why to reopen.</li>
+      <li><strong>Status:</strong> steps 1, 2, 6, 7, 8 are decided (AD-1, AD-9, PD-8, PD-9, PD-10, PD-22, GR-7). Steps 3–5 wait for §3 (PD-4, PD-5, PD-6); the spend cap is an assumption (PD-14); approval pinning is PD-7, a proposal.</li>
+    </ol>
+  </figure>
+</section>
+
+<section aria-labelledby="trap-h">
+  <h2 id="trap-h">5 · The traps we found</h2>
+  <p class="section-sub">A trap is a line in the brief that, read literally, leads to a bad build. These are 8 of the 26, the most severe first. Each shows the brief's words, the trap, and what we do instead. All 26 are in the <a href="../analysis/2026-10-24-brief-audit.md">audit §5</a>.</p>
+  <div class="grid two">
+    <article class="card trap" data-status="decision">
+      <h3>T-1 · Invented quotes <span class="st decision">Your decision</span></h3>
+      <p class="sev">Critical · legal, ethical, engineering</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"referencing text/novel indicated in the provided unit outline sheet"</dd>
+        <dt>The trap</dt><dd>No source texts are supplied, so the model fills the gap from memory: invented quotes, or passages of <em>The Lightning Thief</em> (in copyright). Statewide, one error becomes hundreds.</dd>
+        <dt>Our response</dt><dd>Reference, don't reproduce. Quotes only from supplied text; otherwise a "Reviewer to insert" box. A rights status on every excerpt.</dd>
+      </dl>
+      <p class="src">AD-8, GR-1–GR-3 (decided 2026-10-24). <em>How</em> we check it is PD-5, a <span class="st proposal">Proposal</span> for §3.</p>
+    </article>
+    <article class="card trap" data-status="proposal">
+      <h3>T-2 · "Aligned" with no check <span class="st proposal">Proposal</span></h3>
+      <p class="sev">Critical · engineering, ethical, legal</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"what's important is that we generate standard aligned content"</dd>
+        <dt>The trap</dt><dd>"Aligned" is the whole value, and nobody defines it. Copying the codes into the header feeds false claims into a state purchase.</dd>
+        <dt>Our response</dt><dd>Check in layers: codes resolve to the official list; each standard maps to a part that teaches it and a question that checks it; a person confirms. Never a bare "aligned" badge.</dd>
+      </dl>
+      <p class="src">PD-6, settled at §3. The no-badge rule (GR-4) is <span class="st decision">Your decision</span>.</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-3 · A rubber-stamp Approve <span class="st decision">Your decision</span></h3>
+      <p class="sev">Critical · ethical, engineering</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"once reviewed/updated it is flagged as complete"</dd>
+        <dt>The trap</dt><dd>Approve becomes "approve all 40". AI rewrites slip in after review.</dd>
+        <dt>Our response</dt><dd>One lesson at a time, no bulk approve. Approve is off while blocks stand. Approval is pinned to the version seen. An append-only log.</dd>
+      </dl>
+      <p class="src">AD-11, PD-10 (decided 2026-10-24). The pinning mechanics (PD-7) wait for §3.</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-4 · The example site is private <span class="st decision">Your decision</span></h3>
+      <p class="sev">Critical (legal)</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"feel free to crawl as many examples as needed via that link"</dd>
+        <dt>The trap</dt><dd>The site is very likely the state-review copy of a program not yet adopted. Showing it in public would disclose it.</dd>
+        <dt>Our response</dt><dd>Crawled pages stay in a git-ignored folder. Unit 4 is held out as the test set. The repo is private. The video shows only our output.</dd>
+      </dl>
+      <p class="src">AD-3, AD-4, GR-9 (decided 2026-10-24). Whether the site is confidential is AQ-1 <span class="st unknown">Unknown</span>.</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-5 · The outline is dirty <span class="st decision">Your decision</span></h3>
+      <p class="sev">High · engineering, legal</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"That outline is a google spreadsheet of ~40 lessons"</dd>
+        <dt>The trap</dt><dd>Cell A1 says U4; every filename says U3. 41 lessons + 6 flex days = 47 days. <code>RL.6.9.a</code> does not exist. A simple parser drops <code>6.2</code>, and every later check passes against the wrong list.</dd>
+        <dt>Our response</dt><dd>A strict cleaner plus a validation report a person confirms before Generate turns on. Each defect becomes a test.</dd>
+      </dl>
+      <p class="src">AD-9 (decided 2026-10-24); R-3–R-5.</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-6 · Six products in 1–2 days <span class="st decision">Your decision</span></h3>
+      <p class="sev">Critical (scope)</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">Six requirements, a bonus, ProseMirror + Yjs, "1-2 days"</dd>
+        <dt>The trap</dt><dd>Build a thin layer of everything, so nothing holds up.</dd>
+        <dt>Our response</dt><dd>The smallest slice we can defend, with a named cut order (section 7).</dd>
+      </dl>
+      <p class="src">AD-1, PD-17 (decided 2026-10-24).</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-7 · An HTML blob in the editor <span class="st decision">Your decision</span></h3>
+      <p class="sev">Critical · engineering</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"ProseMirror and Yjs for the frontend/collaborative editor"</dd>
+        <dt>The trap</dt><dd>Load generated HTML into the editor. It looks done, but nothing can check, compare or export it.</dd>
+        <dt>Our response</dt><dd>Newsela's own typed lesson record. Standards and minutes are form fields. One logged-in sync server, saved to our database.</dd>
+      </dl>
+      <p class="src">AD-5, AD-6 (decided 2026-10-24).</p>
+    </article>
+    <article class="card trap" data-status="decision">
+      <h3>T-9 · "Async is fine" hides a job system <span class="st decision">Your decision</span></h3>
+      <p class="sev">High · engineering</p>
+      <dl>
+        <dt>The brief's words</dt><dd class="quote">"a few minutes per lesson is ok"; "Vercel or Railway … feel free"</dd>
+        <dt>The trap</dt><dd>47 rows × ~3 minutes is ~2 hours one after another. Serverless functions time out, so jobs die mid-lesson.</dd>
+        <dt>Our response</dt><dd>A database-backed job queue in a long-running worker: each lesson its own job, safe to retry and resume, with a spend cap.</dd>
+      </dl>
+      <p class="src">AD-14 (decided 2026-10-24). The hosting spend is not decided: section 9.</p>
+    </article>
+  </div>
+
+  <h3 class="sub-h">The guardrails that follow from them</h3>
+  <article class="card" data-status="decision">
+    <h3>18 guardrails, none negotiable <span class="st decision">Your decision</span></h3>
+    <ul class="idlist">
+      <li><b>GR-1</b>No invented quotes, pages, facts or article text</li>
+      <li><b>GR-2</b>Never write a passage of a text we weren't given</li>
+      <li><b>GR-3</b>Every excerpt has a rights status; "to-clear" blocks Approve</li>
+      <li><b>GR-4</b>No bare "standards-aligned" badge; every link says who claimed it</li>
+      <li><b>GR-5</b>Cite only the official state standards text</li>
+      <li><b>GR-6</b>No bulk or automatic approval</li>
+      <li><b>GR-7</b>AI edits are suggestions a person accepts</li>
+      <li><b>GR-8</b>Provenance on every version, always</li>
+      <li><b>GR-9</b>Crawled Newsela content never committed or shown</li>
+      <li><b>GR-10</b>Examples in the prompt only; no fine-tuning</li>
+      <li><b>GR-11</b>Grade 6 Unit 4 held out, never an example</li>
+      <li><b>GR-12</b>Locked content rules for sacred texts, trauma, ELD supports</li>
+      <li><b>GR-13</b>No student or teacher data; staff login only</li>
+      <li><b>GR-14</b>Demo honesty: full run first, random lesson, numbers with <em>n</em></li>
+      <li><b>GR-15</b>Review time shown in aggregate, never ranked by person</li>
+      <li><b>GR-16</b>Framed as expert-driven, never "AI replaces writers"</li>
+      <li><b>GR-17</b>An explicit LICENSE; no Newsela content in the repo</li>
+      <li><b>GR-18</b>The locked prompt layer can't be edited from the UI</li>
+    </ul>
+    <p class="src" style="margin-top:var(--space-2)">PRD §8. The guardrails are decided (PD-5); how some are met is open for §3.</p>
+  </article>
+</section>
+
+<section aria-labelledby="met-h">
+  <h2 id="met-h">6 · The metrics chain</h2>
+  <p class="section-sub">How we will know the tool works, and how that reaches money. Labels: <strong>[T]</strong> a target we set, <strong>[A]</strong> an assumption we would check, <strong>[M]</strong> a measurement. No metric has a baseline: Newsela has not told us its review time per lesson (AQ-14).</p>
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll wide" tabindex="0" aria-label="Metrics chain diagram, scrolls sideways">
+    <svg viewBox="0 0 1160 340" role="img" aria-labelledby="mc-t mc-d">
+      <title id="mc-t">Metrics chain: north star, guards, supporting, lagging and money</title>
+      <desc id="mc-d">North star and guards, then supporting metrics, lagging outcomes and money, left to right; the list below gives each one.</desc>
+      <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <text x="10" y="14" class="small strong">NORTH STAR</text>
+      <g data-status="decision"><rect class="node decision" x="10" y="22" width="250" height="132" rx="8"/><text x="22" y="46" class="strong">NS · Reviewer minutes</text><text x="22" y="64" class="strong">per approved lesson</text><text x="22" y="86" class="small">median per unit, by lesson type;</text><text x="22" y="102" class="small">lower is better</text><text x="22" y="122" class="small">Reading median ≤ 30 min [T]</text><text x="22" y="144" class="tag-t decision">◆ PD-1 · baseline: none</text></g>
+      <g data-status="decision"><rect class="node decision" x="10" y="174" width="250" height="156" rx="8"/><text x="22" y="196" class="strong">Guards, always beside it</text><text x="22" y="220" class="small">G-1 blocks cleared by a</text><text x="22" y="236" class="small">resolution, not a fix · ≤ 10% [T]</text><text x="22" y="258" class="small">G-2 review faster than half the</text><text x="22" y="274" class="small">read time · ≤ 5% [T]</text><text x="22" y="296" class="small">G-3 planted errors caught · ≥ 90% [T]</text><text x="22" y="320" class="tag-t decision">◆ PD-1 (never without G-2)</text></g>
+      <path class="arrow" d="M135,154 L135,172" marker-end="url(#ah3)"/>
+      <text x="310" y="14" class="small strong">SUPPORTING (why it moved)</text>
+      <g data-status="proposal"><rect class="node proposal" x="310" y="22" width="250" height="92" rx="8"/><text x="322" y="44" class="strong">V-1 First-pass clean rate</text><text x="322" y="64" class="small">no blocking issue after the</text><text x="322" y="80" class="small">one repair · ≥ 60% [T]</text><text x="322" y="104" class="tag-t proposal">▲ target · baseline: none</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="310" y="126" width="250" height="92" rx="8"/><text x="322" y="148" class="strong">V-2 Standards verified</text><text x="322" y="168" class="small">each claim a person checked</text><text x="322" y="184" class="small">· 100% [T]</text><text x="322" y="208" class="tag-t proposal">▲ target · baseline: none</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="310" y="230" width="250" height="100" rx="8"/><text x="322" y="252" class="strong">V-3 Quotes sourced</text><text x="322" y="272" class="small">or a placeholder · 100%;</text><text x="322" y="288" class="small">≤ 2 placeholders a lesson [T]</text><text x="322" y="318" class="tag-t proposal">▲ target · baseline: none</text></g>
+      <text x="610" y="14" class="small strong">LAGGING (outcomes)</text>
+      <g data-status="proposal"><rect class="node proposal" x="610" y="22" width="250" height="92" rx="8"/><text x="622" y="44" class="strong">O-1 Cost per lesson</text><text x="622" y="64" class="small">model spend and review time,</text><text x="622" y="80" class="small">apart · model ≤ $1 a lesson [T]</text><text x="622" y="104" class="tag-t proposal">▲ target · baseline: none</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="610" y="126" width="250" height="92" rx="8"/><text x="622" y="148" class="strong">O-4 Standards coverage</text><text x="622" y="168" class="small">each standard introduced,</text><text x="622" y="184" class="small">practised, assessed · 100% [T]</text><text x="622" y="208" class="tag-t proposal">▲ target · baseline: none</text></g>
+      <g data-status="proposal"><rect class="node proposal" x="610" y="230" width="250" height="100" rx="8"/><text x="622" y="252" class="strong">O-3 Unit lead time</text><text x="622" y="272" class="small">days to finish a unit, and the</text><text x="622" y="288" class="small">oldest open lesson</text><text x="622" y="318" class="tag-t proposal">▲ target set after unit 1</text></g>
+      <text x="910" y="14" class="small strong">MONEY (layer 2)</text>
+      <g data-status="proposal"><rect class="node proposal" x="910" y="22" width="240" height="308" rx="8"/><text x="922" y="46" class="strong">Fewer minutes a lesson</text><text x="922" y="66" class="small">→ a ~1,000-lesson program [A]</text><text x="922" y="82" class="small">needs fewer reviewer-hours</text><text x="922" y="114" class="strong">Next program on time</text><text x="922" y="134" class="small">→ 9–12 ("coming 2027"),</text><text x="922" y="150" class="small">other states, on the calendar</text><text x="922" y="182" class="strong">District-wide licences</text><text x="922" y="202" class="small">→ the brief's "10's of</text><text x="922" y="218" class="small">millions" of ARR</text><text x="922" y="250" class="small">10 min saved × 1,000 lessons</text><text x="922" y="266" class="small">≈ 167 reviewer-hours ≈ $6,700</text><text x="922" y="282" class="small">at $40/h [calculation on A]</text><text x="922" y="318" class="tag-t proposal">▲ hops 2–3: our inference</text></g>
+      <path class="arrow" d="M308,68 L262,68" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M308,172 L262,100" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M308,280 L262,130" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M560,68 L608,68" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M560,172 L608,172" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M560,280 L608,280" marker-end="url(#ah3)"/>
+      <path class="arrow" d="M860,172 L908,172" marker-end="url(#ah3)"/>
+    </svg>
+    </div>
+    <figcaption>From framing §3 and PRD §4. The supporting metrics explain the north star (arrows point back to it); the outcomes roll up to money.</figcaption>
+    <ol class="words">
+      <li>North star: reviewer minutes per approved lesson (PD-1), with guards G-1, G-2, G-3 beside it.</li>
+      <li>Supporting, which explain it: V-1 first-pass clean rate, V-2 standards verified, V-3 quotes sourced.</li>
+      <li>Lagging: O-1 cost per lesson, O-4 standards coverage, O-3 unit lead time.</li>
+      <li>Money: fewer minutes → the next program on its calendar → district-wide licences → ARR. Numbers are in the table below.</li>
+    </ol>
+  </figure>
+
+  <div class="grid two">
+    <article class="card" data-status="decision">
+      <h3>Why this north star <span class="st decision">Your decision</span></h3>
+      <p><strong>It is the cost.</strong> About 30 minutes of review at about $40 an hour is about $20 a lesson. Model spend is well under $1. So review is about 98% of the cost [A].</p>
+      <p><strong>It can be measured for every lesson</strong> from activity events.</p>
+      <p><strong>Reading time sets the scale.</strong> A published Unit 4 teacher lesson is a median 3,306 words [M]. That is about 13 minutes just to read [calculation].</p>
+      <p class="src">PD-1; framing §3.2; PRD §4. Rejected: "lessons generated" (vanity) and ARR (years away, can't be credited to a build).</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>Why it needs guards <span class="st decision">Your decision</span></h3>
+      <p>Lower is better, so the cheapest way to "improve" it is to skim. That is why it never appears alone.</p>
+      <p>G-2 flags review faster than half the read time. G-3 plants errors and counts the catches.</p>
+      <p class="src">Framing §3.2, §7 (the best objection and our answer); GR-15: shown in aggregate only, never per person.</p>
+    </article>
+  </div>
+
+  <h3 class="sub-h">Every metric in the tree</h3>
+  <div class="table-scroll" tabindex="0" aria-label="Metrics table, scrolls sideways">
+  <table>
+    <caption class="section-sub" style="text-align:left;padding:8px 10px">Baseline · aspiration · hard gate, from PRD §4 and framing §3.</caption>
+    <thead><tr><th scope="col">ID</th><th scope="col">Metric</th><th scope="col">Kind</th><th scope="col">Baseline</th><th scope="col">Aspiration · gate</th><th scope="col">Status</th></tr></thead>
+    <tbody>
+      <tr data-status="decision"><td class="num"><b>NS</b></td><td>Reviewer minutes per approved lesson (median, p90, <em>n</em>)</td><td>Lagging for the unit</td><td><span class="st unknown">none · AQ-14</span></td><td>Reading ≤ 30 min [T] · &gt; 60 min or &gt; 25% over 120 [T]</td><td><span class="st decision">PD-1</span></td></tr>
+      <tr data-status="proposal"><td class="num">G-1</td><td>Blocks cleared by resolution, not fix</td><td>Leading guard</td><td><span class="st unknown">none</span></td><td>≤ 10% · &gt; 25% [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">G-2</td><td>Fast-approval rate (under half the read time)</td><td>Leading guard</td><td><span class="st unknown">none</span></td><td>≤ 5% · &gt; 15% [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">G-3</td><td>Planted-error catch rate</td><td>Lagging guard</td><td><span class="st unknown">none</span></td><td>≥ 90% · &lt; 70% [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">V-1</td><td>First-pass clean rate</td><td>Leading</td><td><span class="st unknown">none</span></td><td>≥ 60% · &lt; 30% [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">V-2 / O-4</td><td>Standards claims verified; coverage complete</td><td>Lagging</td><td><span class="st unknown">none</span></td><td>100% · below 100% is a bug in the Approve gate [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">V-3</td><td>Quotes sourced or placeholder; placeholders per lesson</td><td>Leading</td><td><span class="st unknown">none</span></td><td>100%, ≤ 2 a lesson · any unsourced quote at the Approve step [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">O-1</td><td>Cost per lesson (model spend and review time apart)</td><td>Lagging</td><td><span class="st unknown">none</span></td><td>model spend ≤ $1 a lesson [T]</td><td><span class="st proposal">target</span></td></tr>
+      <tr data-status="proposal"><td class="num">H-1…H-6</td><td>Health: generation success and time, spend vs cap, page speed, live-edit speed</td><td>Health</td><td><span class="st unknown">none</span></td><td>e.g. p95 ≤ 5 min a lesson; p95 lesson open &lt; 1.5 s [T]</td><td><span class="st proposal">target</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="src" style="margin-top:var(--space-2)">Targets are ours; they change after the first measured unit or an AQ-14 answer.</p>
+</section>
+
+<section aria-labelledby="scope-h">
+  <h2 id="scope-h">7 · Scope, cuts and the honest time math</h2>
+  <p class="section-sub">34 MVP features do not fit 2.5 days, and the brief is testing which slice we pick (T-6). The PRD has 59 requirements: 43 MVP (33 core, 10 in the cut order), 10 Stretch, 6 Roadmap.</p>
+
+  <figure>
+    <p class="scroll-hint">Diagram: swipe sideways. The list below it says the same thing.</p>
+    <div class="scroll" tabindex="0" aria-label="Time budget diagram, scrolls sideways">
+    <svg viewBox="0 0 1000 200" role="img" aria-labelledby="tm-t tm-d">
+      <title id="tm-t">Time budget: 49 hours of clock against 30.5 hours of core work</title>
+      <desc id="tm-d">A 49-hour bar split into sleep, gates and build time, and a 30.5-hour core bar that runs 3.5 hours past the build window.</desc>
+      <text x="60" y="24" class="small strong">WALL CLOCK · Sat 16:40 → Mon 18:00 CT ≈ 49 h [calculation]</text>
+      <g data-status="proposal"><rect class="seg-sleep" x="60" y="34" width="224" height="40" rx="4"/><text x="72" y="59">Sleep ~14 h</text></g>
+      <g data-status="proposal"><rect class="seg-gates" x="284" y="34" width="128" height="40" rx="4"/><text x="294" y="59">Gates ~8 h</text></g>
+      <g data-status="proposal"><rect class="seg-build" x="412" y="34" width="432" height="40" rx="4"/><text x="424" y="59" class="strong">Left for building ~27 h</text></g>
+      <text x="412" y="112" class="small strong">MUST-SHIP CORE · 9 blocks ≈ 30.5 h [A]</text>
+      <g data-status="proposal"><rect class="seg-core" x="412" y="122" width="432" height="40" rx="4"/><text x="424" y="147">Core work that fits</text></g>
+      <g data-status="proposal"><rect class="seg-over" x="844" y="122" width="56" height="40" rx="4"/><text x="850" y="147" class="strong">+3.5 h</text></g>
+      <line x1="844" y1="28" x2="844" y2="172" stroke="currentColor" style="stroke:var(--awaiting)" stroke-width="2" stroke-dasharray="4 3"/>
+      <text x="852" y="188" class="small">internal cutoff Mon 18:00</text>
+    </svg>
+    </div>
+    <figcaption><span class="st proposal">Proposal</span> All hours are assumptions [A] from PRD §6.1 and §6.3 (§6.1 rounds the core to "about 30"). The 3-lesson trial replaces them. After the cutoff, 9 h remain for video, docs and submission before Tue 03:00 CT.</figcaption>
+    <ol class="words">
+      <li>About 49 hours of clock: ~14 sleep, ~8 for the zero-to-hero gates (run light), ~27 left for building.</li>
+      <li>The must-ship core is about 30.5 hours. So the core alone fills the window and runs about 3.5 hours over.</li>
+      <li>We plan as if nothing in the cut order lands. Each extra that does is a bonus.</li>
+    </ol>
+  </figure>
+
+  <div class="grid two">
+    <article class="card" data-status="decision">
+      <h3>The must-ship core (33 requirements) <span class="st decision">Your decision</span></h3>
+      <p>Alone, it is a demo we can defend:</p>
+      <ol class="tight">
+        <li>Upload the issued sheet. The report catches U4 vs U3, <code>RL.6.9.a</code>, the broken <code>6.2</code> and the 7 ELD label mismatches.</li>
+        <li>A live run of three rows: row 8 Reading, row 9 Writing, row 25 Flex Day.</li>
+        <li>Open a lesson picked at random from the 47-day batch run: placeholders, evidence, Approve off with its reasons.</li>
+        <li>Fix it, see a second cursor live, submit; a second account approves the pinned version.</li>
+        <li>Close on numbers: run summary and the north-star tile with <em>n</em> and "no baseline".</li>
+      </ol>
+      <p class="src">PRD §6.2 · PD-2, PD-17 (decided 2026-10-24; you can override). The PRD as a whole is approved at §4.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>Never trimmed, even if late <span class="st decision">Your decision</span></h3>
+      <p>ProseMirror + Yjs (R-26), the Approve gate (R-33, R-34), grounding (R-12, R-19) and provenance (R-35).</p>
+      <p>If the core itself is late, we trim inside it, in this order: sheet link → upload only; regenerate only on failed lessons; progress on reload; a smaller evidence pane.</p>
+      <p class="src">PRD §6.5.</p>
+    </article>
+  </div>
+
+  <p class="cutline">Core ends here · below this line, #1 drops first</p>
+  <ol class="cuts" aria-label="Cut order">
+    <li data-status="decision"><span class="n">#1</span><div><p><strong>R-56 · Live-editing load script.</strong> Evidence, not function.</p><p class="say">We'd say: "Collaboration latency under 25 editors: not measured".</p></div></li>
+    <li data-status="decision"><span class="n">#2</span><div><p><strong>R-23 judge, R-53 held-out comparison.</strong> Needs a second provider and ~30 of your labels; advisory anyway.</p><p class="say">"Alignment is checked by code and confirmed by a named reviewer; no model judge in this build".</p></div></li>
+    <li data-status="decision"><span class="n">#3</span><div><p><strong>R-9 · Arc checks across lessons.</strong> Advisory only.</p><p class="say">"Arc coherence comes from the unit plan; cross-lesson checks are next".</p></div></li>
+    <li data-status="decision"><span class="n">#4</span><div><p><strong>R-41 · Coverage matrix.</strong> The links are stored anyway.</p><p class="say">"Coverage data exists per lesson; the unit grid is next".</p></div></li>
+    <li data-status="decision"><span class="n">#5</span><div><p><strong>R-42 · JSON export.</strong> Storing lessons is the core; the file is not.</p><p class="say">"Lessons are stored in the <code>Lesson</code> schema; the export file is next".</p></div></li>
+    <li data-status="decision"><span class="n">#6</span><div><p><strong>R-50 Unit quality page, R-52 planted errors.</strong> The core's north-star tile carries the headline.</p><p class="say">"G-3 not measured in this build".</p></div></li>
+    <li data-status="decision"><span class="n">#7</span><div><p><strong>R-39 · Prompt guidance editing.</strong> A brief bonus.</p><p class="say">"Prompts are versioned and pinned per run; author editing is next".</p></div></li>
+    <li data-status="decision"><span class="n">#8</span><div><p><strong>R-31 · AI assist.</strong> The brief names AI tools, so this goes last.</p><p class="say">"AI help is regenerate-as-candidate only".</p></div></li>
+  </ol>
+  <p class="section-sub" style="margin-top:var(--space-2)">PRD §6.4, PD-17 (decided 2026-10-24). If time remains we build in reverse: #8 first. <strong>Tripwires:</strong> no 3 valid lessons by Sun 14:00 → drop #1–#5 at once; no lesson through draft → approval by two accounts by Mon 02:00 → drop #1–#7.</p>
+
+  <div class="grid two" style="margin-top:var(--space-4)">
+    <article class="card" data-status="decision">
+      <h3>Out of scope <span class="st decision">Your decision</span></h3>
+      <ul class="tight">
+        <li>An autonomous agent that plans and judges itself (PD-3)</li>
+        <li>Bulk approve, or auto-approve when checks pass</li>
+        <li>Fine-tuning on Newsela lessons</li>
+        <li>A per-reviewer speed leaderboard</li>
+        <li>Anything student- or teacher-facing</li>
+        <li>A live "Publish to Newsela" button</li>
+      </ul>
+      <p class="src">PRD §7.</p>
+    </article>
+    <article class="card" data-status="proposal">
+      <h3>Shown honestly, with a label <span class="st proposal">Proposal</span></h3>
+      <ul class="tight">
+        <li>"Publish" → a JSON export, labelled "Export (no live integration)"</li>
+        <li>Novel passages → "Reviewer to insert", labelled "Source text not supplied"</li>
+        <li>"20+ reviewers" → a simulated probe, labelled "Simulated load"</li>
+        <li>Time savings → our own minutes, labelled "No baseline (AQ-14); our reviewers"</li>
+        <li>A deployed app → maybe local only, labelled "Recorded locally; deploy config included"</li>
+      </ul>
+      <p class="src">PRD §6.6. The last row depends on the hosting spend (section 9).</p>
+    </article>
+  </div>
+
+  <p class="src" style="margin-top:var(--space-3)"><span class="st proposal">Proposal</span> The hour-by-hour calendar is in PRD §6.3: §1–§4 on Saturday evening, the build on Sunday and Monday, a freeze at Mon 15:00, then video, docs and submission from Mon 18:00 to Tue 03:00 CT.</p>
+</section>
+
+<section aria-labelledby="lim-h">
+  <h2 id="lim-h">8 · What research could not establish</h2>
+  <p class="section-sub">Each of these limits a claim we can make in the demo or the docs.</p>
+  <div class="grid">
+    <article class="card" data-status="unknown"><h3>No baseline <span class="st unknown">Unknown</span></h3><p>We don't know Newsela's review time or cost per lesson today. Any number we show is a measurement, not an improvement.</p><p class="src">AQ-14 · PRD §12.</p></article>
+    <article class="card" data-status="unknown"><h3>Our reviewers are us <span class="st unknown">Unknown</span></h3><p>Minutes and catch rates come from you and Claude acting as reviewers, not Newsela's designers.</p><p class="src">PD-25 · PRD §12.</p></article>
+    <article class="card" data-status="unknown"><h3>One sheet only <span class="st unknown">Unknown</span></h3><p>The outline defect counts come from the single issued sheet. Other outlines will differ.</p><p class="src">AQ-19 · PRD §12.</p></article>
+    <article class="card" data-status="unknown"><h3>Their real schema <span class="st unknown">Unknown</span></h3><p>We copy the lesson shape from the review site. Whether it matches Newsela's authoring system is not known.</p><p class="src">AQ-4 · PRD §12.</p></article>
+    <article class="card" data-status="unknown"><h3>Time and cost per lesson <span class="st unknown">Unknown</span></h3><p>"~3 minutes" and "~$0.50" per lesson and every block estimate are guesses until the 3-lesson trial. Render and model prices, and your current Render total, were not checked.</p><p class="src">SP-1 · PRD §9, §12.</p></article>
+    <article class="card" data-status="unknown"><h3>Program size and cost <span class="st unknown">Unknown</span></h3><p>"1,000+ lessons per program" and "$600–1,350 per hand-authored lesson" are assumptions, used only as illustration.</p><p class="src">PRD §12 [CA §4].</p></article>
+    <article class="card" data-status="unknown"><h3>What the review site is <span class="st unknown">Unknown</span></h3><p>That <code>ca-2026-review</code> is the state's review copy is our inference. We treat it as confidential until told otherwise.</p><p class="src">AQ-1 · profile §10.4.</p></article>
+    <article class="card" data-status="unknown"><h3>Which program is next <span class="st unknown">Unknown</span></h3><p>9–12 is "coming 2027". Whether K–5, another state or the corrections package comes first, no source says.</p><p class="src">AQ-18 · profile §10.4.</p></article>
+    <article class="card" data-status="unknown"><h3>The state's September step <span class="st unknown">Unknown</span></h3><p>The Instructional Quality Commission met on 2026-09-24. Its outcome was not found in any file.</p><p class="src">Profile §6, §10.4.</p></article>
+    <article class="card" data-status="unknown"><h3>The demo's reach <span class="st unknown">Unknown</span></h3><p>The live demo shows 3 lessons. The other 44 come from the batch run, reported with <em>n</em>. A model judge, if built, is checked by a non-expert.</p><p class="src">PRD §12.</p></article>
+  </div>
+</section>
+
+<section aria-labelledby="ask-h">
+  <div class="ask" data-status="awaiting" data-ask="S1-GATE">
+    <h2 id="ask-h">9 · What you are asked to review now</h2>
+    <p><span class="st awaiting">Awaiting approval</span> <strong>Stage 1 gate: sign off the brief audit and the framing.</strong> Sources: <a href="../analysis/2026-10-24-brief-audit.md">brief audit</a>, <a href="../delivery/2026-10-24-angle-and-demo-framing.md">framing</a>, with the <a href="../analysis/2026-10-24-product-direction.md">product direction</a> and <a href="../analysis/2026-10-24-newsela-company-profile.md">company profile</a> behind them.</p>
+
+    <div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>Newsela asked for a tool that writes a unit of lessons from an outline, then lets 20+ staff edit and approve them. Before building anything, we read the brief three ways (legal, ethical, engineering), studied the company and the California market, and wrote down who uses the tool and what success means. This page shows the result. Every later stage builds on it: the worked examples (§2), the hard problems (§3) and the PRD interview (§4).</p></div>
+
+    <div class="part" data-part="problem"><h3>The problem we're solving</h3><p>We need you to agree on what problem we are solving. In one line: <em>cut the reviewer minutes each lesson needs to pass approval, without lowering the state's bar.</em> For example, Lesson 4 arrives with its broken code flagged, each standard linked to the part that teaches it, and a "Reviewer to insert" box where a quote would have been invented. The reviewer checks evidence instead of rebuilding it.</p></div>
+
+    <div class="part" data-part="why-hard"><h3>Why it's hard</h3><p>The brief asks for a generator, and the obvious build is a generator. But our research says drafting is already partly solved, so a better generator would not help the reviewer much. Choosing review as the target changes the whole build: the north star, the guardrails, which features are core and which are cut. If the framing is wrong, all of that is aimed at the wrong thing, and there are only about 27 hours to build.</p></div>
+
+    <div class="part" data-part="why-asked"><h3>Why we're asking you, and what your answer changes</h3><p>The zero-to-hero sequence needs your sign-off at this gate before Stage 2 starts. Your pre-approval covers our recommended choices, but not the framing as a whole: that is the gate itself. <strong>If you approve,</strong> we start Stage 2 tonight with three worked examples (rows 8, 9 and 25), keeping the calendar in section 7. <strong>If you change the framing</strong> (say, aim at generation speed instead), the north star, the core list and the cut order are rewritten first, before Stage 2 starts.</p></div>
+
+    <div class="grid two" style="margin-top:var(--space-3)">
+      <article class="card" data-status="awaiting">
+        <h3>Approving it would mean <span class="st awaiting">Awaiting approval</span></h3>
+        <ul class="tight">
+          <li>The real problem is review, not drafting (audit §1–§2).</li>
+          <li>The 26 traps and our responses stand (audit §5).</li>
+          <li>The two layers of success and the metrics tree stand, with the north star and its guards (framing §1–§3).</li>
+          <li>Stage 2 (data reality) can start.</li>
+        </ul>
+      </article>
+      <article class="card" data-status="unknown">
+        <h3>It would not cover <span class="st unknown">Unknown</span></h3>
+        <ul class="tight">
+          <li><strong>The PRD.</strong> It is a draft; you approve it at the §4 interview.</li>
+          <li><strong>Hosting spend over your $40/month Render cap.</strong> About $20/month more; our fallback is a local recording at $0. Your own call at §6 (SD-1.6, PD-15).</li>
+          <li><strong>Sending the questions to Newsela.</strong> AQ-1…AQ-22 are drafted, not sent. Your own call (PD-24).</li>
+          <li><strong>Each gate skip.</strong> One at a time, in the checklist's Skips table (PD-23).</li>
+          <li><strong>The reading of the deadline</strong> ("Monday night at 3 am"), a quick fact for §4.</li>
+        </ul>
+      </article>
+    </div>
+    <p style="margin-top:var(--space-3)"><strong>Recommendation:</strong> approve. The framing rests on cited facts, and you can still override any choice inside it.</p>
+    <p><strong>Decision needed:</strong> Do you sign off the brief audit and the framing (the problem is review time, at the state's bar) so Stage 2 can start?</p>
+  </div>
+</section>
+
+</main>
+<footer class="wrap">Local file, not published. The Markdown sources are the source of truth. If one changes, this page is rebuilt, re-stamped and re-checked before any sign-off.</footer>
+</body>
+</html>

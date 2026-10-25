@@ -1,0 +1,36 @@
+{
+  "sample_id": "DS-14",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    51
+  ],
+  "why_selected": "Filename `L309` for Lesson 39; column F starts with `N/A` and then holds goals.",
+  "edge_cases": [
+    "malformed filename",
+    "`N/A` followed by content",
+    "ELD.PI.6.5 label mismatch"
+  ],
+  "rows": [
+    {
+      "filename": "L309_ELA_TE_G6_U3_CA_Core",
+      "arc": "Showcase",
+      "lesson_number": "Lesson 39",
+      "lesson_type": "Writing",
+      "days": 1.0,
+      "text_dependent_question": "N/A\n\nLearning Goals / EQ\n\t•\tStudents will revise their explanatory essays for clarity, cohesion, and formal style.\n\t•\tStudents will practice writing effective conclusions that synthesize ideas across myths.\n\t•\tStudents will use a revision checklist and the Lesson 36 rubric to guide revisions.\n\t•\tStudents will engage in structured peer feedback focused on reasoning, evidence, and formal style.",
+      "lesson_description": "Revision Focus\n• Teacher models revising an example essay using proper capitalization, punctuation, and spelling.\n• Students work in pairs to peer-review one another's essays.",
+      "homework": "• Incorporate revision feedback into essay",
+      "focus_standards": "L.6.2, L.6.2.a, L.6.2.b, W.6.5",
+      "additional_standards": "W.6.2.a–f, W.6.4, W.6.5, W.6.6, W.6.9, W.6.9.a, W.6.10, L.6.2.a–b",
+      "performance_task_skill": "Revising Performance Task",
+      "foundational_skills_focus": "Students revise for capitalization of proper nouns (myth titles, cultural groups) and correct punctuation in complex sentences. Instruction reinforces subject-verb agreement in longer analytical sentences. Students use editing checklists aligned to standards.",
+      "designated_eld_standards": "• ELD.PI.6.5 – Revise writing for clarity\n• ELD.PI.6.10 – Improve explanatory text\n• ELD.PII.6.4 – Refine sentence-level clarity",
+      "sheet_row": 51,
+      "row_kind": "lesson"
+    }
+  ]
+}

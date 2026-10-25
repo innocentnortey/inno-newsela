@@ -1,0 +1,1 @@
+{"id": "FW-4", "kind": "foundation", "cons": [], "screens": [], "depends_on": ["FW-2", "FW-3"], "scope": ["component gallery", "accessibility checks", "visual checks"]}

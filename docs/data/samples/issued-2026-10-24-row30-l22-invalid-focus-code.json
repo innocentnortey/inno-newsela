@@ -1,0 +1,38 @@
+{
+  "sample_id": "DS-8",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    30
+  ],
+  "why_selected": "The only row whose *focus* list carries the non-existent `RL.6.9.a` (an error that must block Generate).",
+  "edge_cases": [
+    "non-existent code in focus and supporting lists",
+    "public-domain Homer excerpt not supplied",
+    "homework 'Read summary of Ch. 16'"
+  ],
+  "rows": [
+    {
+      "filename": "L22_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 2",
+      "lesson_number": "Lesson 22",
+      "lesson_type": "Core Reading",
+      "days": 1.0,
+      "text_dependent_question": "How does Riordan’s retelling change the way we view the gods’ jealousy and betrayal compared to the older poetic telling?",
+      "lesson_description": "Chapter 15\nFocus: pp. 224–233\n• Students cite Percy, Annabeth, and Ares’s dialogue about the Tunnel of Love, Hephaestus’s traps, and Aphrodite’s behavior in pp. 224–233 to analyze how the novel references the original myth and what that reveals about the gods’ relationships.\n• Students analyze how themes of jealousy, betrayal, and trickery in divine relationships appear in the novel’s retelling and compare them to how those themes appear in the Homeric excerpt.\n• Students compare Riordan’s humorous, modernized take on the mythic love triangle with the more formal poetic version by analyzing differences in narrator voice, tone, and level of detail.\n• Students interpret similes, hyperbole, and other figurative language in the Tunnel of Love setting and Ares’s dramatic speech to explain their effects on tone and meaning.",
+      "text_set_choice": "• An adapted excerpt from Homer’s Odyssey Book 8, “The Song of Ares and Aphrodite,” where Hephaestus traps Aphrodite and Ares in a net and the gods comment on their behavior.",
+      "homework": "• Read and annotate The Lightning Thief Ch. 15 (pp. 234–241)\n• Read summary of Ch. 16",
+      "focus_standards": "RL.6.9, RL.6.9.a, L.6.4, L.6.5.a, L.6.6",
+      "additional_standards": "RL.6.1, RL.6.2, RL.6.3, RL.6.4, RL.6.5, RL.6.6, RL.6.9, RL.6.9.a, RL.6.10, L.6.4, L.6.5, L.6.5.a, L.6.6",
+      "performance_task_skill": "Comparing themes across versions of a mythic relationship",
+      "foundational_skills_focus": "• Students will add today's vocabulary words to their Unit Vocabulary graphic organizers.\n• Students complete a review activity for the week's newly taught vocabulary words.",
+      "vocabulary": "• brutal (225)\n• sneer (226)\n• proposition (226)\n• suspicions (228)\n• clouded (229)\n• temperamental (230)\n• defunct (231)\n• gossip (232)\n• crippled (232)\n• marooned (233)",
+      "designated_eld_standards": "• ELD.PI.6.7 – Compare how ideas are presented\n• ELD.PI.6.6 – Explain author choices\n• ELD.PII.6.4 – Produce expanded comparisons",
+      "sheet_row": 30,
+      "row_kind": "lesson"
+    }
+  ]
+}

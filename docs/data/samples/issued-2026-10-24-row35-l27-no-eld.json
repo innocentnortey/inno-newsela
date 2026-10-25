@@ -1,0 +1,36 @@
+{
+  "sample_id": "DS-10",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    35
+  ],
+  "why_selected": "A row with no Designated ELD standards and a comma-list vocabulary cell.",
+  "edge_cases": [
+    "column P empty",
+    "vocabulary without page numbers, mixed capitals",
+    "non-breaking space in column N"
+  ],
+  "rows": [
+    {
+      "filename": "L27_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 2",
+      "lesson_number": "Lesson 27",
+      "lesson_type": "Core Reading",
+      "days": 1.0,
+      "text_dependent_question": "How does the \"apathy\" of the Fields of Asphodel represent a different kind of danger than a monster?",
+      "lesson_description": "Chapter 19\nFocus: pp. 300–309\nUpdated Afterlife:\nStudents explore how Rick Riordan uses figurative language to modernize the Fields of Asphodel in Chapter 19. They analyze descriptions of souls waiting for a \"concert that will never start\" to identify central ideas about justice, punishment, and apathy in the afterlife. By interpreting specific figurative phrases, such as comparing stalactites to booster rockets, students explain how the author’s word choice creates a mood of hollow, endless waiting. This analysis helps students understand how modern metaphors can be used to represent ancient concepts of morality.",
+      "homework": "• Read and annotate The Lightning Thief Ch. 19 (pp. 310–319)",
+      "focus_standards": "RL.6.4, L.6.5.c",
+      "additional_standards": "RL.6.1, RL.6.4, L.6.4.b",
+      "performance_task_skill": "Interpreting figurative language to explain mood and ideas",
+      "foundational_skills_focus": "• Students will add today's vocabulary words to their Unit Vocabulary graphic organizers. \n• Students focus on phonics by examining r-controlled vowels (hazards, eternal) and suffixes (wickedly, wistfully) in today's vocabulary words.\n\nInterpreting Nuance: Distinguishing connotations of the afterlife.",
+      "vocabulary": "eternal, wistfully, charisma, tragic, Apathy, Judgement, Symbolic, Figurative",
+      "sheet_row": 35,
+      "row_kind": "lesson"
+    }
+  ]
+}

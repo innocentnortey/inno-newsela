@@ -1,0 +1,13 @@
+{
+  "sample_id": "SYN-2",
+  "synthetic": true,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "file": "synthetic-2026-10-24-syn2-layout-shifted.csv",
+  "dimension": "sheet layout (header row position, column order, header case)",
+  "mutation": "two extra rows and a blank row above the header; columns H (Text Set Choice) and I (Homework) swapped; 'Lesson #' written 'lesson #'. Cell values unchanged.",
+  "assumption": "Newsela's other unit outlines use the same template but drift in layout. We hold one sheet only.",
+  "expected": "The normalizer finds the header by column names and reports the same counts as the issued sheet: 41 lessons, 6 flex days, 7 arc headers, 1 total row (PRD R-3)."
+}

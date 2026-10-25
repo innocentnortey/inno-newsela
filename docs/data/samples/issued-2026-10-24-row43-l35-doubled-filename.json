@@ -1,0 +1,36 @@
+{
+  "sample_id": "DS-12",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    43
+  ],
+  "why_selected": "Two filenames pasted together; the ID must come from `Lesson #`.",
+  "edge_cases": [
+    "malformed filename",
+    "film clips as a text",
+    "EQ-level discussion"
+  ],
+  "rows": [
+    {
+      "filename": "L35_ELA_TE_G6_U3_CA_CoreL30_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 2",
+      "lesson_number": "Lesson 35",
+      "lesson_type": "Academic Discussion",
+      "days": 1.0,
+      "text_dependent_question": "N/A",
+      "lesson_description": "Academic Discussion\n• Prepare students to discuss the EQ \"How do retellings change across cultures and generations?\" and the movie vs. novel versions of The Lightning Thief\nDiscussion (Part 1) Focus: Myths from Inv 1 and 2 and The Lightning Thief\n• Students synthesize what they've read this unit to analyze how The Lightning Thief's narrative functions as a retelling or reworking of myth.\n  o Students trace how the story has updated, shifted, or reinterpreted traditional mythic elements for a modern audience.\n  o Students consider how setting, character, humor, and point of view in the assigned readings change the cultural messages of the myths being referenced.\n  o Students connect the text to broader questions about how communities adapt myths over time and how students themselves might reinterpret a myth to express contemporary values.\nDiscussion (Part 2) Focus: The Lightning Thief novel vs. film\n• Students analyze how what they “saw” and “heard” in the movie (actors’ performances, camera angles, music, special effects) differs from what they imagined when reading, and explain how those choices change their experience of the scene.\n• Students analyze how changes in the adaptation—such as added or omitted dialogue, reordered events, or altered settings—affect characterization, tone, or themes compared with the original text.\n• Students discuss how well the film clips honor or change the novel, using academic language and evidence from both text and film to build on one another’s ideas.",
+      "text_set_choice": "• Teacher-chosen clips from the movie version of The Lightning Thief",
+      "focus_standards": "SL.6.1, SL.6.2, SL.6.6, RL.6.7, RL.6.9",
+      "additional_standards": "SL.6.1.a–d, SL.6.2, SL.6.6, RL.6.7, RL.6.9",
+      "performance_task_skill": "Discussing an essential question using evidence from texts; comparing/contrasting two interpretations of a story",
+      "foundational_skills_focus": "Students analyze how academic discourse markers (Building on…, I would like to add…, In contrast…, A recurring pattern is…) support sustained discussion.",
+      "designated_eld_standards": "• ELD.PI.6.1 – Participate in extended academic discussions\n• ELD.PI.6.7 – Analyze how retellings change meaning\n• ELD.PII.6.4 – Produce expanded oral explanations",
+      "sheet_row": 43,
+      "row_kind": "lesson"
+    }
+  ]
+}

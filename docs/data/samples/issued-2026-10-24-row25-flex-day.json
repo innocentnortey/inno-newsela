@@ -1,0 +1,30 @@
+{
+  "sample_id": "DS-7",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    25
+  ],
+  "why_selected": "WP-3. A flex day: no filename, no Lesson #, no standards, duplicated text.",
+  "edge_cases": [
+    "no ID in the sheet",
+    "no standards at all",
+    "duplicated sentence in column G",
+    "typos",
+    "film as a second text"
+  ],
+  "rows": [
+    {
+      "arc": "Flex",
+      "lesson_type": "End-of-Arc Flex Day",
+      "days": 1.0,
+      "text_dependent_question": "N/A",
+      "lesson_description": "Meaning-Making Huddle\n• Revisit Chs. 1–12 of The Lightning Thief, supporting students' understanding of key ideas/events\n• Help bridge students into Investigation 2 by asking questions, such as: \"What questions emerged from the texts you've read? Based on • Help bridge students into Investigation 2 by asking questions, such as: \"What questions emerged from the texts you've read? Based on what you've read so far, how do you feel retellings change across cultures and generations?\"                               \n *Students should re-read two key events from the book and, in three rows of a a two-column graphic organizer, make specific notes on the left side about what occurrred, the emotions that the main characters are experiencing, and the tone that the narrator uses in describing the event, and how they know. Then, they should watch film versions of these events from the 2010 firm version of The Lightning Thief and answer the same questions about the film in the right hand column. Below the graphic organizer, students make notes contrasting what they “see” and “hear” when reading the text to what they perceive when they listen or watch.",
+      "sheet_row": 25,
+      "row_kind": "flex_day"
+    }
+  ]
+}

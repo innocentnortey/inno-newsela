@@ -1,0 +1,37 @@
+{
+  "sample_id": "DS-2",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    4
+  ],
+  "why_selected": "The only Spark shape (15/30/5, no Literacy Lab); an informational text, not the novel.",
+  "edge_cases": [
+    "Spark section template",
+    "Newsela article as text (content not supplied)",
+    "ELD.PI.6.6 labelled as PI.1's meaning"
+  ],
+  "rows": [
+    {
+      "filename": "L1_ELA_TE_G6_U3_CA_Core",
+      "arc": "Spark",
+      "lesson_number": "Lesson 1",
+      "lesson_type": "Spark 1",
+      "days": 1.0,
+      "text_dependent_question": "N/A",
+      "lesson_description": "What Are Myths?\n• Students read \"What Are Myths?\" to gather and discuss as a whole class initial ideas about why cultures create stories about gods, nature, danger, or the unknown. Then students receive three very short, unlabeled passages from Coolidge’s Prometheus/Pandora myths. Without titles or context, they work in small groups to annotate evidence to answer these three questions (infer):\n   ◦ What problem is this passage trying to explain?\n   ◦ What kind of world does this story imagine?\n   ◦ What clues hint at fear, hope, or cultural values?\n• Students share theories and add to their previous response to \"what is a myth\" (teacher then reveal morphology of the word mythology and the source myths.",
+      "text_set_choice": "• \"What Are Myths?\" Newsela article\n• 3 passages from Coolidge's Prometheus/Pandora myths",
+      "focus_standards": "L.6.4.b, RI.6.1, RI.6.4, SL.6.1.a",
+      "additional_standards": "SL.6.1",
+      "performance_task_skill": "Build curiosity and mystery through inference; introduce myths as explanations of the world",
+      "foundational_skills_focus": "vocabulary: Morphology: \n\nMini Morphology Move:\nmythology → study of myths\nbio + logy → study of life",
+      "vocabulary": "• myth\n• mythology",
+      "designated_eld_standards": "• ELD.PI.6.6 – Exchange information and ideas orally\n• ELD.PI.6.7 – Analyze how meaning is conveyed\n• ELD.PII.6.4 – Expand noun phrases and descriptive language",
+      "sheet_row": 4,
+      "row_kind": "lesson"
+    }
+  ]
+}

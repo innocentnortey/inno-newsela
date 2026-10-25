@@ -1,0 +1,47 @@
+{
+  "sample_id": "DS-1",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    3,
+    7,
+    24,
+    57
+  ],
+  "why_selected": "Rows that are not lessons: arc headers (one with arc-level prose in the Lesson # cell) and the SUM total row.",
+  "edge_cases": [
+    "arc header mixed with lesson rows",
+    "prose in column C of row 7",
+    "total row with a formula"
+  ],
+  "rows": [
+    {
+      "arc": "Spark",
+      "lesson_description": "Builds knowledge related to the topic, piques excitement, and students show what they already know about the unit topic and key ELA content.",
+      "sheet_row": 3,
+      "row_kind": "arc_header"
+    },
+    {
+      "arc": "Investigation 1",
+      "lesson_number": "Across Lessons 4-19, students: 1) cite evidence 2) explain tone 3) compare 4) analyze structure 5) write explanatory paragraphs 6) participate in discussion",
+      "lesson_description": "Core of the unit: engaging with anchor text, writing instruction, academic discussion, on-demand writing, and text set resources. Regular support with language development and foundational skills.",
+      "performance_task_skill": "Culminating writing requires: 1) cross-text comparison 2) cultural value analysis 3) adaptation analysis 4) multi-source evidence 5) abstract nouns 6) sustained cohesion",
+      "sheet_row": 7,
+      "row_kind": "arc_header"
+    },
+    {
+      "arc": "End of Investigation 1 (Flex Days)",
+      "lesson_description": "Flexible days used to support ongoing student needs based on formative assessment, progress on in-class work, or extensions of learning. Teachers may select to use a small group or whole group format based on formative data collection.",
+      "sheet_row": 24,
+      "row_kind": "arc_header"
+    },
+    {
+      "sheet_row": 57,
+      "days_formula": "=SUM(E4:E56)",
+      "row_kind": "total_row"
+    }
+  ]
+}

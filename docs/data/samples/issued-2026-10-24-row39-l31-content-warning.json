@@ -1,0 +1,38 @@
+{
+  "sample_id": "DS-11",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    39
+  ],
+  "why_selected": "WP-4. The only content warning in the unit (homework column).",
+  "edge_cases": [
+    "content warning in homework",
+    "`RL.6.9.a` in supporting list",
+    "range `W.6.2.a–f`",
+    "teacher-chosen Iliad excerpt"
+  ],
+  "rows": [
+    {
+      "filename": "L31_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 2",
+      "lesson_number": "Lesson 31",
+      "lesson_type": "Core Writing",
+      "days": 1.0,
+      "text_dependent_question": "Which details show how each story reflects its own culture's ideas about power, beauty, and the gods' separation from humanity?",
+      "lesson_description": "Chapter 21\n• Teacher reviews recognizing/correcting vague pronouns\nFocus: pp. 334–343\n• Students cite descriptive details and figurative language from Ch. 21, pp. 334–343 (e.g., Olympus atop the skyscraper, palaces, clouds, throne room) and from the Iliad excerpt (e.g., Zeus's throne on the \"highest peak,\" the banquet at the end of Book 1) to compare how each text portrays the gods’ home.\n• Students analyze imagery and word choice in both passages to explain how each author creates tone and mood—for instance, the serene, timeless Olympus in Homer versus the bustling, modern skyscraper Olympus in The Lightning Thief.\n• Students write an explanatory paragraph that compares the two descriptions, explaining how Riordan’s modern Olympus both honors key elements of the traditional setting and updates them for a contemporary world.",
+      "text_set_choice": "• Short, teacher-chosen excerpts from lines 488–611 of Book 1 of Homer's Iliad describing Olympus",
+      "homework": "• Read and annotate The Lightning Thief Ch. 21 (pp. 344–353)\n• Warn students about potentially triggering scene in tonight's reading (references to domestic abuse)",
+      "focus_standards": "W.6.2",
+      "additional_standards": "W.6.2.a–f, W.6.4, W.6.5, W.6.9, W.6.10, RL.6.1, RL.6.2, RL.6.4, RL.6.9, RL.6.9.a, RL.6.10, L.6.1, L.6.1.d, L.6.2, L.6.3, L.6.6",
+      "performance_task_skill": "Comparing two descriptions of a setting to analyze author choices",
+      "foundational_skills_focus": "Students analyze how cohesive transitions (whereas, however, in contrast, similarly, as a result) clarify comparative reasoning. They revise paragraphs to ensure logical progression and clear comparative structure.",
+      "designated_eld_standards": "• ELD.PI.6.10 – Write explanatory text\n• ELD.PI.6.7 – Compare cultural portrayals\n• ELD.PII.6.5 – Maintain cohesion in comparisons",
+      "sheet_row": 39,
+      "row_kind": "lesson"
+    }
+  ]
+}

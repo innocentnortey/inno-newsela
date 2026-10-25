@@ -1,0 +1,2550 @@
+openapi: 3.1.0
+info:
+  title: Newsela Lesson Studio interface (draft)
+  version: 0.1.0
+  summary: The machine form of the CON cards in INTERFACE.md. Draft; nothing here is agreed.
+  description: |
+    Draft 0.1.0, 2026-10-25 (UX-3a). Every operation names its card in `x-con`. The card in
+    `docs/contracts/INTERFACE.md` is the behavioural promise; this file is its machine form. Generated
+    types, Prism mocks and contract checks read this one file.
+
+    Status: every card is `proposed` (UX review done 2026-10-25; System review pending). Cards blocked by
+    an open product question are listed in INTERFACE.md. Do not build a feature against an operation
+    whose card is not `agreed`.
+
+    CON-12 (the collaboration channel) is a websocket, not REST. It is described under
+    `x-collaboration-channel` at the end of this file.
+
+    HTTP status codes are proposed, except 403 for the wrong role (R-54) and 409 for a stale pin (R-33).
+    Every refusal changes nothing. Example data is synthetic and follows the worked pairs (Lesson 4 from
+    row 8, Lesson 5 from row 9, Lesson 31 from row 39).
+  license:
+    name: All rights reserved; evaluation use permitted
+    identifier: LicenseRef-All-Rights-Reserved
+servers:
+  - url: /api
+    description: Relative to the web app. The demo runs under local Docker Compose (PD-15 option D); no public deployment.
+security:
+  - session: []
+tags:
+  - name: session
+    description: Sign-in and roles (CON-1).
+  - name: intake
+    description: Outline versions, the validation report and intake choices (CON-2, CON-3, CON-4).
+  - name: runs
+    description: Runs, progress, control, the unit plan and the run summary (CON-5 to CON-8, CON-21).
+  - name: review
+    description: The unit board, lesson read, issues, resolutions, slots, candidates and AI suggestions (CON-9, CON-11, CON-13 to CON-17).
+  - name: approval
+    description: Lesson transitions, history and heartbeats (CON-18 to CON-20).
+  - name: evidence
+    description: Unit metrics, coverage and export (CON-10, CON-22, CON-23).
+  - name: prompts
+    description: Prompt versions (CON-24).
+
+paths:
+  /session:
+    post:
+      tags: [session]
+      operationId: signIn
+      x-con: CON-1
+      x-named-errors: [NOT_ON_ALLOW_LIST]
+      summary: Sign in with an allow-listed staff email
+      description: The sign-in method is a System choice and may add one proof field. The screens need only the session and the role.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SignInRequest' }
+            examples:
+              reviewer:
+                value: { email: reviewer.demo@example.org }
+      responses:
+        '200':
+          description: Signed in with one role.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+              examples:
+                reviewer:
+                  value:
+                    user: { user_id: u-rev-1, name: Reviewer A (demo), email: reviewer.demo@example.org, role: reviewer, synthetic: false }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    get:
+      tags: [session]
+      operationId: getSession
+      x-con: CON-1
+      x-named-errors: [UNAUTHENTICATED]
+      summary: Who am I, with which role
+      responses:
+        '200':
+          description: The current session.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+              examples:
+                approver:
+                  value:
+                    user: { user_id: u-app-1, name: Approver (demo), email: approver.demo@example.org, role: approver, synthetic: false }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+    delete:
+      tags: [session]
+      operationId: signOut
+      x-con: CON-1
+      x-named-errors: [UNAUTHENTICATED]
+      summary: End the session
+      responses:
+        '204': { description: Signed out. }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /units:
+    get:
+      tags: [intake]
+      operationId: listUnits
+      x-con: CON-2
+      x-named-errors: [UNAUTHENTICATED]
+      summary: Units with their outline versions and latest run
+      responses:
+        '200':
+          description: The unit list (one unit in the MVP).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnitList' }
+              examples:
+                oneUnit:
+                  value:
+                    units:
+                      - unit_id: G6.U4
+                        title: Grade 6 · Unit 4
+                        versions:
+                          - outline_version_id: G6.U4.ov2
+                            unit_id: G6.U4
+                            version_number: 2
+                            sha256: a100000000000000000000000000000000000000000000000000000000000001
+                            same_as_version: 1
+                            changed_lessons: 0
+                            row_counts: { lessons: 41, flex_days: 6, arc_headers: 7, total_rows: 1 }
+                            created_at: '2026-10-25T15:02:00Z'
+                            created_by: Author (demo)
+                        latest_run: { run_id: run-0001, state: running }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+
+  /outline-versions:
+    post:
+      tags: [intake]
+      operationId: uploadOutline
+      x-con: CON-2
+      x-named-errors: [UNSUPPORTED_FILE, HEADER_NOT_FOUND, TOO_MANY_ROWS, ROLE_FORBIDDEN]
+      summary: Upload a CSV or XLSX outline as a new version
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  contentMediaType: application/octet-stream
+                  description: The CSV or XLSX bytes.
+      responses:
+        '201':
+          description: Outline version stored, immutable, with its SHA-256.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OutlineVersion' }
+              examples:
+                firstUpload:
+                  value:
+                    outline_version_id: G6.U4.ov1
+                    unit_id: G6.U4
+                    version_number: 1
+                    sha256: a100000000000000000000000000000000000000000000000000000000000001
+                    same_as_version: null
+                    changed_lessons: 0
+                    row_counts: { lessons: 41, flex_days: 6, arc_headers: 7, total_rows: 1 }
+                    created_at: '2026-10-25T14:50:00Z'
+                    created_by: Author (demo)
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /outline-versions/import:
+    post:
+      tags: [intake]
+      operationId: importOutlineLink
+      x-con: CON-2
+      x-named-errors: [SHEET_NOT_PUBLIC, HEADER_NOT_FOUND, TOO_MANY_ROWS, ROLE_FORBIDDEN]
+      summary: Import a public Google Sheet link as a new version
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportLinkRequest' }
+            examples:
+              link:
+                value: { sheet_url: 'https://docs.google.com/spreadsheets/d/EXAMPLE-SYNTHETIC-ID/edit' }
+      responses:
+        '201':
+          description: Outline version stored. The same bytes as version 1 give same_as_version 1 and 0 changed lessons.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OutlineVersion' }
+              examples:
+                sameAsV1:
+                  value:
+                    outline_version_id: G6.U4.ov2
+                    unit_id: G6.U4
+                    version_number: 2
+                    sha256: a100000000000000000000000000000000000000000000000000000000000001
+                    same_as_version: 1
+                    changed_lessons: 0
+                    row_counts: { lessons: 41, flex_days: 6, arc_headers: 7, total_rows: 1 }
+                    created_at: '2026-10-25T15:02:00Z'
+                    created_by: Author (demo)
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /outline-versions/{outlineVersionId}/report:
+    parameters:
+      - $ref: '#/components/parameters/OutlineVersionId'
+    get:
+      tags: [intake]
+      operationId: getValidationReport
+      x-con: CON-3
+      x-named-errors: [NOT_FOUND]
+      summary: The validation report for one outline version
+      responses:
+        '200':
+          description: Every row with its level, original cell and proposed fix. Deterministic.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationReport' }
+              examples:
+                row8:
+                  value:
+                    outline_version_id: G6.U4.ov1
+                    version_number: 1
+                    sha256: a100000000000000000000000000000000000000000000000000000000000001
+                    same_as_version: null
+                    unit: { as_written: U4, filenames_say: U3, confirmed: false, confirmed_by: null }
+                    counts:
+                      teaching_days: 47
+                      lessons: 41
+                      flex_days: 6
+                      arc_headers: 7
+                      total_rows: 1
+                      errors: 5
+                      errors_unconfirmed: 5
+                      warnings: 31
+                      unit_conflicts: 1
+                      malformed_codes: 1
+                      rows_with_nonexistent_code: 3
+                      bad_filenames: 2
+                      eld_mismatches: 7
+                    rows:
+                      - row_number: 8
+                        kind: lesson
+                        lesson_id: G6.U4.L4
+                        level: error
+                        findings:
+                          - finding_id: f-8-J-1
+                            level: error
+                            kind: malformed_code
+                            column: J
+                            original_text: 'RL.6.1, 6.2 L.6.4'
+                            proposed_fix: 'RL.6.1, RL.6.2, L.6.4'
+                            choice: { value: null, source: default, by: null, at: null }
+                        segments:
+                          - segment_id: s-8-N-2
+                            column: N
+                            kind: editor_note
+                            text: Instead, think about using morphology when teaching the vocabulary words
+                            action: apply
+                            source: default
+                            by: null
+                        eld:
+                          - code: ELD.PII.6.5
+                            sheet_label: Use transitions to connect ideas
+                            official_strand: Modifying to add details
+                            verdict: mismatch
+                            suggested_remap: ELD.PII.6.2b
+                            choice: keep
+                        flags: []
+                    unit_rules:
+                      - text: 'Across Investigation 1: Cap at 6 words per lesson.'
+                        scope_rows: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+                        source: default
+                    generate_allowed: false
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /outline-versions/{outlineVersionId}/choices:
+    parameters:
+      - $ref: '#/components/parameters/OutlineVersionId'
+    post:
+      tags: [intake]
+      operationId: recordIntakeChoice
+      x-con: CON-4
+      x-named-errors: [ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Record one intake choice (confirm a fix, set a note's action, keep or re-map an ELD code, confirm a safety note)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IntakeChoiceRequest' }
+            examples:
+              confirmRow8Fix:
+                value: { target_id: f-8-J-1, kind: confirm_fix, value: 'RL.6.1, RL.6.2, L.6.4' }
+      responses:
+        '200':
+          description: The updated row and counts. Each choice is stored as default or confirmed by a named person.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IntakeChoiceResult' }
+              examples:
+                afterConfirm:
+                  value:
+                    row:
+                      row_number: 8
+                      kind: lesson
+                      lesson_id: G6.U4.L4
+                      level: warning
+                      findings:
+                        - finding_id: f-8-J-1
+                          level: error
+                          kind: malformed_code
+                          column: J
+                          original_text: 'RL.6.1, 6.2 L.6.4'
+                          proposed_fix: 'RL.6.1, RL.6.2, L.6.4'
+                          choice: { value: 'RL.6.1, RL.6.2, L.6.4', source: confirmed, by: Author (demo), at: '2026-10-25T15:10:00Z' }
+                      segments: []
+                      eld: []
+                      flags: []
+                    counts:
+                      teaching_days: 47
+                      lessons: 41
+                      flex_days: 6
+                      arc_headers: 7
+                      total_rows: 1
+                      errors: 5
+                      errors_unconfirmed: 4
+                      warnings: 31
+                      unit_conflicts: 1
+                      malformed_codes: 1
+                      rows_with_nonexistent_code: 3
+                      bad_filenames: 2
+                      eld_mismatches: 7
+                    generate_allowed: false
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /runs:
+    post:
+      tags: [runs]
+      operationId: startRun
+      x-con: CON-5
+      x-named-errors: [VALIDATION_INCOMPLETE, DAY_CAP_REACHED, ROLE_FORBIDDEN]
+      summary: Start a run (scope, pinned prompt version, cap) or a one-lesson trial
+      description: Refused before any spend. A trial writes a candidate (CON-16), never an overwrite. Blocked by UXP-5 (a capped run is never raised in place).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StartRunRequest' }
+            examples:
+              threeRowTrial:
+                value:
+                  outline_version_id: G6.U4.ov1
+                  mode: run
+                  scope: { kind: rows, rows: [8, 9, 25] }
+                  lesson_id: null
+                  prompt_version_id: pv-locked1-guidance1
+                  cap_usd: 3.0
+      responses:
+        '201':
+          description: Run created in planning.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Run' }
+              examples:
+                created:
+                  value:
+                    run_id: run-0001
+                    state: planning
+                    mode: run
+                    scope: { kind: rows, rows: [8, 9, 25] }
+                    prompt_version_id: pv-locked1-guidance1
+                    cap_usd: 3.0
+                    spent_usd: 0
+                    created_by: Author (demo)
+                    created_at: '2026-10-25T15:20:00Z'
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /runs/{runId}/progress:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      tags: [runs]
+      operationId: getRunProgress
+      x-con: CON-6
+      x-named-errors: [NOT_FOUND]
+      x-poll-interval-seconds: 2
+      summary: Run state and one tile per lesson (polled every 2 s)
+      responses:
+        '200':
+          description: The run and its tiles. capped, paused and partial are states, not errors.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RunProgress' }
+              examples:
+                lesson4Ready:
+                  value:
+                    run_id: run-0001
+                    state: running
+                    paused_reason: null
+                    spent_usd: 0.84
+                    reserved_usd: 0.6
+                    cap_usd: 3.0
+                    concurrency_cap: 4
+                    counts_by_tile_state: { queued: 0, planning: 0, drafting: 2, checking: 0, repairing: 0, ready: 1, failed: 0 }
+                    updated_at: '2026-10-25T15:26:02Z'
+                    tiles:
+                      - lesson_id: G6.U4.L4
+                        number: 4
+                        title: 'Lesson 4: The Lightning Thief, Chapter 1'
+                        tile_state: ready
+                        attempts: 1
+                        repair_used: false
+                        truncation_retry_used: false
+                        failure_reasons: []
+                        cost_usd: 0.52
+                        openable: true
+                      - lesson_id: G6.U4.L5
+                        number: 5
+                        title: Lesson 5
+                        tile_state: drafting
+                        attempts: 1
+                        repair_used: false
+                        truncation_retry_used: false
+                        failure_reasons: []
+                        cost_usd: 0
+                        openable: false
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /runs/{runId}/actions:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    post:
+      tags: [runs]
+      operationId: controlRun
+      x-con: CON-7
+      x-named-errors: [INVALID_TRANSITION, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Cancel, retry failed lessons, or resume a paused run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RunControlRequest' }
+            examples:
+              retry:
+                value: { action: retry_failed }
+      responses:
+        '200':
+          description: The new run state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RunControlResult' }
+              examples:
+                retried:
+                  value: { run_id: run-0001, state: running, requeued_lessons: [G6.U4.L4] }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /runs/{runId}/plan:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      tags: [runs]
+      operationId: getUnitPlan
+      x-con: CON-8
+      x-named-errors: [NOT_FOUND]
+      summary: The run's stored UnitPlan and lesson_link rows (read-only)
+      responses:
+        '200':
+          description: The plan, stored before any lesson job starts.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnitPlan' }
+              examples:
+                lesson4Entry:
+                  value:
+                    run_id: run-0001
+                    state: stored
+                    stored_at: '2026-10-25T15:21:10Z'
+                    entries:
+                      - lesson_id: G6.U4.L4
+                        day: 4
+                        purpose: Infer what Percy's sarcastic narration shows about his world.
+                        routines: [Think-Pair-Share, Teacher Read Aloud, Pulse Check, Quick Write]
+                        hands_forward: Lesson 5 compares Percy with the hare in The Hare and the Lion.
+                        performance_task_thread: Identifying and explaining emerging themes
+                    lesson_links:
+                      - link_id: lnk-4-5
+                        from_lesson_id: G6.U4.L4
+                        from_address: G6.U4.L4.Homework
+                        to_lesson_id: G6.U4.L5
+                        to_slot_id: slot-L5-PartA-excerpt
+                        label: Lesson 4 Homework → Lesson 5 excerpt slot
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /runs/{runId}/summary:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      tags: [runs]
+      operationId: getRunSummary
+      x-con: CON-21
+      x-named-errors: [NOT_FOUND]
+      summary: The run's totals, each with its n
+      responses:
+        '200':
+          description: Totals equal the sums over stored call rows.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RunSummary' }
+              examples:
+                trial:
+                  value:
+                    run_id: run-0001
+                    state: complete
+                    n: 3
+                    wall_time_seconds: 612
+                    cost_usd: 1.61
+                    cost_per_lesson_usd: 0.54
+                    lessons: { ready: 3, failed: 0 }
+                    retries: 1
+                    failures_by_reason: []
+                    placeholders_left: 3
+                    calls_lost_in_flight: 0
+                    brakes_fired: []
+                    truncation_retries: 0
+                    p95_minutes_per_lesson: 3.4
+                    target_minutes_per_lesson: 5
+                    report_path: null
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /units/{unitId}/board:
+    parameters:
+      - $ref: '#/components/parameters/UnitId'
+    get:
+      tags: [review]
+      operationId: getUnitBoard
+      x-con: CON-9
+      x-named-errors: [NOT_FOUND]
+      summary: Lesson rows sorted by blocking issues, with the roll-up
+      description: Blocked by UXP-1 (reviewer column), UXP-2 (dependency flags) and UXP-6 (send-back tag).
+      parameters:
+        - name: state
+          in: query
+          required: false
+          description: Filter by one lesson state.
+          schema: { $ref: '#/components/schemas/LessonState' }
+      responses:
+        '200':
+          description: Rows, most blocking first; roll-up counts equal the sum of lesson states.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnitBoard' }
+              examples:
+                lesson4Top:
+                  value:
+                    unit_id: G6.U4
+                    rollup: { draft: 46, in_review: 1 }
+                    rows:
+                      - lesson_id: G6.U4.L4
+                        number: 4
+                        title: 'Lesson 4: The Lightning Thief, Chapter 1'
+                        type: Reading
+                        state: draft
+                        blocking_count: 2
+                        confirmation_count: 1
+                        advisory_count: 1
+                        reviewer: null
+                        last_change_at: '2026-10-25T15:26:00Z'
+                        dependency_flags:
+                          - { kind: waits_on, lesson_id: G6.U4.L5, label: 'waits on Lesson 5: excerpt' }
+                        send_back: null
+                        judge_flag: null
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /units/{unitId}/metrics:
+    parameters:
+      - $ref: '#/components/parameters/UnitId'
+    get:
+      tags: [evidence]
+      operationId: getUnitMetrics
+      x-con: CON-10
+      x-named-errors: [NOT_FOUND]
+      summary: The north-star tile and, if built, the unit quality page (aggregate only)
+      responses:
+        '200':
+          description: Never minutes by named person. The median never comes without n, G-2, approved k of N and the caption.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnitMetrics' }
+              examples:
+                layoutExample:
+                  summary: Example layout from US-30, not data.
+                  value:
+                    north_star:
+                      median_minutes: 31
+                      n: 3
+                      fast_approvals: { count: 0, of: 3 }
+                      approved: { k: 3, total: 47 }
+                      caption: No baseline yet (AQ-14). Measured with us as reviewers.
+                      segment_label: one reviewer, n = 3
+                    quality: null
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /units/{unitId}/coverage:
+    parameters:
+      - $ref: '#/components/parameters/UnitId'
+    get:
+      tags: [evidence]
+      operationId: getCoverageMatrix
+      x-con: CON-22
+      x-named-errors: [NOT_FOUND]
+      summary: Standard × lesson coverage, computed by one query (cut 4)
+      responses:
+        '200':
+          description: Never computed by a model. Never-assessed standards are flagged.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CoverageMatrix' }
+              examples:
+                lesson4:
+                  value:
+                    standards:
+                      - { code: RL.6.1, official_text: Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text., never_assessed: false }
+                    lessons:
+                      - { lesson_id: G6.U4.L4, number: 4 }
+                    cells:
+                      - { code: RL.6.1, lesson_id: G6.U4.L4, roles: [P], confirmed_by: person }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /units/{unitId}/exports:
+    parameters:
+      - $ref: '#/components/parameters/UnitId'
+    get:
+      tags: [evidence]
+      operationId: listExports
+      x-con: CON-23
+      x-named-errors: [ROLE_FORBIDDEN, NOT_FOUND]
+      summary: What an export would include now, what is held back, and past export versions
+      responses:
+        '200':
+          description: Approved snapshots only; dependants held back while a linked lesson is not approved.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExportList' }
+              examples:
+                lesson4HeldBack:
+                  value:
+                    included:
+                      - { lesson_id: G6.U4.L31, approved_hash: 7b00000000000000000000000000000000000000000000000000000000000031 }
+                    held_back:
+                      - { lesson_id: G6.U4.L4, reason: a lesson it links to is not approved, waits_on: G6.U4.L5 }
+                    exports: []
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [evidence]
+      operationId: createExport
+      x-con: CON-23
+      x-named-errors: [ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Write an export version (idempotent; no live integration)
+      responses:
+        '201':
+          description: Export version written; included lessons become exported. With no change, payloads are identical to the last export.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExportCreated' }
+              examples:
+                first:
+                  value:
+                    export_id: exp-0001
+                    version_number: 1
+                    same_as_previous: false
+                    included:
+                      - { lesson_id: G6.U4.L31, approved_hash: 7b00000000000000000000000000000000000000000000000000000000000031 }
+                    held_back:
+                      - { lesson_id: G6.U4.L4, reason: a lesson it links to is not approved, waits_on: G6.U4.L5 }
+                    download_path: /api/exports/exp-0001/download
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /exports/{exportId}/download:
+    parameters:
+      - name: exportId
+        in: path
+        required: true
+        description: The export version.
+        schema: { type: string }
+    get:
+      tags: [evidence]
+      operationId: downloadExport
+      x-con: CON-23
+      x-named-errors: [ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Download the export JSON (validates against the published Lesson export schema)
+      responses:
+        '200':
+          description: The export file. The Lesson export JSON Schema will be published in docs/contracts/ (planned).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LessonExportFile' }
+              examples:
+                file:
+                  value:
+                    export_id: exp-0001
+                    version_number: 1
+                    label: Export (no live integration)
+                    payload_hash: e20000000000000000000000000000000000000000000000000000000000e001
+                    lessons:
+                      - { lesson_id: G6.U4.L31, content_hash: 7b00000000000000000000000000000000000000000000000000000000000031, lesson: { schema_version: 1 } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /lessons/{lessonId}:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    get:
+      tags: [review]
+      operationId: getLesson
+      x-con: CON-11
+      x-named-errors: [SCHEMA_UNKNOWN, NOT_FOUND]
+      summary: Everything the workspace and approval review show, from the stored row or snapshot
+      description: Never changes state (reads have no side effects). Blocked by UXP-1 (reviewer) and UXP-6 (send-back tag).
+      responses:
+        '200':
+          description: The lesson as stored. Text is text, never HTML.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lesson' }
+              examples:
+                lesson4:
+                  value:
+                    lesson_id: G6.U4.L4
+                    number: 4
+                    title: 'Lesson 4: The Lightning Thief, Chapter 1'
+                    type: Reading
+                    state: in_review
+                    version_number: 1
+                    content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
+                    state_vector: AQKH6qQEAA==
+                    schema_version: 1
+                    last_editor: Reviewer A (demo)
+                    snapshot: null
+                    front_matter:
+                      standards:
+                        - { code: RL.6.1, role: focus, origin: outline, official_text: Cite textual evidence to support analysis of what the text says explicitly as well as inferences drawn from the text., asserted_by: outline, confirmation: null }
+                        - { code: L.6.4.b, role: focus, origin: narrowed, official_text: 'Use common, grade-appropriate Greek or Latin affixes and roots as clues to the meaning of a word.', asserted_by: generator, confirmation: open }
+                    sections:
+                      - { address: G6.U4.L4.Launch, name: Launch, minutes: 5, content: { type: doc, content: [] } }
+                      - { address: G6.U4.L4.LearningInAction.PartA, name: Learning in Action Part A, minutes: 15, content: { type: doc, content: [] } }
+                    text_cards:
+                      - { title: The Lightning Thief, author: Rick Riordan, edition_or_isbn: '9780786838653', chapter: '1', pages: 1–8, kind: off-platform-text, rights_status: null }
+                    outline_row:
+                      row_number: 8
+                      segments:
+                        - { segment_id: s-8-N-2, column: 'N', kind: editor_note, text: 'Instead, think about using morphology when teaching the vocabulary words', action: apply, source: default, by: null }
+                    alignment_map:
+                      - { code: RL.6.1, teach_links: [G6.U4.L4.LearningInAction.PartA], check_links: [G6.U4.L4.LookBack], link_role: P, asserted_by: outline }
+                    reviewer: Reviewer A (demo)
+                    send_back: null
+                    checklist: []
+                    dependencies:
+                      - { direction: waits_on, lesson_id: G6.U4.L5, slot_id: slot-L5-PartA-excerpt, status: slot_empty }
+                    allowed_actions: [submit, regenerate, request_suggestion]
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/issues:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    get:
+      tags: [review]
+      operationId: getLessonIssues
+      x-con: CON-13
+      x-named-errors: [NOT_FOUND]
+      summary: Blocking, confirmation and advisory issues as of a stored hash
+      description: Checks re-run on every durable store; a new blocking issue appears within 5 s [T]. Blocked by UXP-2 (two-phase cross-lesson block).
+      responses:
+        '200':
+          description: The issues the checks found on the stored copy named by checked_hash.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IssueList' }
+              examples:
+                lesson4v1:
+                  value:
+                    lesson_id: G6.U4.L4
+                    checked_hash: 9f00000000000000000000000000000000000000000000000000000000000405
+                    checked_at: '2026-10-25T15:40:03Z'
+                    pending: false
+                    counts: { blocking: 2, confirmation: 1, advisory: 1 }
+                    issues:
+                      - { issue_id: iss-4-1, level: blocking, kind: quote_placeholder_open, message: "Reviewer to insert: one sentence from Ch. 1, pp. 1–8, where Percy's sarcastic word choice sets the tone", address: G6.U4.L4.LearningInAction.PartA, span_anchor: null, related_lesson_id: null, resolution: null }
+                      - { issue_id: iss-4-2, level: blocking, kind: cross_lesson_link, message: Homework text not chosen, address: G6.U4.L4.Homework, span_anchor: null, related_lesson_id: G6.U4.L5, resolution: null }
+                      - { issue_id: iss-4-3, level: confirmation, kind: standard_confirmation, message: 'L.6.4.b is AI-proposed: confirm or remove', address: null, span_anchor: null, related_lesson_id: null, resolution: null }
+                      - { issue_id: iss-4-4, level: advisory, kind: eld_label_mismatch, message: ELD.PII.6.5 label belongs to another strand, address: null, span_anchor: null, related_lesson_id: null, resolution: null }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /lessons/{lessonId}/issues/{issueId}/resolution:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - name: issueId
+        in: path
+        required: true
+        description: The blocking issue to resolve.
+        schema: { type: string }
+    post:
+      tags: [review]
+      operationId: recordResolution
+      x-con: CON-14
+      x-named-errors: [REASON_REQUIRED, LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Clear a blocking issue with a named resolution and its reason
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ResolutionRequest' }
+            examples:
+              classCopy:
+                value: { reason: 'quote inserted from class copy, rights: short-quote-commentary' }
+      responses:
+        '200':
+          description: Issue cleared by resolution; logged with user, reason and time.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolveResult' }
+              examples:
+                cleared:
+                  value:
+                    item_id: iss-4-1
+                    status: resolved
+                    by: Reviewer A (demo)
+                    at: '2026-10-25T15:44:00Z'
+                    audit_id: aud-0101
+                    counts: { blocking: 1, confirmation: 1, advisory: 1 }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/safety-flags/{flagId}/clear:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - name: flagId
+        in: path
+        required: true
+        description: The safety flag to clear.
+        schema: { type: string }
+    post:
+      tags: [review]
+      operationId: clearSafetyFlag
+      x-con: CON-14
+      x-named-errors: [NOTE_REQUIRED, LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Clear a safety flag with a note (any named reviewer or approver)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SafetyFlagClearRequest' }
+            examples:
+              lesson31:
+                value: { note: Teacher tip read; the warning stays out of the student homework. }
+      responses:
+        '200':
+          description: Flag cleared; name, note and time logged; the approver's checklist shows it.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolveResult' }
+              examples:
+                cleared:
+                  value:
+                    item_id: flag-31-1
+                    status: cleared
+                    by: Reviewer A (demo)
+                    at: '2026-10-25T16:05:00Z'
+                    audit_id: aud-0131
+                    counts: { blocking: 0, confirmation: 0, advisory: 0 }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/standards/decision:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    post:
+      tags: [review]
+      operationId: decideStandard
+      x-con: CON-14
+      x-named-errors: [LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Confirm or remove a narrowed or added code, or add a code from an "add?" advisory
+      description: A front-matter change, applied through the collaboration server as a logged edit by the named reviewer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StandardDecisionRequest' }
+            examples:
+              confirmL64b:
+                value: { code: L.6.4.b, decision: confirm }
+      responses:
+        '200':
+          description: Confirmation closed; the link is now asserted by a named reviewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolveResult' }
+              examples:
+                confirmed:
+                  value:
+                    item_id: iss-4-3
+                    status: confirmed
+                    by: Reviewer A (demo)
+                    at: '2026-10-25T15:46:00Z'
+                    audit_id: aud-0102
+                    counts: { blocking: 1, confirmation: 0, advisory: 1 }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /lessons/{lessonId}/slots/{slotId}/fill:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - name: slotId
+        in: path
+        required: true
+        description: The quote placeholder or excerpt slot.
+        schema: { type: string }
+    post:
+      tags: [review]
+      operationId: fillSlot
+      x-con: CON-15
+      x-named-errors: [SOURCE_REQUIRED, QUOTE_TOO_LONG, LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Insert a sourced quote or excerpt with its rights status
+      description: Only a person inserts a quote. Applied through the collaboration server as a logged edit. Blocked by UXP-2 (what the linked lesson's item becomes).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FillSlotRequest' }
+            examples:
+              lesson5Excerpt:
+                value:
+                  text: '[synthetic placeholder: the reviewer pastes the public-domain passage here]'
+                  source_ref: { title: The Hare and the Lion (Bateman translation), chapter: null, pages: null, url: 'https://www.gutenberg.org/ebooks/EXAMPLE' }
+                  rights_status: public-domain
+      responses:
+        '200':
+          description: Inserted by a named person; rights recorded; linked lessons updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FillSlotResult' }
+              examples:
+                filled:
+                  value:
+                    slot_id: slot-L5-PartA-excerpt
+                    inserted_by: Reviewer A (demo)
+                    inserted_at: '2026-10-25T15:52:00Z'
+                    still_blocking: false
+                    blocking_reason: null
+                    linked_lessons:
+                      - { lesson_id: G6.U4.L4, status: waiting_for_source_approval }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/candidates:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    post:
+      tags: [review]
+      operationId: regenerateLesson
+      x-con: CON-16
+      x-named-errors: [LESSON_LOCKED, DAY_CAP_REACHED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Regenerate as a candidate beside the current version (never an overwrite)
+      description: Blocked by UXP-3 (refused on submitted lessons as well as approved ones).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegenerateRequest' }
+            examples:
+              withNote:
+                value: { note: Make the Look Back Quick Write more open-ended. }
+      responses:
+        '202':
+          description: Candidate job queued; the current version's hash is unchanged.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+              examples:
+                queued:
+                  value:
+                    candidate_id: cand-4-2
+                    version_number: 2
+                    status: queued
+                    adopted: false
+                    failure_reasons: []
+                    current_content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
+                    sections: []
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/candidates/{candidateId}:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - $ref: '#/components/parameters/CandidateId'
+    get:
+      tags: [review]
+      operationId: getCandidate
+      x-con: CON-16
+      x-named-errors: [NOT_FOUND]
+      x-poll-interval-seconds: 2
+      summary: Read a candidate beside the current version
+      responses:
+        '200':
+          description: The candidate, marked not adopted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Candidate' }
+              examples:
+                ready:
+                  value:
+                    candidate_id: cand-4-2
+                    version_number: 2
+                    status: ready
+                    adopted: false
+                    failure_reasons: []
+                    current_content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
+                    sections:
+                      - { address: G6.U4.L4.LookBack, name: Look Back, minutes: 5, content: { type: doc, content: [] } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /lessons/{lessonId}/candidates/{candidateId}/adopt:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - $ref: '#/components/parameters/CandidateId'
+    post:
+      tags: [review]
+      operationId: adoptCandidate
+      x-con: CON-16
+      x-named-errors: [LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Adopt the whole candidate or one section, as a logged edit by a named person
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdoptRequest' }
+            examples:
+              lookBack:
+                value: { scope: section, section_address: G6.U4.L4.LookBack }
+      responses:
+        '200':
+          description: Applied through the collaboration server; the adopter becomes the last editor.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdoptResult' }
+              examples:
+                adopted:
+                  value: { candidate_id: cand-4-2, audit_id: aud-0110, last_editor: Reviewer A (demo) }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /lessons/{lessonId}/suggestions:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    post:
+      tags: [review]
+      operationId: requestSuggestion
+      x-con: CON-17
+      x-named-errors: [LESSON_LOCKED, MODEL_UNAVAILABLE, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Ask the AI to rewrite a selection with a note (held outside the document)
+      description: Cut 8. Blocked by UXP-3.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SuggestionRequest' }
+            examples:
+              launch:
+                value:
+                  anchor: { start: AQSH6qQEAgA=, end: AQSH6qQEBgA= }
+                  selected_text: Connection to Today's Learning
+                  note: Make this Ask more open-ended.
+      responses:
+        '201':
+          description: A pending suggestion; Submit and Approve are off while it is pending.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Suggestion' }
+              examples:
+                pending:
+                  value:
+                    suggestion_id: sug-4-1
+                    status: pending
+                    suggested_text: How might a storyteller's voice change the way you hear a story?
+                    requested_by: Reviewer A (demo)
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+
+  /lessons/{lessonId}/suggestions/{suggestionId}/decision:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+      - name: suggestionId
+        in: path
+        required: true
+        description: The pending suggestion.
+        schema: { type: string }
+    post:
+      tags: [review]
+      operationId: decideSuggestion
+      x-con: CON-17
+      x-named-errors: [ANCHOR_CHANGED, LESSON_LOCKED, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: Accept or reject a pending suggestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SuggestionDecisionRequest' }
+            examples:
+              accept:
+                value: { decision: accept, anchored_text_now: Connection to Today's Learning }
+      responses:
+        '200':
+          description: Accepted as one ai-assist transaction with the acceptor's name, or rejected and logged.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Suggestion' }
+              examples:
+                accepted:
+                  value:
+                    suggestion_id: sug-4-1
+                    status: accepted
+                    suggested_text: How might a storyteller's voice change the way you hear a story?
+                    requested_by: Reviewer A (demo)
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /lessons/{lessonId}/transitions:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    post:
+      tags: [approval]
+      operationId: transitionLesson
+      x-con: CON-18
+      x-named-errors: [BLOCKED, CONFIRMATION_OPEN, SUGGESTION_PENDING, NOT_STORED, STALE_PIN, FOUR_EYES, RATING_REQUIRED, DEPENDENCY_UNAPPROVED, NOTE_REQUIRED, REASON_REQUIRED, INVALID_TRANSITION, ROLE_FORBIDDEN, NOT_FOUND]
+      summary: One lesson, one move (start review, submit, withdraw, approve, request changes, reopen)
+      description: |
+        One lesson per call; no bulk approve. Approve pins the snapshot's hash and state vector, re-runs the
+        blocking checks, and returns 409 STALE_PIN on any mismatch with no change. Blocked by UXP-1
+        (start_review), UXP-2, UXP-4 (reopen role), UXP-6 (tags) and UXP-10 (withdraw note).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TransitionRequest' }
+            examples:
+              approveLesson5:
+                value:
+                  action: approve
+                  snapshot_hash: c300000000000000000000000000000000000000000000000000000000000501
+                  snapshot_state_vector: AQLE9qQEBwA=
+                  rating: usable_with_edits
+      responses:
+        '200':
+          description: The move is done; Submit, Approve and Reopen write an immutable snapshot.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransitionResult' }
+              examples:
+                lesson5Approved:
+                  value:
+                    lesson_id: G6.U4.L5
+                    from_state: submitted
+                    to_state: approved
+                    version: { version_id: lv-5-2, version_number: 2, content_hash: c300000000000000000000000000000000000000000000000000000000000501, state_vector: AQLE9qQEBwA= }
+                    audit_id: aud-0150
+                    dependency_record: []
+                    metrics_row_written: true
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /lessons/{lessonId}/history:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    get:
+      tags: [approval]
+      operationId: getLessonHistory
+      x-con: CON-19
+      x-named-errors: [NOT_FOUND]
+      summary: Versions with hashes, provenance and the audit log (read-only)
+      responses:
+        '200':
+          description: Every version has non-null provenance; the audit log is append-only.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LessonHistory' }
+              examples:
+                lesson4:
+                  value:
+                    versions:
+                      - version_id: lv-4-1
+                        version_number: 1
+                        kind: generated
+                        content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
+                        created_at: '2026-10-25T15:26:00Z'
+                        created_by: worker
+                        adopted: null
+                        provenance:
+                          outline_row_hash: d400000000000000000000000000000000000000000000000000000000000004
+                          prompt_version_id: pv-locked1-guidance1
+                          model: generation-model (ID confirmed at build time)
+                          parameters: { max_output_tokens: 16000 }
+                          schema_version: 1
+                          example_set_id: ex-u1-u3-v1
+                          run_id: run-0001
+                          cost_usd: 0.52
+                    audit:
+                      - { at: '2026-10-25T15:38:00Z', user: Reviewer A (demo), action: start_review, from_state: draft, to_state: in_review, version_hash: 9f00000000000000000000000000000000000000000000000000000000000405, reason: null }
+                    ai_spans: []
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /lessons/{lessonId}/heartbeats:
+    parameters:
+      - $ref: '#/components/parameters/LessonId'
+    post:
+      tags: [approval]
+      operationId: sendHeartbeat
+      x-con: CON-20
+      x-named-errors: [UNAUTHENTICATED, NOT_FOUND]
+      summary: One review heartbeat (every 15 s while focused, visible and touched in the last 60 s)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Heartbeat' }
+            examples:
+              beat:
+                value:
+                  tab_id: tab-7f3a
+                  focused: true
+                  visible: true
+                  last_input_at: '2026-10-25T15:40:41Z'
+                  sent_at: '2026-10-25T15:40:45Z'
+                  version_id: lv-4-1
+      responses:
+        '204': { description: Stored. Nothing is returned to show. }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /prompt-versions:
+    get:
+      tags: [prompts]
+      operationId: listPromptVersions
+      x-con: CON-24
+      x-named-errors: [UNAUTHENTICATED]
+      summary: The locked layer (read-only) and every guidance version
+      responses:
+        '200':
+          description: Versions are immutable; running runs keep their pin.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PromptVersions' }
+              examples:
+                v1:
+                  value:
+                    current_prompt_version_id: pv-locked1-guidance1
+                    locked_layer: { version_id: locked-1, text: '[locked layer: grounding rules, content rules, output schema; read-only]' }
+                    guidance_versions:
+                      - { version_id: guidance-1, number: 1, author: Author (demo), created_at: '2026-10-25T14:00:00Z', reason: First guidance, diff: '', pinned_by_runs: [run-0001] }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+    post:
+      tags: [prompts]
+      operationId: saveGuidance
+      x-con: CON-24
+      x-named-errors: [REASON_REQUIRED, ROLE_FORBIDDEN]
+      summary: Save new guidance text with a reason (the locked layer has no write route)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveGuidanceRequest' }
+            examples:
+              v2:
+                value: { base_version_id: guidance-1, guidance_text: 'Prefer Think-Pair-Share in Launch; keep Quick Write in Look Back.', reason: Reviewers asked for a steadier Launch routine. }
+      responses:
+        '201':
+          description: Guidance v(n+1) with its diff.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuidanceVersion' }
+              examples:
+                saved:
+                  value: { version_id: guidance-2, number: 2, author: Author (demo), created_at: '2026-10-25T16:30:00Z', reason: Reviewers asked for a steadier Launch routine., diff: '+ Prefer Think-Pair-Share in Launch; keep Quick Write in Look Back.', pinned_by_runs: [] }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: ls_session
+      description: The app session from CON-1. The mechanism is a System choice; the socket (CON-12) accepts the same session.
+
+  parameters:
+    OutlineVersionId:
+      name: outlineVersionId
+      in: path
+      required: true
+      description: An outline version, e.g. G6.U4.ov1.
+      schema: { type: string }
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: A run, e.g. run-0001.
+      schema: { type: string }
+    UnitId:
+      name: unitId
+      in: path
+      required: true
+      description: A unit, e.g. G6.U4.
+      schema: { type: string }
+    LessonId:
+      name: lessonId
+      in: path
+      required: true
+      description: A lesson, e.g. G6.U4.L4 or G6.U4.FLEX-1a.
+      schema: { type: string }
+    CandidateId:
+      name: candidateId
+      in: path
+      required: true
+      description: A candidate version, e.g. cand-4-2.
+      schema: { type: string }
+
+  responses:
+    Unauthenticated:
+      description: No valid session.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            unauthenticated:
+              value: { error: { code: UNAUTHENTICATED, message: Please sign in., details: {} } }
+    Forbidden:
+      description: The role may not do this (ROLE_FORBIDDEN), or the email is not on the allow-list (NOT_ON_ALLOW_LIST). Nothing changes.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            roleForbidden:
+              value: { error: { code: ROLE_FORBIDDEN, message: Only approvers can approve., details: { required_role: approver } } }
+    NotFound:
+      description: No such unit, version, run, lesson or item.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            notFound:
+              value: { error: { code: NOT_FOUND, message: No such lesson., details: {} } }
+    Conflict:
+      description: STALE_PIN, LESSON_LOCKED, ANCHOR_CHANGED, NOT_STORED or INVALID_TRANSITION. Nothing changes.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            stalePin:
+              value: { error: { code: STALE_PIN, message: This lesson changed since you opened it. Reload., details: { pinned_hash: 9f00000000000000000000000000000000000000000000000000000000000405, current_hash: 9f00000000000000000000000000000000000000000000000000000000000406 } } }
+    Unprocessable:
+      description: A named business refusal (e.g. BLOCKED, VALIDATION_INCOMPLETE, SOURCE_REQUIRED). Nothing changes.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            dependencyUnapproved:
+              value: { error: { code: DEPENDENCY_UNAPPROVED, message: Lesson 5 must be approved first., details: { lesson_id: G6.U4.L5 } } }
+    Unavailable:
+      description: MODEL_UNAVAILABLE. Nothing changed.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            model:
+              value: { error: { code: MODEL_UNAVAILABLE, message: "Couldn't get a suggestion; nothing changed.", details: {} } }
+
+  schemas:
+    ErrorCode:
+      type: string
+      description: The named errors from INTERFACE.md. DISCONNECTED is a channel state on CON-12, not an HTTP code.
+      enum:
+        - UNAUTHENTICATED
+        - NOT_ON_ALLOW_LIST
+        - ROLE_FORBIDDEN
+        - NOT_FOUND
+        - INVALID_TRANSITION
+        - SHEET_NOT_PUBLIC
+        - UNSUPPORTED_FILE
+        - HEADER_NOT_FOUND
+        - TOO_MANY_ROWS
+        - VALIDATION_INCOMPLETE
+        - DAY_CAP_REACHED
+        - SCHEMA_UNKNOWN
+        - LESSON_LOCKED
+        - REASON_REQUIRED
+        - NOTE_REQUIRED
+        - SOURCE_REQUIRED
+        - QUOTE_TOO_LONG
+        - ANCHOR_CHANGED
+        - MODEL_UNAVAILABLE
+        - BLOCKED
+        - CONFIRMATION_OPEN
+        - SUGGESTION_PENDING
+        - NOT_STORED
+        - STALE_PIN
+        - FOUR_EYES
+        - RATING_REQUIRED
+        - DEPENDENCY_UNAPPROVED
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { $ref: '#/components/schemas/ErrorCode' }
+            message: { type: string, description: Plain words the screen may show. }
+            details: { type: object, additionalProperties: true }
+
+    Sha256:
+      type: string
+      pattern: '^[0-9a-f]{64}$'
+    StateVector:
+      type: string
+      description: A Yjs state vector, base64.
+    Timestamp:
+      type: string
+      format: date-time
+    NullableText:
+      type: [string, 'null']
+
+    Role:
+      type: string
+      enum: [author, reviewer, approver]
+    User:
+      type: object
+      required: [user_id, name, email, role, synthetic]
+      properties:
+        user_id: { type: string }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { $ref: '#/components/schemas/Role' }
+        synthetic: { type: boolean, description: An account Claude or a load script drives; excluded from NS and G-2 (HP-8). }
+    SignInRequest:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+    Session:
+      type: object
+      required: [user]
+      properties:
+        user: { $ref: '#/components/schemas/User' }
+
+    RowCounts:
+      type: object
+      required: [lessons, flex_days, arc_headers, total_rows]
+      properties:
+        lessons: { type: integer }
+        flex_days: { type: integer }
+        arc_headers: { type: integer }
+        total_rows: { type: integer }
+    OutlineVersion:
+      type: object
+      required: [outline_version_id, unit_id, version_number, sha256, same_as_version, changed_lessons, row_counts, created_at, created_by]
+      properties:
+        outline_version_id: { type: string }
+        unit_id: { type: string }
+        version_number: { type: integer, minimum: 1 }
+        sha256: { $ref: '#/components/schemas/Sha256' }
+        same_as_version: { type: [integer, 'null'] }
+        changed_lessons: { type: integer }
+        row_counts: { $ref: '#/components/schemas/RowCounts' }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+        created_by: { type: string }
+    RunRef:
+      type: object
+      required: [run_id, state]
+      properties:
+        run_id: { type: string }
+        state: { $ref: '#/components/schemas/RunState' }
+    Unit:
+      type: object
+      required: [unit_id, title, versions, latest_run]
+      properties:
+        unit_id: { type: string }
+        title: { type: string }
+        versions: { type: array, items: { $ref: '#/components/schemas/OutlineVersion' } }
+        latest_run:
+          oneOf:
+            - $ref: '#/components/schemas/RunRef'
+            - type: 'null'
+    UnitList:
+      type: object
+      required: [units]
+      properties:
+        units: { type: array, items: { $ref: '#/components/schemas/Unit' } }
+    ImportLinkRequest:
+      type: object
+      required: [sheet_url]
+      properties:
+        sheet_url: { type: string, format: uri }
+
+    ChoiceRecord:
+      type: object
+      required: [value, source, by, at]
+      properties:
+        value: { $ref: '#/components/schemas/NullableText' }
+        source: { type: string, enum: [default, confirmed] }
+        by: { $ref: '#/components/schemas/NullableText' }
+        at: { type: [string, 'null'], format: date-time }
+    Finding:
+      type: object
+      required: [finding_id, level, kind, column, original_text, proposed_fix, choice]
+      properties:
+        finding_id: { type: string }
+        level: { type: string, enum: [info, warning, error] }
+        kind: { type: string, description: 'e.g. malformed_code, nonexistent_code, parent_code, unit_conflict, vocabulary_over_cap, homework_links_later_row. System owns the full list.' }
+        column: { type: string }
+        original_text: { type: string }
+        proposed_fix: { $ref: '#/components/schemas/NullableText' }
+        choice: { $ref: '#/components/schemas/ChoiceRecord' }
+    SegmentKind:
+      type: string
+      enum: [content, writer_task, editor_note, unit_rule, safety_note]
+    Segment:
+      type: object
+      required: [segment_id, column, kind, text, action, source, by]
+      properties:
+        segment_id: { type: string }
+        column: { type: string }
+        kind: { $ref: '#/components/schemas/SegmentKind' }
+        text: { type: string, description: 'Plain text, never markup (R-58).' }
+        action: { type: [string, 'null'], enum: [apply, show_only, ignore, null], description: For notes only; default apply (HP-6). }
+        source: { type: string, enum: [default, confirmed] }
+        by: { $ref: '#/components/schemas/NullableText' }
+    EldEntry:
+      type: object
+      required: [code, sheet_label, official_strand, verdict, suggested_remap, choice]
+      properties:
+        code: { type: string }
+        sheet_label: { type: string }
+        official_strand: { type: string }
+        verdict: { type: string, enum: [fits, mismatch, not_checked] }
+        suggested_remap: { $ref: '#/components/schemas/NullableText' }
+        choice: { type: string, enum: [keep, remap] }
+    ReportRow:
+      type: object
+      required: [row_number, kind, lesson_id, level, findings, segments, eld, flags]
+      properties:
+        row_number: { type: integer }
+        kind: { type: string, enum: [lesson, flex_day, arc_header, total] }
+        lesson_id: { $ref: '#/components/schemas/NullableText' }
+        level: { type: string, enum: [ok, info, warning, error] }
+        findings: { type: array, items: { $ref: '#/components/schemas/Finding' } }
+        segments: { type: array, items: { $ref: '#/components/schemas/Segment' } }
+        eld: { type: array, items: { $ref: '#/components/schemas/EldEntry' } }
+        flags: { type: array, items: { type: string, description: 'e.g. instruction_shaped (kept as content).' } }
+    ReportCounts:
+      type: object
+      required: [teaching_days, lessons, flex_days, arc_headers, total_rows, errors, errors_unconfirmed, warnings, unit_conflicts, malformed_codes, rows_with_nonexistent_code, bad_filenames, eld_mismatches]
+      properties:
+        teaching_days: { type: integer }
+        lessons: { type: integer }
+        flex_days: { type: integer }
+        arc_headers: { type: integer }
+        total_rows: { type: integer }
+        errors: { type: integer }
+        errors_unconfirmed: { type: integer }
+        warnings: { type: integer }
+        unit_conflicts: { type: integer }
+        malformed_codes: { type: integer }
+        rows_with_nonexistent_code: { type: integer }
+        bad_filenames: { type: integer }
+        eld_mismatches: { type: integer }
+    UnitRule:
+      type: object
+      required: [text, scope_rows, source]
+      properties:
+        text: { type: string }
+        scope_rows: { type: array, items: { type: integer } }
+        source: { type: string, enum: [default, confirmed] }
+    ValidationReport:
+      type: object
+      required: [outline_version_id, version_number, sha256, same_as_version, unit, counts, rows, unit_rules, generate_allowed]
+      properties:
+        outline_version_id: { type: string }
+        version_number: { type: integer }
+        sha256: { $ref: '#/components/schemas/Sha256' }
+        same_as_version: { type: [integer, 'null'] }
+        unit:
+          type: object
+          required: [as_written, filenames_say, confirmed, confirmed_by]
+          properties:
+            as_written: { type: string }
+            filenames_say: { $ref: '#/components/schemas/NullableText' }
+            confirmed: { type: boolean }
+            confirmed_by: { $ref: '#/components/schemas/NullableText' }
+        counts: { $ref: '#/components/schemas/ReportCounts' }
+        rows: { type: array, items: { $ref: '#/components/schemas/ReportRow' } }
+        unit_rules: { type: array, items: { $ref: '#/components/schemas/UnitRule' } }
+        generate_allowed: { type: boolean, description: True only when errors_unconfirmed is 0 (R-5). }
+    IntakeChoiceRequest:
+      type: object
+      required: [target_id, kind]
+      properties:
+        target_id: { type: string, description: 'A finding, segment or ELD entry.' }
+        kind:
+          type: string
+          enum: [confirm_unit, confirm_fix, edit_fix, set_note_action, change_split, set_unit_rule_scope, eld_keep, eld_remap, confirm_safety_note, reject_safety_note]
+        value:
+          description: Text or a list, depending on the kind.
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: [string, integer] }
+            - type: 'null'
+    IntakeChoiceResult:
+      type: object
+      required: [row, counts, generate_allowed]
+      properties:
+        row: { $ref: '#/components/schemas/ReportRow' }
+        counts: { $ref: '#/components/schemas/ReportCounts' }
+        generate_allowed: { type: boolean }
+
+    RunState:
+      type: string
+      enum: [planning, running, complete, partial, capped, paused, cancelled]
+    TileState:
+      type: string
+      enum: [queued, planning, drafting, checking, repairing, ready, failed]
+    RunScope:
+      type: object
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [all, rows] }
+        rows: { type: array, items: { type: integer }, description: 'Row numbers, when kind is rows.' }
+    StartRunRequest:
+      type: object
+      required: [outline_version_id, mode, scope, prompt_version_id, cap_usd]
+      properties:
+        outline_version_id: { type: string }
+        mode: { type: string, enum: [run, trial], description: A trial writes a candidate for one lesson (R-39). }
+        scope: { $ref: '#/components/schemas/RunScope' }
+        lesson_id: { type: [string, 'null'], description: Trial only. }
+        prompt_version_id: { type: string, description: One locked layer plus one guidance version. }
+        cap_usd: { type: number, exclusiveMinimum: 0 }
+    Run:
+      type: object
+      required: [run_id, state, mode, scope, prompt_version_id, cap_usd, spent_usd, created_by, created_at]
+      properties:
+        run_id: { type: string }
+        state: { $ref: '#/components/schemas/RunState' }
+        mode: { type: string, enum: [run, trial] }
+        scope: { $ref: '#/components/schemas/RunScope' }
+        prompt_version_id: { type: string }
+        cap_usd: { type: number }
+        spent_usd: { type: number }
+        created_by: { type: string }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+    FailureReason:
+      type: object
+      required: [check, message]
+      properties:
+        check: { type: string }
+        message: { type: string }
+    Tile:
+      type: object
+      required: [lesson_id, number, title, tile_state, attempts, repair_used, truncation_retry_used, failure_reasons, cost_usd, openable]
+      properties:
+        lesson_id: { type: string }
+        number: { type: [integer, 'null'] }
+        title: { type: string }
+        tile_state: { $ref: '#/components/schemas/TileState' }
+        attempts: { type: integer }
+        repair_used: { type: boolean }
+        truncation_retry_used: { type: boolean }
+        failure_reasons: { type: array, items: { $ref: '#/components/schemas/FailureReason' } }
+        cost_usd: { type: number }
+        openable: { type: boolean }
+    RunProgress:
+      type: object
+      required: [run_id, state, paused_reason, spent_usd, reserved_usd, cap_usd, concurrency_cap, counts_by_tile_state, updated_at, tiles]
+      properties:
+        run_id: { type: string }
+        state: { $ref: '#/components/schemas/RunState' }
+        paused_reason:
+          oneOf:
+            - type: object
+              required: [check, lesson_ids]
+              properties:
+                check: { type: string }
+                lesson_ids: { type: array, items: { type: string } }
+            - type: 'null'
+        spent_usd: { type: number }
+        reserved_usd: { type: number }
+        cap_usd: { type: number }
+        concurrency_cap: { type: integer }
+        counts_by_tile_state:
+          type: object
+          additionalProperties: { type: integer }
+        updated_at: { $ref: '#/components/schemas/Timestamp' }
+        tiles: { type: array, items: { $ref: '#/components/schemas/Tile' } }
+    RunControlRequest:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string, enum: [cancel, retry_failed, resume], description: 'No raise-the-cap action (UXP-5, pending).' }
+    RunControlResult:
+      type: object
+      required: [run_id, state, requeued_lessons]
+      properties:
+        run_id: { type: string }
+        state: { $ref: '#/components/schemas/RunState' }
+        requeued_lessons: { type: array, items: { type: string } }
+    PlanEntry:
+      type: object
+      required: [lesson_id, day, purpose, routines, hands_forward, performance_task_thread]
+      properties:
+        lesson_id: { type: string }
+        day: { type: integer }
+        purpose: { type: string }
+        routines: { type: array, items: { type: string } }
+        hands_forward: { type: string }
+        performance_task_thread: { type: string }
+    LessonLink:
+      type: object
+      required: [link_id, from_lesson_id, from_address, to_lesson_id, to_slot_id, label]
+      properties:
+        link_id: { type: string }
+        from_lesson_id: { type: string }
+        from_address: { type: string }
+        to_lesson_id: { type: string }
+        to_slot_id: { type: string }
+        label: { type: string }
+    UnitPlan:
+      type: object
+      required: [run_id, state, stored_at, entries, lesson_links]
+      properties:
+        run_id: { type: string }
+        state: { type: string, enum: [planning, stored] }
+        stored_at: { type: [string, 'null'], format: date-time }
+        entries: { type: array, items: { $ref: '#/components/schemas/PlanEntry' } }
+        lesson_links: { type: array, items: { $ref: '#/components/schemas/LessonLink' }, description: 'Computed by code at intake, never by the model (HP-1).' }
+    RunSummary:
+      type: object
+      required: [run_id, state, n, wall_time_seconds, cost_usd, cost_per_lesson_usd, lessons, retries, failures_by_reason, placeholders_left, calls_lost_in_flight, brakes_fired, truncation_retries, p95_minutes_per_lesson, target_minutes_per_lesson, report_path]
+      properties:
+        run_id: { type: string }
+        state: { $ref: '#/components/schemas/RunState' }
+        n: { type: integer }
+        wall_time_seconds: { type: integer }
+        cost_usd: { type: number }
+        cost_per_lesson_usd: { type: number }
+        lessons:
+          type: object
+          required: [ready, failed]
+          properties:
+            ready: { type: integer }
+            failed: { type: integer }
+        retries: { type: integer }
+        failures_by_reason:
+          type: array
+          items:
+            type: object
+            required: [reason, count]
+            properties:
+              reason: { type: string }
+              count: { type: integer }
+        placeholders_left: { type: integer }
+        calls_lost_in_flight: { type: integer }
+        brakes_fired:
+          type: array
+          items:
+            type: object
+            required: [brake, count]
+            properties:
+              brake: { type: string }
+              count: { type: integer }
+        truncation_retries: { type: integer }
+        p95_minutes_per_lesson: { type: [number, 'null'] }
+        target_minutes_per_lesson: { type: number }
+        report_path: { $ref: '#/components/schemas/NullableText' }
+
+    LessonState:
+      type: string
+      enum: [generation_failed, draft, in_review, submitted, changes_requested, approved, reopened, exported]
+    SendBackTag:
+      type: string
+      description: Pending UXP-6.
+      enum: [standards, quotes_and_rights, eld_support, content_safety, ai_spans, teaching_quality, other]
+    SendBack:
+      type: object
+      required: [tag, note, by, at]
+      properties:
+        tag: { $ref: '#/components/schemas/SendBackTag' }
+        note: { type: string }
+        by: { type: string }
+        at: { $ref: '#/components/schemas/Timestamp' }
+    DependencyFlag:
+      type: object
+      required: [kind, lesson_id, label]
+      properties:
+        kind: { type: string, enum: [waits_on, source_reopened] }
+        lesson_id: { type: string }
+        label: { type: string }
+    BoardRow:
+      type: object
+      required: [lesson_id, number, title, type, state, blocking_count, confirmation_count, advisory_count, reviewer, last_change_at, dependency_flags, send_back, judge_flag]
+      properties:
+        lesson_id: { type: string }
+        number: { type: [integer, 'null'] }
+        title: { type: string }
+        type: { type: string }
+        state: { $ref: '#/components/schemas/LessonState' }
+        blocking_count: { type: integer }
+        confirmation_count: { type: integer }
+        advisory_count: { type: integer }
+        reviewer: { $ref: '#/components/schemas/NullableText' }
+        last_change_at: { $ref: '#/components/schemas/Timestamp' }
+        dependency_flags: { type: array, items: { $ref: '#/components/schemas/DependencyFlag' } }
+        send_back:
+          oneOf:
+            - $ref: '#/components/schemas/SendBack'
+            - type: 'null'
+        judge_flag:
+          description: Only if the judge is built (cut 2); labelled provisional, not expert.
+          oneOf:
+            - type: object
+              required: [verdict, label]
+              properties:
+                verdict: { type: string, enum: ['no'] }
+                label: { type: string }
+            - type: 'null'
+    UnitBoard:
+      type: object
+      required: [unit_id, rollup, rows]
+      properties:
+        unit_id: { type: string }
+        rollup:
+          type: object
+          additionalProperties: { type: integer }
+        rows: { type: array, items: { $ref: '#/components/schemas/BoardRow' } }
+
+    UnitMetrics:
+      type: object
+      required: [north_star, quality]
+      properties:
+        north_star:
+          type: object
+          required: [median_minutes, n, fast_approvals, approved, caption, segment_label]
+          properties:
+            median_minutes: { type: [number, 'null'] }
+            n: { type: integer }
+            fast_approvals:
+              type: object
+              required: [count, of]
+              properties:
+                count: { type: integer }
+                of: { type: integer }
+            approved:
+              type: object
+              required: [k, total]
+              properties:
+                k: { type: integer }
+                total: { type: integer }
+            caption: { type: string }
+            segment_label: { $ref: '#/components/schemas/NullableText' }
+        quality:
+          description: Only if R-50 is built (cut 6).
+          oneOf:
+            - type: object
+              required: [tiles, rating_counts, seeded_errors]
+              properties:
+                tiles:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, value, n, label]
+                    properties:
+                      id: { type: string }
+                      value: { type: [number, 'null'] }
+                      n: { type: integer }
+                      label: { type: string }
+                rating_counts:
+                  type: object
+                  required: [usable_as_drafted, usable_with_edits, rewritten, n]
+                  properties:
+                    usable_as_drafted: { type: integer }
+                    usable_with_edits: { type: integer }
+                    rewritten: { type: integer }
+                    n: { type: integer }
+                seeded_errors:
+                  type: object
+                  required: [planted, caught, label]
+                  properties:
+                    planted: { type: integer }
+                    caught: { type: integer }
+                    label: { type: string }
+            - type: 'null'
+
+    ProseMirrorDoc:
+      type: object
+      description: ProseMirror JSON in the one shared node schema module (HP-4 addendum). Its node types are defined by the Zod Lesson schema, not repeated here.
+      required: [type]
+      properties:
+        type: { type: string, const: doc }
+        content: { type: array, items: { type: object } }
+      additionalProperties: true
+    Standard:
+      type: object
+      required: [code, role, origin, official_text, asserted_by, confirmation]
+      properties:
+        code: { type: string }
+        role: { type: string, enum: [focus, supporting, eld] }
+        origin: { type: string, enum: [outline, outline-fixed, narrowed, added] }
+        official_text: { type: string, description: Official CDE text only (GR-5). }
+        asserted_by: { type: string, enum: [outline, generator, judge, reviewer] }
+        confirmation: { type: [string, 'null'], enum: [open, confirmed, removed, null] }
+    Section:
+      type: object
+      required: [address, name, minutes, content]
+      properties:
+        address: { type: string, description: 'e.g. G6.U4.L4.LearningInAction.PartA (R-21).' }
+        name: { type: string }
+        minutes: { type: integer }
+        content: { $ref: '#/components/schemas/ProseMirrorDoc' }
+    RightsStatus:
+      type: string
+      enum: [public-domain, Newsela-owned, licensed, to-clear, short-quote-commentary]
+    TextCard:
+      type: object
+      required: [title, author, edition_or_isbn, chapter, pages, kind, rights_status]
+      properties:
+        title: { type: string }
+        author: { $ref: '#/components/schemas/NullableText' }
+        edition_or_isbn: { $ref: '#/components/schemas/NullableText' }
+        chapter: { $ref: '#/components/schemas/NullableText' }
+        pages: { $ref: '#/components/schemas/NullableText' }
+        kind: { type: string, enum: [off-platform-text, newsela-reference, excerpt] }
+        rights_status:
+          oneOf:
+            - $ref: '#/components/schemas/RightsStatus'
+            - type: 'null'
+    AlignmentEntry:
+      type: object
+      required: [code, teach_links, check_links, link_role, asserted_by]
+      properties:
+        code: { type: string }
+        teach_links: { type: array, items: { type: string } }
+        check_links: { type: array, items: { type: string } }
+        link_role: { type: string, enum: [I, P, A] }
+        asserted_by: { type: string, enum: [outline, generator, judge, reviewer] }
+    ChecklistItem:
+      type: object
+      required: [key, label, status, evidence_refs]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        status: { type: string, enum: [ok, open] }
+        evidence_refs: { type: array, items: { type: string } }
+    Dependency:
+      type: object
+      required: [direction, lesson_id, slot_id, status]
+      properties:
+        direction: { type: string, enum: [waits_on, depended_on_by] }
+        lesson_id: { type: string }
+        slot_id: { type: string }
+        status: { type: string, enum: [slot_empty, waiting_for_source_approval, source_approved, source_reopened] }
+    SnapshotRef:
+      type: object
+      required: [version_id, content_hash, state_vector]
+      properties:
+        version_id: { type: string }
+        content_hash: { $ref: '#/components/schemas/Sha256' }
+        state_vector: { $ref: '#/components/schemas/StateVector' }
+    Lesson:
+      type: object
+      required: [lesson_id, number, title, type, state, version_number, content_hash, state_vector, schema_version, last_editor, snapshot, front_matter, sections, text_cards, outline_row, alignment_map, reviewer, send_back, checklist, dependencies, allowed_actions]
+      properties:
+        lesson_id: { type: string }
+        number: { type: [integer, 'null'] }
+        title: { type: string }
+        type: { type: string }
+        state: { $ref: '#/components/schemas/LessonState' }
+        version_number: { type: integer }
+        content_hash: { $ref: '#/components/schemas/Sha256' }
+        state_vector: { $ref: '#/components/schemas/StateVector' }
+        schema_version: { type: integer }
+        last_editor: { $ref: '#/components/schemas/NullableText' }
+        snapshot:
+          description: For submitted and later; the values Approve must send back.
+          oneOf:
+            - $ref: '#/components/schemas/SnapshotRef'
+            - type: 'null'
+        front_matter:
+          type: object
+          required: [standards]
+          properties:
+            standards: { type: array, items: { $ref: '#/components/schemas/Standard' } }
+          additionalProperties: true
+        sections: { type: array, items: { $ref: '#/components/schemas/Section' } }
+        text_cards: { type: array, items: { $ref: '#/components/schemas/TextCard' } }
+        outline_row:
+          type: object
+          required: [row_number, segments]
+          properties:
+            row_number: { type: integer }
+            segments: { type: array, items: { $ref: '#/components/schemas/Segment' } }
+        alignment_map: { type: array, items: { $ref: '#/components/schemas/AlignmentEntry' } }
+        reviewer: { $ref: '#/components/schemas/NullableText' }
+        send_back:
+          oneOf:
+            - $ref: '#/components/schemas/SendBack'
+            - type: 'null'
+        checklist: { type: array, items: { $ref: '#/components/schemas/ChecklistItem' } }
+        dependencies: { type: array, items: { $ref: '#/components/schemas/Dependency' } }
+        allowed_actions: { type: array, items: { type: string }, description: A hint for the screen; the server still decides. }
+
+    IssueLevel:
+      type: string
+      enum: [blocking, confirmation, advisory]
+    Issue:
+      type: object
+      required: [issue_id, level, kind, message, address, span_anchor, related_lesson_id, resolution]
+      properties:
+        issue_id: { type: string }
+        level: { $ref: '#/components/schemas/IssueLevel' }
+        kind:
+          type: string
+          description: The System owns the full list of check kinds.
+          enum: [quote_placeholder_open, excerpt_slot_open, cross_lesson_link, standard_not_taught, standard_not_checked, code_not_allowed, minutes_out_of_range, section_missing, quote_unmatched, page_out_of_range, proper_noun_unsourced, quote_without_source, quote_too_long, rights_to_clear, suggestion_pending, safety_flag_open, safety_note_without_tip, safety_text_in_student_block, disclosure_prompt, standard_confirmation, standard_add_suggestion, eld_label_mismatch, arc_repeat, vocabulary_over_cap, vocabulary_word_missing, linked_text_changed, judge_no]
+        message: { type: string }
+        address: { $ref: '#/components/schemas/NullableText' }
+        span_anchor: { type: [string, 'null'], description: 'A Yjs relative position, base64.' }
+        related_lesson_id: { $ref: '#/components/schemas/NullableText' }
+        resolution:
+          oneOf:
+            - type: object
+              required: [by, reason, at]
+              properties:
+                by: { type: string }
+                reason: { type: string }
+                at: { $ref: '#/components/schemas/Timestamp' }
+            - type: 'null'
+    IssueList:
+      type: object
+      required: [lesson_id, checked_hash, checked_at, pending, counts, issues]
+      properties:
+        lesson_id: { type: string }
+        checked_hash: { $ref: '#/components/schemas/Sha256' }
+        checked_at: { $ref: '#/components/schemas/Timestamp' }
+        pending: { type: boolean, description: A newer store is still being checked. }
+        counts: { $ref: '#/components/schemas/IssueCounts' }
+        issues: { type: array, items: { $ref: '#/components/schemas/Issue' } }
+    IssueCounts:
+      type: object
+      required: [blocking, confirmation, advisory]
+      properties:
+        blocking: { type: integer }
+        confirmation: { type: integer }
+        advisory: { type: integer }
+
+    ResolutionRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, description: Empty → REASON_REQUIRED. }
+    SafetyFlagClearRequest:
+      type: object
+      required: [note]
+      properties:
+        note: { type: string, description: Empty → NOTE_REQUIRED. }
+    StandardDecisionRequest:
+      type: object
+      required: [code, decision]
+      properties:
+        code: { type: string }
+        decision: { type: string, enum: [confirm, remove, add] }
+    ResolveResult:
+      type: object
+      required: [item_id, status, by, at, audit_id, counts]
+      properties:
+        item_id: { type: string }
+        status: { type: string, enum: [resolved, cleared, confirmed, removed, added] }
+        by: { type: string }
+        at: { $ref: '#/components/schemas/Timestamp' }
+        audit_id: { type: string }
+        counts: { $ref: '#/components/schemas/IssueCounts' }
+
+    SourceRef:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        chapter: { $ref: '#/components/schemas/NullableText' }
+        pages: { $ref: '#/components/schemas/NullableText' }
+        url: { type: [string, 'null'], format: uri }
+    FillSlotRequest:
+      type: object
+      required: [text, source_ref, rights_status]
+      properties:
+        text: { type: string }
+        source_ref: { $ref: '#/components/schemas/SourceRef' }
+        rights_status: { $ref: '#/components/schemas/RightsStatus' }
+    FillSlotResult:
+      type: object
+      required: [slot_id, inserted_by, inserted_at, still_blocking, blocking_reason, linked_lessons]
+      properties:
+        slot_id: { type: string }
+        inserted_by: { type: string }
+        inserted_at: { $ref: '#/components/schemas/Timestamp' }
+        still_blocking: { type: boolean }
+        blocking_reason: { $ref: '#/components/schemas/NullableText' }
+        linked_lessons:
+          type: array
+          items:
+            type: object
+            required: [lesson_id, status]
+            properties:
+              lesson_id: { type: string }
+              status: { type: string, enum: [slot_empty, waiting_for_source_approval, source_approved] }
+
+    RegenerateRequest:
+      type: object
+      properties:
+        note: { $ref: '#/components/schemas/NullableText' }
+    Candidate:
+      type: object
+      required: [candidate_id, version_number, status, adopted, failure_reasons, current_content_hash, sections]
+      properties:
+        candidate_id: { type: string }
+        version_number: { type: integer }
+        status: { type: string, enum: [queued, drafting, ready, failed] }
+        adopted: { type: boolean }
+        failure_reasons: { type: array, items: { $ref: '#/components/schemas/FailureReason' } }
+        current_content_hash: { $ref: '#/components/schemas/Sha256' }
+        sections: { type: array, items: { $ref: '#/components/schemas/Section' } }
+    AdoptRequest:
+      type: object
+      required: [scope]
+      properties:
+        scope: { type: string, enum: [whole, section] }
+        section_address: { $ref: '#/components/schemas/NullableText' }
+    AdoptResult:
+      type: object
+      required: [candidate_id, audit_id, last_editor]
+      properties:
+        candidate_id: { type: string }
+        audit_id: { type: string }
+        last_editor: { type: string }
+
+    Anchor:
+      type: object
+      required: [start, end]
+      properties:
+        start: { type: string, description: 'Yjs relative position, base64.' }
+        end: { type: string, description: 'Yjs relative position, base64.' }
+    SuggestionRequest:
+      type: object
+      required: [anchor, selected_text, note]
+      properties:
+        anchor: { $ref: '#/components/schemas/Anchor' }
+        selected_text: { type: string }
+        note: { type: string }
+    SuggestionDecisionRequest:
+      type: object
+      required: [decision, anchored_text_now]
+      properties:
+        decision: { type: string, enum: [accept, reject] }
+        anchored_text_now: { type: string }
+    Suggestion:
+      type: object
+      required: [suggestion_id, status, suggested_text, requested_by]
+      properties:
+        suggestion_id: { type: string }
+        status: { type: string, enum: [pending, accepted, rejected, closed] }
+        suggested_text: { type: string }
+        requested_by: { type: string }
+
+    TransitionRequest:
+      description: One move on one lesson. Pending UXP-1 (start_review), UXP-4 (reopen), UXP-6 (tags), UXP-10 (withdraw note).
+      oneOf:
+        - $ref: '#/components/schemas/StartReview'
+        - $ref: '#/components/schemas/Submit'
+        - $ref: '#/components/schemas/Withdraw'
+        - $ref: '#/components/schemas/Approve'
+        - $ref: '#/components/schemas/RequestChanges'
+        - $ref: '#/components/schemas/Reopen'
+      discriminator:
+        propertyName: action
+        mapping:
+          start_review: '#/components/schemas/StartReview'
+          submit: '#/components/schemas/Submit'
+          withdraw: '#/components/schemas/Withdraw'
+          approve: '#/components/schemas/Approve'
+          request_changes: '#/components/schemas/RequestChanges'
+          reopen: '#/components/schemas/Reopen'
+    StartReview:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string, const: start_review }
+    Submit:
+      type: object
+      required: [action, client_state_vector]
+      properties:
+        action: { type: string, const: submit }
+        client_state_vector: { $ref: '#/components/schemas/StateVector' }
+    Withdraw:
+      type: object
+      required: [action]
+      properties:
+        action: { type: string, const: withdraw }
+        note: { $ref: '#/components/schemas/NullableText' }
+    Approve:
+      type: object
+      required: [action, snapshot_hash, snapshot_state_vector, rating]
+      properties:
+        action: { type: string, const: approve }
+        snapshot_hash: { $ref: '#/components/schemas/Sha256' }
+        snapshot_state_vector: { $ref: '#/components/schemas/StateVector' }
+        rating: { type: string, enum: [usable_as_drafted, usable_with_edits, rewritten] }
+    RequestChanges:
+      type: object
+      required: [action, tag, note]
+      properties:
+        action: { type: string, const: request_changes }
+        tag: { $ref: '#/components/schemas/SendBackTag' }
+        note: { type: string }
+    Reopen:
+      type: object
+      required: [action, reason]
+      properties:
+        action: { type: string, const: reopen }
+        reason: { type: string }
+    VersionRef:
+      type: object
+      required: [version_id, version_number, content_hash, state_vector]
+      properties:
+        version_id: { type: string }
+        version_number: { type: integer }
+        content_hash: { $ref: '#/components/schemas/Sha256' }
+        state_vector: { $ref: '#/components/schemas/StateVector' }
+    TransitionResult:
+      type: object
+      required: [lesson_id, from_state, to_state, version, audit_id]
+      properties:
+        lesson_id: { type: string }
+        from_state: { $ref: '#/components/schemas/LessonState' }
+        to_state: { $ref: '#/components/schemas/LessonState' }
+        version: { $ref: '#/components/schemas/VersionRef' }
+        audit_id: { type: string }
+        dependency_record:
+          type: array
+          description: Approve only. The approved hash of each lesson this one links to (R-34).
+          items:
+            type: object
+            required: [lesson_id, approved_hash]
+            properties:
+              lesson_id: { type: string }
+              approved_hash: { $ref: '#/components/schemas/Sha256' }
+        metrics_row_written: { type: boolean, description: Approve only. True at the first approval. }
+
+    Provenance:
+      type: object
+      required: [outline_row_hash, prompt_version_id, model, parameters, schema_version, example_set_id, run_id, cost_usd]
+      properties:
+        outline_row_hash: { $ref: '#/components/schemas/Sha256' }
+        prompt_version_id: { type: string }
+        model: { type: string }
+        parameters: { type: object, additionalProperties: true }
+        schema_version: { type: integer }
+        example_set_id: { type: string }
+        run_id: { type: string }
+        cost_usd: { type: number }
+    VersionEntry:
+      type: object
+      required: [version_id, version_number, kind, content_hash, created_at, created_by, adopted, provenance]
+      properties:
+        version_id: { type: string }
+        version_number: { type: integer }
+        kind: { type: string, enum: [generated, candidate, submit, approval, reopen] }
+        content_hash: { $ref: '#/components/schemas/Sha256' }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+        created_by: { type: string }
+        adopted: { type: [boolean, 'null'], description: Candidates only. }
+        provenance: { $ref: '#/components/schemas/Provenance' }
+    AuditRow:
+      type: object
+      required: [at, user, action, from_state, to_state, version_hash, reason]
+      properties:
+        at: { $ref: '#/components/schemas/Timestamp' }
+        user: { type: string }
+        action: { type: string }
+        from_state:
+          oneOf:
+            - $ref: '#/components/schemas/LessonState'
+            - type: 'null'
+        to_state:
+          oneOf:
+            - $ref: '#/components/schemas/LessonState'
+            - type: 'null'
+        version_hash: { $ref: '#/components/schemas/Sha256' }
+        reason: { $ref: '#/components/schemas/NullableText' }
+    LessonHistory:
+      type: object
+      required: [versions, audit, ai_spans]
+      properties:
+        versions: { type: array, items: { $ref: '#/components/schemas/VersionEntry' } }
+        audit: { type: array, items: { $ref: '#/components/schemas/AuditRow' } }
+        ai_spans:
+          type: array
+          items:
+            type: object
+            required: [accepted_by, at]
+            properties:
+              accepted_by: { type: string }
+              at: { $ref: '#/components/schemas/Timestamp' }
+
+    Heartbeat:
+      type: object
+      required: [tab_id, focused, visible, last_input_at, sent_at, version_id]
+      properties:
+        tab_id: { type: string }
+        focused: { type: boolean }
+        visible: { type: boolean }
+        last_input_at: { $ref: '#/components/schemas/Timestamp' }
+        sent_at: { $ref: '#/components/schemas/Timestamp' }
+        version_id: { type: string }
+
+    CoverageMatrix:
+      type: object
+      required: [standards, lessons, cells]
+      properties:
+        standards:
+          type: array
+          items:
+            type: object
+            required: [code, official_text, never_assessed]
+            properties:
+              code: { type: string }
+              official_text: { type: string }
+              never_assessed: { type: boolean }
+        lessons:
+          type: array
+          items:
+            type: object
+            required: [lesson_id, number]
+            properties:
+              lesson_id: { type: string }
+              number: { type: [integer, 'null'] }
+        cells:
+          type: array
+          items:
+            type: object
+            required: [code, lesson_id, roles, confirmed_by]
+            properties:
+              code: { type: string }
+              lesson_id: { type: string }
+              roles: { type: array, items: { type: string, enum: [I, P, A] } }
+              confirmed_by: { type: string, enum: [person, judge_only, generator_only] }
+
+    ExportLesson:
+      type: object
+      required: [lesson_id, approved_hash]
+      properties:
+        lesson_id: { type: string }
+        approved_hash: { $ref: '#/components/schemas/Sha256' }
+    HeldBack:
+      type: object
+      required: [lesson_id, reason, waits_on]
+      properties:
+        lesson_id: { type: string }
+        reason: { type: string }
+        waits_on: { type: string }
+    ExportVersion:
+      type: object
+      required: [export_id, version_number, created_at, created_by, lesson_count, payload_hash]
+      properties:
+        export_id: { type: string }
+        version_number: { type: integer }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+        created_by: { type: string }
+        lesson_count: { type: integer }
+        payload_hash: { $ref: '#/components/schemas/Sha256' }
+    ExportList:
+      type: object
+      required: [included, held_back, exports]
+      properties:
+        included: { type: array, items: { $ref: '#/components/schemas/ExportLesson' } }
+        held_back: { type: array, items: { $ref: '#/components/schemas/HeldBack' } }
+        exports: { type: array, items: { $ref: '#/components/schemas/ExportVersion' } }
+    ExportCreated:
+      type: object
+      required: [export_id, version_number, same_as_previous, included, held_back, download_path]
+      properties:
+        export_id: { type: string }
+        version_number: { type: integer }
+        same_as_previous: { type: boolean }
+        included: { type: array, items: { $ref: '#/components/schemas/ExportLesson' } }
+        held_back: { type: array, items: { $ref: '#/components/schemas/HeldBack' } }
+        download_path: { type: string }
+    LessonExportFile:
+      type: object
+      description: The export file. Each lesson validates against the published Lesson export JSON Schema (planned in docs/contracts/).
+      required: [export_id, version_number, label, payload_hash, lessons]
+      properties:
+        export_id: { type: string }
+        version_number: { type: integer }
+        label: { type: string, const: Export (no live integration) }
+        payload_hash: { $ref: '#/components/schemas/Sha256' }
+        lessons:
+          type: array
+          items:
+            type: object
+            required: [lesson_id, content_hash, lesson]
+            properties:
+              lesson_id: { type: string }
+              content_hash: { $ref: '#/components/schemas/Sha256' }
+              lesson: { type: object, additionalProperties: true }
+
+    GuidanceVersion:
+      type: object
+      required: [version_id, number, author, created_at, reason, diff, pinned_by_runs]
+      properties:
+        version_id: { type: string }
+        number: { type: integer }
+        author: { type: string }
+        created_at: { $ref: '#/components/schemas/Timestamp' }
+        reason: { type: string }
+        diff: { type: string }
+        pinned_by_runs: { type: array, items: { type: string } }
+    PromptVersions:
+      type: object
+      required: [current_prompt_version_id, locked_layer, guidance_versions]
+      properties:
+        current_prompt_version_id: { type: string }
+        locked_layer:
+          type: object
+          required: [version_id, text]
+          description: Read-only; no API route writes it (R-38, GR-18).
+          properties:
+            version_id: { type: string }
+            text: { type: string }
+        guidance_versions: { type: array, items: { $ref: '#/components/schemas/GuidanceVersion' } }
+    SaveGuidanceRequest:
+      type: object
+      required: [base_version_id, guidance_text, reason]
+      properties:
+        base_version_id: { type: string }
+        guidance_text: { type: string }
+        reason: { type: string, description: Empty → REASON_REQUIRED. }
+
+x-collaboration-channel:
+  x-con: CON-12
+  status: proposed
+  summary: One authenticated Yjs websocket per lesson, served by one Hocuspocus process (PD-9). Not REST.
+  transport: websocket (Hocuspocus protocol over y-protocols)
+  document_name: 'lesson:<lesson_id>, e.g. lesson:G6.U4.L4'
+  authentication: The app session from CON-1. An unauthenticated connection or an unknown email is refused (R-26, R-54).
+  document_shape:
+    sections: One Y.XmlFragment per section, in the shared ProseMirror node schema (HP-4).
+    front_matter: One Y.Map in the same Y.Doc, bound to the form fields (standards, minutes) (HP-4).
+  awareness: Each co-editor's name and cursor.
+  write_permission: Reviewer connections only, and only while the lesson is in_review, changes_requested or reopened [A]. Every other connection is read-only.
+  server_messages:
+    stored:
+      description: Sent after each durable store. The client uses it to clear "saving" and to allow Submit.
+      fields: { content_hash: 64 hex characters, state_vector: base64, stored_at: date-time }
+    refused:
+      description: Sent to the typist when a write is refused. Nothing persists.
+      fields: { code: LESSON_LOCKED, message: plain words }
+    mode:
+      description: Sent when the lesson freezes (Submit, Approve) or unfreezes (Withdraw, Request changes, Reopen).
+      fields: { mode: editable | read_only, state: lesson state }
+  client_states: [connecting, synced, saving, stored, DISCONNECTED, read_only]
+  named_errors:
+    UNAUTHENTICATED: The connection is refused.
+    LESSON_LOCKED: A write to a frozen or approved lesson. Nothing persists; the typist is told.
+    DISCONNECTED: Channel state. Local edits are held; Submit is off until a stored message covers them (UXP-7, from HP-4 and HP-5).
+  guarantees:
+    - Only the collaboration server writes lesson content (R-26, HP-4).
+    - Each durable store writes, in one Postgres transaction, the Y.Doc bytes, the derived Lesson JSON, its SHA-256 and the state vector (R-26, HP-4).
+    - The last editor is the user on the connection whose update was last stored, including AI accepts and candidate adoption (R-33, HP-5).
+    - After a lock, 0 edits persist; every keystroke is either in the snapshot or reported refused to its typist (HP-5).
+  timing:
+    store_debounce: ≤ 2 s [T] (R-26)
+    store_transaction_p95: ≤ 500 ms [T] (HP-4)
+    remote_edit_visible_p95: < 300 ms [T] (R-56, cut 1)
+    durably_stored_p95: < 3 s [T] (R-56, cut 1)
+  system_review_must_confirm:
+    - The stored message as a Hocuspocus stateless message.
+    - How the Submit lock reaches the collaboration process (HP-5 reason 3), and the SP-2 fallback (close all connections at Submit).
+    - The write-permission assumption above.

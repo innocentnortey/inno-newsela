@@ -1,0 +1,39 @@
+{
+  "sample_id": "DS-3",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    8
+  ],
+  "why_selected": "WP-1. A Core Reading day with the malformed focus cell and reviewer notes inside content cells.",
+  "edge_cases": [
+    "malformed code `6.2 L.6.4`",
+    "editor note rewrites the Literacy Lab",
+    "10 vocabulary words vs a 6-word cap",
+    "homework names an excerpt row 9 has not chosen yet",
+    "ELD.PII.6.5 label mismatch"
+  ],
+  "rows": [
+    {
+      "filename": "L4_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 1",
+      "lesson_number": "Lesson 4",
+      "lesson_type": "Core Reading",
+      "days": 1.0,
+      "text_dependent_question": "How do Percy’s comments in the opening pages show his world values (and fears) about “normal” kids, and how might these opening pages be setting him up to become a hero or “problem” figure in a modern myth?",
+      "lesson_description": "Chapter 1\nFocus: pp. 1–8 Teacher Read Aloud - modeling engaging fluency - think alouds \n• Students will cite evidence to make inferences and predictions about Percy and Percy's story based around what future Percy says through his first-person narration in the opening pages.\n• Students analyze how the narrator's informal, sarcastic word choices shape the tone of the opening and readers' first impression of him.",
+      "homework": "• Read and annotate The Lightning Thief Ch. 1 (pp. 9–15)\n• Read and annotate excerpt from the “The Hare and the Lion”",
+      "focus_standards": "RL.6.1, 6.2 L.6.4",
+      "additional_standards": "RL.6.1, RL.6.2, RL.6.3, RL.6.4, RL.6.5, RL.6.6, RL.6.10, L.6.4, L.6.4.a, L.6.4.d, L.6.5, L.6.6",
+      "performance_task_skill": "Identifying and explaining emerging themes",
+      "foundational_skills_focus": "• Teacher reviews determining/clarifying the meaning of words using examples from today's vocabulary word list, demonstrating how to use context to find and verify word meanings.\n• Students will add this week's vocabulary words to their Unit Vocabulary graphic organizers.\nContext clues are not considered foundational skills. Instead, think about using morphology when teaching the vocabulary words \n\nConsider using context clues for during reading vocabulary instruction to confirm before reading instruction and provide in context learning. This could be part of Worktime A\n\nReplace repeated “context clue review” with:\n        •        Morphology mini-lessons tied to the unit vocabulary.\n\nIntroduce morphology tied to myth language:\n        •        mort- (mortal, immortal)\n        •        -ology (mythology)\n        •        trans- (transform, transport)\n\nQuick 5-minute word building routine:\n\nIf mort means death, what does immortal mean?",
+      "vocabulary": "• envy (1)\n• recognize (1)\n• frayed (2)\n• expelled (2)\n• probation (3)\n• threatened (3)\n• spawn (4)\n• detention (4)\n• immortal (6)\n• dyslexia (7)\n10 vocabulary words are taught, which is a lot for depth vocabulary words",
+      "designated_eld_standards": "• ELD.PI.6.7 – Analyze how language creates meaning\n• ELD.PI.6.6 – Justify interpretations with evidence\n• ELD.PII.6.5 – Use transitions to connect ideas",
+      "sheet_row": 8,
+      "row_kind": "lesson"
+    }
+  ]
+}

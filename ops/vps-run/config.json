@@ -1,0 +1,12 @@
+{
+  "note": "Budgets are API-equivalent dollars from Claude Code's own estimate (total_cost_usd); billing is a subscription, so they act as a usage cap. Claude recommendation adopted under Innocent's standing authorization (PRD PD-35), 2026-10-25. Change only with a dev-log entry.",
+  "gitlab_host": "labs.gauntletai.com",
+  "gitlab_project_id": 2346,
+  "permission_mode": "bypassPermissions",
+  "tmux_session": "newsela-run",
+  "min_free_gb": 2.5,
+  "phases": {
+    "A": {"per_run_budget_usd": 150, "total_budget_usd": 300, "max_runs": 4},
+    "B": {"per_run_budget_usd": 200, "total_budget_usd": 600, "max_runs": 8}
+  }
+}

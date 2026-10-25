@@ -1,0 +1,36 @@
+{
+  "sample_id": "DS-6",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    23
+  ],
+  "why_selected": "The Academic Discussion shape; only parent SL codes in the focus list.",
+  "edge_cases": [
+    "parent `SL.6.1` in focus",
+    "range `SL.6.1.a–d`",
+    "ELD.PII.6.1 label mismatch",
+    "homework is a summary plus pages"
+  ],
+  "rows": [
+    {
+      "filename": "L19_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 1",
+      "lesson_number": "Lesson 19",
+      "lesson_type": "Academic Discussion",
+      "days": 1.0,
+      "text_dependent_question": "How does chapter 12 show modern values about the environment and human actions?",
+      "lesson_description": "Academic Discussion\n• Prepare students to discuss the EQ \"How do myths reflect cultural values?\"\nFocus: Myths from Inv 1 and Chs. 1–12 of The Lightning Thief\n• Students synthesize what they read from Chs. 1–12 and excerpts from traditional myths to explore how the story’s mythic elements reflect cultural values.\n• Discussion:\n  o Use specific scenes, characters, and events from the assigned readings to respond to the EQ.\n  o Trace how fears, values, and recurring patterns are emerging so far in the narrative.\n  o Compare patterns they see in The Lightning Thief to myths they read from other cultures.",
+      "homework": "• Read summary of Ch. 13 (pp. 197–201)\n• Read and annotate The Lightning Thief Ch. 13 (pp. 202–211)",
+      "focus_standards": "SL.6.1, SL.6.6, RL.6.9",
+      "additional_standards": "SL.6.1.a–d, SL.6.6, RL.6.9",
+      "performance_task_skill": "Discussing an essential question using evidence from texts",
+      "designated_eld_standards": "• ELD.PI.6.1 – Participate in academic discussions\n• ELD.PI.6.6 – Support claims with evidence\n• ELD.PII.6.1 – Use collaborative discussion strategies",
+      "sheet_row": 23,
+      "row_kind": "lesson"
+    }
+  ]
+}

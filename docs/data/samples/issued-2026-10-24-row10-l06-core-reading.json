@@ -1,0 +1,37 @@
+{
+  "sample_id": "DS-5",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    10
+  ],
+  "why_selected": "A typical Core Reading day; the base of the clean control SYN-3.",
+  "edge_cases": [
+    "editor note in column N",
+    "10 vocabulary words",
+    "ELD.PII.6.5 label mismatch"
+  ],
+  "rows": [
+    {
+      "filename": "L6_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 1",
+      "lesson_number": "Lesson 6",
+      "lesson_type": "Core Reading",
+      "days": 1.0,
+      "text_dependent_question": "How does the museum field trip reveal fears and values about ancient powers still being present in the modern world?",
+      "lesson_description": "Chapter 2\nFocus: pp. 16–22\n• Students cite details about Percy’s behavior, Grover’s nervousness, and Mr. Brunner’s lecture to analyze what is explicitly happening at the museum and what is being hinted at.\n• Students analyze how the museum field trip functions as rising action that layers in mythology content and danger signs, explaining how this episode fits into the overall plot and builds toward later confrontations.",
+      "homework": "• Read and annotate The Lightning Thief Ch. 2 (pp. 23–28)",
+      "focus_standards": "RL.6.1",
+      "additional_standards": "RL.6.1, RL.6.2, RL.6.3, RL.6.4, RL.6.5, RL.6.6, RL.6.10, L.6.4, L.6.4.c, L.6.5, L.6.6",
+      "performance_task_skill": "Explaining how scenes contribute to overall plot structure",
+      "foundational_skills_focus": "Morphology mini-lessons tied to the unit vocabulary.\n\nConsider identifying which prefixes and suffixes from the identified vocabulary words should be taught there. This can help reduce the number of vocabulary words",
+      "vocabulary": "• hallucination (16)\n• talons (16)\n• unusual (17)\n• eavesdropper (19)\n• solstice (19)\n• ignorance (19)\n• discouraged (21)\n• sarcastic (21)\n• juvenile (22)\n• delinquents (22)",
+      "designated_eld_standards": "• ELD.PI.6.7 – Analyze how events shape meaning\n• ELD.PI.6.6 – Explain interpretations with evidence\n• ELD.PII.6.5 – Use transitions to show sequence and cause",
+      "sheet_row": 10,
+      "row_kind": "lesson"
+    }
+  ]
+}

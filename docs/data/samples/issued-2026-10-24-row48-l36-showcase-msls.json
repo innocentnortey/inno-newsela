@@ -1,0 +1,37 @@
+{
+  "sample_id": "DS-13",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    48
+  ],
+  "why_selected": "Showcase: column F holds learning goals, column L holds library-standard codes.",
+  "edge_cases": [
+    "column F changes meaning",
+    "MSLS codes without a prefix",
+    "performance task planning"
+  ],
+  "rows": [
+    {
+      "filename": "L36_ELA_TE_G6_U3_CA_Core",
+      "arc": "Showcase",
+      "lesson_number": "Lesson 36",
+      "lesson_type": "Writing",
+      "days": 1.0,
+      "text_dependent_question": "Learning Goals / EQ\n\t•\tStudents will plan an explanatory essay comparing or classifying myths from multiple cultures.\n\t•\tStudents will develop a clear thesis, organize ideas logically, and use precise comparative language.\n\t•\tStudents will plan a visual representation (chart, concept map, digital collage) to support their argument.",
+      "lesson_description": "Plan for Performance Task—Shared Stories, Shared Lessons\n• Introduce the explanatory essay students will be writing, explaining that they will be using the myths from different cultures they read this unit to craft an essay that shows what these stories teach us about being human, how they explain the world, and how they express values. Students will choose to:\n   o Compare two myths that share a similar lesson or theme, or\n   o Classify several myths into types (e.g., creation, hero, cautionary, or transformation)\nThey will also include a visual (chart, concept map, or digital collage) to make the comparison.\n• Using a model essay, the teacher explains that a successful essay has a clear thesis identifying a shared theme or category, logical organization with transitions that show relationships, precise comparative language (both, unlike, while, although), relevant evidence from more than one myth, a visual or diagram (chart, concept map, or digital collage) that helps the reader see reasoning, and a formal style.\n• Explain that students will use their essays while participating in a seminar or podcast at the end of the unit where they will be listening, responding, and connecting ideas to modern values.\n• Students plan out their essay, using their annotations and notes on this unit's myths to choose which myths to write about, along with the Research Essay Outline graphic organizer to plan out their paragraphs and visual.",
+      "homework": "• Finish essay outline",
+      "focus_standards": "W.6.2, W.6.2.a, W.6.5, W.6.8, SL.6.5",
+      "additional_standards": "W.6.2.a–f, W.6.4, W.6.5, W.6.6, W.6.8, W.6.9, W.6.9.a, W.6.10",
+      "media_literacy_standards": "2.1.a, 2.1.b",
+      "performance_task_skill": "Planning Performance Task",
+      "foundational_skills_focus": "Students rehearse complex thesis statements using subordinating conjunctions (although, while, because) to clarify relationships among myths. Mini-lessons focus on precise comparative vocabulary (similarly, in contrast, unlike) and pronoun clarity when referencing multiple texts. Students orally rehearse full thesis statements before drafting.",
+      "designated_eld_standards": "• ELD.PI.6.10 – Plan extended explanatory texts\n• ELD.PI.6.6 – Explain relationships among ideas\n• ELD.PII.6.5 – Use cohesive organizational language",
+      "sheet_row": 48,
+      "row_kind": "lesson"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "sample_id": "DS-9",
+  "synthetic": false,
+  "source_id": "S-2",
+  "derived_from": "docs/data/samples/g6-u4-lesson-outline.json",
+  "derived_from_sha256": "de8016ea1ea5ad9cd65241399e315259ca1ce6a6016c0fbab990dd06b9a3848a",
+  "captured": "2026-10-24",
+  "sheet_rows": [
+    31
+  ],
+  "why_selected": "The first of two 'Core Writing (Double Lesson)' rows: one 50-minute lesson inside a two-day task (AD-10).",
+  "edge_cases": [
+    "double lesson",
+    "narrative writing W.6.3 parent + range",
+    "page refs with quoted anchors",
+    "ELD.PI.6.7 label fits no strand"
+  ],
+  "rows": [
+    {
+      "filename": "L23_ELA_TE_G6_U3_CA_Core",
+      "arc": "Investigation 2",
+      "lesson_number": "Lesson 23",
+      "lesson_type": "Core Writing (Double Lesson)",
+      "days": 1.0,
+      "text_dependent_question": "How can Riordan’s modern version of divine characters give you ideas for your story?",
+      "lesson_description": "Archetype-Based Story Writing\n• Students plan a short archetype-based story by selecting an original myth or archetypal pattern (hero, cautionary, or transformation) and outlining new characters, setting, and key plot events for a modern retelling.\n• Students begin drafting their story using narrative techniques such as dialogue, pacing, and description to develop experiences, events, and characters.",
+      "homework": "• Read summary of Ch. 17 (pp. 266–top of 274 (\"…we turned our backs on the sea.\")\n• Read and annotate The Lightning Thief Ch. 17 (pp. 274 (\"With some spare change…\")–282)",
+      "focus_standards": "W.6.3, W.6.4, RL.6.9",
+      "additional_standards": "W.6.3.a–e, W.6.4, W.6.5, W.6.9, W.6.10, RL.6.9, L.6.1, L.6.2, L.6.3, L.6.6",
+      "performance_task_skill": "Crafting a narrative that adapts an archetypal pattern",
+      "foundational_skills_focus": "Students analyze how narrative sequencing and expanded noun phrases clarify character motivation and theme. They revise sentences to ensure clarity of pronoun reference and precise description in storytelling.",
+      "designated_eld_standards": "• ELD.PI.6.10 – Write narrative texts\n• ELD.PI.6.7 – Apply archetypal ideas\n• ELD.PII.6.5 – Organize events coherently",
+      "sheet_row": 31,
+      "row_kind": "lesson"
+    }
+  ]
+}

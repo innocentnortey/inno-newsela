@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Newsela Lesson Studio — Stage 3 hard problems</title>
+<meta name="review-stage" content="Zero-to-hero Stage 3 · Hard problems">
+<meta name="review-status" content="Choices recorded under Innocent's 2026-10-25 instruction to follow the recommendations; not yet read by him">
+<meta name="review-date" content="2026-10-25">
+<meta name="review-source" content="docs/design/hard-problems.md|ff1fb7bf43faf87cca8c003196afb1c345ef52462c9471e82dfca0f79b5f3e07">
+<meta name="review-source" content="docs/data/worked-pairs.md|e6053cc18991da23be453f6d5ee6c4725d886df18c60eab7b6be8ad06101253e">
+<style>
+:root{color-scheme:light dark}
+
+:root{
+  --bg:#f6f4ee;--surface:#fffdf8;--surface-2:#f0ece2;--ink:#1c1b19;--muted:#5b584f;--line:#d9d2c3;
+  --accent:#1f5f5b;--focus:#b8541e;
+  --fact:#1f6a5f;--fact-bg:#e3f1ee;
+  --decision:#2b4f8f;--decision-bg:#e6ecf8;
+  --proposal:#7a4f00;--proposal-bg:#fbf0d9;
+  --unknown:#55524a;--unknown-bg:#ecebe6;
+  --awaiting:#a3361c;--awaiting-bg:#fbe7e1;
+  --lane-family:#f3efe6;--lane-assistant:#e9f2f0;--lane-staff:#ecebf5;
+  --space-1:4px;--space-2:8px;--space-3:16px;--space-4:24px;--space-5:40px;--radius:10px;
+  --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-body:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161513;--surface:#1f1e1b;--surface-2:#2a2824;--ink:#ece8df;--muted:#b5afa1;--line:#3b3832;
+  --accent:#7cc4bd;--focus:#f0a070;
+  --fact:#7fd0c3;--fact-bg:#17302c;--decision:#a9c1f2;--decision-bg:#1d2740;
+  --proposal:#f1c879;--proposal-bg:#3a2d12;--unknown:#c9c5ba;--unknown-bg:#2c2b27;
+  --awaiting:#f6a58f;--awaiting-bg:#3d1f17;
+  --lane-family:#24221e;--lane-assistant:#1b2a28;--lane-staff:#22212d}}
+:root[data-theme="dark"]{
+  --bg:#161513;--surface:#1f1e1b;--surface-2:#2a2824;--ink:#ece8df;--muted:#b5afa1;--line:#3b3832;
+  --accent:#7cc4bd;--focus:#f0a070;
+  --fact:#7fd0c3;--fact-bg:#17302c;--decision:#a9c1f2;--decision-bg:#1d2740;
+  --proposal:#f1c879;--proposal-bg:#3a2d12;--unknown:#c9c5ba;--unknown-bg:#2c2b27;
+  --awaiting:#f6a58f;--awaiting-bg:#3d1f17;
+  --lane-family:#24221e;--lane-assistant:#1b2a28;--lane-staff:#22212d}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-ui)}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--surface);padding:8px 16px}
+.skip:focus{left:16px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--space-3)}
+header.top{background:var(--surface);border-bottom:1px solid var(--line);padding:var(--space-4) 0}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:var(--space-2) 0 var(--space-3)}
+h2{font-size:clamp(21px,2.6vw,26px);line-height:1.25;margin:0 0 var(--space-2)}
+h3{font-size:17px;margin:0 0 var(--space-2)}
+p{margin:0 0 var(--space-3)}
+.lede{font:18px/1.55 var(--font-body);max-width:72ch}
+.status-banner{display:flex;gap:var(--space-3);align-items:flex-start;background:var(--awaiting-bg);
+  border:1px solid var(--awaiting);border-radius:var(--radius);padding:var(--space-3);margin-bottom:var(--space-3)}
+.status-banner strong{color:var(--awaiting)}
+.meta{display:grid;grid-template-columns:max-content 1fr;gap:4px var(--space-3);font-size:14px;color:var(--muted);margin:0}
+.meta dt{font-weight:600;color:var(--ink)}
+.meta dt{grid-column:1}.meta dd{grid-column:2;margin:0;overflow-wrap:anywhere}
+code{font:0.88em var(--font-mono);background:var(--surface-2);padding:1px 5px;border-radius:5px}
+section{padding:var(--space-5) 0 var(--space-3);border-bottom:1px solid var(--line)}
+.section-sub{color:var(--muted);max-width:75ch}
+/* status badges */
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;
+  padding:2px 9px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap;vertical-align:middle}
+.st::before{font-size:11px}
+.st.fact{color:var(--fact);background:var(--fact-bg)} .st.fact::before{content:"●"}
+.st.decision{color:var(--decision);background:var(--decision-bg)} .st.decision::before{content:"◆"}
+.st.proposal{color:var(--proposal);background:var(--proposal-bg)} .st.proposal::before{content:"▲"}
+.st.unknown{color:var(--unknown);background:var(--unknown-bg);border-style:dashed} .st.unknown::before{content:"?"}
+.st.awaiting{color:var(--awaiting);background:var(--awaiting-bg);border-width:2px} .st.awaiting::before{content:"⧗"}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-3);list-style:none;padding:var(--space-3);margin:var(--space-3) 0 0;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:14px}
+.legend li{display:flex;gap:8px;align-items:center}
+/* cards */
+.grid{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--radius);padding:var(--space-3)}
+.card[data-status="fact"]{border-left-color:var(--fact)}
+.card[data-status="decision"]{border-left-color:var(--decision)}
+.card[data-status="proposal"]{border-left-color:var(--proposal)}
+.card[data-status="unknown"]{border-left-color:var(--unknown);border-left-style:dashed}
+.card[data-status="awaiting"]{border-left-color:var(--awaiting);border-color:var(--awaiting)}
+.card h3{display:flex;justify-content:space-between;gap:var(--space-2);align-items:flex-start;flex-wrap:wrap}
+.card p:last-child,.card ul:last-child{margin-bottom:0}
+.card .src{font-size:13px;color:var(--muted)}
+.big{font-size:20px;font-weight:700;line-height:1.25;margin:var(--space-1) 0 var(--space-2)}
+ul.tight{margin:0;padding-left:20px} ul.tight li{margin:2px 0}
+/* diagrams */
+figure{margin:var(--space-3) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:var(--space-3)}
+figcaption{font-size:14px;color:var(--muted);margin-top:var(--space-2)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll svg{min-width:760px}
+.scroll:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.scroll-hint{display:none;font-size:13px;color:var(--muted);margin:0 0 var(--space-2)}
+svg{display:block;width:100%;height:auto;font-family:var(--font-ui)}
+svg .lane-family{fill:var(--lane-family)} svg .lane-assistant{fill:var(--lane-assistant)} svg .lane-staff{fill:var(--lane-staff)}
+svg .lane-label{fill:var(--muted);font-size:13px;font-weight:700}
+svg .node{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg .node.fact{stroke:var(--fact)} svg .node.decision{stroke:var(--decision);stroke-width:2}
+svg .node.proposal{stroke:var(--proposal);stroke-dasharray:6 3} svg .node.unknown{stroke:var(--unknown);stroke-dasharray:3 3}
+svg .node.awaiting{stroke:var(--awaiting);stroke-width:2.5}
+svg .node.demo{stroke:var(--proposal);stroke-dasharray:4 4;fill:var(--proposal-bg)}
+svg text{fill:var(--ink);font-size:13px} svg .small{font-size:11.5px;fill:var(--muted)} svg .strong{font-weight:700}
+svg .arrow{stroke:var(--muted);stroke-width:1.6;fill:none} svg .arrow.dash{stroke-dasharray:5 4}
+svg .head{fill:var(--muted)} svg .band{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:2 4}
+svg .band-label{fill:var(--accent);font-weight:700;font-size:12.5px}
+.words{font-size:14px;color:var(--muted);margin:var(--space-2) 0 0;padding-left:20px}
+/* why chain */
+.chain{display:grid;gap:var(--space-2);grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));counter-reset:why}
+.chain .card{position:relative}
+.chain .card::before{counter-increment:why;content:"Why " counter(why);display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+/* timeline */
+.days{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:var(--space-3)}
+.day h3{margin-bottom:var(--space-2)}
+.day ol{margin:0;padding-left:22px} .day li{margin:5px 0}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:0 7px;border-radius:6px;margin-left:4px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted)}
+.cutline{display:flex;align-items:center;gap:var(--space-3);margin:var(--space-4) 0;color:var(--awaiting);font-weight:700}
+.cutline::before,.cutline::after{content:"";flex:1;border-top:2px dashed var(--awaiting)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{background:var(--surface-2)}
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+/* story parts (context → problem → why-hard) */
+.part{border-left:3px solid var(--line);padding:2px 0 2px var(--space-3);margin:var(--space-3) 0}
+.part h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 4px}
+.part p{max-width:78ch}
+.part[data-part="context"]{border-left-color:var(--accent)}
+.part[data-part="problem"]{border-left-color:var(--decision)}
+.part[data-part="why-hard"]{border-left-color:var(--awaiting)}
+.ask{background:var(--awaiting-bg);border:2px solid var(--awaiting);border-radius:var(--radius);padding:var(--space-4)}
+.ask h2{color:var(--awaiting)}
+footer{padding:var(--space-4) 0 var(--space-5);font-size:13px;color:var(--muted)}
+@media (max-width:640px){
+  .status-banner{flex-direction:column;gap:var(--space-2)}
+  .meta{grid-template-columns:1fr}
+  .meta dt,.meta dd{grid-column:1}
+  .meta dt:not(:first-child){margin-top:var(--space-2)}
+  figure{padding:var(--space-2)}
+  .scroll-hint{display:block}
+  .cutline{flex-direction:column;gap:var(--space-2);text-align:center}
+  .cutline::before,.cutline::after{flex:none;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{
+  html,body{background:#fff;color:#000}
+  .skip{display:none}
+  section{break-inside:auto;padding:16px 0}
+  figure,.card,.day{break-inside:avoid}
+  h2,h3,.section-sub{break-after:avoid}
+  .scroll{overflow:visible} .scroll svg{min-width:0} .scroll-hint{display:none}
+  a{color:#000}
+  a[href^="../"]::after{content:" (" attr(href) ")";font-size:10px}
+}
+
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pair{display:grid;gap:var(--space-2);grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));margin:var(--space-3) 0}
+.pair > div{background:var(--surface-2);border-radius:8px;padding:var(--space-3)}
+.pair h4{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pair ul{margin:0;padding-left:18px;font-size:14.5px} .pair li{margin:3px 0} .pair p{margin:0;font-size:14.5px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 var(--space-2)}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);text-decoration:none}
+a.pill:hover{border-color:var(--accent)}
+.pill.chosen{border-color:var(--decision);color:var(--decision);background:var(--decision-bg)}
+.pill.fallback{border-style:dashed;border-color:var(--proposal);color:var(--proposal)}
+.pill.no{color:var(--muted)}
+.rec{background:var(--proposal-bg);border-radius:8px;padding:var(--space-2) var(--space-3);margin-top:var(--space-2);font-size:14.5px}
+.choice{background:var(--decision-bg);border:1px solid var(--decision);border-radius:8px;padding:var(--space-3);margin:var(--space-3) 0}
+.choice p:last-child,.choice ul:last-child{margin-bottom:0}
+.choice ul{margin:6px 0 0;padding-left:20px} .choice li{margin:3px 0}
+.spikebox{border:1.5px dashed var(--proposal);background:var(--proposal-bg);border-radius:8px;padding:var(--space-2) var(--space-3);margin:var(--space-2) 0;font-size:14.5px}
+.spikebox p{margin:0}
+.note-unknown{border:1.5px dashed var(--unknown);background:var(--unknown-bg);border-radius:8px;padding:var(--space-2) var(--space-3);margin:var(--space-2) 0;font-size:14.5px}
+.note-unknown p{margin:0}
+.addendum{border-top:2px dotted var(--line);margin-top:var(--space-3);padding-top:var(--space-3)}
+.addendum h3{font-size:15px}
+article.hp{margin-top:var(--space-4);padding:var(--space-4)}
+article.hp > h2{display:flex;justify-content:space-between;gap:var(--space-2);flex-wrap:wrap;align-items:flex-start;scroll-margin-top:16px}
+.hp h3.sub{font-size:15px;margin:var(--space-4) 0 var(--space-2)}
+ol.reasons{margin:0;padding-left:22px;max-width:80ch} ol.reasons li{margin:4px 0}
+.opts{display:grid;gap:var(--space-2);grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));margin-top:var(--space-2)}
+.opt{background:var(--surface-2);border-radius:8px;padding:var(--space-2) var(--space-3);font-size:14.5px;border:1.5px solid transparent}
+.opt.is-chosen{border-color:var(--decision);background:var(--decision-bg)}
+.opt.is-fallback{border-style:dashed;border-color:var(--proposal)}
+.opt h4{margin:0 0 4px;font-size:14.5px}
+.opt p{margin:0 0 4px} .opt p.flow{font-size:13px;color:var(--muted)}
+.scroll svg.opts-svg{min-width:900px}
+svg .lbl-chosen{fill:var(--decision);font-weight:700}
+svg .lbl-fallback{fill:var(--proposal);font-weight:700}
+svg .lbl-no{fill:var(--muted);font-weight:700}
+svg .node.plain{stroke:var(--line)}
+svg .chip{fill:var(--decision-bg);stroke:var(--decision);stroke-width:1.5}
+svg a:focus-visible .chip{stroke:var(--focus);stroke-width:3}
+svg .colhead{fill:var(--ink);font-weight:700;font-size:12.5px}
+svg .lane-reviewer{fill:var(--lane-assistant)} svg .lane-approver{fill:var(--lane-staff)}
+.hbd{display:grid;gap:var(--space-2);grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));list-style:none;padding:0;margin:0;counter-reset:hbd}
+.hbd li{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--fact);border-radius:8px;padding:var(--space-2) var(--space-3);font-size:14.5px;counter-increment:hbd}
+.hbd li::before{content:counter(hbd) " · ";font-weight:700;color:var(--muted)}
+.hbd .ids{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:var(--space-2) 0 0}
+@media print{.table-scroll{overflow:visible;border:0}.opt,.choice,.pair > div,.hbd li{break-inside:avoid}article.hp{break-inside:auto}.scroll svg.opts-svg{min-width:0}}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Zero-to-hero Stage 3 · Hard problems · local visual review · Markdown is the source of truth</p>
+    <h1>Newsela Lesson Studio — the ten hard problems, and what we chose</h1>
+    <div class="status-banner" role="status">
+      <span class="st awaiting">Awaiting your read</span>
+      <div><strong>Choices recorded, not yet read by you.</strong> You said on 2026-10-25 that you would follow the recommendations. Please read the ten cards; anything you raise reopens that card.</div>
+    </div>
+    <dl class="meta">
+      <dt>Review date</dt><dd>2026-10-25 (built after the Markdown sources were written)</dd>
+      <dt>Sources (full documents)</dt>
+      <dd><a href="../design/hard-problems.md"><code>docs/design/hard-problems.md</code></a> — the register: HP-1…HP-10, spikes, handled by default · SHA-256 <code data-sha-for="docs/design/hard-problems.md">ff1fb7bf43fa</code></dd>
+      <dd><a href="../data/worked-pairs.md"><code>docs/data/worked-pairs.md</code></a> — the evidence pairs WP-1…WP-5 · SHA-256 <code data-sha-for="docs/data/worked-pairs.md">e6053cc18991</code></dd>
+      <dt>Refresh</dt><dd>If either source changes, this page is rebuilt and re-checked before you are asked to sign off.</dd>
+    </dl>
+    <ul class="legend" data-legend aria-label="Status legend">
+      <li><span class="st fact" data-legend-item="fact">Fact</span> established; a source is cited</li>
+      <li><span class="st decision" data-legend-item="decision">Your decision</span> decided by you, with date or rule</li>
+      <li><span class="st proposal" data-legend-item="proposal">Proposal</span> Claude proposes; not decided</li>
+      <li><span class="st unknown" data-legend-item="unknown">Unknown</span> not established; question ID given</li>
+      <li><span class="st awaiting" data-legend-item="awaiting">Awaiting approval</span> asked of you at this gate</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+<section aria-labelledby="sum-h" data-visual="summary">
+  <h2 id="sum-h">At a glance</h2>
+  <div class="grid">
+    <article class="card" data-status="decision">
+      <h3>Cards <span class="st decision">Your decision</span></h3>
+      <p class="big">10 cards, each with a chosen option</p>
+      <p>Every hard worked pair maps to a card.</p>
+      <p class="src">Innocent ✓ 2026-10-25, recommendation accepted.</p>
+    </article>
+    <article class="card" data-status="proposal">
+      <h3>Spikes <span class="st proposal">Proposal</span></h3>
+      <p class="big">3 spikes defined, none run yet</p>
+      <p>Each card names its fallback if a spike fails.</p>
+      <p class="src">They run at §5, the System track.</p>
+    </article>
+    <article class="card" data-status="decision">
+      <h3>Biggest changes <span class="st decision">Your decision</span></h3>
+      <ul class="tight">
+        <li>No quote block in the draft schema (HP-2).</li>
+        <li>R-19 reworded: a 3-word quote scan, page and name scans, origin-based codes, link blocks.</li>
+        <li>Submit freezes the lesson (HP-5).</li>
+        <li>R-16 reworded: no completed call paid twice (HP-7).</li>
+        <li>A one-click quality rating at Approve (HP-10).</li>
+      </ul>
+    </article>
+    <article class="card" data-status="awaiting">
+      <h3>Asked of you now <span class="st awaiting">Awaiting approval</span></h3>
+      <p class="big">Read the 10 cards</p>
+      <p>Raise anything you disagree with. That card reopens.</p>
+      <p class="src">Not covered: the PRD sign-off (Stage 4) or running the spikes (§5).</p>
+    </article>
+  </div>
+</section>
+
+<section aria-labelledby="story-h" data-visual="story">
+  <h2 id="story-h">The story so far</h2>
+  <p class="lede">Newsela is entering California's core English classes (ELA/ELD). It needs about 180 lessons per grade, in its own lesson shape, good enough for state reviewers. The brief asks for a tool that turns a designer's unit outline into lessons. Then staff review, edit and approve them.</p>
+  <p>Stage 1 found that review time is the real cost, so our north star is <strong>reviewer minutes per approved lesson</strong>. Stage 2 worked five outline rows through the tool by hand (<a href="../data/worked-pairs.md">the worked pairs</a>). Every place that needed judgement became a card. A system-design walk added HP-10 and two addenda.</p>
+  <p><strong>How the choices were made.</strong> On 2026-10-25 you wrote: "finish stage 3 and 4 dont ask for my input ill follow your recommendations". So each card's recommended option is recorded as chosen. Where a choice rests on a number only code can give, a spike checks it. If the spike fails, the card's fallback is the choice.</p>
+  <p class="src">Number labels: [T] target · [A] assumption · [C] calculated · [M] measured.</p>
+  <figure>
+    <p class="scroll-hint">Swipe to see the diagram. The list below says the same.</p>
+    <div class="scroll" tabindex="0" aria-label="Journey map, scrolls sideways">
+<svg viewBox="0 0 1040 512" role="img" aria-labelledby="jt jd">
+<title id="jt">Where each hard problem sits in the journey</title>
+<desc id="jd">Four lanes across journey steps 1 to 9, with each hard problem where it comes up.</desc>
+<defs><marker id="ah-j" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="128" y="20" class="colhead">Steps 1–2</text><text x="128" y="38" class="small">Upload, validate</text>
+<path class="arrow" d="M276,15 L296,15" marker-end="url(#ah-j)"/>
+<text x="312" y="20" class="colhead">Steps 3–5</text><text x="312" y="38" class="small">Plan, generate</text>
+<path class="arrow" d="M460,15 L480,15" marker-end="url(#ah-j)"/>
+<text x="496" y="20" class="colhead">Steps 6–7</text><text x="496" y="38" class="small">Triage, review, edit</text>
+<path class="arrow" d="M644,15 L664,15" marker-end="url(#ah-j)"/>
+<text x="680" y="20" class="colhead">Step 8</text><text x="680" y="38" class="small">Approve</text>
+<path class="arrow" d="M828,15 L848,15" marker-end="url(#ah-j)"/>
+<text x="864" y="20" class="colhead">Step 9</text><text x="864" y="38" class="small">Export, reopen, metrics</text>
+<rect class="lane-family" x="0" y="52" width="1040" height="78" rx="8"/><text class="lane-label" x="12" y="74">AUTHOR</text>
+<a href="#hp-6"><rect class="chip" x="124" y="61" width="172" height="24" rx="12"/><text x="136" y="77" style="font-size:12.5px">HP-6 normalization</text></a>
+<a href="#hp-9"><rect class="chip" x="124" y="91" width="172" height="24" rx="12"/><text x="136" y="107" style="font-size:12.5px">HP-9 safety notes</text></a>
+<text x="312" y="78" class="small">watches progress</text>
+<rect class="lane-assistant" x="0" y="136" width="1040" height="138" rx="8"/><text class="lane-label" x="12" y="158">THE PRODUCT</text>
+<a href="#hp-1"><rect class="chip" x="308" y="145" width="172" height="24" rx="12"/><text x="320" y="161" style="font-size:12.5px">HP-1 orchestration</text></a>
+<a href="#hp-7"><rect class="chip" x="308" y="175" width="172" height="24" rx="12"/><text x="320" y="191" style="font-size:12.5px">HP-7 long jobs</text></a>
+<a href="#hp-2"><rect class="chip" x="308" y="205" width="172" height="24" rx="12"/><text x="320" y="221" style="font-size:12.5px">HP-2 grounding</text></a>
+<a href="#hp-3"><rect class="chip" x="308" y="235" width="172" height="24" rx="12"/><text x="320" y="251" style="font-size:12.5px">HP-3 codes claimed</text></a>
+<rect class="lane-staff" x="0" y="280" width="1040" height="138" rx="8"/><text class="lane-label" x="12" y="302">REVIEWER</text>
+<a href="#hp-4"><rect class="chip" x="492" y="289" width="172" height="24" rx="12"/><text x="504" y="305" style="font-size:12.5px">HP-4 canonical copy</text></a>
+<a href="#hp-3"><rect class="chip" x="492" y="319" width="172" height="24" rx="12"/><text x="504" y="335" style="font-size:12.5px">HP-3 confirmations</text></a>
+<a href="#hp-2"><rect class="chip" x="492" y="349" width="172" height="24" rx="12"/><text x="504" y="365" style="font-size:12.5px">HP-2 placeholders</text></a>
+<a href="#hp-10"><rect class="chip" x="492" y="379" width="172" height="24" rx="12"/><text x="504" y="395" style="font-size:12.5px">HP-10 teaching quality</text></a>
+<rect class="lane-family" x="0" y="424" width="1040" height="78" rx="8"/><text class="lane-label" x="12" y="446">APPROVER</text>
+<a href="#hp-5"><rect class="chip" x="676" y="433" width="172" height="24" rx="12"/><text x="688" y="449" style="font-size:12.5px">HP-5 approval integrity</text></a>
+<a href="#hp-9"><rect class="chip" x="676" y="463" width="172" height="24" rx="12"/><text x="688" y="479" style="font-size:12.5px">HP-9 clearing a flag</text></a>
+<a href="#hp-8"><rect class="chip" x="860" y="433" width="172" height="24" rx="12"/><text x="872" y="449" style="font-size:12.5px">HP-8 north star</text></a>
+<a href="#hp-5"><rect class="chip" x="860" y="463" width="172" height="24" rx="12"/><text x="872" y="479" style="font-size:12.5px">HP-5 reopen cascade</text></a>
+</svg>
+    </div>
+    <figcaption><span class="st fact">Fact</span> From the register's journey table (PRD §5.1 steps). Each chip links to its card.</figcaption>
+    <ol class="words">
+      <li>Steps 1–2, upload and validate (author): HP-6, HP-9.</li>
+      <li>Steps 3–5, plan and generate (the product; the author watches): HP-1, HP-7, HP-2, HP-3.</li>
+      <li>Steps 6–7, triage, review and edit (reviewer): HP-4, HP-3, HP-2, HP-10.</li>
+      <li>Step 8, approve (approver): HP-5, HP-9 (clearing a flag).</li>
+      <li>Step 9, export, reopen and the metrics (approver; Newsela): HP-8, HP-5 (reopen).</li>
+    </ol>
+  </figure>
+  <nav aria-label="Jump to a card" class="toc"><a class="pill" href="#hp-1">HP-1</a><a class="pill" href="#hp-2">HP-2</a><a class="pill" href="#hp-3">HP-3</a><a class="pill" href="#hp-4">HP-4</a><a class="pill" href="#hp-5">HP-5</a><a class="pill" href="#hp-6">HP-6</a><a class="pill" href="#hp-7">HP-7</a><a class="pill" href="#hp-8">HP-8</a><a class="pill" href="#hp-9">HP-9</a><a class="pill" href="#hp-10">HP-10</a></nav>
+</section>
+
+<section aria-labelledby="cards-h">
+  <h2 id="cards-h">The ten cards</h2>
+  <p class="section-sub">Each card says where the problem comes up, what we must solve and why it's hard. Then come the options and the choice. In each option diagram, blue with ◆ is chosen, dashed is the fallback if a spike fails, and grey is not chosen.</p>
+<article class="card hp" id="hp-1" data-hp="HP-1" data-status="decision" aria-labelledby="hp1-h">
+<h2 id="hp1-h">HP-1 · Orchestration: the shape of the generation pipeline <span class="st decision">Chosen: A · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 3–5</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>The author presses Generate on a 47-day outline. Row 8, Lesson 4, is the test. Its teacher edition must reach Newsela's size: a median of 3,306 words [M]. Its homework names an excerpt that Lesson 5 has not chosen yet, so one lesson waits on another (<a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, U3).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Turn one outline into 47 valid drafts that follow the unit's arc, at a bounded cost. A model must never run the workflow.</p><div class="pair"><div><h4>In</h4><p>Row 8: focus <code>RL.6.1, RL.6.2, L.6.4.b</code>, Ch. 1 pp. 1–8.</p></div><div><h4>Out</h4><p>One typed <code>LessonDraft</code>. Code turns it into Launch 5 · Literacy Lab 10 · Learning in Action 15 + 15 · Look Back 5 · Homework. The Homework links to Lesson 5's excerpt slot and blocks until it is filled.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>Size.</strong> A draft is about 5,500–7,000 output tokens [C on A]. A cut-off answer is broken JSON.</li><li><strong>The arc.</strong> Lessons written alone all open the same way. Written one after another, the run takes about 2 hours.</li><li><strong>Links.</strong> If Lesson 4's link lives only in its text, nothing clears it when Lesson 5 changes.</li><li><strong>"Agent".</strong> A free-running loop has no cost limit, no replay and no reliable stop.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-1 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp1t">
+<title id="hp1t">HP-1: four ways to run generation</title>
+<defs><marker id="ah-hp1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="16" width="105.1" height="32" rx="7"/><text x="164.6" y="36" text-anchor="middle" style="font-size:12.5px">UnitPlan call</text>
+<path class="arrow" d="M217.1,32 L236.1,32" marker-end="url(#ah-hp1)"/>
+<rect class="node decision" x="237.1" y="16" width="125.2" height="32" rx="7"/><text x="299.7" y="36" text-anchor="middle" style="font-size:12.5px">LessonDraft call</text>
+<path class="arrow" d="M362.3,32 L381.3,32" marker-end="url(#ah-hp1)"/>
+<rect class="node decision" x="382.3" y="16" width="105.1" height="32" rx="7"/><text x="434.9" y="36" text-anchor="middle" style="font-size:12.5px">code compiles</text>
+<path class="arrow" d="M487.4,32 L506.4,32" marker-end="url(#ah-hp1)"/>
+<rect class="node decision" x="507.4" y="16" width="60.0" height="32" rx="7"/><text x="537.4" y="36" text-anchor="middle" style="font-size:12.5px">checks</text>
+<path class="arrow" d="M567.4,32 L586.4,32" marker-end="url(#ah-hp1)"/>
+<rect class="node decision" x="587.4" y="16" width="131.9" height="32" rx="7"/><text x="653.4" y="36" text-anchor="middle" style="font-size:12.5px">store or 1 repair</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-fallback" style="font-size:12px">fallback</text>
+<rect class="node proposal" x="112.0" y="68" width="131.9" height="32" rx="7"/><text x="177.9" y="88" text-anchor="middle" style="font-size:12.5px">5–6 section calls</text>
+<path class="arrow" d="M243.9,84 L262.9,84" marker-end="url(#ah-hp1)"/>
+<rect class="node proposal" x="263.9" y="68" width="71.6" height="32" rx="7"/><text x="299.7" y="88" text-anchor="middle" style="font-size:12.5px">assemble</text>
+<path class="arrow" d="M335.5,84 L354.5,84" marker-end="url(#ah-hp1)"/>
+<rect class="node proposal" x="355.5" y="68" width="64.9" height="32" rx="7"/><text x="387.9" y="88" text-anchor="middle" style="font-size:12.5px">compile</text>
+<path class="arrow" d="M420.4,84 L439.4,84" marker-end="url(#ah-hp1)"/>
+<rect class="node proposal" x="440.4" y="68" width="60.0" height="32" rx="7"/><text x="470.4" y="88" text-anchor="middle" style="font-size:12.5px">checks</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="60.0" height="32" rx="7"/><text x="142.0" y="140" text-anchor="middle" style="font-size:12.5px">1 call</text>
+<path class="arrow" d="M172.0,136 L191.0,136" marker-end="url(#ah-hp1)"/>
+<rect class="node plain" x="192.0" y="120" width="152.0" height="32" rx="7"/><text x="268.0" y="140" text-anchor="middle" style="font-size:12.5px">raw ProseMirror JSON</text>
+<path class="arrow" d="M344.0,136 L363.0,136" marker-end="url(#ah-hp1)"/>
+<rect class="node plain" x="364.0" y="120" width="60.0" height="32" rx="7"/><text x="394.0" y="140" text-anchor="middle" style="font-size:12.5px">checks</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="138.6" height="32" rx="7"/><text x="181.3" y="192" text-anchor="middle" style="font-size:12.5px">model picks a tool</text>
+<path class="arrow" d="M250.6,188 L269.6,188" marker-end="url(#ah-hp1)"/>
+<rect class="node plain" x="270.6" y="172" width="60.0" height="32" rx="7"/><text x="300.6" y="192" text-anchor="middle" style="font-size:12.5px">result</text>
+<path class="arrow" d="M330.6,188 L349.6,188" marker-end="url(#ah-hp1)"/>
+<rect class="node plain" x="350.6" y="172" width="118.5" height="32" rx="7"/><text x="409.9" y="192" text-anchor="middle" style="font-size:12.5px">model says done</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt is-chosen"><h4>A · One typed call per lesson <span class="pill chosen">chosen</span></h4><p class="flow">UnitPlan call → LessonDraft call → code compiles → checks → store or 1 repair.</p><p>Fits blocks 3–4 as planned (~9 h). Carries the cut-off risk SP-1 measures.</p></div>
+<div class="opt is-fallback"><h4>B · One call per section <span class="pill fallback">fallback</span></h4><p class="flow">5–6 section calls → assemble → compile → checks.</p><p>Cut-offs nearly vanish. About +2 h [A].</p></div>
+<div class="opt"><h4>C · Model writes editor JSON </h4><p class="flow">1 call → raw ProseMirror JSON → checks.</p><p>Saves 1–2 h [A]. Output 2–3× bigger [A]; risks unsafe markup.</p></div>
+<div class="opt"><h4>D · Agent loop with tools </h4><p class="flow">model picks a tool → result → model says done.</p><p>+4–8 h [A]. Can't be replayed. Contradicts PD-3 and AD-7.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option A, with B as the switch if SP-1 fails.</strong></p><ul><li>The model fills typed slots only. Code decides "what next" and "am I done".</li><li>Brakes include 1 repair round, a 10-minute job limit and a spend check before each call.</li><li>Code writes <code>lesson_link</code> rows at intake. A new block: "an unresolved cross-lesson link".</li></ul></div>
+<div class="spikebox" data-status="proposal"><p><span class="st proposal">Proposal</span> <strong>SP-1 tests this.</strong> Not yet run; see <a href="#sp-h">the spikes</a>.</p></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-3">WP-3</a>; U3 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted. If SP-1 fails, B is the choice. · <strong>Changes:</strong> PD-4; R-8, R-19 · <a href="../design/hard-problems.md#hp-1">Full card</a></p>
+</article>
+<article class="card hp" id="hp-2" data-hp="HP-2" data-status="decision" aria-labelledby="hp2-h">
+<h2 id="hp2-h">HP-2 · Grounding and quotes without the source texts <span class="st decision">Chosen: B · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 5 and 7</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>Lessons discuss <em>The Lightning Thief</em>, "The Hare and the Lion" and the Iliad. We were given none of these texts. The model will "remember" lines anyway. Lesson 4 needs "one sentence from Ch. 1, pp. 1–8, where Percy's sarcastic word choice sets the tone" (<a href="../data/worked-pairs.md#wp-1">WP-1</a>). The reviewer must trust every quote.</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>A lesson may repeat what the row says about a text. It must never state a quote, page or plot fact the row does not give.</p><div class="pair"><div><h4>In</h4><p>Row 8 → Lesson 4, Part A.</p></div><div><h4>Out</h4><p>Right: "Reviewer to insert: one sentence from Ch. 1, pp. 1–8…". Wrong: a short line the model wrote from memory as Percy's words.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>The 12-word rule misses short quotes.</strong> R-19 flags quoted runs of 12+ words, so any made-up quote of 11 words or fewer gets through.</li><li><strong>Not every quotation mark is a quote.</strong> Flag them all, and reviewers stop reading flags.</li><li><strong>Made-up plot facts carry no quotation marks.</strong> "The hare tricks the lion into a pit" reads like normal text.</li><li><strong>A cell can ask for a quote.</strong> SYN-1 plants one such order. A prompt rule alone promises nothing.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-2 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp2t">
+<title id="hp2t">HP-2: four ways to stop made-up quotes</title>
+<defs><marker id="ah-hp2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="16" width="60.0" height="32" rx="7"/><text x="142.0" y="36" text-anchor="middle" style="font-size:12.5px">draft</text>
+<path class="arrow" d="M172.0,32 L191.0,32" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="192.0" y="16" width="105.1" height="32" rx="7"/><text x="244.6" y="36" text-anchor="middle" style="font-size:12.5px">12-word check</text>
+<path class="arrow" d="M297.1,32 L316.1,32" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="317.1" y="16" width="85.0" height="32" rx="7"/><text x="359.6" y="36" text-anchor="middle" style="font-size:12.5px">page check</text>
+<path class="arrow" d="M402.1,32 L421.1,32" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="422.1" y="16" width="71.6" height="32" rx="7"/><text x="457.9" y="36" text-anchor="middle" style="font-size:12.5px">reviewer</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="68" width="178.8" height="32" rx="7"/><text x="201.4" y="88" text-anchor="middle" style="font-size:12.5px">draft with no quote type</text>
+<path class="arrow" d="M290.8,84 L309.8,84" marker-end="url(#ah-hp2)"/>
+<rect class="node decision" x="310.8" y="68" width="85.0" height="32" rx="7"/><text x="353.3" y="88" text-anchor="middle" style="font-size:12.5px">quote scan</text>
+<path class="arrow" d="M395.8,84 L414.8,84" marker-end="url(#ah-hp2)"/>
+<rect class="node decision" x="415.8" y="68" width="78.3" height="32" rx="7"/><text x="455.0" y="88" text-anchor="middle" style="font-size:12.5px">page scan</text>
+<path class="arrow" d="M494.1,84 L513.1,84" marker-end="url(#ah-hp2)"/>
+<rect class="node decision" x="514.1" y="68" width="78.3" height="32" rx="7"/><text x="553.2" y="88" text-anchor="middle" style="font-size:12.5px">name scan</text>
+<path class="arrow" d="M592.4,84 L611.4,84" marker-end="url(#ah-hp2)"/>
+<rect class="node decision" x="612.4" y="68" width="152.0" height="32" rx="7"/><text x="688.4" y="88" text-anchor="middle" style="font-size:12.5px">reviewer adds quotes</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="60.0" height="32" rx="7"/><text x="142.0" y="140" text-anchor="middle" style="font-size:12.5px">draft</text>
+<path class="arrow" d="M172.0,136 L191.0,136" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="192.0" y="120" width="138.6" height="32" rx="7"/><text x="261.3" y="140" text-anchor="middle" style="font-size:12.5px">judge: in the row?</text>
+<path class="arrow" d="M330.6,136 L349.6,136" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="350.6" y="120" width="111.8" height="32" rx="7"/><text x="406.5" y="140" text-anchor="middle" style="font-size:12.5px">advisory flags</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="105.1" height="32" rx="7"/><text x="164.6" y="192" text-anchor="middle" style="font-size:12.5px">listed source</text>
+<path class="arrow" d="M217.1,188 L236.1,188" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="237.1" y="172" width="125.2" height="32" rx="7"/><text x="299.7" y="192" text-anchor="middle" style="font-size:12.5px">code copies span</text>
+<path class="arrow" d="M362.3,188 L381.3,188" marker-end="url(#ah-hp2)"/>
+<rect class="node plain" x="382.3" y="172" width="85.0" height="32" rx="7"/><text x="424.8" y="192" text-anchor="middle" style="font-size:12.5px">hash check</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt"><h4>A · PD-5 as written </h4><p class="flow">draft → 12-word check → page check → reviewer.</p><p>0 extra hours. Misses short quotes and plot facts.</p></div>
+<div class="opt is-chosen"><h4>B · No quote type, three scans <span class="pill chosen">chosen</span></h4><p class="flow">draft with no quote type → quote scan → page scan → name scan → reviewer adds quotes.</p><p>~3 h [A]. A plot fact with no name in it is left to the reviewer.</p></div>
+<div class="opt"><h4>C · A model judge </h4><p class="flow">draft → judge: in the row? → advisory flags.</p><p>~4–5 h [A] plus ~30 labels. Advisory only; may answer from memory.</p></div>
+<div class="opt"><h4>D · Fetch the public-domain texts </h4><p class="flow">listed source → code copies span → hash check.</p><p>~3–4 h [A]. Does nothing for the novel.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option B. The draft has nowhere to put a quote.</strong></p><ul><li>Blocking scans: a quoted span of 3+ words [A] not in the lesson's own row or standards; a page or chapter outside the row's range; a name not in those sources (inside checks; elsewhere SP-3 decides).</li><li>U6: a reviewer supplies the excerpt. U10: a reviewer slot that blocks.</li></ul></div>
+<div class="spikebox" data-status="proposal"><p><span class="st proposal">Proposal</span> <strong>SP-3 tests the scans.</strong> Not yet run; see <a href="#sp-h">the spikes</a>.</p></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-4">WP-4</a>; control <a href="../data/worked-pairs.md#wp-3">WP-3</a>; U6, U10 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted.  · <strong>Changes:</strong> PD-5; R-12, R-19 · <a href="../design/hard-problems.md#hp-2">Full card</a></p>
+</article>
+<article class="card hp" id="hp-3" data-hp="HP-3" data-status="decision" aria-labelledby="hp3-h">
+<h2 id="hp3-h">HP-3 · Proving alignment to standards <span class="st decision">Chosen: B · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 3–9</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>Every standard a lesson lists is a claim to the state. A reviewer opens Lesson 4. It shows <code>L.6.4.b</code>, but the outline wrote the parent <code>L.6.4</code>. The tool chose <code>.b</code> from a note: "think about using morphology" (<a href="../data/worked-pairs.md#wp-1">WP-1</a>). The first flex day has no codes at all (<a href="../data/worked-pairs.md#wp-3">WP-3</a>).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Each standard must say who claimed it. A named person must confirm any claim the outline did not make.</p><div class="pair"><div><h4>In</h4><p>Row 8's <code>L.6.4</code> plus the note.</p></div><div><h4>Out</h4><p><code>L.6.4.b</code>, origin <code>narrowed</code> → a blocking "confirm" item → the reviewer reads the official text → "confirmed by &lt;name&gt;, v2".</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>"Aligned" is never defined.</strong> Code can prove each code is taught and checked somewhere. It can't prove the teaching is real.</li><li><strong>Most lists need a human choice.</strong> 23 of 41 lessons carry 27 bare parent codes [C].</li><li><strong>Empty lists are real.</strong> 6 flex rows have no codes; R-19 as written blocks them all.</li><li><strong>Too many confirmations</strong> and people click without reading.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-3 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp3t">
+<title id="hp3t">HP-3: four ways to handle codes the outline did not name</title>
+<defs><marker id="ah-hp3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="16" width="125.2" height="32" rx="7"/><text x="174.6" y="36" text-anchor="middle" style="font-size:12.5px">tool picks codes</text>
+<path class="arrow" d="M237.2,32 L256.2,32" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="257.2" y="16" width="145.3" height="32" rx="7"/><text x="329.9" y="36" text-anchor="middle" style="font-size:12.5px">&quot;AI-proposed&quot; label</text>
+<path class="arrow" d="M402.5,32 L421.5,32" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="422.5" y="16" width="71.6" height="32" rx="7"/><text x="458.3" y="36" text-anchor="middle" style="font-size:12.5px">one tick</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="68" width="111.8" height="32" rx="7"/><text x="167.9" y="88" text-anchor="middle" style="font-size:12.5px">codes + origin</text>
+<path class="arrow" d="M223.8,84 L242.8,84" marker-end="url(#ah-hp3)"/>
+<rect class="node decision" x="243.8" y="68" width="152.0" height="32" rx="7"/><text x="319.8" y="88" text-anchor="middle" style="font-size:12.5px">tool narrows or adds</text>
+<path class="arrow" d="M395.8,84 L414.8,84" marker-end="url(#ah-hp3)"/>
+<rect class="node decision" x="415.8" y="68" width="145.3" height="32" rx="7"/><text x="488.5" y="88" text-anchor="middle" style="font-size:12.5px">confirm items block</text>
+<path class="arrow" d="M561.1,84 L580.1,84" marker-end="url(#ah-hp3)"/>
+<rect class="node decision" x="581.1" y="68" width="131.9" height="32" rx="7"/><text x="647.1" y="88" text-anchor="middle" style="font-size:12.5px">reviewer confirms</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="172.1" height="32" rx="7"/><text x="198.1" y="140" text-anchor="middle" style="font-size:12.5px">parent or empty = error</text>
+<path class="arrow" d="M284.1,136 L303.1,136" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="304.1" y="120" width="98.4" height="32" rx="7"/><text x="353.3" y="140" text-anchor="middle" style="font-size:12.5px">author picks</text>
+<path class="arrow" d="M402.5,136 L421.5,136" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="422.5" y="120" width="71.6" height="32" rx="7"/><text x="458.3" y="140" text-anchor="middle" style="font-size:12.5px">Generate</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="60.0" height="32" rx="7"/><text x="142.0" y="192" text-anchor="middle" style="font-size:12.5px">draft</text>
+<path class="arrow" d="M172.0,188 L191.0,188" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="192.0" y="172" width="138.6" height="32" rx="7"/><text x="261.3" y="192" text-anchor="middle" style="font-size:12.5px">judge per activity</text>
+<path class="arrow" d="M330.6,188 L349.6,188" marker-end="url(#ah-hp3)"/>
+<rect class="node plain" x="350.6" y="172" width="91.7" height="32" rx="7"/><text x="396.5" y="192" text-anchor="middle" style="font-size:12.5px">&quot;no&quot; blocks</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt"><h4>A · Labels only </h4><p class="flow">tool picks codes → &quot;AI-proposed&quot; label → one tick.</p><p>0 extra hours. AI-chosen codes can pass unread.</p></div>
+<div class="opt is-chosen"><h4>B · Confirm what the outline didn't say <span class="pill chosen">chosen</span></h4><p class="flow">codes + origin → tool narrows or adds → confirm items block → reviewer confirms.</p><p>~2.5 h [A]. About 2–4 confirmations per lesson [C].</p></div>
+<div class="opt"><h4>C · Author picks all codes </h4><p class="flow">parent or empty = error → author picks → Generate.</p><p>~2 h [A]. 27 picks plus 6 flex rows [C] at the busiest step.</p></div>
+<div class="opt"><h4>D · Judge is the gate </h4><p class="flow">draft → judge per activity → &quot;no&quot; blocks.</p><p>~5 h [A] plus ~30 labels. Against PD-17.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option B. A person checks exactly where the outline stopped making the claim.</strong></p><ul><li>Every code carries an <code>origin</code>: <code>outline</code>, <code>outline-fixed</code>, <code>narrowed</code> or <code>added</code>. The last two block Approve.</li><li>WP-1 changes: <code>L.6.4.b</code> becomes a blocking confirmation. Confirmations count in neither V-1 nor G-1.</li><li>U1 → <code>L.6.4.b</code>. U5 → <code>a</code>, <code>b</code>, <code>f</code>, with "add?" for <code>c</code>, <code>d</code>. U7 → (b).</li></ul></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-3">WP-3</a>; control <a href="../data/worked-pairs.md#wp-5">WP-5</a>; U1, U5, U7 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted.  · <strong>Changes:</strong> PD-6; R-19, R-20 · <a href="../design/hard-problems.md#hp-3">Full card</a></p>
+</article>
+<article class="card hp" id="hp-4" data-hp="HP-4" data-status="decision" aria-labelledby="hp4-h">
+<h2 id="hp4-h">HP-4 · Which copy of a lesson is canonical <span class="st decision">Chosen: A · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 7–9</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>A lesson lives in three copies. The live one is a Y.Doc, a shared Yjs document that merges everyone's typing. The stored one is ProseMirror JSON. At 14:02:01 a reviewer types a sentence into Lesson 4's "Reviewer to insert" slot (<a href="../data/worked-pairs.md#wp-1">WP-1</a>). Checks, approval and export must all read it.</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Every reader gets the lesson the editors last stored, and the stored record can always be rebuilt from the live copy.</p><div class="pair"><div><h4>In</h4><p>The edit at 14:02:01.</p></div><div><h4>Out</h4><p>By 14:02:03 one Postgres row holds the Y.Doc bytes, the JSON, its hash and its state vector (a list of which edits it holds). By 14:02:06 the placeholder block is gone.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>Two stores written by separate code drift apart.</strong></li><li><strong>The live copy runs ahead</strong> of the stored one by up to 2 s.</li><li><strong>Round trips can change bytes.</strong> Then the hash changes with no edit, and every approval pin fails.</li><li><strong>Rebuilding duplicates.</strong> A fresh Y.Doc beside the old one makes Yjs merge both, so text appears twice.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-4 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 172" role="img" aria-labelledby="hp4t">
+<title id="hp4t">HP-4: three ways to choose the master copy</title>
+<defs><marker id="ah-hp4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="16" width="60.0" height="32" rx="7"/><text x="142.0" y="36" text-anchor="middle" style="font-size:12.5px">edit</text>
+<path class="arrow" d="M172.0,32 L191.0,32" marker-end="url(#ah-hp4)"/>
+<rect class="node decision" x="192.0" y="16" width="118.5" height="32" rx="7"/><text x="251.2" y="36" text-anchor="middle" style="font-size:12.5px">Y.Doc in memory</text>
+<path class="arrow" d="M310.5,32 L329.5,32" marker-end="url(#ah-hp4)"/>
+<rect class="node decision" x="330.5" y="16" width="91.7" height="32" rx="7"/><text x="376.4" y="36" text-anchor="middle" style="font-size:12.5px">store ≤ 2 s</text>
+<path class="arrow" d="M422.2,32 L441.2,32" marker-end="url(#ah-hp4)"/>
+<rect class="node decision" x="442.2" y="16" width="118.5" height="32" rx="7"/><text x="501.4" y="36" text-anchor="middle" style="font-size:12.5px">one transaction</text>
+<path class="arrow" d="M560.7,32 L579.7,32" marker-end="url(#ah-hp4)"/>
+<rect class="node decision" x="580.7" y="16" width="152.0" height="32" rx="7"/><text x="656.7" y="36" text-anchor="middle" style="font-size:12.5px">readers read the row</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="68" width="71.6" height="32" rx="7"/><text x="147.8" y="88" text-anchor="middle" style="font-size:12.5px">JSON row</text>
+<path class="arrow" d="M183.6,84 L202.6,84" marker-end="url(#ah-hp4)"/>
+<rect class="node plain" x="203.6" y="68" width="131.9" height="32" rx="7"/><text x="269.6" y="88" text-anchor="middle" style="font-size:12.5px">Y.Doc per version</text>
+<path class="arrow" d="M335.5,84 L354.5,84" marker-end="url(#ah-hp4)"/>
+<rect class="node plain" x="355.5" y="68" width="60.0" height="32" rx="7"/><text x="385.5" y="88" text-anchor="middle" style="font-size:12.5px">edit</text>
+<path class="arrow" d="M415.5,84 L434.5,84" marker-end="url(#ah-hp4)"/>
+<rect class="node plain" x="435.5" y="68" width="98.4" height="32" rx="7"/><text x="484.7" y="88" text-anchor="middle" style="font-size:12.5px">back to JSON</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="111.8" height="32" rx="7"/><text x="167.9" y="140" text-anchor="middle" style="font-size:12.5px">append updates</text>
+<path class="arrow" d="M223.8,136 L242.8,136" marker-end="url(#ah-hp4)"/>
+<rect class="node plain" x="243.8" y="120" width="105.1" height="32" rx="7"/><text x="296.4" y="140" text-anchor="middle" style="font-size:12.5px">reader merges</text>
+<path class="arrow" d="M348.9,136 L367.9,136" marker-end="url(#ah-hp4)"/>
+<rect class="node plain" x="368.9" y="120" width="91.7" height="32" rx="7"/><text x="414.8" y="140" text-anchor="middle" style="font-size:12.5px">derive JSON</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt is-chosen"><h4>A · Y.Doc is the master <span class="pill chosen">chosen</span></h4><p class="flow">edit → Y.Doc in memory → store ≤ 2 s → one transaction → readers read the row.</p><p>About +1.5 h [A]. Only the collaboration server writes content.</p></div>
+<div class="opt"><h4>B · JSON is the master </h4><p class="flow">JSON row → Y.Doc per version → edit → back to JSON.</p><p>About +1 h [A]. Text duplicates; edits at risk.</p></div>
+<div class="opt"><h4>C · Store only Yjs updates </h4><p class="flow">append updates → reader merges → derive JSON.</p><p>Same time as A, no saving. Two readers can disagree.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option A, plus the front matter in the same Y.Doc.</strong></p><ul><li>Each store writes bytes, JSON, hash and state vector in one transaction.</li><li>Standards and minutes live in the Y.Doc too.</li></ul></div>
+<div class="addendum"><h3>Addendum: the batch run comes before the editor</h3><p>The 47-lesson run starts Sunday ~18:00; the editor schema comes later, in blocks 6–7. ProseMirror drops unknown nodes silently. <strong>Rule:</strong> one schema module, written in block 3, shared by compiler, editor and server. Each lesson stores <code>schema_version</code>. A lesson the schema can't read fails loudly.</p></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a> · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted. SP-2 checks the round trip. · <strong>Changes:</strong> PD-7 (first half); R-11, R-26, R-28, R-29, R-35, R-42 · <a href="../design/hard-problems.md#hp-4">Full card</a></p>
+</article>
+<article class="card hp" id="hp-5" data-hp="HP-5" data-status="decision" aria-labelledby="hp5-h">
+<h2 id="hp5-h">HP-5 · Approval integrity under live co-editing and AI edits <span class="st decision">Chosen: B · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 7–9</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>"Approved" must mean a named person approved exactly the text they saw. Reviewer A clicks Submit on Lesson 4; reviewer B's last keystroke lands 300 ms later. Ten minutes on, the approver opens it. And Lesson 4's homework waits on Lesson 5's excerpt (<a href="../data/worked-pairs.md#wp-1">WP-1</a>, U3).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>The server refuses any approval that does not match, edit for edit, the version the approver loaded.</p><div class="pair"><div><h4>In</h4><p>The approver loaded Lesson 5 at v4. A request-changes cycle made v5. The old tab sends approve(v4 hash, v4 state vector).</p></div><div><h4>Out</h4><p><code>409</code> "this lesson changed since you opened it". Nothing changes.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>Yjs never reports a conflict.</strong> A late edit just merges in, so what the approver saw must be captured on purpose.</li><li><strong>The stored row lags</strong> by up to 2 s, so an edit still in memory can slip in.</li><li><strong>AI rewrites</strong> written straight into the text mix with a co-editor's typing.</li><li><strong>Four-eyes</strong> needs a name on each edit, and Yjs updates carry none.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-5 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 172" role="img" aria-labelledby="hp5t">
+<title id="hp5t">HP-5: three ways to pin what the approver saw</title>
+<defs><marker id="ah-hp5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="16" width="64.9" height="32" rx="7"/><text x="144.4" y="36" text-anchor="middle" style="font-size:12.5px">approve</text>
+<path class="arrow" d="M176.9,32 L195.9,32" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="196.9" y="16" width="60.0" height="32" rx="7"/><text x="226.9" y="36" text-anchor="middle" style="font-size:12.5px">lock</text>
+<path class="arrow" d="M256.9,32 L275.9,32" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="276.9" y="16" width="60.0" height="32" rx="7"/><text x="306.9" y="36" text-anchor="middle" style="font-size:12.5px">flush</text>
+<path class="arrow" d="M336.9,32 L355.9,32" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="356.9" y="16" width="131.9" height="32" rx="7"/><text x="422.8" y="36" text-anchor="middle" style="font-size:12.5px">compare with live</text>
+<path class="arrow" d="M488.8,32 L507.8,32" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="508.8" y="16" width="78.3" height="32" rx="7"/><text x="547.9" y="36" text-anchor="middle" style="font-size:12.5px">read-only</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="68" width="60.0" height="32" rx="7"/><text x="142.0" y="88" text-anchor="middle" style="font-size:12.5px">submit</text>
+<path class="arrow" d="M172.0,84 L191.0,84" marker-end="url(#ah-hp5)"/>
+<rect class="node decision" x="192.0" y="68" width="98.4" height="32" rx="7"/><text x="241.2" y="88" text-anchor="middle" style="font-size:12.5px">lock + flush</text>
+<path class="arrow" d="M290.4,84 L309.4,84" marker-end="url(#ah-hp5)"/>
+<rect class="node decision" x="310.4" y="68" width="138.6" height="32" rx="7"/><text x="379.7" y="88" text-anchor="middle" style="font-size:12.5px">read-only snapshot</text>
+<path class="arrow" d="M449.0,84 L468.0,84" marker-end="url(#ah-hp5)"/>
+<rect class="node decision" x="469.0" y="68" width="145.3" height="32" rx="7"/><text x="541.6" y="88" text-anchor="middle" style="font-size:12.5px">approve = snapshot?</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="64.9" height="32" rx="7"/><text x="144.4" y="140" text-anchor="middle" style="font-size:12.5px">approve</text>
+<path class="arrow" d="M176.9,136 L195.9,136" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="196.9" y="120" width="172.1" height="32" rx="7"/><text x="282.9" y="140" text-anchor="middle" style="font-size:12.5px">compare with stored row</text>
+<path class="arrow" d="M369.0,136 L388.0,136" marker-end="url(#ah-hp5)"/>
+<rect class="node plain" x="389.0" y="120" width="125.2" height="32" rx="7"/><text x="451.6" y="140" text-anchor="middle" style="font-size:12.5px">edits still land</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt"><h4>A · Live pin at approval </h4><p class="flow">approve → lock → flush → compare with live → read-only.</p><p>About 4 h [A]. A race against live typing on every click.</p></div>
+<div class="opt is-chosen"><h4>B · Submit freezes the lesson <span class="pill chosen">chosen</span></h4><p class="flow">submit → lock + flush → read-only snapshot → approve = snapshot?.</p><p>About 3 h [A]. A typo fix needs a withdraw first.</p></div>
+<div class="opt"><h4>C · Compare with stored row </h4><p class="flow">approve → compare with stored row → edits still land.</p><p>About 1.5 h [A]. Fails R-33's test under load.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option B. A submitted lesson can't change, so "approved what was seen" holds by design.</strong></p><ul><li>AI suggestions wait in a side panel; a pending one blocks Submit and Approve. Regenerate never touches the current version.</li><li>U3: Lesson 4 blocks until Lesson 5 is approved with its slot filled.</li></ul></div>
+<div class="spikebox" data-status="proposal"><p><span class="st proposal">Proposal</span> <strong>SP-2 tests this.</strong> Not yet run; see <a href="#sp-h">the spikes</a>.</p></div><div class="addendum"><h3>Addendum: reopening a lesson another one needs</h3><p>If Lesson 5 is reopened, Lesson 4 is flagged, and <strong>export holds Lesson 4 back until Lesson 5 is approved again.</strong> Nothing reopens on its own.</p></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-4">WP-4</a>; U3 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted. If SP-2 fails, close all connections at Submit. · <strong>Changes:</strong> PD-7 (second half); R-19, R-29, R-31, R-33, R-34, R-42 · <a href="../design/hard-problems.md#hp-5">Full card</a></p>
+</article>
+<article class="card hp" id="hp-6" data-hp="HP-6" data-status="decision" aria-labelledby="hp6-h">
+<h2 id="hp6-h">HP-6 · Outline normalization: codes, ELD labels, notes and unit-wide rules <span class="st decision">Chosen: A · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 1–2</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>An author uploads the outline, and the report opens on row 8. Its focus cell reads <code>RL.6.1, 6.2 L.6.4</code>. Its plan cell holds a reviewer's note: "Instead, think about using morphology…". Its 10 words break a 6-word cap written on row 9. Row 39 lists a code that does not exist (<a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-4">WP-4</a>).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Turn a messy outline into typed rows the generator can trust, and decide which problems must be settled before Generate.</p><div class="pair"><div><h4>In</h4><p>Row 8, focus <code>RL.6.1, 6.2 L.6.4</code>.</p></div><div><h4>Out</h4><p><code>RL.6.1</code> OK · <code>6.2</code> <strong>error</strong>, fix <code>RL.6.2</code> proposed · <code>L.6.4</code> warning. Generate stays off until the author settles the fix.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>Plan and comment share a cell.</strong> Only formatting tells them apart.</li><li><strong>A rule on one row rules others.</strong> "Across Investigation 1" on row 9 means rows 8–23.</li><li><strong>Fixes are guesses.</strong> <code>6.2</code> could be <code>RL</code>, <code>RI</code> or <code>W</code>. Only the author knows.</li><li><strong>Too many questions fail too.</strong> One ELD code sits on 20 rows: 20+ clicks [C].</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-6 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp6t">
+<title id="hp6t">HP-6: four ways to clean the outline</title>
+<defs><marker id="ah-hp6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="16" width="91.7" height="32" rx="7"/><text x="157.8" y="36" text-anchor="middle" style="font-size:12.5px">find header</text>
+<path class="arrow" d="M203.7,32 L222.7,32" marker-end="url(#ah-hp6)"/>
+<rect class="node decision" x="223.7" y="16" width="91.7" height="32" rx="7"/><text x="269.6" y="36" text-anchor="middle" style="font-size:12.5px">split cells</text>
+<path class="arrow" d="M315.4,32 L334.4,32" marker-end="url(#ah-hp6)"/>
+<rect class="node decision" x="335.4" y="16" width="105.1" height="32" rx="7"/><text x="387.9" y="36" text-anchor="middle" style="font-size:12.5px">look up codes</text>
+<path class="arrow" d="M440.5,32 L459.5,32" marker-end="url(#ah-hp6)"/>
+<rect class="node decision" x="460.5" y="16" width="91.7" height="32" rx="7"/><text x="506.4" y="36" text-anchor="middle" style="font-size:12.5px">errors gate</text>
+<path class="arrow" d="M552.2,32 L571.2,32" marker-end="url(#ah-hp6)"/>
+<rect class="node decision" x="572.2" y="16" width="71.6" height="32" rx="7"/><text x="608.0" y="36" text-anchor="middle" style="font-size:12.5px">Generate</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="68" width="60.0" height="32" rx="7"/><text x="142.0" y="88" text-anchor="middle" style="font-size:12.5px">parse</text>
+<path class="arrow" d="M172.0,84 L191.0,84" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="192.0" y="68" width="138.6" height="32" rx="7"/><text x="261.3" y="88" text-anchor="middle" style="font-size:12.5px">model call per row</text>
+<path class="arrow" d="M330.6,84 L349.6,84" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="350.6" y="68" width="118.5" height="32" rx="7"/><text x="409.9" y="88" text-anchor="middle" style="font-size:12.5px">author confirms</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="60.0" height="32" rx="7"/><text x="142.0" y="140" text-anchor="middle" style="font-size:12.5px">parse</text>
+<path class="arrow" d="M172.0,136 L191.0,136" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="192.0" y="120" width="91.7" height="32" rx="7"/><text x="237.8" y="140" text-anchor="middle" style="font-size:12.5px">errors gate</text>
+<path class="arrow" d="M283.7,136 L302.7,136" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="303.7" y="120" width="158.7" height="32" rx="7"/><text x="383.1" y="140" text-anchor="middle" style="font-size:12.5px">whole cells to prompt</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="85.0" height="32" rx="7"/><text x="154.5" y="192" text-anchor="middle" style="font-size:12.5px">clean as A</text>
+<path class="arrow" d="M197.0,188 L216.0,188" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="217.0" y="172" width="138.6" height="32" rx="7"/><text x="286.3" y="192" text-anchor="middle" style="font-size:12.5px">confirm every line</text>
+<path class="arrow" d="M355.6,188 L374.6,188" marker-end="url(#ah-hp6)"/>
+<rect class="node plain" x="375.6" y="172" width="71.6" height="32" rx="7"/><text x="411.4" y="192" text-anchor="middle" style="font-size:12.5px">Generate</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt is-chosen"><h4>A · Code-only, safe defaults <span class="pill chosen">chosen</span></h4><p class="flow">find header → split cells → look up codes → errors gate → Generate.</p><p>About 5.5 h [A]. Free, exact, testable.</p></div>
+<div class="opt"><h4>B · A model reads each row </h4><p class="flow">parse → model call per row → author confirms.</p><p>About 8–9 h [A]. Costs money; SYN-1 reaches a model first.</p></div>
+<div class="opt"><h4>C · Pass cells straight through </h4><p class="flow">parse → errors gate → whole cells to prompt.</p><p>About 2.5 h [A]. Fails R-6: row 8 ships 10 words.</p></div>
+<div class="opt"><h4>D · A, confirm every warning </h4><p class="flow">clean as A → confirm every line → Generate.</p><p>About 5.5 h [A]. A gate people click through proves nothing.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option A. Ask a person only where a wrong guess would be silent and costly.</strong></p><ul><li>Model at generation: the sub-part a note points at, which 6 of 10 words. Labelled "AI-proposed".</li><li>Person before Generate: each error; 5 on the issued sheet [C]. Everything else has a stored default.</li></ul></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a> … <a href="../data/worked-pairs.md#wp-5">WP-5</a>; SYN-1…3; U1, U2, U4, U5, U8 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted.  · <strong>Changes:</strong> new PD-27; R-3–R-6, R-11, R-19 · <a href="../design/hard-problems.md#hp-6">Full card</a></p>
+</article>
+<article class="card hp" id="hp-7" data-hp="HP-7" data-status="decision" aria-labelledby="hp7-h">
+<h2 id="hp7-h">HP-7 · Long jobs: rate limits, truncation, resume, spend <span class="st decision">Chosen: B · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 3 and 5</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>On Sunday evening the author starts the full 47-day run. Midway, a push to the mirror redeploys the app and restarts the worker. The same machinery runs the live demo on rows 8, 9 and 25 (<a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-3">WP-3</a>).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Survive restarts, 429s (the provider saying "slow down"), cut-offs and a spend cap, storing each lesson once.</p><div class="pair"><div><h4>In</h4><p>The worker dies while drafting Lesson 23. Lesson 22's draft has just come back, not yet stored.</p></div><div><h4>Out</h4><p>After the restart, Lesson 23 carries on. Lesson 22 is built from its saved output, no second call. The run ends "46 of 47 ready, 1 failed: truncated".</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>"No job billed twice" can't hold literally.</strong> A worker can die after the provider answers but before we store.</li><li><strong>A cap checked per call overshoots.</strong> With 6 calls in flight, by up to 6 × one call's top cost [C].</li><li><strong>A cut-off looks like a schema failure</strong> and would waste the one repair round.</li><li><strong>429s arrive together,</strong> so plain retries hit the limit again.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-7 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp7t">
+<title id="hp7t">HP-7: four ways to run long jobs</title>
+<defs><marker id="ah-hp7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="16" width="64.9" height="32" rx="7"/><text x="144.4" y="36" text-anchor="middle" style="font-size:12.5px">enqueue</text>
+<path class="arrow" d="M176.9,32 L195.9,32" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="196.9" y="16" width="60.0" height="32" rx="7"/><text x="226.9" y="36" text-anchor="middle" style="font-size:12.5px">worker</text>
+<path class="arrow" d="M256.9,32 L275.9,32" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="276.9" y="16" width="91.7" height="32" rx="7"/><text x="322.8" y="36" text-anchor="middle" style="font-size:12.5px">copy status</text>
+<path class="arrow" d="M368.6,32 L387.6,32" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="388.6" y="16" width="125.2" height="32" rx="7"/><text x="451.2" y="36" text-anchor="middle" style="font-size:12.5px">board reads copy</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="68" width="125.2" height="32" rx="7"/><text x="174.6" y="88" text-anchor="middle" style="font-size:12.5px">claim with lease</text>
+<path class="arrow" d="M237.2,84 L256.2,84" marker-end="url(#ah-hp7)"/>
+<rect class="node decision" x="257.2" y="68" width="105.1" height="32" rx="7"/><text x="309.8" y="88" text-anchor="middle" style="font-size:12.5px">reserve spend</text>
+<path class="arrow" d="M362.3,84 L381.3,84" marker-end="url(#ah-hp7)"/>
+<rect class="node decision" x="382.3" y="68" width="60.0" height="32" rx="7"/><text x="412.3" y="88" text-anchor="middle" style="font-size:12.5px">call</text>
+<path class="arrow" d="M442.3,84 L461.3,84" marker-end="url(#ah-hp7)"/>
+<rect class="node decision" x="462.3" y="68" width="118.5" height="32" rx="7"/><text x="521.5" y="88" text-anchor="middle" style="font-size:12.5px">save raw output</text>
+<path class="arrow" d="M580.8,84 L599.8,84" marker-end="url(#ah-hp7)"/>
+<rect class="node decision" x="600.8" y="68" width="85.0" height="32" rx="7"/><text x="643.3" y="88" text-anchor="middle" style="font-size:12.5px">store once</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="64.9" height="32" rx="7"/><text x="144.4" y="140" text-anchor="middle" style="font-size:12.5px">request</text>
+<path class="arrow" d="M176.9,136 L195.9,136" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="196.9" y="120" width="60.0" height="32" rx="7"/><text x="226.9" y="140" text-anchor="middle" style="font-size:12.5px">call</text>
+<path class="arrow" d="M256.9,136 L275.9,136" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="276.9" y="120" width="131.9" height="32" rx="7"/><text x="342.8" y="140" text-anchor="middle" style="font-size:12.5px">restart: run lost</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="91.7" height="32" rx="7"/><text x="157.8" y="192" text-anchor="middle" style="font-size:12.5px">47 requests</text>
+<path class="arrow" d="M203.7,188 L222.7,188" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="223.7" y="172" width="60.0" height="32" rx="7"/><text x="253.7" y="192" text-anchor="middle" style="font-size:12.5px">batch</text>
+<path class="arrow" d="M283.7,188 L302.7,188" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="303.7" y="172" width="60.0" height="32" rx="7"/><text x="333.7" y="192" text-anchor="middle" style="font-size:12.5px">poll</text>
+<path class="arrow" d="M363.7,188 L382.7,188" marker-end="url(#ah-hp7)"/>
+<rect class="node plain" x="383.7" y="172" width="98.4" height="32" rx="7"/><text x="432.9" y="192" text-anchor="middle" style="font-size:12.5px">repair batch</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt"><h4>A · pg-boss plus our tables </h4><p class="flow">enqueue → worker → copy status → board reads copy.</p><p>About 2 h [A]. State in two places can drift.</p></div>
+<div class="opt is-chosen"><h4>B · One lesson_job table <span class="pill chosen">chosen</span></h4><p class="flow">claim with lease → reserve spend → call → save raw output → store once.</p><p>About 2–2.5 h [A]. The board reads the same rows.</p></div>
+<div class="opt"><h4>C · Jobs in the web app </h4><p class="flow">request → call → restart: run lost.</p><p>About 1 h. Any deploy kills the run.</p></div>
+<div class="opt"><h4>D · Provider batch API </h4><p class="flow">47 requests → batch → poll → repair batch.</p><p>+2–3 h [A]. No live progress; two paths.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option B. One table is both the queue and what the board shows.</strong></p><p>Workers claim rows with <code>SKIP LOCKED</code>, so no two hold the same row. A lease is a claim that runs out unless renewed.</p><ul><li>Each call reserves its top cost first; a call that would pass the cap is refused.</li><li>R-16 reworded: no lesson stored twice, no completed call paid again, lost calls counted.</li></ul></div>
+<div class="note-unknown" data-status="unknown"><p><span class="st unknown">Unknown</span> Still Innocent's to answer: the failure to survive (SD-7.2) and the spend ceiling (SD-1.6).</p></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-3">WP-3</a> · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted. SP-1 sets the caps. · <strong>Changes:</strong> PD-13; PD-14; R-16, R-48 · <a href="../design/hard-problems.md#hp-7">Full card</a></p>
+</article>
+<article class="card hp" id="hp-8" data-hp="HP-8" data-status="decision" aria-labelledby="hp8-h">
+<h2 id="hp8-h">HP-8 · Measuring the north star honestly <span class="st decision">Chosen: B · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 6–9</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>Our headline number is reviewer minutes per approved lesson. Lower is better, so skimming "wins". On Monday Innocent reviews Lesson 4 (<a href="../data/worked-pairs.md#wp-1">WP-1</a>). A second account approves, and the server writes the frozen metrics row. The demo ends on the north-star tile.</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Count active review minutes so that skimming, idle tabs, scripted sessions and tiny samples can't flatter the number.</p><div class="pair"><div><h4>In</h4><p>Reviewer 14 active minutes; approver 9; a Claude-driven test 3.</p></div><div><h4>Out</h4><p><code>active_minutes = 23</code>, <code>synthetic_minutes_excluded = 3</code>. Tile: "Reading median 23 min, n = 1 · G-2 0% · approved 1 of 47".</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>No baseline (AQ-14).</strong> Any figure is a measurement, not an improvement.</li><li><strong>Skimming wins.</strong> G-2 must flag approvals faster than reading, and today it has two thresholds.</li><li><strong>Our reviewers are us.</strong> Claude-driven sessions send machine-speed heartbeats.</li><li><strong>Tiny samples.</strong> With one reviewer, every total is one person's number.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-8 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp8t">
+<title id="hp8t">HP-8: four ways to count review minutes</title>
+<defs><marker id="ah-hp8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="16" width="60.0" height="32" rx="7"/><text x="142.0" y="36" text-anchor="middle" style="font-size:12.5px">open</text>
+<path class="arrow" d="M172.0,32 L191.0,32" marker-end="url(#ah-hp8)"/>
+<rect class="node plain" x="192.0" y="16" width="60.0" height="32" rx="7"/><text x="222.0" y="36" text-anchor="middle" style="font-size:12.5px">close</text>
+<path class="arrow" d="M252.0,32 L271.0,32" marker-end="url(#ah-hp8)"/>
+<rect class="node plain" x="272.0" y="16" width="60.0" height="32" rx="7"/><text x="302.0" y="36" text-anchor="middle" style="font-size:12.5px">sum</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="68" width="111.8" height="32" rx="7"/><text x="167.9" y="88" text-anchor="middle" style="font-size:12.5px">heartbeat 15 s</text>
+<path class="arrow" d="M223.8,84 L242.8,84" marker-end="url(#ah-hp8)"/>
+<rect class="node decision" x="243.8" y="68" width="111.8" height="32" rx="7"/><text x="299.7" y="88" text-anchor="middle" style="font-size:12.5px">merge per user</text>
+<path class="arrow" d="M355.6,84 L374.6,84" marker-end="url(#ah-hp8)"/>
+<rect class="node decision" x="375.6" y="68" width="158.7" height="32" rx="7"/><text x="455.0" y="88" text-anchor="middle" style="font-size:12.5px">row at first approval</text>
+<path class="arrow" d="M534.3,84 L553.3,84" marker-end="url(#ah-hp8)"/>
+<rect class="node decision" x="554.3" y="68" width="91.7" height="32" rx="7"/><text x="600.2" y="88" text-anchor="middle" style="font-size:12.5px">tile with n</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="78.3" height="32" rx="7"/><text x="151.2" y="140" text-anchor="middle" style="font-size:12.5px">6 lessons</text>
+<path class="arrow" d="M190.3,136 L209.3,136" marker-end="url(#ah-hp8)"/>
+<rect class="node plain" x="210.3" y="120" width="131.9" height="32" rx="7"/><text x="276.2" y="140" text-anchor="middle" style="font-size:12.5px">3 with, 3 without</text>
+<path class="arrow" d="M342.2,136 L361.2,136" marker-end="url(#ah-hp8)"/>
+<rect class="node plain" x="362.2" y="120" width="91.7" height="32" rx="7"/><text x="408.1" y="140" text-anchor="middle" style="font-size:12.5px">two medians</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="105.1" height="32" rx="7"/><text x="164.6" y="192" text-anchor="middle" style="font-size:12.5px">define metric</text>
+<path class="arrow" d="M217.1,188 L236.1,188" marker-end="url(#ah-hp8)"/>
+<rect class="node plain" x="237.1" y="172" width="64.9" height="32" rx="7"/><text x="269.6" y="192" text-anchor="middle" style="font-size:12.5px">no tile</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt"><h4>A · Wall clock </h4><p class="flow">open → close → sum.</p><p>About 0.5 h [A]. Counts idle tabs.</p></div>
+<div class="opt is-chosen"><h4>B · Heartbeats with honesty rules <span class="pill chosen">chosen</span></h4><p class="flow">heartbeat 15 s → merge per user → row at first approval → tile with n.</p><p>About 2 h. Rules out claiming any saving.</p></div>
+<div class="opt"><h4>C · B plus a with/without test </h4><p class="flow">6 lessons → 3 with, 3 without → two medians.</p><p>Plus ~2.5 h of Innocent's time. n = 3 is an anecdote.</p></div>
+<div class="opt"><h4>D · No number </h4><p class="flow">define metric → no tile.</p><p>0 h. Contradicts PD-17.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option B, with honesty rules.</strong></p><ul><li>Count only a focused tab with input in the last 60 s [A].</li><li><code>synthetic</code> sessions are left out. Count to the first approval only.</li><li>One G-2 threshold: under half the version's own read time.</li></ul></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a> … <a href="../data/worked-pairs.md#wp-4">WP-4</a> · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted. AQ-14 stays open. · <strong>Changes:</strong> PD-1, PD-25; R-36, R-49, R-52; GR-15 · <a href="../design/hard-problems.md#hp-8">Full card</a></p>
+</article>
+<article class="card hp" id="hp-9" data-hp="HP-9" data-status="decision" aria-labelledby="hp9-h">
+<h2 id="hp9-h">HP-9 · Content-safety notes and teacher-only text <span class="st decision">Chosen: A · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 1–2, 5, 7–8</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>Row 39's Homework cell says "Warn students about potentially triggering scene in tonight's reading (references to domestic abuse)". Copied as written, that line would land in the students' homework list (<a href="../data/worked-pairs.md#wp-4">WP-4</a>).</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>A sentence written to the teacher is never shown to students. Approval waits until a named person has handled it.</p><div class="pair"><div><h4>In</h4><p>Row 39 Homework: the reading plus the warning.</p></div><div><h4>Out</h4><p>Student homework: "Read and annotate <em>The Lightning Thief</em> Chapter 21 (pp. 344–353)". A <code>teacher_tip</code> with the warning. An open flag that blocks Approve.</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>The column and the sentence disagree</strong> about who reads it.</li><li><strong>One real case in 620 cells [M].</strong> A tight keyword list flags exactly 1. A broad one flags 30, and 29 are false [M].</li><li><strong>A model must not clear a flag,</strong> or a cell can talk it out of asking a human.</li><li><strong>Disclosure prompts</strong> such as "Describe a time you felt left out" are harmful next to this chapter.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-9 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp9t">
+<title id="hp9t">HP-9: four ways to catch a warning to the teacher</title>
+<defs><marker id="ah-hp9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="16" width="71.6" height="32" rx="7"/><text x="147.8" y="36" text-anchor="middle" style="font-size:12.5px">patterns</text>
+<path class="arrow" d="M183.6,32 L202.6,32" marker-end="url(#ah-hp9)"/>
+<rect class="node decision" x="203.6" y="16" width="118.5" height="32" rx="7"/><text x="262.9" y="36" text-anchor="middle" style="font-size:12.5px">author confirms</text>
+<path class="arrow" d="M322.1,32 L341.1,32" marker-end="url(#ah-hp9)"/>
+<rect class="node decision" x="342.1" y="16" width="165.4" height="32" rx="7"/><text x="424.8" y="36" text-anchor="middle" style="font-size:12.5px">code places tip + flag</text>
+<path class="arrow" d="M507.5,32 L526.5,32" marker-end="url(#ah-hp9)"/>
+<rect class="node decision" x="527.5" y="16" width="118.5" height="32" rx="7"/><text x="586.8" y="36" text-anchor="middle" style="font-size:12.5px">reviewer clears</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="68" width="118.5" height="32" rx="7"/><text x="171.2" y="88" text-anchor="middle" style="font-size:12.5px">classifier call</text>
+<path class="arrow" d="M230.5,84 L249.5,84" marker-end="url(#ah-hp9)"/>
+<rect class="node plain" x="250.5" y="68" width="118.5" height="32" rx="7"/><text x="309.8" y="88" text-anchor="middle" style="font-size:12.5px">author confirms</text>
+<path class="arrow" d="M369.0,84 L388.0,84" marker-end="url(#ah-hp9)"/>
+<rect class="node plain" x="389.0" y="68" width="85.0" height="32" rx="7"/><text x="431.5" y="88" text-anchor="middle" style="font-size:12.5px">tip + flag</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="131.9" height="32" rx="7"/><text x="177.9" y="140" text-anchor="middle" style="font-size:12.5px">author picks kind</text>
+<path class="arrow" d="M243.9,136 L262.9,136" marker-end="url(#ah-hp9)"/>
+<rect class="node plain" x="263.9" y="120" width="85.0" height="32" rx="7"/><text x="306.4" y="140" text-anchor="middle" style="font-size:12.5px">tip + flag</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="85.0" height="32" rx="7"/><text x="154.5" y="192" text-anchor="middle" style="font-size:12.5px">draft call</text>
+<path class="arrow" d="M197.0,188 L216.0,188" marker-end="url(#ah-hp9)"/>
+<rect class="node plain" x="217.0" y="172" width="98.4" height="32" rx="7"/><text x="266.2" y="192" text-anchor="middle" style="font-size:12.5px">maybe a flag</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt is-chosen"><h4>A · Rules propose, author confirms <span class="pill chosen">chosen</span></h4><p class="flow">patterns → author confirms → code places tip + flag → reviewer clears.</p><p>About 2 h [A]. Free at intake. May miss reworded warnings.</p></div>
+<div class="opt"><h4>B · A model sorts every cell </h4><p class="flow">classifier call → author confirms → tip + flag.</p><p>About 3.5 h [A], 47 calls.</p></div>
+<div class="opt"><h4>C · Author tags by hand </h4><p class="flow">author picks kind → tip + flag.</p><p>About 1 h [A]. 38 cells to read [M]; misses leak.</p></div>
+<div class="opt"><h4>D · At generation only </h4><p class="flow">draft call → maybe a flag.</p><p>About 1 h [A]. The model decides when to ask a human.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option A. On the issued sheet it finds the one real case with no false alarms [M].</strong></p><ul><li>The draft may add a flag but never remove one.</li><li>Disclosure prompts are blocked in the flagged lesson and the next.</li><li>U9: any named reviewer or approver may clear a flag, only with a note.</li></ul></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-4">WP-4</a>; controls <a href="../data/worked-pairs.md#wp-5">WP-5</a>, <a href="../data/worked-pairs.md#wp-1">WP-1</a>; U9 · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted.  · <strong>Changes:</strong> new PD-26; R-6, R-19, R-22 · <a href="../design/hard-problems.md#hp-9">Full card</a></p>
+</article>
+<article class="card hp" id="hp-10" data-hp="HP-10" data-status="decision" aria-labelledby="hp10-h">
+<h2 id="hp10-h">HP-10 · Is the generated teaching any good? <span class="st decision">Chosen: A · 2026-10-25</span></h2>
+<div class="badges"><span class="pill">Journey steps 7–8</span></div>
+<div class="part" data-part="context"><h3>Where this comes up in the project</h3><p>A lesson can pass every check and still teach badly. Lesson 4's draft is about 3,300 words the model wrote from two bullets and a note (<a href="../data/worked-pairs.md#wp-1">WP-1</a>). A weak draft costs more review minutes than it saves, yet every quality signal in the plan can be cut.</p></div>
+<div class="part" data-part="problem"><h3>The problem we're solving</h3><p>Get a measured signal of draft quality for each lesson, with no expert rubric and no second model.</p><div class="pair"><div><h4>In</h4><p>Lesson 4 approved after 22 active minutes.</p></div><div><h4>Out</h4><p>The record also holds the approver's one-click rating, "usable with edits". The report says "of n approved lessons, k were usable with edits or better".</p></div></div></div>
+<div class="part" data-part="why-hard"><h3>Why it's hard</h3><ol class="reasons"><li><strong>No rubric.</strong> Newsela's checklist is unknown (AQ-20).</li><li><strong>No expert.</strong> A judge tuned by a non-expert is provisional.</li><li><strong>Time.</strong> A judge needs a second provider and ~30 labels.</li><li><strong>A model checking itself</strong> shares its own blind spots.</li></ol></div>
+<h3 class="sub">The options</h3>
+<figure>
+<p class="scroll-hint">Swipe to see the diagram.</p>
+<div class="scroll" tabindex="0" aria-label="HP-10 options diagram, scrolls sideways">
+<svg class="opts-svg" viewBox="0 0 1000 224" role="img" aria-labelledby="hp10t">
+<title id="hp10t">HP-10: four ways to judge teaching quality</title>
+<defs><marker id="ah-hp10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<text x="4" y="32" class="strong">A</text><text x="24" y="32" class="lbl-chosen" style="font-size:12px">◆ chosen</text>
+<rect class="node decision" x="112.0" y="16" width="64.9" height="32" rx="7"/><text x="144.4" y="36" text-anchor="middle" style="font-size:12.5px">approve</text>
+<path class="arrow" d="M176.9,32 L195.9,32" marker-end="url(#ah-hp10)"/>
+<rect class="node decision" x="196.9" y="16" width="125.2" height="32" rx="7"/><text x="259.5" y="36" text-anchor="middle" style="font-size:12.5px">one-click rating</text>
+<path class="arrow" d="M322.1,32 L341.1,32" marker-end="url(#ah-hp10)"/>
+<rect class="node decision" x="342.1" y="16" width="91.7" height="32" rx="7"/><text x="388.0" y="36" text-anchor="middle" style="font-size:12.5px">metrics row</text>
+<path class="arrow" d="M433.8,32 L452.8,32" marker-end="url(#ah-hp10)"/>
+<rect class="node decision" x="453.8" y="16" width="91.7" height="32" rx="7"/><text x="499.7" y="36" text-anchor="middle" style="font-size:12.5px">unit report</text>
+<text x="4" y="84" class="strong">B</text><text x="24" y="84" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="68" width="60.0" height="32" rx="7"/><text x="142.0" y="88" text-anchor="middle" style="font-size:12.5px">draft</text>
+<path class="arrow" d="M172.0,84 L191.0,84" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="192.0" y="68" width="60.0" height="32" rx="7"/><text x="222.0" y="88" text-anchor="middle" style="font-size:12.5px">judge</text>
+<path class="arrow" d="M252.0,84 L271.0,84" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="272.0" y="68" width="111.8" height="32" rx="7"/><text x="327.9" y="88" text-anchor="middle" style="font-size:12.5px">advisory flags</text>
+<text x="4" y="136" class="strong">C</text><text x="24" y="136" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="120" width="85.0" height="32" rx="7"/><text x="154.5" y="140" text-anchor="middle" style="font-size:12.5px">all drafts</text>
+<path class="arrow" d="M197.0,136 L216.0,136" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="217.0" y="120" width="91.7" height="32" rx="7"/><text x="262.9" y="140" text-anchor="middle" style="font-size:12.5px">unit checks</text>
+<path class="arrow" d="M308.7,136 L327.7,136" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="328.7" y="120" width="118.5" height="32" rx="7"/><text x="387.9" y="140" text-anchor="middle" style="font-size:12.5px">advisory issues</text>
+<text x="4" y="188" class="strong">D</text><text x="24" y="188" class="lbl-no" style="font-size:12px">not chosen</text>
+<rect class="node plain" x="112.0" y="172" width="60.0" height="32" rx="7"/><text x="142.0" y="192" text-anchor="middle" style="font-size:12.5px">draft</text>
+<path class="arrow" d="M172.0,188 L191.0,188" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="192.0" y="172" width="105.1" height="32" rx="7"/><text x="244.6" y="192" text-anchor="middle" style="font-size:12.5px">critique call</text>
+<path class="arrow" d="M297.1,188 L316.1,188" marker-end="url(#ah-hp10)"/>
+<rect class="node plain" x="317.1" y="172" width="60.0" height="32" rx="7"/><text x="347.1" y="192" text-anchor="middle" style="font-size:12.5px">store</text>
+</svg>
+</div>
+<figcaption>In words: the boxes below.</figcaption>
+</figure>
+<div class="opts">
+<div class="opt is-chosen"><h4>A · Approver rates each draft <span class="pill chosen">chosen</span></h4><p class="flow">approve → one-click rating → metrics row → unit report.</p><p>About 0.5 h. A number with n from day one.</p></div>
+<div class="opt"><h4>B · Yes/no judge </h4><p class="flow">draft → judge → advisory flags.</p><p>About 3 h plus ~30 labels. Stays at cut #2.</p></div>
+<div class="opt"><h4>C · Arc checks in code </h4><p class="flow">all drafts → unit checks → advisory issues.</p><p>About 1 h. Kept at cut #3.</p></div>
+<div class="opt"><h4>D · Self-critique </h4><p class="flow">draft → critique call → store.</p><p>+1 call per lesson. Rejected.</p></div>
+</div>
+<div class="choice"><p><span class="st decision">Your decision</span> <strong>Option A now; C stays at cut #3 and B at cut #2.</strong></p><ul><li>New R-60: Approve needs a rating: <em>usable as drafted</em>, <em>usable with edits</em> or <em>rewritten</em>.</li><li>Target: 2 of 3 demo lessons rated "usable with edits" or better [T].</li></ul></div>
+<p class="src"><strong>Evidence:</strong> <a href="../data/worked-pairs.md#wp-1">WP-1</a>, <a href="../data/worked-pairs.md#wp-2">WP-2</a>, <a href="../data/worked-pairs.md#wp-3">WP-3</a> · <strong>Status:</strong> Innocent ✓ 2026-10-25, recommendation accepted.  · <strong>Changes:</strong> new PD-28; new R-60 · <a href="../design/hard-problems.md#hp-10">Full card</a></p>
+</article>
+</section>
+
+<section aria-labelledby="sp-h">
+  <h2 id="sp-h">The spikes</h2>
+  <p class="section-sub">A spike is a short, cheap test of a number only running code can give. These run at §5. None has run yet.</p>
+  <div class="table-scroll" tabindex="0" aria-label="Spikes table, scrolls sideways">
+  <table>
+    <thead><tr><th scope="col">Spike</th><th scope="col">Card</th><th scope="col">Question</th><th scope="col">Pass line</th><th scope="col">Budget</th></tr></thead>
+    <tbody>
+      <tr data-status="proposal"><td><strong>SP-1</strong> <span class="st proposal">Proposal</span></td><td>HP-1 (sets HP-7's caps)</td><td>Can one call write a valid ~3,300-word <code>LessonDraft</code>?</td><td>Rows 8, 9, 25: 3/3 valid, 0 cut-offs, ≤ 5 min and ≤ $1 per lesson; rows 8–9 within 1,827–3,878 words; a valid 47-entry <code>UnitPlan</code></td><td>≤ 2 h, ≤ $5</td></tr>
+      <tr data-status="proposal"><td><strong>SP-2</strong> <span class="st proposal">Proposal</span></td><td>HP-5, HP-4</td><td>Does freezing at Submit keep approval pinned while two people type?</td><td>20/20 runs; 0 edits kept after a lock; 0 silent keystroke losses; the JSON round trip keeps the hash; store p95 ≤ 500 ms</td><td>≤ 2 h, $0</td></tr>
+      <tr data-status="proposal"><td><strong>SP-3</strong> <span class="st proposal">Proposal</span></td><td>HP-2</td><td>Do the quote, page and name scans catch planted errors without false alarms?</td><td>Every plant code can catch is caught; ≤ 1 false flag per clean lesson (else the name scan blocks only in checks)</td><td>≤ 1.5 h, $0 (reuses SP-1's drafts)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section aria-labelledby="hbd-h">
+  <h2 id="hbd-h">Handled by default</h2>
+  <p class="section-sub">Real but solved problems. Each has a default in the records, so none needs a card.</p>
+  <ol class="hbd">
+<li data-status="fact"><strong>Who may press the money button.</strong> allow-list sign-in, three roles on the API and websocket, spend caps per user, run and day.<span class="ids">R-54, N-22, AR-25</span></li>
+<li data-status="fact"><strong>Showing progress.</strong> status polled every 2 s; ready lessons open while others generate.<span class="ids">PD-18, AD-16, R-17</span></li>
+<li data-status="fact"><strong>Where traces live.</strong> our own Postgres, one ID per run, lesson and call.<span class="ids">PD-19, AD-17, R-48</span></li>
+<li data-status="fact"><strong>"Ultimately published to our application".</strong> a versioned JSON export, labelled "Export (no live integration)".<span class="ids">PD-22, R-42, AR-35</span></li>
+<li data-status="fact"><strong>The U4 vs U3 clash.</strong> the unit is U4; IDs come from <code>Lesson #</code>; confirmed once.<span class="ids">PD-16, AD-9, R-3, R-5</span></li>
+<li data-status="fact"><strong>Layout drift (SYN-2).</strong> find header and columns by name, never by position.<span class="ids">R-3, AQ-19</span></li>
+<li data-status="fact"><strong>A private Sheet link.</strong> a clear message; upload is the main path; no Google sign-in.<span class="ids">R-2, N-9, L-14</span></li>
+<li data-status="fact"><strong>Which queue.</strong> a Postgres-backed queue in a separate worker, no Redis.<span class="ids">PD-13, AD-14</span></li>
+<li data-status="fact"><strong>Which Yjs server.</strong> one signed-in Hocuspocus process saved to our Postgres.<span class="ids">PD-9, AD-6</span></li>
+<li data-status="fact"><strong>Raw HTML.</strong> nothing renders as raw HTML; only listed node types compile.<span class="ids">R-58, T-26</span></li>
+<li data-status="fact"><strong>Planted orders (SYN-1).</strong> cell text enters prompts only as labelled data.<span class="ids">R-6, R-38, GR-18, N-15</span></li>
+<li data-status="fact"><strong>Wiping reviewed work.</strong> each upload is a new hashed version; regenerate makes a candidate.<span class="ids">R-1, R-29, N-16, AR-24</span></li>
+<li data-status="fact"><strong>Approval policy.</strong> per lesson, no bulk approve, separate roles, four-eyes on.<span class="ids">PD-10, AD-11, GR-6</span></li>
+<li data-status="fact"><strong>Flex and Double Lesson rows.</strong> flex rows become Flex lessons; a Double Lesson row is one 50-minute lesson.<span class="ids">PD-16, AD-10 (pending AQ-6)</span></li>
+<li data-status="fact"><strong>Crawled pages and the held-out unit.</strong> kept in a git-ignored folder; Unit 4 never used as an example.<span class="ids">GR-9, GR-11, PD-20, AD-3, AD-4</span></li>
+  </ol>
+  <p class="src" style="margin-top:8px"><span class="st fact">Fact</span> <a href="../design/hard-problems.md">hard-problems.md</a>, <em>Handled by default</em>.</p>
+</section>
+
+<section aria-labelledby="chg-h">
+  <h2 id="chg-h">What changed in the PRD</h2>
+  <p class="section-sub">Each card records changes to the PRD's decisions (PD) and requirements (R). The PRD itself is signed at Stage 4.</p>
+  <div class="table-scroll" tabindex="0" aria-label="PRD changes table, scrolls sideways">
+  <table>
+    <thead><tr><th scope="col">Card</th><th scope="col">IDs</th><th scope="col">In plain words</th></tr></thead>
+    <tbody>
+<tr data-status="decision"><td><a href="#hp-1">HP-1</a></td><td>PD-4 → A; R-8, R-19</td><td>Code writes cross-lesson links; an open link blocks.</td></tr>
+<tr data-status="decision"><td><a href="#hp-2">HP-2</a></td><td>PD-5 → B; R-12, R-19</td><td>No quote type in the draft; three scans replace the 12-word check.</td></tr>
+<tr data-status="decision"><td><a href="#hp-3">HP-3</a></td><td>PD-6 → B; R-19, R-20</td><td>Every code carries its origin; narrowed and added codes block.</td></tr>
+<tr data-status="decision"><td><a href="#hp-4">HP-4</a></td><td>PD-7 (first half) → A; R-11, R-26, R-28, R-29, R-35, R-42</td><td>One transaction per store; one shared schema module.</td></tr>
+<tr data-status="decision"><td><a href="#hp-5">HP-5</a></td><td>PD-7 (second half) → B; R-19, R-29, R-31, R-33, R-34, R-42</td><td>Submit freezes the lesson; a stale pin gets 409.</td></tr>
+<tr data-status="decision"><td><a href="#hp-6">HP-6</a></td><td>new PD-27; R-3–R-6, R-11, R-19</td><td>Intake makes no model call; only errors block Generate.</td></tr>
+<tr data-status="decision"><td><a href="#hp-7">HP-7</a></td><td>PD-13 → B; PD-14; R-16, R-48</td><td>R-16 reworded: no completed call paid again.</td></tr>
+<tr data-status="decision"><td><a href="#hp-8">HP-8</a></td><td>PD-1, PD-25; R-36, R-49, R-52; GR-15</td><td>Human sessions only; one G-2 threshold.</td></tr>
+<tr data-status="decision"><td><a href="#hp-9">HP-9</a></td><td>new PD-26; R-6, R-19, R-22</td><td>A safety-note cell kind; only a named person clears a flag.</td></tr>
+<tr data-status="decision"><td><a href="#hp-10">HP-10</a></td><td>new PD-28; new R-60</td><td>Approve needs a one-click quality rating.</td></tr>
+      <tr data-status="decision"><td>Stage 2</td><td>WP-1 §C</td><td>The <code>L.6.4.b</code> row moves from advisory to a blocking confirmation (HP-3).</td></tr>
+      <tr data-status="decision"><td>PRD §12</td><td>HP-8</td><td>"Our reviewers are us" becomes "our reviewer is Innocent; Claude-driven sessions are synthetic and excluded".</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section aria-labelledby="ask-h">
+  <div class="ask" data-status="awaiting">
+    <h2 id="ask-h">What you are asked to do now</h2>
+    <p><span class="st awaiting">Awaiting your read</span> <strong>Stage 3 gate:</strong> read the ten cards, HP-1 to HP-10, and their sources (<a href="../design/hard-problems.md">hard-problems.md</a>, <a href="../data/worked-pairs.md">worked-pairs.md</a>).</p>
+    <p>The choices were recorded under your 2026-10-25 instruction to follow the recommendations. Anything you raise reopens that card, and we rework it with you.</p>
+    <p><strong>This does not cover:</strong> the PRD sign-off, which happens at Stage 4 in <a href="../prd/interview.md">docs/prd/interview.md</a>; running the spikes, which happens at §5; or the open foundation questions such as the failure to survive (SD-7.2) and the spend ceiling (SD-1.6).</p>
+  </div>
+</section>
+
+</main>
+<footer class="wrap">Local file, not published. The Markdown sources are the source of truth; this page is a synthesis built after them. If a source changes, the page is rebuilt and checked with the zero-to-hero <code>check_review_page.py</code> before any sign-off.</footer>
+</body>
+</html>
