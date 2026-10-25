@@ -1,16 +1,11 @@
 # Resume checkpoint
 
-Updated 2026-10-25 (VPS, end of Phase A run 2). Replace this file's content at each handoff; history goes in the
-[dev log](../../docs/devlog/README.md).
+Updated 2026-10-25 (VPS, Phase B, Sonnet). Replace at each handoff; history in the [dev log](../../docs/devlog/README.md).
 
-- **Where the work is:** the **VPS copy is authoritative** (`claude-vultr:/home/linuxuser/workspaces/inno-newsela`,
-  PD-34), run by the two-phase launcher in [`ops/vps-run/`](../../ops/vps-run/README.md).
-- **Where the project is:** zero-to-hero 2.0.0. §0–§6 done (UX-3a: CON-1…24 agreed; UX-3b: SCR-1…21 signed; §5: SP-1…SP-3
-  pass; §6: DO-1…DO-7 ready, Metz PASS, signature check clean, spec dry run closed); §7 four passes done: 147 tickets in
-  `docs/plans/tickets/`, coverage audit passes, published to GitLab project 2346. FW wave not built yet.
-- **Next action:** Phase B (Sonnet) — start at *Next action* in [`docs/plans/HANDOFF-PHASE-B.md`](../../docs/plans/HANDOFF-PHASE-B.md)
-  (wave 0: FW-1 and NL-01).
-- **Open for Innocent (human-only):** read the SP-1…SP-3 results; review DO-1/DO-2 and the Stage 6 page
-  (`docs/artifacts/2026-10-25-system-design.html`); the slice plan. Gates were ticked under his standing authorization
-  (PD-32); anything he raises reopens the item.
-- **Data boundary:** `docs/source/restricted/` is git-ignored; never quote it into tracked docs, prompts or issues.
+- **Where:** VPS copy authoritative (PD-34). zero-to-hero 2.0.0, §8 Build in progress. **Waves 0, 1, 2 fully merged** (`docs/plans/merged.txt` is the ledger; GitLab issues closed with evidence); main pushed to origin over HTTPS.
+- **Build method:** per ticket: `fanout-planner` (brief: `docs/plans/fanout/PLANNER-BRIEF.md`, plans in `docs/plans/fanout/2026-10-25-w<N>/`) → (`test-writer-agent` first only for `risk::security`; frozen manifest in `docs/plans/frozen-tests/`) → `fanout-implementer` in worktree `../.worktrees/newsela-<ID>` branch `ticket/<ID>` → `code-review-agent` → batch merge in tree order (resolve `.claude/reference/area-map.md` row conflicts by combining status cells) → full gates on main (`npm install`, lint, typecheck, `scripts/test-db.sh up`, `npm test`, `scripts/test-db.sh down`) → close issues, remove worktrees, append `merged.txt`, push. Security agent once per wave merge when the wave has `risk::security` tickets; fix findings or record accepted risk.
+- **Next action:** wave 3 (NL-24…NL-52; 29 tickets, all READY). Run `ticket_readiness.py` per ticket, plan all, build. Then waves 4+ per `docs/plans/HANDOFF-PHASE-B.md` execution order. Critical path: NL-12 ✓ → NL-25 → NL-80 → NL-105 → NL-113 …; NL-112 (full run) gates §9.
+- **Decisions this run (PD-32):** Next pinned 16.4.3 (advisory in 16.4.0); vitest/vite unified at root; test Postgres on 55440 (55434 is Riverside's); xlsx replaced by SheetJS 0.20.3 CDN (integrity-pinned); CHG-2 added `schema_invalid` to CheckKind; AR-1 accepted risk (Render owner DB credential; see `docs/devlog/2026-10-25-nl23-accepted-risk.md`); frozen NL-13 fixture type-only re-freeze.
+- **Open follow-ups:** per-person heartbeat retention question (NL-08 devlog); NL-26 must pass `load_eld_verdicts()` and re-raise `IntakeError` as `DomainRefusal`; NL-77 id notes; NL-53 four-eyes test; NL-83 `/api/healthz`; disk ~91% used (clean worktrees after merges).
+- **Open for Innocent (human-only):** spike results, DO-1/DO-2/Stage 6 review; lane::human tickets NL-02/NL-03 (provider keys, voice key), UX-5b walkthrough, recording, portal submission.
+- **Data boundary:** `docs/source/restricted/` git-ignored; never quote into tracked files.

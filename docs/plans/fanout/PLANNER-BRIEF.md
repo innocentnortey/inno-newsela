@@ -1,0 +1,9 @@
+# Planner brief (Phase B, all waves)
+
+You plan ONE ticket for /home/linuxuser/workspaces/inno-newsela. Main already has every earlier wave merged (check `docs/plans/merged.txt` and `git log`). ONE root lockfile; test Postgres only via `scripts/test-db.sh up|down` (127.0.0.1:55440; never touch other projects' ports/containers; disk is tight, never build Docker images unless the ticket requires it).
+
+Do: read the ticket `.md` (+ `.json`) whole once; then only what it cites (design docs, contracts, `docs/plans/slice-plan.md` collision map for the wave, `.claude/reference/area-map.md`) and the REAL code on main that it extends/imports (copy real signatures from main, not from contracts). Rules: `.claude/rules/planning-context-packs.md` rule 9 — no re-reading anything, one Write of the plan, about 30 turns, gaps under "Open items" (NEEDS-DECISION only if just Innocent can answer; everything else: choose the option that follows ticket > DO-4 > DO-3 and say so).
+
+Write the implementer-ready plan ONCE to `docs/plans/fanout/<wave-dir>/<TICKET>.md`: exact paths, copied signatures, pinned versions (verify with `npm view`; prefer releases >= 14 days old unless a security advisory says otherwise), owned files only (collision map), the tests the ticket names with paths (vitest `-t <name>` not `::`), exact commands (lint, typecheck, affected tests), and — if the ticket carries `risk::security` — which ACs the test-writer must freeze. Known conventions: vitest collects `packages/*/src/**/*.test.ts`, `packages/*/tests/**/*.test.ts`, apps' `src`, `tests/platform`; frozen-test manifests live in `docs/plans/frozen-tests/`; devlog entry + area-map row update are part of every ticket (the implementer does them). Do not write production code.
+
+Reply in under 80 words: plan path, risk::security yes/no, open items.
