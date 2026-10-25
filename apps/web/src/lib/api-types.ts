@@ -870,6 +870,8 @@ export interface components {
                 filenames_say: components["schemas"]["NullableText"];
                 confirmed: boolean;
                 confirmed_by: components["schemas"]["NullableText"];
+                /** @description The unit-conflict finding (kind unit_conflict), or null when the sheet and filenames agree; confirm it with CON-4 confirm_unit. */
+                finding?: components["schemas"]["Finding"] | null;
             };
             counts: components["schemas"]["ReportCounts"];
             rows: components["schemas"]["ReportRow"][];

@@ -1,5 +1,4 @@
-// NL-94 AC-4: ELD labels on the real stack. The report fills sheet_label/official_strand/suggested_remap with "" / "" / null
-// (packages/core/src/intake/report.ts builds them that way), so the side-by-side text is a fixme, not a weakened assertion.
+// NL-94 AC-4: ELD labels on the real stack; CHG-5 fills sheet_label/official_strand/suggested_remap from stored data.
 import { expect, test } from "@playwright/test";
 import { db } from "../support/db";
 import { authorWithUpload, distinctEldMismatchCodes, getReport, screenUrl } from "./helpers";
@@ -19,7 +18,7 @@ test("eld: every code flagged on any row is listed once, with the rows that carr
   for (const code of codes) await expect(flaggedTable(page).locator("tbody tr").filter({ hasText: code }).first()).toBeVisible();
 });
 
-test.fixme("eld: the sheet label sits beside the seeded official strand, with a suggested re-map", async ({ page }) => {
+test("eld: the sheet label sits beside the seeded official strand, with a suggested re-map", async ({ page }) => {
   const { up } = await authorWithUpload(page);
   const report = await getReport(page, up.outline_version_id);
   const entries = report.rows.flatMap((r) => r.eld).filter((e) => e.verdict === "mismatch");

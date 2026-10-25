@@ -23,7 +23,22 @@ export interface GateDecision {
   details: { unconfirmed_finding_ids: string[] };
 }
 
+export interface EldLookup {
+  strand_of(code: string): string | null;
+}
+
 type FindingKind = Finding["kind"];
+
+const ELD_LINE = /^\W*(ELD\.P(?:I|II)\.\d+\.?\d*[a-z]?)\s*[–-]\s*(.+?)\s*$/;
+
+function parse_eld_line(text: string): { code: string; label: string } | null {
+  for (const line of text.split(/\r?\n/)) {
+    const m = ELD_LINE.exec(line);
+    if (m !== null && m[1] !== undefined && m[2] !== undefined)
+      return { code: m[1], label: m[2] };
+  }
+  return null;
+}
 
 // Presentation-only column names; the stored finding has no column (plan open item 1).
 const KIND_COLUMN: Record<FindingKind, string> = {
@@ -132,6 +147,7 @@ function report_row(
   row: NormalizedRow,
   findings: Finding[],
   latest: Map<string, IntakeChoiceRow>,
+  eld_lookup?: EldLookup,
 ): ReportRow {
   const level = findings.some((f) => f.level === "error")
     ? "error"
@@ -157,23 +173,29 @@ function report_row(
   const not_checked = findings.some((f) => f.kind === "eld_not_checked");
   const eld: EldEntry[] = row.eld_codes.map((code) => {
     const mismatch = findings.find(
-      (f) => f.kind === "eld_mismatch" && f.original_text.includes(code),
+      (f) =>
+        f.kind === "eld_mismatch" &&
+        parse_eld_line(f.original_text)?.code === code,
     );
+    const label =
+      mismatch !== undefined
+        ? (parse_eld_line(mismatch.original_text)?.label ?? "")
+        : "";
     const remap =
       mismatch !== undefined &&
       mismatch.choice.source === "confirmed" &&
       mismatch.choice.value === "remap";
     return {
       code,
-      sheet_label: "",
-      official_strand: "",
+      sheet_label: label,
+      official_strand: eld_lookup?.strand_of(code) ?? "",
       verdict:
         mismatch !== undefined
           ? "mismatch"
           : not_checked
             ? "not_checked"
             : "fits",
-      suggested_remap: null,
+      suggested_remap: mismatch !== undefined ? mismatch.proposed_fix : null,
       choice: remap ? "remap" : "keep",
     };
   });
@@ -195,6 +217,7 @@ export function build_validation_report(
   version: OutlineVersionRow,
   outline: NormalizedOutline,
   choices: readonly IntakeChoiceRow[],
+  eld_lookup?: EldLookup,
 ): ValidationReport {
   const latest = latest_by_target(choices, version.outline_version_id);
   const findings = outline.findings
@@ -210,6 +233,7 @@ export function build_validation_report(
         .filter((f) => f.row_number === r.row_number)
         .map((f) => report_finding(f, latest)),
       latest,
+      eld_lookup,
     ),
   );
 
@@ -289,6 +313,10 @@ export function build_validation_report(
       filenames_say: outline.unit_from_filenames,
       confirmed: unit_confirmed,
       confirmed_by,
+      finding:
+        conflicts[0] === undefined
+          ? null
+          : report_finding(conflicts[0], latest),
     },
     counts,
     rows: rows_out,

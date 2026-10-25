@@ -262,7 +262,7 @@ paths:
                     version_number: 1
                     sha256: a100000000000000000000000000000000000000000000000000000000000001
                     same_as_version: null
-                    unit: { as_written: U4, filenames_say: U3, confirmed: false, confirmed_by: null }
+                    unit: { as_written: U4, filenames_say: U3, confirmed: false, confirmed_by: null, finding: { finding_id: F-unit-conflict, level: error, kind: unit_conflict, column: Unit, original_text: 'Grade 6 · U4 · Gathering Evidence', proposed_fix: U4, choice: { value: null, source: default, by: null, at: null } } }
                     counts:
                       teaching_days: 47
                       lessons: 41
@@ -1903,6 +1903,9 @@ components:
             filenames_say: { $ref: '#/components/schemas/NullableText' }
             confirmed: { type: boolean }
             confirmed_by: { $ref: '#/components/schemas/NullableText' }
+            finding:
+              oneOf: [{ $ref: '#/components/schemas/Finding' }, { type: 'null' }]
+              description: The unit-conflict finding (kind unit_conflict), or null when the sheet and filenames agree; confirm it with CON-4 confirm_unit.
         counts: { $ref: '#/components/schemas/ReportCounts' }
         rows: { type: array, items: { $ref: '#/components/schemas/ReportRow' } }
         unit_rules: { type: array, items: { $ref: '#/components/schemas/UnitRule' } }

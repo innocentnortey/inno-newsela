@@ -159,6 +159,7 @@ export const ValidationReport = z.object({
     filenames_say: NullableText,
     confirmed: z.boolean(),
     confirmed_by: NullableText,
+    finding: Finding.nullable().optional(),
   }),
   counts: ReportCounts,
   rows: z.array(ReportRow),
