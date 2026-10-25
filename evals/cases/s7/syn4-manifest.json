@@ -1,0 +1,19 @@
+{
+  "generator": "evals/cases/s7/build_syn4.py",
+  "n": 11,
+  "label": "synthetic",
+  "files": {
+    "s7-syn4-warning-1.json": "301413930b9862c4eb0bf4c22789ceff62ea126364466dd00b9d0c0b5f206212",
+    "s7-syn4-warning-2.json": "8ba418e9109e9f4d8675a4d1d68368cb7280eaf072d41915b8886bc3f12b9005",
+    "s7-syn4-warning-3.json": "1c8bef9d2776050a0e4ffcbf011b40d3fda1216c338bb5e411f00b47e747f4cf",
+    "s7-syn4-warning-4.json": "53438b2c754fcff72ecd4db31597d2d2f0d0118b9c2e6eba189140543a1c2a01",
+    "s7-syn4-warning-5.json": "bc52669888981509a2a625b53c29fcb9023546ff5bcfd296611c6276b97bb866",
+    "s7-syn4-decoy-1.json": "86e468a76f9b8a6afaf6c17c214bcd84f7b6a7d58debafa8fed2a2790f710f09",
+    "s7-syn4-decoy-2.json": "f26b692d97431bfe7a5c07ae84157fe6c29648ae7a5e52837270274e0d349192",
+    "s7-syn4-decoy-3.json": "3a552f84f33598f3bd6368a6b4b7138c35dd288f0064d3befce6c8cfd2d2f097",
+    "s7-syn4-paraphrase-1.json": "a731b92b231f3bc9c8588796ac474d607e64517950fa6a8b31a4110fd25f3b18",
+    "s7-syn4-paraphrase-2.json": "b3064b17cf81a9cdce2797c28e604516707dfe02f8177e6cd9ca8049f530f3e8",
+    "s7-syn4-paraphrase-3.json": "30d6b7035fc7140fb132d5614dd23d88391624e08090d4187753339c21652fe7"
+  },
+  "sha256": "1aff5c4279577d8b5f071ef4de1010bdf51e9248fe1169d0c407ba70e57333b0"
+}

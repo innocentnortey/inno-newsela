@@ -1,0 +1,44 @@
+{
+  "case_id": "s1-issued-counts",
+  "provenance": "issued",
+  "source": "docs/data/samples/g6-u4-lesson-outline.json; PRD R-3, R-4, R-5; docs/data/README.md",
+  "guards": "every headline count and defect figure of the issued sheet is reproduced exactly",
+  "input": {
+    "grid": "issued"
+  },
+  "expected": {
+    "counts": {
+      "teaching_days": 47,
+      "lessons": 41,
+      "flex_days": 6,
+      "arc_headers": 7,
+      "total_rows": 1,
+      "errors": 6,
+      "errors_unconfirmed": 6,
+      "warnings": 166,
+      "unit_conflicts": 1,
+      "malformed_codes": 1,
+      "rows_with_nonexistent_code": 3,
+      "bad_filenames": 2,
+      "eld_mismatches": 16
+    },
+    "generate_allowed": false,
+    "unit_as_written": "U4",
+    "unit_from_filenames": "U3",
+    "nonexistent_findings": 4,
+    "eld_mismatch_whole_code_set": [
+      "ELD.PI.6.2",
+      "ELD.PI.6.4",
+      "ELD.PI.6.5",
+      "ELD.PII.6.1",
+      "ELD.PII.6.3",
+      "ELD.PII.6.5",
+      "ELD.PII.6.6"
+    ],
+    "eld_partial_code_label_mismatches": {
+      "ELD.PI.6.6": 2,
+      "ELD.PI.6.7": 4
+    }
+  },
+  "note": "PRD's 7 = whole-code ELD mismatches (the explicit code list); report counter eld_mismatches 16 = findings (10 on whole-code mismatches + 6 label-level on the 2 partial codes ELD.PI.6.6 and ELD.PI.6.7), on 14 rows, 9 distinct codes in total. Ticket text and PRD R-5 say '7 ELD mismatches' and need a docs correction. warnings 166 is a regression pin (measured, not hand-counted). errors 6 = 1 unit conflict + 1 malformed + 4 nonexistent."
+}

@@ -1,0 +1,28 @@
+{
+  "case_id": "s1-syn2-layout",
+  "provenance": "synthetic",
+  "source": "docs/data/samples/synthetic-2026-10-24-syn2-layout-shifted.csv (SYN-2)",
+  "guards": "a column-shifted copy of the sheet normalizes to the same counts, rows and findings as the issued sheet",
+  "input": {
+    "grid": "syn2"
+  },
+  "expected": {
+    "counts": {
+      "teaching_days": 47,
+      "lessons": 41,
+      "flex_days": 6,
+      "arc_headers": 7,
+      "total_rows": 1,
+      "errors": 6,
+      "errors_unconfirmed": 6,
+      "warnings": 166,
+      "unit_conflicts": 1,
+      "malformed_codes": 1,
+      "rows_with_nonexistent_code": 3,
+      "bad_filenames": 2,
+      "eld_mismatches": 16
+    },
+    "same_rows_as_issued": true
+  },
+  "note": "Row numbers differ in SYN-2 (shifted by two) and are stripped before comparing rows and findings. warnings 166 is the same regression pin as s1-issued-counts."
+}

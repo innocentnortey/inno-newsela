@@ -1,0 +1,12 @@
+{
+  "case_id": "s7-syn4-decoy-1",
+  "provenance": "synthetic",
+  "source": "SYN-4+ (HP-9; metrics-registry M-39), written by evals/cases/s7/build_syn4.py",
+  "guards": "a look-alike line that is not a warning is not proposed",
+  "input": {
+    "line": "Annotate the graphic organizer with two details from each paragraph."
+  },
+  "expected": {
+    "proposed": false
+  }
+}
