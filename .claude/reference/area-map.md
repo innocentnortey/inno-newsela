@@ -47,7 +47,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 3 | A11 collab server | `apps/collab/**` (except `main.ts`, `health.ts`; incl. `frozen-docs.ts`, `wiring/collab.ts`) | planned |
 | 3 | A12 review | `apps/web/src/server/services/{lesson-read,issue,slot,candidate,transition,approve}-service.ts`, `apps/web/app/api/lessons/**` (except suggestions, heartbeats), `apps/web/src/server/wiring/review.ts` | planned |
 | 3 | A13 metrics | `apps/web/src/server/services/{heartbeat,board}-service.ts`, `apps/web/app/api/units/[unitId]/{board,metrics}/**`, `apps/web/app/api/lessons/[lessonId]/heartbeats/**`, `apps/web/src/server/wiring/metrics.ts` | planned |
-| 3–4 | A20 evals | `evals/**`, `load/**`, `ops/faults/**`, `ops/import-spike.ts`, `packages/db/src/repos/evidence.ts` | planned |
+| 3–4 | A20 evals | `evals/**`, `load/**`, `ops/faults/**`, `ops/import-spike.ts`, `packages/db/src/repos/evidence.ts` (NL-49 built: `evals/src/{runner,cli,registry,report,floors}.ts`, `suites/s1…s14` shells, `load/{spike,http-mix,yjs-mix}.ts` shells, `evidence.ts`; rest planned) | planned |
 | 0–3 | A21 ops | `ops/{seed.ts,backup.sh}`, `apps/{worker,collab}/src/health.ts`, `apps/web/app/api/healthz/**` | NL-07 built the worker/collab `health.ts` shells; rest planned |
 | 4 | A15 assist (cut #8) | `apps/web/src/server/services/suggestion-service.ts`, `apps/web/app/api/lessons/[lessonId]/suggestions/**`, `apps/web/src/server/wiring/assist.ts` | planned |
 | 4 | A16 prompts (save is cut #7) | `apps/web/src/server/services/prompt-service.ts`, `apps/web/app/api/prompt-versions/**`, `apps/web/src/server/wiring/prompts.ts` | planned |
