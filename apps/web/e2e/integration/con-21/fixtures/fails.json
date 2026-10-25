@@ -1,0 +1,1 @@
+{"_synthetic":true,"name":"fails","rows":[25],"lessons":{"*":"fail"},"canary_prefix":"CANARY-97-","markup":"<img src=x onerror=window.__pwned=1>"}
