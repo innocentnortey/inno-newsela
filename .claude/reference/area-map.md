@@ -29,7 +29,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 1 | A4a intake core | `packages/core/src/intake/**`, `packages/db/src/repos/outlines.ts` | NL-15 built: `intake/standards-index.ts`, `packages/core/data/standards/**`; rest planned ; `intake/report.ts` built (NL-17); rest planned ; NL-16 built: `packages/core/src/intake/{errors,parse-grid,normalize,normalize-codes,normalize-segments,lesson-links,instruction-patterns,safety-patterns}.ts`, `packages/core/scripts/build-outline-fixtures.ts`, `packages/core/tests/fixtures/outline/**`; `standards-index.ts` (NL-15), `report.ts` (NL-17) and `repos/outlines.ts` planned |
 | 1 | A5 compile | `packages/core/src/compile/**`, `packages/ydoc/{src/convert.ts,src/hash.ts,tests/fixtures/}` (built, NL-19), `packages/ydoc/**` (rest), `packages/db/src/repos/lesson-doc-reads.ts` | planned ; planned (ydoc convert/hash built) |
 | 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates,types}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | checks kernel actual (NL-20); `check-queue.ts` planned |
-| 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**` (built by NL-14), `packages/db/src/repos/{model-calls,prompts}.ts` | planned |
+| 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**` (built by NL-14), `packages/db/src/repos/{model-calls,prompts}.ts` (`prompts.ts` built by NL-34) | planned |
 | 1 | A8 spend | `packages/core/src/spend/**`, `packages/db/src/repos/spend.ts` | planned |
 | 1 | A9a queue and runs | `packages/db/src/repos/{runs,job-queue}.ts`, `packages/core/src/lifecycle/run-machine.ts` | planned |
 | 1 | A12a lesson records | `packages/db/src/repos/{lessons,review-extras}.ts`, `packages/core/src/lifecycle/lesson-machine.ts` | `lesson-machine.ts` built (NL-21); repos planned |
@@ -50,7 +50,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 3–4 | A20 evals | `evals/**`, `load/**`, `ops/faults/**`, `ops/import-spike.ts`, `packages/db/src/repos/evidence.ts` | planned |
 | 0–3 | A21 ops | `ops/{seed.ts,backup.sh}`, `apps/{worker,collab}/src/health.ts`, `apps/web/app/api/healthz/**` | NL-07 built the worker/collab `health.ts` shells; rest planned |
 | 4 | A15 assist (cut #8) | `apps/web/src/server/services/suggestion-service.ts`, `apps/web/app/api/lessons/[lessonId]/suggestions/**`, `apps/web/src/server/wiring/assist.ts` | planned |
-| 4 | A16 prompts (save is cut #7) | `apps/web/src/server/services/prompt-service.ts`, `apps/web/app/api/prompt-versions/**`, `apps/web/src/server/wiring/prompts.ts` | planned |
+| 4 | A16 prompts (save is cut #7) | `apps/web/src/server/services/prompt-service.ts`, `apps/web/app/api/prompt-versions/**`, `apps/web/src/server/wiring/prompts.ts` (list, current, v1 sync built by NL-34; save is NL-88) | built |
 | 4 | A17 export (cut #5) | `apps/web/src/server/services/export-service.ts`, `packages/db/src/repos/exports.ts`, `docs/contracts/lesson-export.schema.json`, `apps/web/app/api/{units/[unitId]/exports,exports}/**`, `apps/web/src/server/wiring/exports.ts` | planned |
 | 4 | A18 coverage (cut #4) | `apps/web/src/server/services/coverage-service.ts`, `apps/web/app/api/units/[unitId]/coverage/**`, `apps/web/src/server/wiring/coverage.ts` | planned |
 | 4 | A19 judge (cut #2) | `apps/worker/src/judge/**`, `packages/llm/src/openrouter-judge.ts`, `packages/db/src/repos/judge.ts`, `apps/worker/src/wiring/judge.ts` | planned |
