@@ -76,7 +76,7 @@ services:
     <<: *node
     command: ["node_modules/.bin/tsx", "apps/collab/src/main.ts"]
     ports:
-      - "1234:1234"
+      - "127.0.0.1:${COLLAB_PORT:-1234}:1234"
     environment:
       DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
       ? AUDIT_HASH_SALT
@@ -102,7 +102,7 @@ services:
     image: ls-web
     networks: [ls_net]
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
     environment:
       DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
       ? AUDIT_HASH_SALT

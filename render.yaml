@@ -3,6 +3,7 @@
 # Basic-256mb $6/month + $0.30/GB-month; Innocent's total Render approval is $40/month across all projects.
 # Secrets live in the Render environment group `ls-secrets` (incl. COLLAB_INTERNAL_URL), never here.
 # Render keeps one connection string (owner); the non-owner runtime role split is Compose-only for now.
+# ACCEPTED RISK AR-1: all three services use the owner URL here, so append-only rests on triggers only; see docs/devlog/2026-10-25-nl23-accepted-risk.md. Not deployed.
 services:
   - type: web
     name: ls-web
