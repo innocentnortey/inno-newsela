@@ -1,0 +1,37 @@
+{
+  "ticket": "NL-32",
+  "risk": "security",
+  "frozen": {
+    "packages/llm/src/anthropic.test.ts": "fab16d0fb4c17da2a55d390254490c3fbf3d6da1982208afa607826d0a325601",
+    "packages/llm/src/boundary.test.ts": "cc3ed06d8809dca3ae6a8e63bf247b999f8d79799970df45054ee4a2a825d0d8",
+    "packages/llm/src/prices.test.ts": "b5b7ee08887dc4aba7c29dec1ece5c1631de2e5db99d2822b49e4f910466c5d3"
+  },
+  "criteria": {
+    "AC-1": [
+      "packages/llm/src/anthropic.test.ts"
+    ],
+    "AC-2": [
+      "packages/llm/src/anthropic.test.ts"
+    ],
+    "AC-3": [
+      "packages/llm/src/anthropic.test.ts"
+    ],
+    "AC-4": [
+      "packages/llm/src/anthropic.test.ts"
+    ],
+    "AC-5": [
+      "packages/llm/src/anthropic.test.ts"
+    ],
+    "AC-6": [
+      "packages/llm/src/boundary.test.ts"
+    ],
+    "AC-8": [
+      "packages/llm/src/prices.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/llm/src/stub.test.ts",
+    "packages/llm/src/model-client.test.ts",
+    "packages/llm/src/anthropic-record.test.ts"
+  ]
+}
