@@ -1,0 +1,28 @@
+{
+  "ticket": "NL-14",
+  "risk": "security",
+  "frozen": {
+    "packages/prompts/src/locked.test.ts": "423bf1b3e478310926f6dd55cc7151dbab7c99ea989bcb35d54d634527531606",
+    "packages/prompts/src/render.test.ts": "ed56d4d1bea7cbee58087a4aa23eff3d12361263eda256a4d7ab06894e6ce8ab",
+    "packages/prompts/src/testing/fixtures.ts": "c387c16e57c48be4139bcb5887a43875e4e64c304053329bb9e041ef0d994231"
+  },
+  "criteria": {
+    "AC-3": [
+      "packages/prompts/src/render.test.ts",
+      "packages/prompts/src/testing/fixtures.ts"
+    ],
+    "AC-4": [
+      "packages/prompts/src/render.test.ts",
+      "packages/prompts/src/testing/fixtures.ts"
+    ],
+    "AC-5": [
+      "packages/prompts/src/locked.test.ts",
+      "packages/prompts/src/testing/fixtures.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/prompts/src/render-shapes.test.ts",
+    "packages/prompts/src/locked-contents.test.ts",
+    "packages/prompts/src/schemas.test.ts"
+  ]
+}

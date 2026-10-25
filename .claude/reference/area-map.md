@@ -29,7 +29,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 1 | A4a intake core | `packages/core/src/intake/**`, `packages/db/src/repos/outlines.ts` | NL-15 built: `intake/standards-index.ts`, `packages/core/data/standards/**`; rest planned ; `intake/report.ts` built (NL-17); rest planned |
 | 1 | A5 compile | `packages/core/src/compile/**`, `packages/ydoc/{src/convert.ts,src/hash.ts,tests/fixtures/}` (built, NL-19), `packages/ydoc/**` (rest), `packages/db/src/repos/lesson-doc-reads.ts` | planned ; planned (ydoc convert/hash built) |
 | 1 | A6a check core | `packages/core/src/checks/{registry,policy,gates,types}.ts`, `packages/core/src/checks/rules/**`, `packages/db/src/repos/check-queue.ts` | checks kernel actual (NL-20); `check-queue.ts` planned |
-| 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**`, `packages/db/src/repos/{model-calls,prompts}.ts` | planned |
+| 1 | A7 llm | `packages/llm/src/{model-client,anthropic,stub,prices}.ts`, `packages/prompts/**` (built by NL-14), `packages/db/src/repos/{model-calls,prompts}.ts` | planned |
 | 1 | A8 spend | `packages/core/src/spend/**`, `packages/db/src/repos/spend.ts` | planned |
 | 1 | A9a queue and runs | `packages/db/src/repos/{runs,job-queue}.ts`, `packages/core/src/lifecycle/run-machine.ts` | planned |
 | 1 | A12a lesson records | `packages/db/src/repos/{lessons,review-extras}.ts`, `packages/core/src/lifecycle/lesson-machine.ts` | `lesson-machine.ts` built (NL-21); repos planned |
