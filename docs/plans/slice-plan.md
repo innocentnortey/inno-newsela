@@ -127,7 +127,7 @@ reruns them against the real backend** and drives the real entry point for its W
 | NL-29 | generation: lesson/candidate job runner and nodes (reserve, draft, compile-check, one repair on required-block misses, truncation retry, store, settle, fail; safety flags at v1) | BE | BL | NL-12, NL-18, NL-20, NL-22 | 6, 16 | — | 7 | WP-1, WP-2, WP-4 | WF-22 | M-5, M-15, M-16, M-31 | no | A9 | — |
 | NL-30 | generation: claim loop (cap 6, lease renewal, expired-lease requeue at start) and run finalizer (terminal, `partial`, `paused`, completeness query) | BE | BL | NL-12, NL-22 | 6, 7 | — | 8 | infra: HP-7 | WF-22, WF-6 | M-15, M-17, M-44 | no | A9 | — |
 | NL-31 | generation: UnitPlan job, stored before any lesson claim | BE | BL | NL-12, NL-14, NL-22 | 8 | — | 9 | WP-1 | WF-21 | M-15 | no | A9 | — |
-| NL-32 | llm: Anthropic adapter (only SDK importer; schema-enforced mode for UnitPlan, plain + Zod for drafts), stub provider, price table | BE | BL | NL-12 | 5, 16, 17 | — | — | WP-1 (stub fixture) | WF-22 | M-11, M-28 | yes | A7 | — |
+| NL-32 | llm: Anthropic adapter (only SDK importer; schema-enforced mode for UnitPlan, plain + Zod for drafts), stub provider, price table | BE | BL | NL-12, 14 | 5, 16, 17 | — | — | WP-1 (stub fixture) | WF-22 | M-11, M-28 | yes | A7 | — |
 | NL-33 | llm: model-call recorder (row before send, raw output on arrival, retries, 240 s timeout, lost calls) and `model_call` log | BE | BL | NL-12 | 21 | — | 32 | infra: R-48 | WF-22 | M-15, M-16, M-17, M-28 | yes | A7 | — |
 | NL-34 | prompts: prompt versions — list, current, v1 from the locked hash, no locked-layer write path; fills prompts wiring | BE | BL | NL-12, NL-13, NL-14 | 24 | — | 10 | infra: R-38 | WF-4 (pin) | M-5 | no | A16 | — |
 | NL-35 | spend: reservation decision and atomic ledger (run cap, user-day cap, $75 build ceiling) | BE | BL | NL-12 | 5, 16, 17 | — | 8 | infra: PD-14, PD-29 | WF-22, WF-28 | M-17, M-29 | yes | A8 | — |
@@ -137,13 +137,13 @@ reruns them against the real backend** and drives the real entry point for its W
 | NL-39 | checks: alignment (taught + checked; listed / narrowed / added; leaf only), safety (tip present, no 6-word leak, disclosure prompts), cross-lesson link, pending suggestion, open flag | BE | BL | NL-20 | 13 | — | 12, 19, 20 | WP-1, WP-4 | WF-10 | M-6, M-38, M-41 | no | A6 | — |
 | NL-40 | checks: grounding — quote span, page/chapter range, name scan (`compromise`; blocking in CFU items, advisory elsewhere), `source_ref`, reviewer quote length, `to-clear` rights | BE | BL | NL-20 | 13, 15 | — | 17, 18 | WP-1, WP-2, WP-3 | WF-10 | M-7, M-32, M-33 | no | A6 | — |
 | NL-41 | checks: arc continuity advisory rules (R-9) | BE | BL | NL-20 | 13 | — | 12 | seeded L6–L8 repeat | WF-10 | M-5 | no | A6 | #3 |
-| NL-42 | review: lessons, versions, snapshots, review events, last editor, dependants, board rows, approved snapshots | BE | BL | NL-12 | 9, 11, 18, 23 | — | 29 | infra | WF-15 | — | no | A12 | — |
+| NL-42 | review: lessons, versions, snapshots, review events, last editor, dependants, approved snapshots | BE | BL | NL-12 | 9, 11, 18, 23 | — | 29 | infra | WF-15 | — | no | A12 | — |
 | NL-43 | review: safety-flag, alignment-link and suggestion repositories | BE | BL | NL-12 | 13, 14, 17, 22 | — | 19, 20 | infra | WF-11 | M-41 | no | A12 | — |
 | NL-44 | review: lesson read (derived row or snapshot) and history | BE | BL | NL-10, NL-12, NL-13 | 11, 19 | — | 13, 14, 29 | WP-1 | WF-8 | M-18 | no | A12 | — |
 | NL-45 | review: issue list as of a hash (`pending`), resolutions, safety-flag clear, standard decisions with undo | BE | BL | NL-12, NL-13 | 13, 14 | — | 16, 19, 20, 21 | WP-4 | WF-11 | M-2, M-6, M-41 | no | A12 | — |
 | NL-46 | review: fill a placeholder or excerpt slot through the collaboration server | BE | BL | NL-12, NL-13, NL-20 | 15 | — | 17, 18 | WP-1, WP-2 | WF-12 | M-7 | no | A12 | — |
 | NL-47 | review: regenerate as candidate, read, adopt | BE | BL | NL-12, NL-13 | 16 | — | 22 | WP-1 | WF-13 | M-11 | no | A12 | — |
-| NL-48 | metrics: heartbeats, merged sessions across tabs, frozen first-approval metrics row (pure + repo + services) | BE | BL | NL-12, NL-13 | 20 | — | 15, 30 | WP-1, WP-3, WP-4 (scripted review) | WF-16 | M-1, M-3, M-12, M-43 | no | A13 | — |
+| NL-48 | metrics: heartbeats, merged sessions across tabs, frozen first-approval metrics row, board rows (pure + repo + services) | BE | BL | NL-12, NL-13 | 20 | — | 15, 30 | WP-1, WP-3, WP-4 (scripted review) | WF-16 | M-1, M-3, M-12, M-43 | no | A13 | — |
 | NL-49 | evals: evidence repository, eval runner, CLI, suite shells S1–S14, `load/` shells | BE | BL | NL-12 | 21 | — | 36 | infra: DO-5 | WF-24 | M-30 | no | A20 | — |
 | NL-50 | assist: request and decide an AI rewrite suggestion | BE | BL | NL-12, NL-13, NL-14 | 17 | — | 23 | WP-1 | WF-14 | M-10 | yes | A15 | #8 |
 | NL-51 | export: idempotent export of approved snapshots (dependants only when their sources are approved) | BE | BL | NL-09, NL-12, NL-13 | 23 | — | 35 | WP-1 | WF-19 | — | yes | A17 | #5 |
@@ -340,13 +340,13 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 
 | Wiring file | Created by | Filled by (wave) |
 |---|---|---|
-| web `wiring/auth.ts` (SessionService) | NL-06 | NL-25 (W3) |
-| web `wiring/intake.ts` (OutlineService) | NL-06 | NL-26 (W3); NL-77 adds methods only, no constructor change |
+| web `wiring/sessions.ts` (SessionService) | NL-06 | NL-25 (W3) |
+| web `wiring/outlines.ts` (OutlineService) | NL-06 | NL-26 (W3); NL-77 adds methods only, no constructor change |
 | web `wiring/prompts.ts` (PromptService) | NL-06 | NL-34 (W3) |
 | web `wiring/runs.ts` (RunService) | NL-06 | NL-78 (W4) |
 | web `wiring/metrics.ts` (Board, Heartbeat, MetricsWriter) | NL-06 | NL-54 (W4); NL-91 adds a method only |
 | web `wiring/review.ts` (LessonRead, Issue, Slot, Candidate, Transition, web CheckContextLoader, collab client) | NL-06 | NL-53 (W4) |
-| web `wiring/export.ts` | NL-06 | NL-102 (W5) |
+| web `wiring/exports.ts` | NL-06 | NL-102 (W5) |
 | web `wiring/assist.ts` (SuggestionService, web model client) | NL-06 | NL-116 (W6) |
 | worker `wiring/generation.ts` | NL-07 | NL-79 (W4) |
 | worker `wiring/checks.ts` | NL-07 | NL-81 (W4) |
@@ -445,7 +445,10 @@ table above is the 7a cut. These rows changed during 7b (the parallelism audit r
 | NL-46 | metrics + M-26 | be3 |
 | NL-47 | metrics + M-28, M-29 | be3 |
 | NL-49 | kind backend → integration (serves no CON card; joins the runner pieces) | be3 |
-| NL-42 | `PgBoardReadRepo` file follows DO-4 §3.5 `repos/metrics.ts` (row said `repos/lessons.ts`) | be3 / orchestrator |
+| NL-42 | `PgBoardReadRepo` file follows DO-4 §3.5 `repos/metrics.ts` (row said `repos/lessons.ts`); it is written by that file's owner NL-48, not NL-42 (DO-4 §13 R-9) | be3 / orchestrator |
+| NL-48 | + `PgBoardReadRepo.board_rows` (CON-9) in its own `repos/metrics.ts` (DO-4 §13 R-9) | orchestrator §4b |
+| NL-20, NL-41 | `vocabulary_word_missing` is blocking and moves from the `arc` group (NL-41) to NL-20's `structural` group (DO-4 §13 R-8) | orchestrator §4b |
+| NL-32 | depends_on + NL-14 (replaces NL-14's local `PromptBlock` with the port's, DO-4 §13 R-19) | orchestrator §4b |
 | NL-105, NL-106 | WFs → WF-41 (collab internal command routes) instead of WF-11/12/13, WF-15; NL-106 keeps WF-9 | be4 |
 | NL-85 | WFs + WF-42 | be4 |
 | NL-82, NL-83 | cons + CON-1 (NL-82 also CON-3) — backend tickets must name a CON | be4 |

@@ -35,9 +35,7 @@ def order_key(p):
 
 def records():
     out = []
-    for p in sorted(TICKETS.glob("*.json"), key=order_key):
-        if p.name.startswith("probe"):
-            continue
+    for p in sorted((q for q in TICKETS.glob("*.json") if not q.name.startswith("probe")), key=order_key):
         out.append(json.loads(p.read_text()))
     return out
 
@@ -59,7 +57,7 @@ def covers(ac_text):
 
 
 def load():
-    tickets = ca.parse_tickets(ca.join_continuations(BOARD.read_text()))
+    tickets = ca.parse_tickets(BOARD.read_text())
     workflows = ca.parse_workflows([OBS.read_text()])
     audit = AUDIT.read_text()
     reqs, _ = ca.parse_audit(audit)
@@ -73,6 +71,7 @@ def compute():
     order = {t["id"]: i for i, t in enumerate(tickets)}
     acs = {t["id"]: ca.ticket_acs(t)[0] for t in tickets}
     rows, gaps = [], []
+    used = {}
     for _, r in reqs:
         rid = ca._plain(r["id"]).upper()
         if not ca._filled(r["id"]):
@@ -81,13 +80,12 @@ def compute():
         coverers = [t for t in tickets if any(rid in covers(a) for a in acs[t["id"]].values())]
         for wf in sorted(included, key=lambda w: int(w.split("-")[1])):
             proof = None
-            for t in coverers:
-                for acid, text in acs[t["id"]].items():
-                    if rid in covers(text) and wf in text.upper():
-                        proof = (t["id"], acid)
-                        break
-                if proof:
-                    break
+            cands = [(t["id"], acid) for t in coverers for acid, text in acs[t["id"]].items()
+                     if rid in covers(text) and wf in text.upper()]
+            fresh = [c for c in cands if used.get((rid,) + c, wf) == wf]
+            if fresh:
+                proof = fresh[0]
+                used[(rid,) + proof] = wf
             if not proof:
                 gaps.append((rid, wf))
                 continue

@@ -213,7 +213,7 @@ class StructuredCallRequest:
     effort: Literal["low", "medium", "high"] | None   # MODEL_EFFORT "low" (SP-1); None = provider default
     temperature: float | None            # None = provider default, as SP-1 measured; no setting overrides it (G-28)
 
-class PromptBlock:
+class PromptBlock:  # owner: packages/core/src/ports/model-client.ts (NL-12); packages/prompts and packages/llm import it (§13 R-19)
     text: str
     cacheable: bool
     label: Literal["locked", "guidance", "schema", "examples", "context", "data", "instruction"]
@@ -304,7 +304,9 @@ class SnapshotResult:
 class StandardEdit:
     kind: Literal["standard"]
     code: str
-    decision: Literal["confirm", "remove", "add"]
+    decision: Literal["confirm", "remove", "add", "undo"]
+    restore: Standard | None             # undo only (§13 R-4): the front-matter entry exactly as it stood before the undone
+                                         # decision (StandardDecisionRow.before_entry); None on undo of an "add" = delete it
 
 class SlotFillEdit:
     kind: Literal["slot_fill"]
@@ -480,6 +482,8 @@ class NewJob:
     lesson_id: LessonId | None
     idempotency_key: str                 # sha256(run_id, lesson_id, prompt_version_id, schema_version)
     priority: int
+    reviewer_note: str | None            # kind "candidate" only: the CON-16 regenerate note (lesson_job.reviewer_note); None for
+                                         # unit_plan and lesson jobs; reaches DraftPromptInput.reviewer_note, never a log line (§13 R-15)
 
 class ClaimedJob:
     job_id: JobId
@@ -495,6 +499,7 @@ class ClaimedJob:
     outline_version_id: OutlineVersionId
     started_by: UserId
     idempotency_key: str
+    reviewer_note: str | None            # copied from NewJob (§13 R-15)
 
 class JobOutcome:
     job_id: JobId
@@ -1041,10 +1046,17 @@ class LessonVersionRepo(Protocol):  # ports/lesson-versions.ts
     async def candidate(self, lesson_id: LessonId, candidate_id: VersionId) -> LessonVersionRow | None: ...
     async def has_generated_version(self, lesson_id: LessonId) -> bool: ...   # FailNode's candidate branch (G-26)
     async def approved_snapshots(self, unit_id: UnitId) -> list[LessonVersionRow]: ...
+    async def mark_adopted(self, version_id: VersionId, tx: Tx) -> LessonVersionRow: ...
+    # whole adopt only (CON-16; §13 R-5): UPDATE … SET adopted = true WHERE version_id = $1 AND kind = 'candidate' AND
+    # adopted = false RETURNING; zero rows → DomainRefusal(INVALID_TRANSITION) (a concurrent whole adopt won). A section
+    # adopt leaves adopted false and is recorded by its audit event only, so a later whole adopt stays possible.
 
 class LessonGraphRepo(Protocol):  # ports/lesson-graph.ts
     async def dependencies(self, lesson_id: LessonId) -> list[DependencyState]: ...
     async def dependants(self, lesson_id: LessonId) -> list[LessonId]: ...
+    async def source_outline_version(self, lesson_id: LessonId) -> OutlineVersionId | None: ...
+    # the outline version of the run that produced the lesson's newest "generated" version or wholly adopted "candidate"
+    # (provenance.run_id → run.outline_version_id); None when it has neither. Only CheckContextLoader calls it (§13 R-14)
 
 class BoardReadRepo(Protocol):  # ports/board-reads.ts; implemented in packages/db/src/repos/metrics.ts (A13a)
     async def board_rows(self, unit_id: UnitId, state: LessonStateName | None) -> list[BoardRowRecord]: ...
@@ -1133,12 +1145,19 @@ class CoverageCell:
     lesson_id: LessonId
     role: Literal["I", "P", "A"]
     confirmation: Literal["person", "judge_only", "generator_only"]
+    source: Literal["approved", "working"]   # CON-22: the latest approved snapshot's links where one exists, else the stored
+                                             # derived row's (§13 R-11); the service groups cells by (code, lesson) into roles
 
 class AlignmentRepo(Protocol):
     async def replace_for_hash(self, lesson_id: LessonId, content_hash: Sha256, links: Sequence[AlignmentLinkRow], tx: Tx) -> int: ...
     async def confirm(self, lesson_id: LessonId, code: str, by: UserId, decision: Literal["confirm", "remove", "add"], tx: Tx) -> AlignmentLinkRow: ...
     async def for_lesson(self, lesson_id: LessonId) -> list[AlignmentLinkRow]: ...
     async def coverage_rows(self, unit_id: UnitId) -> list[CoverageCell]: ...
+    # ONE query (CON-22): per lesson, the alignment_link rows whose content_hash is its latest approve snapshot's hash
+    # (source approved), else its latest lesson_doc derived hash (source working); never a model
+    async def restore(self, lesson_id: LessonId, code: str, rows: Sequence[AlignmentLinkRow], tx: Tx) -> int: ...
+    # undo (CON-14; §13 R-4): replaces the rows for (lesson_id, code) at the lesson's latest hash with `rows` (the undone
+    # decision's before_links), confirmation included; returns the row count
 
 class PgAlignmentRepo(AlignmentRepo): ...  # implements AlignmentRepo; packages/db/src/repos/review-extras.ts
 
@@ -1151,6 +1170,7 @@ class NewSuggestion:
     suggested_text: str
     requested_by: UserId
     model_call_id: ModelCallId
+    expires_at: datetime                 # set by SuggestionService: now + SUGGESTION_TTL_MIN (the repo reads no settings; §13 R-3)
 
 class SuggestionRow:
     suggestion_id: SuggestionId
@@ -1195,9 +1215,22 @@ class HistoryRow:
     version_hash: Sha256 | None
     reason: str | None
 
+class StandardDecisionRow:  # read back from audit_event (actions standard.confirm / .remove / .add / .undo; §13 R-4)
+    audit_id: AuditEventId
+    lesson_id: LessonId
+    code: str
+    decision: Literal["confirm", "remove", "add", "undo"]
+    by: UserId
+    at: datetime
+    before_entry: Standard | None        # the front-matter entry before this decision (codes and CDE text only, no lesson text)
+    before_links: list[AlignmentLinkRow] # the code's alignment_link rows before this decision
+
 class AuditLog(Protocol):
     async def append(self, e: NewAuditEvent, tx: Tx) -> AuditEventId: ...
     async def history(self, lesson_id: LessonId) -> list[HistoryRow]: ...
+    async def standard_decisions(self, lesson_id: LessonId, code: str) -> list[StandardDecisionRow]: ...
+    # newest first; parses details {code, decision, undo_of, before_entry, before_links} that IssueService.decide_standard
+    # writes on every standard decision (§13 R-4)
 
 class PgAuditLog(AuditLog): ...  # implements AuditLog; packages/db/src/repos/audit.ts
 
@@ -1262,7 +1295,12 @@ class PromptRepo(Protocol):
     async def insert_guidance(self, v: NewGuidanceVersion, diff: str, tx: Tx) -> PromptVersionRow: ...   # STALE_BASE unless base is current (row lock)
     async def pinned_by_runs(self, prompt_version_id: str) -> list[RunId]: ...
 
-class PgPromptRepo(PromptRepo): ...  # implements PromptRepo; packages/db/src/repos/prompts.ts
+class PgPromptRepo(PromptRepo):  # implements PromptRepo; packages/db/src/repos/prompts.ts
+    async def sync_locked_layer(self, locked_hash: Sha256, tx: Tx) -> PromptVersionRow | None: ...
+    # repository-level, not on the port (§13 R-6): under pg_advisory_xact_lock('prompt:sync'), an empty table → insert v1
+    # (number 1, locked_hash, empty guidance, author None, reason "initial"); current locked_hash differs → insert n+1 with
+    # the new hash and the current guidance carried over; equal → nothing (returns None). wire_prompts calls it once per
+    # web process at construction (NL-34)
 
 class NewExportBundle:
     unit_id: UnitId
@@ -1419,8 +1457,12 @@ class ModelCallContext:
     experiment_id: str | None
     reservation_id: ReservationId | None
 
+class CostMath(Protocol):  # packages/llm/src/paid-call.ts; the wiring passes §8's pure functions (§13 R-6)
+    def settle_cost(self, price: ModelPrice, usage: TokenUsage) -> Usd: ...
+    def max_call_cost(self, price: ModelPrice, input_tokens_estimate: int, output_cap: int) -> Usd: ...
+
 class ModelCallRecorder:
-    def __init__(self, client: ModelClient, log: ModelCallLog, clock: Clock, prices: PriceTable, settings: ModelSettings) -> None: ...
+    def __init__(self, client: ModelClient, log: ModelCallLog, clock: Clock, prices: PriceTable, settings: ModelSettings, cost: CostMath) -> None: ...
     async def call(self, ctx: ModelCallContext, req: StructuredCallRequest, rendered: RenderedPrompt) -> RecordedCall: ...
     # 1 insert_sent (rendered prompt) → 2 client.complete with retries → 3 complete(raw, usage, cost via settle_cost,
     # served model, provider request id) the moment the response arrives; on final failure fail() and raise ProviderError
@@ -1436,7 +1478,7 @@ class PaidCallRequest:
     user_id: UserId
 
 class PaidCaller:  # packages/llm/src/paid-call.ts (Metz S6): the one reserve → call → settle | release protocol
-    def __init__(self, recorder: ModelCallRecorder, spend: SpendLedger, prices: PriceTable) -> None: ...
+    def __init__(self, recorder: ModelCallRecorder, spend: SpendLedger, prices: PriceTable, cost: CostMath) -> None: ...
     async def call(self, p: PaidCallRequest) -> RecordedCall: ...
     # amount = max_call_cost(price_for(alias model), rendered.input_tokens_estimate, req.max_output_tokens) → spend.reserve
     # (refused → raise SpendRefused(refused_by, scope, amount); nothing sent, no model_call row) → recorder.call with
@@ -1466,6 +1508,11 @@ class UnitPlanPromptInput:
     rows: list[NormalizedRow]
     unit_rules: list[UnitRuleRecord]
     links: list[LessonLinkRecord]
+    repair_of: UnitPlanRepairNote | None # None on the first call; set on the one plan repair (§13 R-13)
+
+class UnitPlanRepairNote:
+    draft_raw: str                       # the previous call's raw output, verbatim
+    issues: list[str]                    # Zod issue paths and the code checks that failed (missing day, duplicate, out of scope)
 
 class DraftPromptInput:
     prompt: PromptVersionRow
@@ -1499,6 +1546,7 @@ class JudgePromptInput:
 class PromptRenderer:
     def __init__(self, locked_dir: str, schemas: SchemaRegistry) -> None: ...
     def render_unit_plan(self, i: UnitPlanPromptInput) -> RenderedPrompt: ...
+    # with i.repair_of set: the same prompt plus one delimited "data" block holding the previous raw plan and its issues
     def render_lesson_draft(self, i: DraftPromptInput) -> RenderedPrompt: ...
     # embeds the LessonDraft JSON Schema as a "schema" system block and asks for JSON only (SP-1 output_mode prompt_embedded)
     def render_repair(self, i: RepairPromptInput) -> RenderedPrompt: ...   # same embedding as the draft
@@ -1523,6 +1571,8 @@ class RouteSpec:
     roles: list[RoleName] | None         # None = any signed-in role
     request_schema: str | None           # Zod mirror name, e.g. "StartRunRequest"; transitionLesson uses "TransitionRequestInput"
     success_status: int
+    public: bool                         # default False; True only for signIn (no session yet): with_route skips the session step
+                                         # but keeps the Origin check (§13 R-17)
 # TransitionRequestInput (packages/schema/src/api/transition.ts, G-11): the Zod mirror of TransitionRequest with
 # Approve.rating, RequestChanges.note and Reopen.reason optional and nullable, every other field strict. A missing or
 # empty one then reaches decide_transition, which raises the card's RATING_REQUIRED / NOTE_REQUIRED / REASON_REQUIRED in
@@ -1628,7 +1678,8 @@ class CoverageService:  # apps/web/src/server/services/coverage-service.ts (A18,
     async def coverage(self, user: RequestUser, unit_id: UnitId) -> CoverageMatrix: ...
 
 class LessonReadService:
-    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, reader: LessonDocReader, outlines: OutlineRepo, alignment: AlignmentRepo, suggestions: SuggestionRepo, audit: AuditLog) -> None: ...
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, reader: LessonDocReader, outlines: OutlineRepo, alignment: AlignmentRepo, suggestions: SuggestionRepo, audit: AuditLog, issues: IssueRepo, flags: SafetyFlagRepo, graph: LessonGraphRepo) -> None: ...
+    # issues / flags / graph feed the approver checklist and the dependency lines of CON-11 (§13 R-6)
     async def get_lesson(self, user: RequestUser, lesson_id: LessonId) -> Lesson: ...
     # derived row for editable states, the latest snapshot for frozen ones; assert_known_nodes → SCHEMA_UNKNOWN; never writes
     async def history(self, user: RequestUser, lesson_id: LessonId) -> LessonHistory: ...
@@ -1642,9 +1693,16 @@ class IssueService:
     async def decide_standard(self, user: RequestUser, lesson_id: LessonId, req: StandardDecisionRequest) -> ResolveResult: ...
     # front-matter change → collab.apply_edit(StandardEdit) (counts as an edit for four-eyes); confirmation recorded on
     # alignment_link; audit. undo: within UNDO_WINDOW_S and no later decision on the code, else UNDO_EXPIRED
+    # Every decision's audit row carries details {code, decision, undo_of, before_entry, before_links} (§13 R-4). undo:
+    # role → NOT_FOUND (lesson; undo_of not in audit.standard_decisions(lesson_id, code) or not the caller's) →
+    # LESSON_LOCKED → UNDO_EXPIRED when now − target.at > UNDO_WINDOW_S or target is not the newest row (an undo is itself
+    # a decision, so a second undo expires) → collab.apply_edit(StandardEdit{decision "undo", code, restore =
+    # target.before_entry}) → one tx: alignment.restore(lesson_id, code, target.before_links) + audit (standard.undo);
+    # status "undone". COLLAB_UNAVAILABLE → nothing recorded.
 
 class SlotService:
-    def __init__(self, states: LessonStateRepo, collab: CollabCommands, policy: CheckPolicy) -> None: ...
+    def __init__(self, states: LessonStateRepo, collab: CollabCommands, policy: CheckPolicy, graph: LessonGraphRepo) -> None: ...
+    # graph: dependants(lesson_id) → FillSlotResult.linked_lessons (§13 R-6)
     async def fill(self, user: RequestUser, lesson_id: LessonId, slot_id: str, req: FillSlotRequest) -> FillSlotResult: ...
     # SOURCE_REQUIRED / QUOTE_TOO_LONG checked here before any edit; LESSON_LOCKED from collab
 
@@ -1658,7 +1716,8 @@ class CandidateService:
     async def adopt(self, user: RequestUser, lesson_id: LessonId, candidate_id: VersionId, req: AdoptRequest) -> AdoptResult: ...
 
 class SuggestionService:
-    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, prompts: PromptRepo, suggestions: SuggestionRepo, states: LessonStateRepo, collab: CollabCommands, audit: AuditLog, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
+    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, prompts: PromptRepo, suggestions: SuggestionRepo, states: LessonStateRepo, collab: CollabCommands, audit: AuditLog, tx: TxRunner, clock: Clock, settings: WebSettings, reader: LessonDocReader) -> None: ...
+    # reader: latest_derived(lesson_id) resolves AssistPromptInput.section_name from the anchor's section (§13 R-6)
     async def list_pending(self, user: RequestUser, lesson_id: LessonId) -> SuggestionList: ...
     async def request(self, user: RequestUser, lesson_id: LessonId, req: SuggestionRequest) -> Suggestion: ...
     # synchronous PaidCaller.call (ASSIST alias, run_id None, ASSIST_CALL_TIMEOUT_MS = 20 s); SpendRefused → DAY_CAP_REACHED
@@ -1689,8 +1748,11 @@ class TransitionService:
     #   submit: collab.lock_and_snapshot (freeze first, store, cover check, blocking checks on the stored row, snapshot +
     #           state + review_event); COLLAB_UNAVAILABLE if it cannot be reached; its refusals pass through unchanged
     #   approve: approvals.approve(user, lesson_id, req)
-    #   withdraw / request_changes / reopen: one tx (reopen writes a new version with derived_from_version_id) → commit →
-    #           collab.set_mode(editable); the review_event id is the response's audit_id
+    #   withdraw / request_changes / reopen: one tx with the lesson row locked (reopen writes a new version with
+    #           derived_from_version_id) → collab.set_mode(editable) INSIDE the open tx → commit (§13 R-10). CollabUnavailable
+    #           → rollback → COLLAB_UNAVAILABLE, nothing changed (CON-18). A commit failure after set_mode succeeded →
+    #           best-effort set_mode(read_only, from_state) + an InvariantViolation log line, then the error envelope; a
+    #           collab restart re-seeds FrozenDocs from the stored state. The review_event id is the response's audit_id
 
 class ApproveService:  # apps/web/src/server/services/approve-service.ts (Metz C2): Approve only, risk::security
     def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, graph: LessonGraphRepo, issues: IssueRepo, loader: CheckContextLoader, rules: Sequence[CheckRule], policy: CheckPolicy, metrics_writer: MetricsWriter, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
@@ -1708,7 +1770,8 @@ class ApproveService:  # apps/web/src/server/services/approve-service.ts (Metz C
 class HeartbeatService:
     def __init__(self, metrics: MetricsRepo, clock: Clock, settings: WebSettings) -> None: ...
     async def record(self, user: RequestUser, lesson_id: LessonId, hb: Heartbeat) -> None: ...
-    # authors → ROLE_FORBIDDEN; beats closer than HEARTBEAT_MIN_SPACING_S are dropped; active = focused, visible, input within the idle window
+    # authors → ROLE_FORBIDDEN; a beat closer than HEARTBEAT_MIN_SPACING_S to the previous one from the same tab is stored but
+    # adds no time (CON-20; §13 R-7); active = focused, visible, input within the idle window
 
 class PromptService:
     def __init__(self, prompts: PromptRepo, audit: AuditLog, tx: TxRunner) -> None: ...
@@ -1716,7 +1779,9 @@ class PromptService:
     async def save_guidance(self, user: RequestUser, req: SaveGuidanceRequest) -> GuidanceVersion: ...   # REASON_REQUIRED, STALE_BASE
 
 class ExportService:
-    def __init__(self, versions: LessonVersionRepo, exports: ExportRepo, audit: AuditLog, tx: TxRunner, ids: IdGenerator, clock: Clock) -> None: ...
+    def __init__(self, versions: LessonVersionRepo, exports: ExportRepo, audit: AuditLog, tx: TxRunner, ids: IdGenerator, clock: Clock, states: LessonStateRepo) -> None: ...
+    # states (§13 R-6): create moves each newly included lesson approved → exported (set_state) and appends one
+    # review_event per lesson (actor = the caller) in the same tx as ExportRepo.insert; an unchanged payload writes nothing
     async def list(self, user: RequestUser, unit_id: UnitId) -> ExportList: ...
     async def create(self, user: RequestUser, unit_id: UnitId) -> ExportCreated: ...   # unchanged payload → the previous version, nothing written
     async def download(self, user: RequestUser, export_id: str) -> LessonExportFile: ...
@@ -1867,7 +1932,8 @@ class UnitPlanOutcome:
 class UnitPlanJob:
     def __init__(self, paid: PaidCaller, renderer: PromptRenderer, runs: RunRepo, outlines: OutlineRepo, prompts: PromptRepo, settings: WorkerSettings) -> None: ...
     async def run(self, job: ClaimedJob) -> UnitPlanOutcome: ...
-    # one PaidCaller.call (output_mode schema_enforced: UnitPlanDraft compiles, SP-1) + at most one repair; valid → store
+    # one PaidCaller.call (output_mode schema_enforced: UnitPlanDraft compiles, SP-1) + at most one repair (purpose "repair",
+    # render_unit_plan with repair_of = {draft_raw, issues}, §13 R-13); valid → store
     # entries, run.plan_stored_at, state running; still invalid → RunRepo.mark_plan_failed (run paused, paused_check =
     # unit_plan; Resume re-queues it). SpendRefused → RunRepo.mark_capped.
 
@@ -1905,7 +1971,8 @@ class StopSignal(Protocol):
     def is_set(self) -> bool: ...
 
 class ClaimLoop:
-    def __init__(self, queue: JobQueue, calls: ModelCallLog, spend: SpendLedger, runner: LessonJobRunner, unit_plans: UnitPlanJob, clock: Clock, logger: Logger, settings: WorkerSettings) -> None: ...
+    def __init__(self, queue: JobQueue, calls: ModelCallLog, spend: SpendLedger, runner: LessonJobRunner, unit_plans: UnitPlanJob, clock: Clock, logger: Logger, settings: WorkerSettings, tx: TxRunner) -> None: ...
+    # tx (§13 R-6): finishing a unit_plan job and its run-level follow-up (capped plan → queue.cancel_run) in one transaction
     async def start(self) -> TickReport: ...
     # requeue_expired once → for its job_ids: calls.mark_lost + spend.release_for_jobs → then claim
     async def run_until(self, stop: StopSignal) -> LoopExit: ...
@@ -1915,6 +1982,7 @@ class ClaimLoop:
 class CheckContext:
     lesson_id: LessonId
     content_hash: Sha256
+    outline_version_id: OutlineVersionId  # the version compared against: graph.source_outline_version, else the unit's latest (§13 R-14)
     lesson: StoredLesson
     row: NormalizedRow
     arc_header: str | None
@@ -1926,10 +1994,18 @@ class CheckContext:
     pending_suggestions: list[SuggestionRow]
     safety_flags: list[SafetyFlagRow]
     confirmations: list[AlignmentLinkRow]
+    previous_lesson_flags: list[SafetyFlagRow]  # open flags of the previous lesson row: disclosure_prompt covers "the flagged lesson
+                                                # and the next" (R-19 as amended; §13 R-1)
+    unit_coverage: list[CoverageCell]            # alignment.coverage_rows(unit): the unpractised-skill case of arc_repeat (R-9; §13 R-2)
 
 class CheckContextLoader:
     def __init__(self, outlines: OutlineRepo, standards: StandardRepo, graph: LessonGraphRepo, reader: LessonDocReader, suggestions: SuggestionRepo, flags: SafetyFlagRepo, alignment: AlignmentRepo, clock: Clock) -> None: ...
     async def load(self, lesson_id: LessonId, lesson: StoredLesson, content_hash: Sha256) -> CheckContext: ...
+    # resolves the outline version itself, in one place, so its callers (CheckJobRunner, ApproveService, lock_and_snapshot)
+    # cannot disagree: graph.source_outline_version(lesson_id), else the unit's latest_outline_version_id; then
+    # outlines.row_context(that version, lesson_id, None); the previous lesson = the kind "lesson" row just before this
+    # one in outlines.rows(that version) (None for the first) → flags.open_for(it); and
+    # alignment.coverage_rows(unit_id). No argument is added (§13 R-14).
 
 class CheckRunReport:
     lesson_id: LessonId
@@ -2135,7 +2211,8 @@ class GateDecision:
     details: JsonValue
 
 class StandardsIndex:
-    def resolve(self, code: str) -> StandardResolution: ...
+    def resolve(self, code: str, sheet_label: str | None = None) -> StandardResolution: ...
+    # sheet_label: the label text the outline gives an ELD code; compared with the official text → eld_label_mismatch (§13 R-18)
     def leaves_of(self, code: str) -> list[str]: ...
     def text_of(self, code: str) -> str | None: ...
 
@@ -2246,7 +2323,9 @@ PRICE_TABLE = PriceTable                 # packages/llm/src/prices.ts, confirmed
 
 class ProseMirrorSchemaRef:
     schema_version: int
-    node_names: list[str]
+    node_names: list[str]                # Newsela's nodes plus three Lesson Studio nodes (§13 R-20): teacher_tip (teacher-only,
+                                         # attr safety_note_id, HP-9), quote_placeholder (slot_id, reason) and excerpt_slot (slot_id,
+                                         # rights; HP-2: a quote is held by a slot a person fills, never generated)
     mark_names: list[str]
 
 class SectionTemplateTable:
@@ -2787,10 +2866,15 @@ class DomainRefusal(Exception):
 
 class ProviderError(Exception):
     kind: ProviderErrorKind
-    retryable: bool                      # rate_limited, overloaded, server_error, connection, timeout
+    retryable: bool                      # rate_limited, overloaded, server_error, connection; NOT timeout: the provider may have
+                                         # run (and billed) the call, so a retry could pay twice (CON-6; NL-33; §13 R-22)
     http_status: int | None
     retry_after_s: float | None
     provider_request_id: str | None
+
+class IntakeError(Exception):  # packages/core/src/intake/errors.ts (NL-16; §13 R-21): the pure intake functions cannot import
+    code: Literal["UNSUPPORTED_FILE", "HEADER_NOT_FOUND", "TOO_MANY_ROWS"]   # DomainRefusal's port layer; OutlineService (NL-26)
+    details: JsonValue                   # re-raises it as DomainRefusal with the same code and details
 
 class SchemaUnknownError(Exception):
     lesson_id: LessonId
@@ -2998,16 +3082,21 @@ class CollabDeps:  # built once by apps/collab/src/main.ts (A0)
     ids: IdGenerator
     clock: Clock
 
-class CollabWiring:
+class CollabServerWiring:  # the socket half (§13 R-12)
     frozen: FrozenDocs
     guard: WriteGuard
     authenticator: CollabAuthenticator
     persistence: LessonPersistence
     acks: AckBroadcaster
+
+class CollabCommandWiring:  # the internal-command half; it reuses the server half's FrozenDocs and AckBroadcaster
     commands: CollabCommandHandler
 
-# wire_collab (apps/collab/src/wiring/collab.ts; owner A11)
-def wire_collab(d: CollabDeps, hocuspocus: HocuspocusServerRef) -> CollabWiring: ...
+# wire_collab_server (apps/collab/src/wiring/server.ts; A0 shell NL-07, filled by NL-80, owner A11)
+def wire_collab_server(d: CollabDeps, hocuspocus: HocuspocusServerRef) -> CollabServerWiring: ...
+# wire_collab_commands (apps/collab/src/wiring/commands.ts; A0 shell NL-07, filled by NL-105, owner A11)
+def wire_collab_commands(d: CollabDeps, server: CollabServerWiring, hocuspocus: HocuspocusServerRef) -> CollabCommandWiring: ...
+# build_collab_runtime calls wire_collab_server, then wire_collab_commands with its result; there is no wiring/collab.ts
 ```
 
 ## 13. Open items
@@ -3028,3 +3117,54 @@ def wire_collab(d: CollabDeps, hocuspocus: HocuspocusServerRef) -> CollabWiring:
    `RATING_REQUIRED`; this design keeps the card's code reachable with `TransitionRequestInput` (§5) and a contract test,
    and a `CHG` could instead drop `rating` from `required` (likewise `note`, `reason`). (c) AI assist past a spend cap
    answers `MODEL_UNAVAILABLE` with `details.reason = "spend_cap"`, since CON-17 names no cap code.
+
+### §7b resolutions (2026-10-25)
+
+Gaps the ticket writers found while specifying `docs/plans/tickets/`, settled in one pass (to-tickets §4b) under PD-32.
+No agreed card changed; no `CHG-N` was needed. Format: gap → decision (basis) → section → tickets updated.
+
+- **R-1** disclosure scope "the flagged lesson and the next" → `CheckContext.previous_lesson_flags` (open flags of the
+  previous `lesson` row of the compared outline version) (PRD R-19 as amended) → §6 → NL-39, NL-38.
+- **R-2** unpractised performance-task skill → `CheckContext.unit_coverage` (`coverage_rows`); a code with role `A` in
+  some lesson and role `P` in none is an `arc_repeat` finding, code `skill_unpractised`, on the lesson holding the `A`
+  (PRD R-9) → §6 → NL-41, NL-38.
+- **R-3** `NewSuggestion.expires_at` set by the service (CON-17's 30 min) → §3.5 → NL-43, NL-50.
+- **R-4** standard-decision undo (CON-14 `undo`, `undo_of`, `UNDO_EXPIRED`, already agreed) → `StandardEdit.decision
+  "undo"` + `restore`, `StandardDecisionRow`, `AuditLog.standard_decisions`, `AlignmentRepo.restore`, the undo order in
+  `IssueService.decide_standard` → §3.3, §3.5, §5 → NL-45, NL-12, NL-43, NL-105.
+- **R-5** marking a candidate adopted → `LessonVersionRepo.mark_adopted` (whole only; section adopts stay audit-only)
+  (CON-16 `INVALID_TRANSITION` "already adopted whole") → §3.5 → NL-47, NL-42.
+- **R-6** additive constructors: `LessonReadService` + `issues`, `flags`, `graph`; `SlotService` + `graph`;
+  `SuggestionService` + `reader`; `ExportService` + `states` (and one `review_event` per newly exported lesson, DO-3 §6);
+  `ModelCallRecorder` / `PaidCaller` + `cost: CostMath`; `ClaimLoop` + `tx`; `PgPromptRepo.sync_locked_layer`
+  (repository-level, advisory-locked); `PgLessonDocReader` owned by NL-36 → §3.5, §4, §5, §6, DO-3 §2.2 → NL-44, NL-46,
+  NL-50, NL-51, NL-33, NL-30, NL-34, NL-36.
+- **R-7** heartbeats under 10 s apart are stored but add no time (CON-20 wins over "dropped") → §5 → NL-48.
+- **R-8** `vocabulary_word_missing` is **blocking** (PRD R-19 as amended, U2) and moves to NL-20's structural group →
+  — → NL-20, NL-41, NL-39.
+- **R-9** `PgBoardReadRepo` stays in `repos/metrics.ts` (DO-3 §4 A13a); the file's owner NL-48 writes it, NL-42 does not
+  → §3.5 → NL-42, NL-48.
+- **R-10** `set_mode` failing after the commit → `set_mode(editable)` is called inside the open transaction, so its
+  failure rolls back (CON-18 `COLLAB_UNAVAILABLE`, "unchanged"); a commit failure after it compensates with
+  `set_mode(read_only)` → §5 `TransitionService` → NL-53.
+- **R-11** coverage `source` per cell (CON-22) → `CoverageCell.source`, chosen by `coverage_rows` in one query → §3.5 →
+  NL-91, NL-43.
+- **R-12** collab wiring split → `wire_collab_server` (`wiring/server.ts`, NL-80) and `wire_collab_commands`
+  (`wiring/commands.ts`, NL-105) → §12, DO-3 §2.5, §8 → NL-07, NL-80, NL-101.
+- **R-13** plan repair → one `render_unit_plan` call with `repair_of = {draft_raw, issues}` (the draft and only what
+  failed, as G-22 does for lessons), purpose `repair` → §4, §6 → NL-31, NL-14.
+- **R-14** outline version for checks → the loader resolves it once (`LessonGraphRepo.source_outline_version`, else the
+  unit's latest) and records it in `CheckContext.outline_version_id`; `load` keeps its arguments so callers cannot
+  disagree (G-24: a run pins its outline version) → §3.5, §6 → NL-38, NL-42.
+- **R-15** `reviewer_note` carrier → `NewJob` / `ClaimedJob.reviewer_note`, column `lesson_job.reviewer_note` → §3.4,
+  DO-3 §6 → NL-29, NL-28, NL-47.
+- **R-16** `model_call.retries` added to DO-3 §6 → NL-33 (DDL with NL-08's `0005_traces.sql`) → NL-33, NL-08.
+- **R-17** `RouteSpec.public` (signIn has no session; the Origin check still runs) → §5 → NL-13.
+- **R-18** `StandardsIndex.resolve(code, sheet_label = None)` for the ELD label verdict → §8 → NL-15.
+- **R-19** `PromptBlock` has one owner, `ports/model-client.ts` (NL-12); NL-14's local copy is replaced by an import in
+  NL-32 → §3.1 → NL-14, NL-32.
+- **R-20** editor nodes `teacher_tip`, `quote_placeholder`, `excerpt_slot` confirmed (HP-2, HP-9) → §8, DO-3 §2.1 → NL-10
+  (unchanged).
+- **R-21** layout facts recorded: 31 port files, `deps-types.ts` re-pointed by NL-12, NL-09's intake records,
+  `IntakeError` → `DomainRefusal` in NL-26, wiring names → §10.2, DO-3 *Addenda* → NL-16 (unchanged).
+- **R-22** a provider `timeout` is not retried (CON-6: never pay twice) → §10.2 `ProviderError.retryable` → NL-33.
