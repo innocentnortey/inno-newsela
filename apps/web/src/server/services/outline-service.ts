@@ -5,6 +5,7 @@ import { IntakeError } from "@ls/core/intake/errors";
 import { compute_lesson_links } from "@ls/core/intake/lesson-links";
 import { normalize_outline } from "@ls/core/intake/normalize";
 import { parse_workbook } from "@ls/core/intake/parse-grid";
+import { build_validation_report, generate_gate } from "@ls/core/intake/report";
 import type { AuditLog } from "@ls/core/ports/audit";
 import type { Clock } from "@ls/core/ports/clock";
 import type { RequestUser, UnitId } from "@ls/core/ports/common";
@@ -14,9 +15,10 @@ import type { SheetFetcher } from "@ls/core/ports/sheet-fetcher";
 import type { StandardRepo } from "@ls/core/ports/standards";
 import type { TxRunner } from "@ls/core/ports/tx";
 import { row_hash_of } from "@ls/db/repos/outlines";
-import type { ImportLinkRequest, OutlineVersion, UnitList } from "@ls/schema/api/outlines";
+import type { ImportLinkRequest, IntakeChoiceRequest, IntakeChoiceResult, OutlineVersion, UnitList, ValidationReport } from "@ls/schema/api/outlines";
 import { UNIT_ID_RE } from "@ls/schema/ids";
-import type { NormalizedRow, OutlineVersionRow } from "@ls/schema/outline";
+import type { IntakeChoiceRow, NormalizedOutline, NormalizedRow, OutlineVersionRow } from "@ls/schema/outline";
+import { find_target, validate_choice } from "./outline-choices.ts";
 
 export interface UploadedFile {
   filename: string;
@@ -38,6 +40,12 @@ export interface UnitOverviewData {
 }
 export interface UnitOverviewReader {
   unit_overview(): Promise<UnitOverviewData[]>;
+}
+
+// Consumer-owned shape of the extra reads the report needs (structurally the db repo's `outline` and `runs_from_version`).
+export interface ReportReader {
+  outline(id: string): Promise<NormalizedOutline>;
+  runs_from_version(id: string): Promise<{ run_id: string; started_at: string; choices_hash: string }[]>;
 }
 
 const FILE_MESSAGE = "That file is not a CSV or XLSX outline within the size limit.";
@@ -108,7 +116,7 @@ const lesson_hashes = (rows: readonly NormalizedRow[]): Record<string, string> =
 
 export class OutlineService {
   constructor(
-    private readonly outlines: OutlineRepo & UnitOverviewReader,
+    private readonly outlines: OutlineRepo & UnitOverviewReader & ReportReader,
     private readonly standards: StandardRepo,
     private readonly sheets: SheetFetcher,
     private readonly audit: AuditLog,
@@ -118,7 +126,6 @@ export class OutlineService {
     private readonly settings: Pick<WebSettings, "outline_max_bytes" | "outline_max_rows">,
   ) {
     void ids;
-    void this.clock;
   }
 
   async list_units(user: RequestUser): Promise<UnitList> {
@@ -137,6 +144,75 @@ export class OutlineService {
         latest_run: u.latest_run as UnitList["units"][number]["latest_run"],
       })),
     };
+  }
+
+  async report(user: RequestUser, outline_version_id: string): Promise<ValidationReport> {
+    void user; // every role reads
+    const version = await this.outlines.version(outline_version_id);
+    if (version === null) throw new DomainRefusal("NOT_FOUND", "Outline version not found.", { outline_version_id });
+    const outline = await this.outlines.outline(outline_version_id);
+    const base = build_validation_report(version, outline, await this.outlines.choices(outline_version_id));
+    const runs = await this.outlines.runs_from_version(outline_version_id);
+    return { ...base, runs_from_this_version: runs };
+  }
+
+  async record_choice(user: RequestUser, outline_version_id: string, req: IntakeChoiceRequest): Promise<IntakeChoiceResult> {
+    if (user.role !== "author") throw new DomainRefusal("ROLE_FORBIDDEN", "Only an author can change intake choices.", {});
+    const id = outline_version_id;
+    const version = await this.outlines.version(id);
+    if (version === null) throw new DomainRefusal("NOT_FOUND", "Outline version not found.", { outline_version_id });
+    const outline = await this.outlines.outline(id);
+    const target = find_target(outline, req.target_id);
+    if (target === null) throw new DomainRefusal("NOT_FOUND", "That item is not in this outline.", { target_id: req.target_id });
+    if (req.kind === "confirm_unit" && (await this.outlines.runs_from_version(id)).length > 0) {
+      const wanted = typeof req.value === "string" ? req.value : version.unit_id;
+      if (wanted !== version.unit_id) {
+        throw new DomainRefusal("INVALID_TRANSITION", "A run already started from this version; the unit cannot change.", { unit_id: version.unit_id });
+      }
+    }
+    const stored = validate_choice(req, target, { outline, standards: await this.standards.index(), unit_id: version.unit_id });
+
+    // The advisory lock serialises authors on one version, so the gate check and the once-only confirmed_at stay right.
+    return this.tx.with_tx(async (tx) => {
+      const fresh = (await this.outlines.version(id)) ?? version;
+      const status = req.kind === "revert" ? "default" : "confirmed";
+      const before = await this.outlines.choices(id);
+      const saved = await this.outlines.upsert_choice(
+        { outline_version_id: id, finding_id: req.target_id, choice: stored, status, confirmed_by: status === "confirmed" ? user.user_id : null, at: this.clock.now().toISOString() } as IntakeChoiceRow,
+        tx,
+      );
+      let current = fresh;
+      const view = (v: OutlineVersionRow): IntakeChoiceRow[] => [
+        ...before.filter((c) => c.finding_id !== req.target_id),
+        { ...saved, confirmed_by: status === "confirmed" ? user.name : null, at: v.confirmed_at ?? v.created_at } as IntakeChoiceRow,
+      ];
+      const gate = generate_gate(outline, view(current));
+      if (gate.allowed && current.confirmed_at === null) {
+        const now = this.clock.now();
+        await this.outlines.mark_confirmed(id, now, tx);
+        current = { ...current, confirmed_at: now.toISOString() } as OutlineVersionRow;
+      }
+      const after = view(current);
+      await this.audit.append(
+        {
+          actor_id: user.user_id,
+          action: "outline.choice",
+          target_kind: "outline_version",
+          target_id: id,
+          version_hash: version.sha256,
+          reason: null,
+          details: { target_id: req.target_id, kind: req.kind, status, choice: stored.length <= 100 ? stored : "(long)" },
+          request_id: user.request_id,
+          store_id: null,
+        },
+        tx,
+      );
+      const report = build_validation_report(current, outline, after);
+      const row_number = target.kind === "finding" ? target.finding.row_number : target.kind === "segment" ? target.row_number : null;
+      const row = report.rows.find((r) => r.row_number === row_number) ?? report.rows[0];
+      if (row === undefined) throw new DomainRefusal("NOT_FOUND", "That item is not in this outline.", { target_id: req.target_id });
+      return { row, counts: report.counts, generate_allowed: gate.allowed };
+    }, "outline-choice:" + id);
   }
 
   async upload(user: RequestUser, file: UploadedFile, unit_id: UnitId | null): Promise<OutlineVersion> {
