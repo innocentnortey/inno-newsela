@@ -79,7 +79,8 @@ export default [
             ...forbid("config", ["config"]),
             ...forbid("obs", ["obs", "config"]),
             // adapters: the pure packages plus config and obs; not each other, not apps.
-            ...ADAPTERS.flatMap((a) => forbid(a, [a, "core", "schema", "editor-schema", "config", "obs"])),
+            // db may also use ydoc (seed_initial builds the first Y.Doc state; NL-36).
+            ...ADAPTERS.flatMap((a) => forbid(a, [a, "core", "schema", "editor-schema", "config", "obs", ...(a === "db" ? ["ydoc"] : [])])),
             // apps: any package, no other app.
             ...forbid("app-web", [...PACKAGES, "app-web"]),
             ...forbid("app-worker", [...PACKAGES, "app-worker"]),
