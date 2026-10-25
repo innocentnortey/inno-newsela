@@ -3,6 +3,7 @@ import type { UserId, JobId, RunId } from "@ls/core/ports/common";
 import type { RecordedCall } from "@ls/core/ports/model-call-log";
 import type { StructuredCallRequest } from "@ls/core/ports/model-client";
 import type { SpendLedger } from "@ls/core/ports/spend";
+import { UnpricedModelError } from "./recorder.ts";
 import type { CostMath, ModelCallContext, ModelCallRecorder, PriceLookup, RenderedPromptLike } from "./recorder.ts";
 
 export type { CostMath } from "./recorder.ts";
@@ -39,6 +40,11 @@ export class PaidCaller {
       recorded = await this.recorder.call({ ...p.ctx, reservation_id }, p.req, p.rendered);
       await this.spend.settle(reservation_id, recorded.cost_usd, recorded.model_call_id);
     } catch (e) {
+      if (e instanceof UnpricedModelError) {
+        // Real spend with an unknown price: settle at the reserved worst case rather than release, then surface the error.
+        await this.spend.settle(reservation_id, amount, e.model_call_id).catch(() => undefined);
+        throw e;
+      }
       // The original error wins over a failing release.
       await this.spend.release(reservation_id).catch(() => undefined);
       throw e;

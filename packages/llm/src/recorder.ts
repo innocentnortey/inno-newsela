@@ -40,6 +40,13 @@ type RetryAwareLog = ModelCallLog & { record_retry?(id: ModelCallId): Promise<vo
 
 const RETRY_AFTER_CAP_S = 120;
 
+// Thrown after the raw output is saved when the served model has no price: the provider was paid but the cost is unknown.
+export class UnpricedModelError extends InvariantViolation {
+  constructor(readonly model_call_id: ModelCallId) {
+    super("no price for served model", { model_call_id });
+  }
+}
+
 export class ModelCallRecorder {
   private readonly random: () => number;
   private readonly logger: Logger | undefined;
@@ -119,7 +126,7 @@ export class ModelCallRecorder {
       });
       if (cost_usd === null) {
         this.logger?.error("model_call.unpriced", { request_id: ctx.request_id, run_id: ctx.run_id, lesson_id: ctx.lesson_id, job_id: ctx.job_id, extra: { model_call_id: id } });
-        throw new InvariantViolation("no price for served model", { model_call_id: id });
+        throw new UnpricedModelError(id);
       }
       this.logger?.info("model_call", {
         request_id: ctx.request_id, run_id: ctx.run_id, lesson_id: ctx.lesson_id, job_id: ctx.job_id, duration_ms: resp.latency_ms,
