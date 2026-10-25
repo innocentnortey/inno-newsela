@@ -20,3 +20,6 @@ Next: gate main (npm install, eslint, typecheck, npm test), push, merge NL-69/67
 
 ## Routing-audit maintenance (2026-10-25)
 Applied: area-map rewrite (one clause per ticket), routes under `.claude/reference/routes/` (index + 5), merge recipe above. Not adopted: E1–E3, planner-model change, context packs, HX-R3. Ticket text corrected in `docs/plans/tickets/` and the live open GitLab issues: look-sheet path, TRACEABILITY verify (`--upto CON` + `test -f`; `--upto TEST` counts only TEST-N, S-11), NL-89 stub, dialog mounting → NL-113, NL-105 → NL-106 ordering. Unresolved: TEST-N ids for trace_check (S-11); SCR-15 opener ownership (NL-68 vs NL-115).
+
+## State after the routing-audit maintenance (2026-10-25)
+Main pushed at 06f969d: NL-65, 66, 67, 69, 70 merged and their issues (#69–#74) closed. In flight: NL-71 implementer (port 3129). Next: review/merge NL-71; plan NL-87, 88, 89; S-22 mount (now NL-113's); file the pin CHG for request_changes/reopen (NL-69 review) and CON-16 Candidate.note CHG (NL-67); then W5+. checkpoint_b.py not yet re-run.
