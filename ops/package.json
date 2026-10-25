@@ -11,7 +11,8 @@
     "@ls/schema": "*",
     "@ls/db": "*",
     "@ls/config": "*",
-    "@ls/obs": "*"
+    "@ls/obs": "*",
+    "@ls/prompts": "*"
   },
   "devDependencies": {}
 }
