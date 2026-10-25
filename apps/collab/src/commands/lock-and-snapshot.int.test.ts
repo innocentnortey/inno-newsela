@@ -6,6 +6,7 @@
 import { randomBytes } from "node:crypto";
 import * as Y from "yjs";
 import { Server } from "@hocuspocus/server";
+import Decimal from "decimal.js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { CHECK_POLICY } from "@ls/core/checks/policy";
 import { SystemClock } from "@ls/core/ports/clock";
@@ -137,13 +138,26 @@ async function new_lesson(state = "in_review", make: (id: string) => StoredLesso
   await t.db.with_tx(async (tx) => {
     await insert_row(tx, "lesson", { id, state, last_editor_id: null });
     await store.seed_initial(id, make(id), SYSTEM_ACTOR, tx);
+    // REFREEZE NOTE (NL-106 implementer): write_snapshot descends from a generated version, so a real lesson needs one.
+    await new PgLessonRepo({ db: t.db, ids, clock }).write_generated_version(
+      {
+        lesson_id: id, unit_id: "G6.U4", kind: "generated", lesson: make(id), draft: {} as never, content_hash: "a".repeat(64),
+        provenance: {
+          outline_row_hash: "a".repeat(64), prompt_version_id: "pv1", model: "m", parameters: {}, schema_version: 1, example_set_id: null,
+          run_id: null as never, model_call_ids: [], cost_usd: new Decimal("0"), ai_assisted_spans: 0, derived_from_version_id: null,
+        },
+        idempotency_key: "k-" + id,
+      },
+      tx,
+    );
   });
   return id;
 }
 const doc_name = (id: string) => `lesson:${id}`;
 const count = async (table: string, col?: string, v?: string) =>
   Number(await scalar(t, col === undefined ? `SELECT count(*)::int FROM ${table}` : `SELECT count(*)::int FROM ${table} WHERE ${col}=$1`, v === undefined ? [] : [v]));
-const versions_of = (id: string) => count("lesson_version", "lesson_id", id);
+// REFREEZE NOTE: the harness lesson owns one generated version (write_snapshot descends from it); snapshots are what the tests count.
+const versions_of = async (id: string) => Number(await scalar(t, "SELECT count(*)::int FROM lesson_version WHERE lesson_id=$1 AND kind<>'generated'", [id]));
 const events_of = (id: string) => count("review_event", "lesson_id", id);
 const state_of = async (id: string) => String(await scalar(t, "SELECT state FROM lesson WHERE id=$1", [id]));
 const docs_of = (id: string) => count("lesson_doc", "lesson_id", id);
@@ -248,7 +262,7 @@ describe("submit_success_one_tx [invariant, AC-1]", () => {
       const res = await h.handler.lock_and_snapshot(cmd(id, sv, 11));
       expect(res).toMatchObject({ lesson_id: id, from_state: "in_review", to_state: "submitted" });
       expect(typeof res.version_number).toBe("number");
-      const [ver] = await rows(t, "SELECT id, kind, content_hash, number FROM lesson_version WHERE lesson_id=$1", [id]);
+      const [ver] = await rows(t, "SELECT id, kind, content_hash, number FROM lesson_version WHERE lesson_id=$1 AND kind='submit'", [id]);
       expect(await versions_of(id)).toBe(1);
       expect(ver).toMatchObject({ kind: "submit", number: res.version_number });
       const doc = await latest_row(id);

@@ -5,7 +5,12 @@ import { PgLessonDocStore } from "@ls/db/repos/lesson-docs";
 import { PgLessonRepo } from "@ls/db/repos/lessons";
 import { PgAuditLog } from "@ls/db/repos/audit";
 import { PgCheckQueue } from "@ls/db/repos/check-queue";
-import { PgStandardRepo } from "@ls/db/repos/outlines";
+import { PgOutlineRepo, PgStandardRepo } from "@ls/db/repos/outlines";
+import { PgIssueRepo } from "@ls/db/repos/issue-repo";
+import { PgAlignmentRepo, PgSafetyFlagRepo, PgSuggestionRepo } from "@ls/db/repos/review-extras";
+import { CheckContextLoader } from "@ls/core/checks/context-loader";
+import { CHECK_POLICY } from "@ls/core/checks/policy";
+import { CHECK_RULES } from "@ls/core/checks/registry";
 import { CollabCommandHandler, install_command_handler } from "../commands/routes.ts";
 import type { CollabCommandHandlerDeps } from "../commands/types.ts";
 import type { CollabDeps } from "../deps-types.ts";
@@ -25,20 +30,28 @@ export function wire_collab_commands(
   const db = new PgDatabase(d.settings.shared, Math.min(4, d.settings.shared.pg_pool_max), 2000, "collab");
   const deps = { db, ids: d.ids, clock: d.clock };
   const states = new PgLessonRepo(deps);
+  const standards = new PgStandardRepo(deps);
+  const reader = new PgLessonDocReader({ db });
   const built: CollabCommandHandlerDeps = {
     store: new PgLessonDocStore({ ...deps, checks: new PgCheckQueue(deps), states, audit: new PgAuditLog(deps) }),
-    reader: new PgLessonDocReader({ db }),
+    reader,
     states,
     versions: states,
-    standards: new PgStandardRepo(deps),
+    standards,
     frozen: s.frozen,
     acks: s.acks,
     persistence: s.persistence,
     hocuspocus: h,
-    tx: d.db,
+    tx: db,
     clock: d.clock,
     logger: d.logger,
     token: d.settings.collab_internal_token,
+    loader: new CheckContextLoader(
+      new PgOutlineRepo(deps), standards, states, reader, new PgSuggestionRepo(deps), new PgSafetyFlagRepo(deps), new PgAlignmentRepo(deps), d.clock,
+    ),
+    rules: CHECK_RULES,
+    policy: CHECK_POLICY,
+    issues: new PgIssueRepo(deps),
   };
   const handler = new CollabCommandHandler({ ...built, ...given });
   install_command_handler(handler);
