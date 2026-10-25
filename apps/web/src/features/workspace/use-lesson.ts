@@ -15,7 +15,7 @@ export type LessonLoad =
 
 export function useLesson(lessonId: string | null): { load: LessonLoad; retry: () => void } {
   const [attempt, setAttempt] = useState(0);
-  const [fetched, setFetched] = useState<{ key: string; load: LessonLoad } | null>(null);
+  const [fetched, setFetched] = useState<{ key: string; lessonId: string | null; load: LessonLoad } | null>(null);
   const key = `${lessonId}#${attempt}`;
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function useLesson(lessonId: string | null): { load: LessonLoad; retry: (
     api
       .GET("/lessons/{lessonId}", { params: { path: { lessonId } } })
       .then((r) => {
-        if (alive) setFetched({ key, load: { kind: "ready", lesson: r.data as Lesson } });
+        if (alive) setFetched({ key, lessonId, load: { kind: "ready", lesson: r.data as Lesson } });
       })
       .catch((e: unknown) => {
         if (!alive) return;
@@ -36,7 +36,7 @@ export function useLesson(lessonId: string | null): { load: LessonLoad; retry: (
         } else if (isApiError(e) && e.code === "NOT_FOUND") {
           load = { kind: "not_found" };
         }
-        setFetched({ key, load });
+        setFetched({ key, lessonId, load });
       });
     return () => {
       alive = false;
@@ -45,7 +45,9 @@ export function useLesson(lessonId: string | null): { load: LessonLoad; retry: (
 
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
   if (lessonId === null) return { load: { kind: "not_found" }, retry };
-  const load: LessonLoad = fetched && fetched.key === key ? fetched.load : { kind: "loading" };
+  // A re-read (after Submit, a decision...) keeps showing the lesson already on screen instead of flashing the skeleton.
+  const keep = fetched && fetched.lessonId === lessonId && fetched.load.kind === "ready";
+  const load: LessonLoad = fetched && (fetched.key === key || keep) ? fetched.load : { kind: "loading" };
   return { load, retry };
 }
 

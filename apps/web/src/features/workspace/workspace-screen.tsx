@@ -7,6 +7,9 @@ import { STATUS_SPECS } from "@/components/ui/status";
 import { Stepper } from "@/components/ui/stepper";
 import { LessonEditor, type EditorClientState } from "@/editor/lesson-editor";
 import { WorkspaceActionBar } from "@/features/workspace/actions/action-bar";
+import { StandardDecisionButtons } from "@/features/workspace/actions/standard-decision";
+import { WorkspaceActionsProvider } from "@/features/workspace/actions/toast-host";
+import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
 import { useSetBreadcrumb } from "@/features/frame/breadcrumb";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
@@ -27,7 +30,16 @@ import { useIssues, useLesson } from "./use-lesson";
 type Issue = components["schemas"]["Issue"];
 const TABS: RailTab[] = ["issues", "standards", "outline-row"];
 
-export function WorkspaceScreen({ unitKey, lessonKey }: { unitKey: string; lessonKey: string }) {
+/** One toast stack for the whole page, so an Undo toast outlives the standard row that raised it. */
+export function WorkspaceScreen(props: { unitKey: string; lessonKey: string }) {
+  return (
+    <WorkspaceActionsProvider>
+      <WorkspaceBody {...props} />
+    </WorkspaceActionsProvider>
+  );
+}
+
+function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: string }) {
   const { role } = useSession();
   const lessonId = lessonIdFromKey(unitKey, lessonKey);
   const label = lessonLabel(lessonKey);
@@ -47,6 +59,13 @@ export function WorkspaceScreen({ unitKey, lessonKey }: { unitKey: string; lesso
   const applied = useRef(false);
 
   const lesson = load.kind === "ready" ? load.lesson : null;
+  // The lesson carries no version id (S-18); the version number stands in until the contract adds one.
+  // Nothing is sent until the lesson has loaded, so no invented id ever reaches the server.
+  useReviewHeartbeat({ lessonId: lesson?.lesson_id ?? "", versionId: `lv-${lesson?.version_number ?? 0}`, enabled: lesson !== null });
+  const reread = useCallback(() => {
+    retry();
+    issuesPoll.retry();
+  }, [retry, issuesPoll]);
   const readOnly = lesson ? isReadOnly(role, lesson.state) : true;
   // SLOT NL-63: onClientState receives the editor's state (NL-63 may widen it to the report object); onPresence is passed to LessonEditor too.
   const [clientState, setClientState] = useState<EditorClientState>("connecting");
@@ -142,7 +161,9 @@ export function WorkspaceScreen({ unitKey, lessonKey }: { unitKey: string; lesso
           selectedCode={selectedCode}
           onSelectCode={setSelectedCode}
           // SLOT NL-65 / NL-66: renderIssueActions (Resolve, Clear flag, Insert quote dialogs mount here).
-          // SLOT NL-64: renderStandardActions (Confirm, Remove, Undo).
+          renderStandardActions={(s) => (
+            <StandardDecisionButtons lessonId={lesson.lesson_id} code={s.code} origin={s.origin} confirmation={s.confirmation ?? null} onChanged={reread} />
+          )}
         />
       }
     >
@@ -157,8 +178,7 @@ export function WorkspaceScreen({ unitKey, lessonKey }: { unitKey: string; lesso
               {`${lesson.type} · ${totalMinutes(lesson.sections)} min · ${STATUS_SPECS[`lesson.${lesson.state}`].label} · v${lesson.version_number}`}
             </p>
             <LessonText ref={textRef} lesson={lesson} />
-            {/* SLOT NL-64: heartbeat hook mount (useReviewHeartbeat) and onLessonChanged={retry} for the action bar. */}
-            {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} /> : null}
+            {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} /> : null}
           </PageSheet>
         </div>
         {readOnly ? null : (
