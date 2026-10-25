@@ -29,7 +29,7 @@ describe("derive", () => {
     expect(viewFromError(err("NETWORK")).kind).toBe("network");
     expect(viewFromError(err("ROLE_FORBIDDEN")).kind).toBe("forbidden");
     expect(viewFromError(new Error("x")).kind).toBe("network");
-    expect(viewFromError(err("DEPENDENCY_UNAPPROVED", { source_lesson_ids: ["G6.U4.L5"] }))).toEqual({ kind: "dependency", lessonIds: ["G6.U4.L5"] });
+    expect(viewFromError(err("DEPENDENCY_UNAPPROVED", { lesson_id: "G6.U4.L5" }))).toEqual({ kind: "dependency", lessonIds: ["G6.U4.L5"] });
     expect(viewFromError(err("BLOCKED", { issues: [issue("standard_not_checked", "RL.6.2 has no checking item")] }))).toMatchObject({ kind: "blocked", message: "RL.6.2 has no checking item" });
     expect(viewFromError(err("NOT_FOUND"))).toEqual({ kind: "other", message: "m NOT_FOUND" });
   });
