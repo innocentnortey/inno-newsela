@@ -1,0 +1,7 @@
+[
+  { "plant_id": "p-wrong-code", "lesson_id": "G6.U99.L1", "source_lesson_id": "G6.U4.L4", "kind": "wrong_standard_code", "locator": "RL.6.1", "marker": "RL.99.99" },
+  { "plant_id": "p-invented-quote", "lesson_id": "G6.U99.L2", "source_lesson_id": "G6.U4.L4", "kind": "invented_quote", "locator": "launch", "marker": "\"The tortoise whispered a zebra verdict.\" (synthetic seeded quote)" },
+  { "plant_id": "p-bad-page", "lesson_id": "G6.U99.L3", "source_lesson_id": "G6.U4.L4", "kind": "page_out_of_range", "locator": "literacy_lab", "marker": "Read page 9999 of the chapter." },
+  { "plant_id": "p-safety", "lesson_id": "G6.U99.L4", "source_lesson_id": "G6.U4.L4", "kind": "safety_in_student_block", "locator": "launch", "marker": "Students hold the lit candle near their sleeves." },
+  { "plant_id": "p-missing", "lesson_id": "G6.U99.L5", "source_lesson_id": "G6.U4.L4", "kind": "missing_section", "locator": "wrap_up", "marker": "Wrap Up" }
+]
