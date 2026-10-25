@@ -69,7 +69,7 @@ Prism mock**. The real backend is an integration ticket's job ([integration rout
 ## Check before planning (in the work system, not here)
 
 - NL-64 built the openers (`IssueOpenerButtons`); NL-65 and NL-66 built the dialogs; **none of them mounts a dialog**. `workspace-screen.tsx` still carries `SLOT NL-65 / NL-66: renderIssueActions`. Owner: **NL-113** (SCR-9 evidence pane, SCR-10, SCR-11; slice plan collision map W6). A screen planner delivers the dialog and its `(dev)/harness` page only. Open row: seam S-22.
-- For NL-69 and NL-72: which ticket adds the opener (no opener at `9951739`)? The ticket's *Agent handoff* names it.
+- SCR-15 opener: NL-68's `DecisionCard` (`Request changes`, `Reopen…`) on SCR-14 already mounts `SendBackDialog`; NL-115 owns the end-to-end proof and `onStale`. NL-72's opener (`AssistPanel`) is still unowned: check its ticket.
 - Any `CHG-N` in `docs/contracts/CHANGES.md` touching the screen's CON card since the ticket was cut.
 - Open rows in `docs/plans/seam-followups.md` that name the screen or its helpers (below).
 
