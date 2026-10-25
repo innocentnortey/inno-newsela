@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // NL-105 frozen fixtures: HTTP harness for the /internal routes, a recording handler, fakes for the repos the
 // handler consumes, and the synthetic lesson used by the apply-edit tests. No database, no @ls/db import.
 import { createServer, type Server as HttpServer } from "node:http";
 import type { AddressInfo } from "node:net";
+import { SecretStr } from "@ls/config/secret";
 import { DomainRefusal } from "@ls/core/errors";
 import type { StoreAck } from "@ls/core/ports/collab-commands";
 import type { LessonVersionRow } from "@ls/core/ports/lesson-versions";
@@ -102,6 +104,8 @@ export function store_ack(lesson_id = LESSON): StoreAck {
 
 /** Stands in for CollabCommandHandler: records each call and can be told to fail. */
 export class RecordingHandler {
+  /** The real handler carries the configured token in `deps`; the route guard reads it from there (refrozen: the fake lacked it). */
+  deps = { token: new SecretStr(TOKEN) };
   calls: { method: string; cmd: any }[] = [];
   fail_with: unknown = null;
   async apply_edit(cmd: unknown): Promise<StoreAck> {

@@ -6,7 +6,7 @@
     "apps/collab/src/commands/set-mode.test.ts": "0a383c16bc83483cf8c9f12723c0682e82bbbbd83afd65bf2c93840cf9d44b4b",
     "apps/collab/src/commands/apply-edit.int.test.ts": "19fbb5eb3c1d8bae604ae558b79e2a18069ffcfd08aa771fa5870098eae31e57",
     "apps/collab/src/wiring/commands.test.ts": "132573a60f0f6468699ac2ac7af1ff9da48f759f5a170b49721c3fc6a2752bba",
-    "apps/collab/src/commands/nl-105.fixtures.ts": "9701b140599e7ce686bbe8f1f9527895e847acf9429056579d137eb0a2a150cf"
+    "apps/collab/src/commands/nl-105.fixtures.ts": "e2653f9366fa9343874f3ecf37c82c76c5565d930a944d612528710709cc9b5b"
   },
   "criteria": {
     "AC-1": [
@@ -68,5 +68,8 @@
     "apps/collab/src/commands/lock-and-snapshot.test.ts (typed refusal)",
     "apps/collab/src/wiring/shells.test.ts (two FILLER/{} assertions; implementer edits only those lines)"
   ],
-  "refreeze": []
+  "refreeze": [],
+  "refreeze_notes": [
+    "2026-10-25 implementer: nl-105.fixtures.ts RecordingHandler gained `deps = { token: new SecretStr(TOKEN) }`. The frozen routes test installs the fake as the handler and expects the guard to accept 't-collab', but the fake carried no token; the guard reads handler.deps.token (the DO-4 ctor field). No assertion changed. Also a file-level eslint-disable for no-explicit-any (the repo lints test fixtures)."
+  ]
 }
