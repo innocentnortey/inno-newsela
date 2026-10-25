@@ -1,0 +1,69 @@
+{
+  "ticket": "NL-26",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/outline-versions/outline.capture.test.ts": "c38981ae3fac36b79f79c73651475766c5e4cc616b376d94eea371cb0e09859f",
+    "apps/web/app/api/outline-versions/route.test.ts": "9df77b9ab8adc048f565c68a7af4913dfb04d5189f6aa197f8f8465ba22aa675",
+    "apps/web/src/server/adapters/google-sheets.test.ts": "dbe7761d97db5fe39bb0c5610686316aae98f1d0bd350d934f6993d2a2b81bf3",
+    "apps/web/src/server/adapters/testing/fake-sheet-transport.ts": "90adac0d0b610d93b7e3e4786aa598aab49cc4332df1617f9982301feca79868",
+    "apps/web/src/server/services/outline-service.test.ts": "0bc1baf1aa7bcd915ad88fd0a2a213f602fafdb9a56f7ac24abdc8765d848b4d",
+    "apps/web/src/server/services/testing/outline-harness.ts": "5a1d24bc66fe6703801f35a4f82e80d447aa15349e4100bead8b047c4aa36261"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/web/app/api/outline-versions/route.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-2": [
+      "apps/web/src/server/services/outline-service.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-3": [
+      "apps/web/app/api/outline-versions/route.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-4": [
+      "apps/web/src/server/adapters/google-sheets.test.ts",
+      "apps/web/src/server/adapters/testing/fake-sheet-transport.ts"
+    ],
+    "AC-5": [
+      "apps/web/src/server/adapters/google-sheets.test.ts",
+      "apps/web/src/server/adapters/testing/fake-sheet-transport.ts"
+    ],
+    "AC-6": [
+      "apps/web/src/server/adapters/google-sheets.test.ts",
+      "apps/web/src/server/adapters/testing/fake-sheet-transport.ts"
+    ],
+    "AC-7": [
+      "apps/web/src/server/services/outline-service.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-8": [
+      "apps/web/app/api/outline-versions/route.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-9": [
+      "apps/web/app/api/outline-versions/route.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ],
+    "AC-12": [
+      "apps/web/app/api/outline-versions/outline.capture.test.ts",
+      "apps/web/src/server/services/testing/outline-harness.ts"
+    ]
+  },
+  "not_frozen": [
+    "packages/db/src/repos/outlines.int.test.ts (AC-10, AC-11)",
+    "apps/web/src/server/wiring/intake.test.ts (AC-13)",
+    "packages/db/src/testing/outline-seed.ts"
+  ],
+  "refreeze": [
+    {
+      "date": "2026-10-25",
+      "file": "apps/web/app/api/outline-versions/outline.capture.test.ts",
+      "reason": "AC-12 line selection matched two log lines (route.done and route.refused share the request id, from NL-13 with_route); narrowed to the single route.refused record, all other assertions unchanged",
+      "old_sha256": "da4d6fff3bed43b3ef77d0645976b12899e62ab79958cebf1e83c67a5447d272",
+      "new_sha256": "c38981ae3fac36b79f79c73651475766c5e4cc616b376d94eea371cb0e09859f",
+      "approved_by": "orchestrator under PD-32"
+    }
+  ]
+}
