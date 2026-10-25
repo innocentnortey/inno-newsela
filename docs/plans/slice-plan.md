@@ -343,7 +343,7 @@ which no slicing can shorten. **Widest wave:** W4 (38). W3 has 29.
 | web `wiring/sessions.ts` (SessionService) | NL-06 | NL-25 (W3) |
 | web `wiring/outlines.ts` (OutlineService) | NL-06 | NL-26 (W3); NL-77 adds methods only, no constructor change |
 | web `wiring/prompts.ts` (PromptService) | NL-06 | NL-34 (W3) |
-| web `wiring/runs.ts` (RunService) | NL-06 | NL-78 (W4) |
+| web `wiring/runs.ts` (RunService) | NL-06 | NL-78 (W4), filled |
 | web `wiring/metrics.ts` (Board, Heartbeat, MetricsWriter) | NL-06 | NL-54 (W4); NL-91 adds a method only |
 | web `wiring/review.ts` (LessonRead, Issue, Slot, Candidate, Transition, web CheckContextLoader, collab client) | NL-06 | NL-53 (W4) |
 | web `wiring/exports.ts` | NL-06 | NL-102 (W5) |

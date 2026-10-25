@@ -1,7 +1,8 @@
-// NL-27: RunService (DO-4 section 5). `start` is built here; progress/control/plan/summary belong to NL-78.
+// RunService (DO-4 section 5). NL-27 built `start`; NL-78 built progress/control/plan/summary.
 import { createHash } from "node:crypto";
 import Decimal from "decimal.js";
-import { DomainRefusal } from "@ls/core/errors";
+import { DomainRefusal, InvariantViolation } from "@ls/core/errors";
+import { decide_run_control } from "@ls/core/lifecycle/run-machine";
 import { generate_gate } from "@ls/core/intake/report";
 import type { AuditLog } from "@ls/core/ports/audit";
 import type { Clock } from "@ls/core/ports/clock";
@@ -12,14 +13,25 @@ import type { LessonStateRepo } from "@ls/core/ports/lesson-state";
 import type { ModelCallLog } from "@ls/core/ports/model-call-log";
 import type { OutlineRepo } from "@ls/core/ports/outlines";
 import type { PromptRepo } from "@ls/core/ports/prompts";
+import type { RunProgressReader } from "@ls/core/ports/run-progress";
 import type { RunRepo, RunRow } from "@ls/core/ports/runs";
 import type { SpendLedger } from "@ls/core/ports/spend";
 import type { TxRunner } from "@ls/core/ports/tx";
 import type { WebSettings } from "@ls/config/settings";
 import { SCHEMA_VERSION } from "@ls/editor-schema/schema";
-import type { Run, StartRunRequest } from "@ls/schema/api/runs";
+import type { Run, RunControlRequest, RunControlResult, RunProgress, StartRunRequest, UnitPlan } from "@ls/schema/api/runs";
 import { canonical_json } from "@ls/schema/content-hash";
 import type { NormalizedRow } from "@ls/schema/outline";
+import { build_progress, build_summary, plan_links, type RunSummaryResult } from "./run-read-model.ts";
+
+export type { RunSummaryResult };
+
+// NL-78: optional collaborators for the read and control methods; the 12-argument DO-4 shape stays valid without them.
+export interface RunServiceExtras {
+  progress?: RunProgressReader;
+  concurrency_cap?: number; // default 6 (GENERATION_CONCURRENCY default and max)
+  notify?: (run_id: string) => Promise<void>; // runs AFTER commit when jobs were re-queued
+}
 
 export class NotBuiltYet extends Error {
   constructor(readonly owner: string) {
@@ -63,6 +75,7 @@ export class RunService {
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
     private readonly settings: WebSettings,
+    private readonly extras: RunServiceExtras = {},
   ) {}
 
   // The scope of a stored run, rebuilt from the run and its jobs: a replay returns the original run, never the retry's body.
@@ -187,17 +200,67 @@ export class RunService {
     }, lock);
   }
 
-  // NL-78 builds these (W4); signatures stay loose until then.
-  async progress(): Promise<never> {
-    throw new NotBuiltYet("NL-78");
+  async progress(_user: RequestUser, run_id: string): Promise<RunProgress> {
+    const reader = this.extras.progress;
+    if (!reader) throw new InvariantViolation("progress reader not wired");
+    const rows = await reader.progress_rows(run_id);
+    if (rows === null) throw new DomainRefusal("NOT_FOUND", "Run not found.");
+    return build_progress(rows, this.extras.concurrency_cap ?? 6);
   }
-  async control(): Promise<never> {
-    throw new NotBuiltYet("NL-78");
+
+  async plan(_user: RequestUser, run_id: string): Promise<UnitPlan> {
+    const run = await this.runs.get(run_id);
+    if (!run) throw new DomainRefusal("NOT_FOUND", "Run not found.");
+    const row = await this.runs.unit_plan(run_id);
+    if (!row) throw new DomainRefusal("NOT_FOUND", "Unit plan not found.");
+    // A resumed run is planning again, but RunRepo cannot reset the stored row.
+    const state = row.state === "failed" && run.state !== "paused" ? "planning" : row.state;
+    return {
+      run_id, state, stored_at: row.stored_at?.toISOString() ?? null,
+      entries: [...(row.plan?.entries ?? [])].sort((a, b) => a.day - b.day) as UnitPlan["entries"],
+      lesson_links: row.lesson_links.map(plan_links),
+    };
   }
-  async plan(): Promise<never> {
-    throw new NotBuiltYet("NL-78");
+
+  async summary(_user: RequestUser, run_id: string): Promise<RunSummaryResult> {
+    const rows = await this.runs.summary_rows(run_id); // throws NOT_FOUND itself
+    const totals = await this.calls.totals_for_run(run_id);
+    const spend = await this.spend.run_totals(run_id);
+    return build_summary(rows, totals, spend.settled_usd, this.clock.now());
   }
-  async summary(): Promise<never> {
-    throw new NotBuiltYet("NL-78");
+
+  async control(user: RequestUser, run_id: string, req: RunControlRequest): Promise<RunControlResult> {
+    if (user.role !== "author") throw new DomainRefusal("ROLE_FORBIDDEN", "Only authors can control a run.");
+    const out = await this.tx.with_tx(async (tx) => {
+      // The row lock comes first so two clicks serialise; a refusal throws inside the tx so nothing is written.
+      const run = await this.runs.lock_for_update(run_id, tx);
+      const d = decide_run_control(run.state, req.action);
+      if (!d.allowed) throw new DomainRefusal("INVALID_TRANSITION", "That action does not fit the run's state.", { state: run.state });
+      if (d.to_state === null) throw new InvariantViolation("allowed run control without a target state");
+      const plan_retry = req.action === "resume" && run.paused_check === "unit_plan";
+      let requeued: string[] = [];
+      if (d.cancel_jobs) {
+        // Queued jobs only; in-flight jobs stop at the worker's next node. No lesson row is created or deleted.
+        await this.queue.cancel_run(run_id, "cancelled", tx);
+      } else if (d.requeue_failed) {
+        const failed = (await this.queue.jobs_for_run(run_id)).filter((j) => j.status === "generation_failed");
+        await this.queue.requeue_failed(run_id, tx);
+        requeued = failed.map((j) => j.lesson_id).filter((x): x is string => x !== null);
+      } else if (plan_retry) {
+        await this.queue.requeue_failed(run_id, tx); // the failed unit_plan job has no lesson id
+      }
+      await this.runs.set_state(run_id, d.to_state, null, tx);
+      await this.audit.append(
+        {
+          actor_id: user.user_id, action: `run.${req.action}`, target_kind: "run", target_id: run_id, version_hash: null, reason: null,
+          details: { from_state: run.state, to_state: d.to_state, requeued: requeued.length },
+          request_id: user.request_id, store_id: null,
+        },
+        tx,
+      );
+      return { result: { run_id, state: d.to_state, requeued_lessons: requeued } as RunControlResult, wake: d.requeue_failed || plan_retry };
+    });
+    if (out.wake && this.extras.notify) await this.extras.notify(run_id); // after COMMIT
+    return out.result;
   }
 }
