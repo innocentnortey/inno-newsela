@@ -6,7 +6,6 @@ import type { RequestUser } from "@ls/core/ports/common";
 import { FakeSpendLedger } from "@ls/core/testing/fake-spend";
 import type { StartRunRequest } from "@ls/schema/api/runs";
 import { describe, expect, it } from "vitest";
-import { NotBuiltYet } from "./run-service.ts";
 import { build_outline, job_row, make_service, OUTLINE_VERSION_ID, PROMPT_VERSION_ID } from "./testing/run-service-fakes.ts";
 
 const user = (role: RequestUser["role"] = "author", id = "usr_synthetic_author"): RequestUser =>
@@ -131,14 +130,5 @@ describe("RunService.start", () => {
     const e = await refusal(k.service.start(user(), request({ mode: "trial" }), null));
     expect(e?.details).toEqual({ fields: ["lesson_id"] });
     expect(k.runs.inserted).toHaveLength(0);
-  });
-
-  it("not_built_yet: the NL-78 methods say so", async () => {
-    const k = make_service();
-    for (const m of ["progress", "control", "plan", "summary"] as const) {
-      const e = await k.service[m]().then(() => null, (x: unknown) => x);
-      expect(e).toBeInstanceOf(NotBuiltYet);
-      expect((e as NotBuiltYet).owner).toBe("NL-78");
-    }
   });
 });
