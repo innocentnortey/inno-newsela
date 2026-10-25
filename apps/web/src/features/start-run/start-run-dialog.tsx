@@ -1,6 +1,5 @@
 "use client";
-// Shell. Body owned by NL-58 after this ticket.
-import { DialogShell } from "@/components/ui/dialog-shell";
+import { StartRunForm } from "./start-run-form";
 
 export interface StartRunDialogProps {
   outlineVersionId: string;
@@ -8,14 +7,7 @@ export interface StartRunDialogProps {
   onClose: () => void;
 }
 
-export function StartRunDialog(props: StartRunDialogProps) {
-  return (
-    <DialogShell
-      open={props.open}
-      onOpenChange={(o) => !o && props.onClose()}
-      title="Start a run"
-    >
-      <p>Built by NL-58.</p>
-    </DialogShell>
-  );
+/** The form is mounted only while open, so every open starts from fresh state. */
+export function StartRunDialog({ outlineVersionId, open, onClose }: StartRunDialogProps) {
+  return open ? <StartRunForm outlineVersionId={outlineVersionId} onClose={onClose} /> : null;
 }
