@@ -16,6 +16,7 @@ import { PgAlignmentRepo, PgSafetyFlagRepo, PgSuggestionRepo } from "@ls/db/repo
 import { PgRunRepo } from "@ls/db/repos/runs";
 import { PgSpendLedger } from "@ls/db/repos/spend";
 import { Tx as DbTx } from "@ls/db/tx";
+import { InvariantViolation } from "@ls/core/errors";
 import type { LessonId } from "@ls/core/ports/common";
 import type { LessonVersionRow } from "@ls/core/ports/lesson-versions";
 import { PRICE_TABLE } from "@ls/llm/prices";
@@ -42,7 +43,8 @@ export interface ReviewWiring {
 const COLLAB_TIMEOUT_MS = 5000;
 
 // LessonReadService.history needs list_for_lesson, which PgLessonRepo does not have (packages/db is not ours to edit).
-// Ids come from one query, rows from PgLessonRepo.version, so row mapping stays in one place.
+// Ids come from one query, rows from PgLessonRepo.version, so row mapping stays in one place (row_to_version and
+// read are private to packages/db, which this ticket does not own; a single-query version needs a db-side method).
 class ListingLessonRepo extends PgLessonRepo {
   readonly #d: WebDeps;
   constructor(d: WebDeps) {
@@ -51,7 +53,7 @@ class ListingLessonRepo extends PgLessonRepo {
   }
   async list_for_lesson(lesson_id: LessonId): Promise<LessonVersionRow[]> {
     const ids = await this.#d.db.with_tx(async (tx) => {
-      if (!(tx instanceof DbTx)) return [] as string[];
+      if (!(tx instanceof DbTx)) throw new InvariantViolation("list_for_lesson needs a real transaction", { lesson_id });
       const r = await tx.query("SELECT id FROM lesson_version WHERE lesson_id=$1 ORDER BY number", [lesson_id]);
       return r.rows.map((x) => String(x["id"]));
     });
