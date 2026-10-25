@@ -4,8 +4,12 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { load_collab_settings } from "@ls/config/settings";
 import { build_collab_runtime } from "../main.ts";
+import type { PgDatabase } from "@ls/db/pool";
 import { wire_collab_server } from "./server.ts";
 import { FakeDocStore, FakeReader, FakeSessions, FakeStates, capture_logger, clock, settings } from "../nl-80.fixtures.ts";
+
+// NL-83 made /healthz ping the database; this test has no database, so it injects a pinging fake (same as main.test.ts).
+const FAKE_DB = { ping: async () => true, with_tx: async () => { throw new Error("unused"); } } as unknown as PgDatabase;
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
@@ -53,7 +57,7 @@ describe("starts_without_provider_keys [invariant, AC-11]", () => {
     const exit = vi.fn();
     const rt = await build_collab_runtime(
       load_collab_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", COLLAB_INTERNAL_TOKEN: "t-collab" }),
-      { port: 0, log_write: () => {}, exit, signal_host: { on: () => {} } },
+      { port: 0, health_db: FAKE_DB, log_write: () => {}, exit, signal_host: { on: () => {} } },
     );
     expect((await fetch(`http://127.0.0.1:${rt.port}/healthz`)).status).toBe(200);
     await rt.stop();

@@ -91,6 +91,7 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
   };
   install_drain({ tracker, close: async () => {
       await server.destroy();
+      await sw.close().catch(() => undefined);
       if (!opts.health_db && "close" in health_db) await (health_db as { close(): Promise<void> }).close().catch(() => undefined);
     },
     exit, logger, host });

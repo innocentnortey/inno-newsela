@@ -8,7 +8,7 @@
     "apps/collab/src/auth.test.ts": "67854b8018f7ba85805f6ab5d223d6863c3a4d0b5ad81348a48b0e445e952961",
     "apps/collab/src/persistence.test.ts": "d17abc93c809bf52655672cc640f3579e7536665884ad78f6a0e5d06098607d1",
     "apps/collab/src/persistence.int.test.ts": "f51e820af6fb3057f25cef2429a5e24b808c6973680cc001b86d2f1f27c09862",
-    "apps/collab/src/wiring/server.test.ts": "89f40609936b1abdd8b5ddf2a2f002008b8bc5dd1200f80a209540b415d06f2b"
+    "apps/collab/src/wiring/server.test.ts": "b3bc9e83031af0ded4d69119e26c2bba58ded8f6cfd0ffa99fc0ed5f7c812314"
   },
   "criteria": {
     "AC-1": [
@@ -65,5 +65,8 @@
   "not_frozen": [
     "apps/collab/src/main.test.ts",
     "apps/collab/src/wiring/shells.test.ts"
+  ],
+  "notes": [
+    "REFREEZE (orchestrator, PD-32, 2026-10-25): wiring/server.test.ts injects a pinging fake health_db because NL-83 made /healthz ping the database; assertions unchanged"
   ]
 }
