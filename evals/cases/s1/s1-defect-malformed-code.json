@@ -1,0 +1,24 @@
+{
+  "case_id": "s1-defect-malformed-code",
+  "provenance": "hand-written",
+  "source": "docs/data/samples issued sheet row 8 (focus cell 'RL.6.1, 6.2 L.6.4')",
+  "guards": "a malformed focus code is detected on its own row",
+  "input": {
+    "grid": "rows",
+    "sheet_rows": [
+      8
+    ]
+  },
+  "expected": {
+    "defect_kinds": {
+      "malformed_code": 1,
+      "nonexistent_code": 0,
+      "unit_conflict": 1,
+      "bad_filename": 0,
+      "eld_mismatch": 1,
+      "duplicate_id": 0,
+      "missing_required_column": 0
+    }
+  },
+  "note": "every slice keeps one unit_conflict because the title says U4 and the filenames say U3; slice row numbers are slice positions"
+}

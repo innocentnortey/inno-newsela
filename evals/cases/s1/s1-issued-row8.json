@@ -1,0 +1,27 @@
+{
+  "case_id": "s1-issued-row8",
+  "provenance": "hand-written",
+  "source": "docs/data/worked-pairs.md WP-1 (sheet row 8)",
+  "guards": "the WP-1 row keeps its lesson id, type, repaired focus codes, ELD order and vocabulary count",
+  "input": {
+    "grid": "issued"
+  },
+  "expected": {
+    "row": {
+      "row_number": 8,
+      "lesson_id": "G6.U4.L4",
+      "lesson_type": "Reading",
+      "focus_codes": [
+        "RL.6.1",
+        "RL.6.2",
+        "L.6.4"
+      ],
+      "eld_codes": [
+        "ELD.PI.6.7",
+        "ELD.PI.6.6",
+        "ELD.PII.6.5"
+      ],
+      "vocabulary_count": 10
+    }
+  }
+}

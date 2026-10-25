@@ -1,0 +1,18 @@
+{
+  "case_id": "s7-recall-summary",
+  "provenance": "synthetic",
+  "source": "SYN-4+ set (HP-9; metrics-registry M-39), rescored here",
+  "guards": "recall over the synthetic warnings is 5/5 with no decoy proposed; paraphrases are reported as a limit",
+  "input": {
+    "set": "syn4"
+  },
+  "expected": {
+    "n": 5,
+    "proposed": 5,
+    "recall": "5/5",
+    "label": "synthetic",
+    "decoys_n": 3,
+    "false_on_decoys": 0,
+    "paraphrases_n": 3
+  }
+}

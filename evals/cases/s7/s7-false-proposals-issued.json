@@ -1,0 +1,13 @@
+{
+  "case_id": "s7-false-proposals-issued",
+  "provenance": "issued",
+  "source": "docs/data/samples/g6-u4-lesson-outline.json; HP-9; metrics-registry M-39",
+  "guards": "at most one safety note is proposed outside row 39 across the issued sheet",
+  "input": {
+    "grid": "issued"
+  },
+  "expected": {
+    "max_false_proposals": 1
+  },
+  "note": "cells_scanned is recorded in actual and mentioned in the devlog; HP-9's 620 is not gated on."
+}

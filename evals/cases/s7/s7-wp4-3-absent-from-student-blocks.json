@@ -1,0 +1,14 @@
+{
+  "case_id": "s7-wp4-3-absent-from-student-blocks",
+  "provenance": "hand-written",
+  "source": "docs/data/worked-pairs.md WP-4 (issued sheet row 39, lesson G6.U4.L31)",
+  "guards": "WP-4 check 3: safety text never appears in a student-facing block",
+  "input": {
+    "grid": "issued",
+    "sheet_row": 39
+  },
+  "expected": {
+    "student_block_findings": 0,
+    "control_has_student_block_finding": true
+  }
+}

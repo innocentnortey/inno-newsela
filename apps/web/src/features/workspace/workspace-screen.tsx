@@ -183,7 +183,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
         {readOnly ? null : (
           // SLOT NL-63: replace this hidden mount with the live editor (un-hide it, pass onPresence/viewer).
           <div hidden data-testid="editor-mount">
-            <LessonEditor lessonId={lesson.lesson_id} lesson={lesson} readOnly={false} onClientState={setClientState} />
+            <LessonEditor lessonId={lesson.lesson_id} lesson={lesson} readOnly={false} onClientState={(r) => setClientState(r.state)} />
           </div>
         )}
       </div>

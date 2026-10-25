@@ -1,0 +1,288 @@
+{
+  "case_id": "s1-issued-row-index",
+  "provenance": "issued",
+  "source": "docs/data/samples/g6-u4-lesson-outline.json (issued G6 U4 sample; row index derived from the sample's own row kinds)",
+  "guards": "every row of the issued sheet keeps its row number, kind and lesson id after normalization",
+  "input": {
+    "grid": "issued"
+  },
+  "expected": {
+    "row_index": [
+      {
+        "row_number": 3,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 4,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L1"
+      },
+      {
+        "row_number": 5,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L2"
+      },
+      {
+        "row_number": 6,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L3"
+      },
+      {
+        "row_number": 7,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 8,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L4"
+      },
+      {
+        "row_number": 9,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L5"
+      },
+      {
+        "row_number": 10,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L6"
+      },
+      {
+        "row_number": 11,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L7"
+      },
+      {
+        "row_number": 12,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L8"
+      },
+      {
+        "row_number": 13,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L9"
+      },
+      {
+        "row_number": 14,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L10"
+      },
+      {
+        "row_number": 15,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L11"
+      },
+      {
+        "row_number": 16,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L12"
+      },
+      {
+        "row_number": 17,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L13"
+      },
+      {
+        "row_number": 18,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L14"
+      },
+      {
+        "row_number": 19,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L15"
+      },
+      {
+        "row_number": 20,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L16"
+      },
+      {
+        "row_number": 21,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L17"
+      },
+      {
+        "row_number": 22,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L18"
+      },
+      {
+        "row_number": 23,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L19"
+      },
+      {
+        "row_number": 24,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 25,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-1a"
+      },
+      {
+        "row_number": 26,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-1b"
+      },
+      {
+        "row_number": 27,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 28,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L20"
+      },
+      {
+        "row_number": 29,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L21"
+      },
+      {
+        "row_number": 30,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L22"
+      },
+      {
+        "row_number": 31,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L23"
+      },
+      {
+        "row_number": 32,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L24"
+      },
+      {
+        "row_number": 33,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L25"
+      },
+      {
+        "row_number": 34,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L26"
+      },
+      {
+        "row_number": 35,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L27"
+      },
+      {
+        "row_number": 36,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L28"
+      },
+      {
+        "row_number": 37,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L29"
+      },
+      {
+        "row_number": 38,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L30"
+      },
+      {
+        "row_number": 39,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L31"
+      },
+      {
+        "row_number": 40,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L32"
+      },
+      {
+        "row_number": 41,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L33"
+      },
+      {
+        "row_number": 42,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L34"
+      },
+      {
+        "row_number": 43,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L35"
+      },
+      {
+        "row_number": 44,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 45,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-2a"
+      },
+      {
+        "row_number": 46,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-2b"
+      },
+      {
+        "row_number": 47,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 48,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L36"
+      },
+      {
+        "row_number": 49,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L37"
+      },
+      {
+        "row_number": 50,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L38"
+      },
+      {
+        "row_number": 51,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L39"
+      },
+      {
+        "row_number": 52,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L40"
+      },
+      {
+        "row_number": 53,
+        "kind": "lesson",
+        "lesson_id": "G6.U4.L41"
+      },
+      {
+        "row_number": 54,
+        "kind": "arc_header",
+        "lesson_id": null
+      },
+      {
+        "row_number": 55,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-3a"
+      },
+      {
+        "row_number": 56,
+        "kind": "flex_day",
+        "lesson_id": "G6.U4.FLEX-3b"
+      },
+      {
+        "row_number": 57,
+        "kind": "total",
+        "lesson_id": null
+      }
+    ]
+  }
+}

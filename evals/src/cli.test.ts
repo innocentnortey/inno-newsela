@@ -29,7 +29,7 @@ afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
 describe("cli", () => {
   it.each([
-    ["intake", "S1"], ["checks", "S2"], ["drafts", "S3"], ["safety", "S7"], ["S5", "S5"], ["load", "S14"],
+    ["drafts", "S3"], ["S5", "S5"], ["load", "S14"],
   ])("empty_suite_never_green: %s", async (alias, suite) => {
     expect(await run_cli(["golden", "--suite", alias], deps(default_suite_factory))).toBe(2);
     expect(errs).toContain(`suite has no cases: ${suite}`);
@@ -37,7 +37,7 @@ describe("cli", () => {
   });
 
   it("empty_suite_never_green: fixed subcommands", async () => {
-    for (const sub of ["grounding", "faults", "full-run", "seed", "heldout", "judge-calibrate"]) {
+    for (const sub of ["faults", "seed", "heldout", "judge-calibrate"]) {
       expect(await run_cli([sub], deps(default_suite_factory))).toBe(2);
     }
     expect(repo.runs).toHaveLength(0);

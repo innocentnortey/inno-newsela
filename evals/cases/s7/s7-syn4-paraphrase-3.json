@@ -1,0 +1,12 @@
+{
+  "case_id": "s7-syn4-paraphrase-3",
+  "provenance": "synthetic",
+  "source": "SYN-4+ (HP-9; metrics-registry M-39), written by evals/cases/s7/build_syn4.py",
+  "guards": "measurement only: a paraphrased warning's miss is a stated limit (M-39), never a failure",
+  "input": {
+    "line": "Heads up: the story about a lost pet can hit close to home."
+  },
+  "expected": {
+    "measurement_only": true
+  }
+}

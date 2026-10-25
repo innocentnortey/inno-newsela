@@ -1,0 +1,12 @@
+{
+  "case_id": "s7-syn4-warning-2",
+  "provenance": "synthetic",
+  "source": "SYN-4+ (HP-9; metrics-registry M-39), written by evals/cases/s7/build_syn4.py",
+  "guards": "a teacher-addressed content warning is proposed as a safety note",
+  "input": {
+    "line": "Alert the teacher team: the passage includes a content warning for a house fire."
+  },
+  "expected": {
+    "proposed": true
+  }
+}

@@ -1,0 +1,83 @@
+{
+ "version": 1,
+ "cases": [
+  {
+   "case_id": "s2-placeholders-wp1",
+   "provenance": "hand-written",
+   "source": "WP-1",
+   "guards": "open placeholder count for WP-1 is 2",
+   "recipe": "wp1",
+   "focus_kinds": [
+    "quote_placeholder_open",
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "open_placeholders": 2
+   }
+  },
+  {
+   "case_id": "s2-placeholders-wp2",
+   "provenance": "hand-written",
+   "source": "WP-2",
+   "guards": "open placeholder count for WP-2 is 1",
+   "recipe": "wp2",
+   "focus_kinds": [
+    "quote_placeholder_open",
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "open_placeholders": 1
+   }
+  },
+  {
+   "case_id": "s2-placeholders-wp3",
+   "provenance": "hand-written",
+   "source": "WP-3",
+   "guards": "open placeholder count for WP-3 is 0",
+   "recipe": "wp3",
+   "focus_kinds": [
+    "quote_placeholder_open",
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "open_placeholders": 0
+   }
+  },
+  {
+   "case_id": "s2-placeholders-wp4",
+   "provenance": "hand-written",
+   "source": "WP-4",
+   "guards": "open placeholder count for WP-4 is 1",
+   "recipe": "wp4",
+   "focus_kinds": [
+    "quote_placeholder_open",
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "open_placeholders": 1
+   }
+  },
+  {
+   "case_id": "s2-approve-refused-wp1",
+   "provenance": "hand-written",
+   "source": "WP-1",
+   "guards": "Approve is refused (BLOCKED) while WP-1 has open placeholders",
+   "recipe": "wp1",
+   "focus_kinds": [
+    "quote_placeholder_open",
+    "excerpt_slot_open"
+   ],
+   "expected": {
+    "open_placeholders": 2,
+    "approve": {
+     "allowed": false,
+     "first_refusal": "BLOCKED",
+     "kinds": [
+      "excerpt_slot_open",
+      "quote_placeholder_open"
+     ]
+    }
+   }
+  }
+ ]
+}
