@@ -1,0 +1,39 @@
+{
+  "ticket": "NL-54",
+  "risk": "security",
+  "frozen": {
+    "apps/web/app/api/units/[unitId]/board/route.security.test.ts": "a34ea46de135ba58db3f4ff0982173b26c61d9a99bcee7299e38546b56db739b",
+    "apps/web/app/api/units/[unitId]/metrics/route.test.ts": "510abaf3b52849c139a157cab1ef74dffd10401a1ca5abd92e60af188995d513",
+    "apps/web/src/server/services/board-test-fakes.ts": "81c8b532636d35db0cd7de02178c591ee6cd49bbed4c1ad7ec6bb7e336bcf612"
+  },
+  "criteria": {
+    "AC-6": [
+      "apps/web/app/api/units/[unitId]/board/route.security.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-7": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-8": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-9": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ],
+    "AC-10": [
+      "apps/web/app/api/units/[unitId]/metrics/route.test.ts",
+      "apps/web/src/server/services/board-test-fakes.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/web/app/api/units/[unitId]/board/route.test.ts",
+    "apps/web/src/server/services/board-service.test.ts",
+    "apps/web/src/server/wiring/metrics.test.ts"
+  ],
+  "notes": [
+    "REFREEZE (orchestrator, PD-32, 2026-10-25): metrics/route.test.ts no-name regex allows the fixed caption word 'reviewers' (AC-7 vs AC-9 conflict); board-test-fakes.ts +override modifier; assertions otherwise unchanged. metrics-test-fakes.ts (NL-48, unfrozen) write_lesson_metrics takes an optional tx."
+  ]
+}

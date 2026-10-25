@@ -39,7 +39,7 @@ export class InMemoryMetricsRepo implements MetricsRepo {
     return this.rows.some((r) => r.lesson_id === lesson_id);
   }
 
-  async write_lesson_metrics(row: LessonMetricsRecord): Promise<boolean> {
+  async write_lesson_metrics(row: LessonMetricsRecord, _tx?: unknown): Promise<boolean> {
     if (this.rows.some((r) => r.lesson_id === row.lesson_id)) return false;
     this.rows.push(row);
     return true;

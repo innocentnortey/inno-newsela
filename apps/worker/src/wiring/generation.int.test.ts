@@ -264,7 +264,19 @@ describe("generation wiring", () => {
 
   it("no_provider_key_anywhere: the canary key reaches no table, log line or error text; a missing key stops the worker", async () => {
     const CANARY = "sk-ant-CANARY-4417";
-    const w = await world({ env: { ANTHROPIC_API_KEY: CANARY } });
+    // A keyed stand-in for the provider adapter: like the real one it reads the configured key (from the loaded
+    // settings, at call time) and puts it in the outgoing request object, so a leak path has something to leak.
+    const sent: Array<{ headers: { "x-api-key": string }; body: StructuredCallRequest }> = [];
+    let keyed: World | undefined;
+    const wrap = (inner: StubModelClient): ModelClient => ({
+      complete: (req) => {
+        const key = keyed!.deps.settings.model.anthropic_api_key;
+        if (key === null) return Promise.reject(new Error("test setup: no key configured"));
+        sent.push({ headers: { "x-api-key": key.reveal() }, body: req });
+        return inner.complete(req);
+      },
+    });
+    const w = (keyed = await world({ env: { ANTHROPIC_API_KEY: CANARY }, wrap }));
     const boom = new ProviderError({ kind: "overloaded", http_status: 529 });
     w.stub.script("GENERATION", "unit_plan", (req) => plan_for(w.rows, req));
     w.stub.script("GENERATION", "lesson_draft", (req) => (lesson_of(req) === L5 ? { kind: "error", error: boom } : text(wp1.draft)));
@@ -275,6 +287,9 @@ describe("generation wiring", () => {
     let dump = "";
     for (const t of tables) dump += (await w.query<{ j: string }>(`select row_to_json(t)::text j from ${t.table_name} t`)).map((r) => r.j).join("\n");
     expect(dump.length).toBeGreaterThan(1000);
+    // The key really was read and sent on every provider call (so the checks below are not vacuous).
+    expect(sent.length).toBeGreaterThan(2);
+    expect(sent.every((s) => s.headers["x-api-key"] === CANARY)).toBe(true);
     expect(dump).not.toContain(CANARY);
     expect(w.lines.join("\n")).not.toContain(CANARY);
     expect(String(boom) + JSON.stringify(boom)).not.toContain(CANARY);

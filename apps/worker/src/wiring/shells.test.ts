@@ -7,8 +7,7 @@ import * as judge from "./judge.ts";
 const deps = {} as WorkerDeps;
 
 describe("worker wiring shells", () => {
-  it("checks/judge return empty records", () => {
-    expect(checks.wire_checks(deps)).toEqual({});
+  it("judge returns an empty record", () => {
     expect(judge.wire_judge(deps)).toEqual({});
   });
   it("each names its filler", () => {

@@ -1,0 +1,19 @@
+{
+  "ticket": "NL-53",
+  "risk": "security",
+  "frozen": {
+    "apps/web/src/server/services/transition-service.fixtures.ts": "4977066a80430e8e509ad72b62ac92ceaa50c34dd3ea386da32b8b524977f8f6",
+    "apps/web/src/server/services/transition-service.security.test.ts": "4a2673c0f0c40c5b2a5cde7e2cc1277b9bcfa5b64b6cbb2d03e29ba60da9941a",
+    "apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts": "324400f761d26f7666d8fd514b1b37aa4be86285a30707fa3919e9f18ec1020c"
+  },
+  "criteria": {
+    "AC-1": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-2": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-3": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-4": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-5": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-6": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"],
+    "AC-7": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-8": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-9": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-10": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-11": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-12": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"],
+    "AC-13": ["apps/web/src/server/services/transition-service.security.test.ts"], "AC-14": ["apps/web/src/server/services/transition-service.security.test.ts"], "AC-15": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-16": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"], "AC-17": ["apps/web/app/api/lessons/[lessonId]/transitions/route.security.test.ts"]
+  },
+  "fixtures": ["apps/web/src/server/services/transition-service.fixtures.ts"],
+  "not_frozen": [
+    "apps/web/src/server/services/transition-service.test.ts (AC-19 set_mode_failure_rolls_back)",
+    "apps/web/src/server/wiring/review.test.ts (container_resolves_review_services, half of AC-17)"
+  ]
+}

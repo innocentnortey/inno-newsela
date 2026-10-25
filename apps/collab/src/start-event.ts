@@ -1,4 +1,4 @@
-// NL-23: write one process_start ops_event. Duplicated per service on purpose (no shared helper until a 4th caller).
+// NL-23: write one process.start ops_event. Duplicated per service on purpose (no shared helper until a 4th caller).
 import { PgDatabase } from "@ls/db/pool";
 import { record_ops_event } from "@ls/db/ops-event";
 import type { CollabSettings } from "@ls/config/settings";
@@ -20,7 +20,7 @@ export async function write_start_event(settings: CollabSettings, logger: Logger
   try {
     for (let i = 0; i < attempts; i++) {
       try {
-        await record_ops_event(db, { kind: "process_start", service: "collab", build_id: settings.shared.build_id, details: {} });
+        await record_ops_event(db, { kind: "process.start", service: "collab", build_id: settings.shared.build_id, details: {} });
         return true;
       } catch (e) {
         last = e instanceof Error ? e.name : "Error";

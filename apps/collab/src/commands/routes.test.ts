@@ -1,6 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { load_collab_settings } from "@ls/config/settings";
 import { build_collab_runtime, type CollabRuntime } from "../main.ts";
+import type { PgDatabase } from "@ls/db/pool";
+
+const FAKE_DB = { ping: async () => true, with_tx: async () => { throw new Error("unused"); } } as unknown as PgDatabase;
 
 const TOKEN = "t-collab";
 let rt: CollabRuntime;
@@ -9,6 +12,7 @@ const lines: string[] = [];
 beforeAll(async () => {
   rt = await build_collab_runtime(load_collab_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", COLLAB_INTERNAL_TOKEN: TOKEN }), {
     port: 0,
+    health_db: FAKE_DB,
     log_write: (l) => lines.push(l),
     exit: vi.fn(),
     signal_host: { on: () => {} },
@@ -36,9 +40,9 @@ describe("/internal shell", () => {
     expect(lines.join("\n")).not.toContain("wrong");
   });
 
-  it("healthz is exactly status ok", async () => {
+  it("healthz reports ok with service and build_id", async () => {
     const res = await fetch(`http://127.0.0.1:${rt.port}/healthz`);
     expect(res.status).toBe(200);
-    expect(await res.text()).toBe('{"status":"ok"}');
+    expect(await res.json()).toEqual({ status: "ok", service: "collab", build_id: rt.settings.shared.build_id });
   });
 });

@@ -99,7 +99,7 @@ describe("WF-22 obligations", () => {
     }
   });
 
-  it("R-9: no arc rule is blocking", () => {
+  it("R-9 [registry obligation, not a behaviour check: the world filters gate rules]: no arc rule is blocking", () => {
     expect(RULE_GROUPS.arc.length).toBeGreaterThan(0);
     expect(RULE_GROUPS.arc.filter((r) => r.level === "blocking")).toEqual([]);
   });
@@ -269,7 +269,7 @@ describe("WF-22 obligations", () => {
     expect(audit.map((a) => a.target_id).sort()).toEqual([run4, run5].sort());
   });
 
-  it("OBS-11 [AC-12]: the observability table has WF-21 and WF-22, and the capture tests they name exist", () => {
+  it("OBS-11 [AC-12, doc obligation only: greps docs and test names]: the observability table has WF-21 and WF-22, and the capture tests they name exist", () => {
     const doc = readFileSync(join(REPO, "docs/design/observability.md"), "utf8");
     expect(/^\| WF-21 \|/m.test(doc)).toBe(true);
     expect(/^\| WF-22 \|/m.test(doc)).toBe(true);

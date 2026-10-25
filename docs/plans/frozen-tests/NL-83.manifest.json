@@ -1,0 +1,70 @@
+{
+  "ticket": "NL-83",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/health.test.ts": "e21fed2e32da9ef7dcfc4568d6f43c1adacf74c6209a2fff86246894aa97a327",
+    "apps/web/app/api/healthz/route.test.ts": "3c31014ec4d396209ea8bcd0096055b9a954f77c56446f76d9f098c5d03e9ecc",
+    "apps/web/src/server/health.test.ts": "83ea6fa1d4879fdcc21647fdd1558161fb378c20c35560d130af463e42fe3a43",
+    "apps/worker/src/health.test.ts": "c22525a3d13349a032f973b6f7cdc22af30cbc534918bad4e12b0f328ba67b9c",
+    "ops/backup.test.ts": "d0ec1cf7b32fd999e2c10b1b6f1fd1edeb27ade4b9f2ad36fa8b6ec7fdbd4bc5",
+    "ops/compose-exposure.test.ts": "26890bdc83b188129417fadbe08a584b145aaca550c3a60f30af4bd999a8ae45",
+    "ops/run-sample-builder.test.ts": "41e8baad9dd1657dae346a94d5220da6d45a8f88e1273468d9b7d1355f4ad8d2",
+    "ops/start-events.int.test.ts": "8ee837499cc0ec367f967e304771a36c53f779bc67dd82cb01da2b192513657f"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/app/api/healthz/route.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts"
+    ],
+    "AC-4": [
+      "ops/start-events.int.test.ts"
+    ],
+    "AC-5": [
+      "ops/backup.test.ts"
+    ],
+    "AC-6": [
+      "ops/backup.test.ts"
+    ],
+    "AC-7": [
+      "ops/backup.test.ts"
+    ],
+    "AC-8": [
+      "ops/run-sample-builder.test.ts"
+    ],
+    "AC-9": [
+      "ops/compose-exposure.test.ts"
+    ],
+    "AC-10": [
+      "apps/collab/src/health.test.ts",
+      "apps/web/src/server/health.test.ts",
+      "apps/worker/src/health.test.ts",
+      "ops/backup.test.ts",
+      "ops/run-sample-builder.test.ts",
+      "ops/start-events.int.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "ops/wf-35-obligations.int.test.ts",
+    "ops/wf-38-obligations.int.test.ts",
+    "ops/wf-39-obligations.int.test.ts",
+    "ops/wf-40-obligations.int.test.ts",
+    "tests/platform/start-event.int.test.ts"
+  ],
+  "notes": [
+    "REFREEZE (orchestrator, PD-32, 2026-10-25): type/lint only \u2014 `as unknown as` on tx.query result casts (TS2352) and one eslint-disable for the boundaries rule in ops/start-events.int.test.ts; assertions unchanged"
+  ]
+}
