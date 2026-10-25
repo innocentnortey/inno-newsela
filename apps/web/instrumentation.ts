@@ -1,4 +1,4 @@
-// NL-23: Next.js server start hook; records one process_start ops_event (never fatal).
+// NL-23: Next.js server start hook; records one process.start ops_event (never fatal).
 export async function register(): Promise<void> {
   if (process.env["NEXT_RUNTIME"] !== "nodejs") return;
   try {

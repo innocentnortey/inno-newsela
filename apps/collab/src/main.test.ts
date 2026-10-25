@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import * as Y from "yjs";
 import { load_collab_settings } from "@ls/config/settings";
 import { build_collab_runtime } from "./main.ts";
+import type { PgDatabase } from "@ls/db/pool";
+
+const FAKE_DB = { ping: async () => true, with_tx: async () => { throw new Error("unused"); } } as unknown as PgDatabase;
 
 function var_uint(n: number): number[] {
   const out: number[] = [];
@@ -32,7 +35,7 @@ describe("collab main", () => {
     const exit = vi.fn();
     const rt = await build_collab_runtime(
       load_collab_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", COLLAB_INTERNAL_TOKEN: "t-collab" }),
-      { port: 0, log_write: () => {}, exit, signal_host: { on: (s, f) => void handlers.set(s, f) } },
+      { port: 0, health_db: FAKE_DB, log_write: () => {}, exit, signal_host: { on: (s, f) => void handlers.set(s, f) } },
     );
     const health = await fetch(`http://127.0.0.1:${rt.port}/healthz`);
     expect(health.status).toBe(200);

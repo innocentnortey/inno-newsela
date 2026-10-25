@@ -21,8 +21,9 @@ function sources(dir: string): string[] {
 }
 const FORBIDDEN = /from\s+"(@ls\/llm|@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
 // NL-23 (orchestrator decision, PD-32): the process-start event writers open their own one-connection PgDatabase to
-// write the process_start ops_event, so these two files, by exact path, may import @ls/db. Nothing else may.
-const DB_EXEMPT = new Set(["collab/src/start-event.ts", "worker/src/start-event.ts"]);
+// write the process.start ops_event, and (NL-83) the health files open their own one-connection pool for GET /healthz, so
+// these four files, by exact path, may import @ls/db. Nothing else may.
+const DB_EXEMPT = new Set(["collab/src/start-event.ts", "worker/src/start-event.ts", "collab/src/health.ts", "worker/src/health.ts"]);
 function forbidden_for(root: string, f: string): RegExp {
   const rel = f.slice(root.length + 1);
   return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
