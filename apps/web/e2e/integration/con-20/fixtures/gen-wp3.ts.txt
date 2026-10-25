@@ -1,0 +1,10 @@
+import { writeFileSync } from "node:fs";
+import { build_ctx } from "./src/checks/rules/grounding/fixtures/build.ts";
+import { CHECK_RULES } from "./src/checks/registry.ts";
+import { CHECK_POLICY } from "./src/checks/policy.ts";
+const ctx = build_ctx("wp3");
+const blocking = CHECK_RULES.flatMap((r) => r.run(ctx, CHECK_POLICY)).filter((f) => f.level === "blocking").map((f) => ({ kind: f.kind, message: f.message, address: f.address, code: f.code ?? null }));
+const out = "../../apps/web/e2e/integration/con-20/fixtures/";
+writeFileSync(out + "wp3-lesson.json", JSON.stringify(ctx.lesson, null, 1));
+writeFileSync(out + "wp3-blocking.json", JSON.stringify(blocking, null, 1));
+console.log(blocking.length);
