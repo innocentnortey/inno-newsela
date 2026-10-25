@@ -17,7 +17,7 @@ function env(url: string): void {
 }
 async function events(): Promise<number> {
   const r = await t.db.with_tx(async (tx) => tx.query("select count(*)::int as n from ops_event", []));
-  return (r as { rows: Array<{ n: number }> }).rows[0]!.n;
+  return (r as unknown as { rows: Array<{ n: number }> }).rows[0]!.n;
 }
 
 describe("NL-83 web /api/healthz (WF-39)", () => {

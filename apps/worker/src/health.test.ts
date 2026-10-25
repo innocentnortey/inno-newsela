@@ -24,11 +24,11 @@ const opts = () => ({ build_id: "b-83", logger: logger(), now: () => now_ms });
 
 async function count(kind = "health.failure"): Promise<number> {
   const r = await t.db.with_tx(async (tx) => tx.query("select count(*)::int as n from ops_event where kind=$1", [kind]));
-  return (r as { rows: Array<{ n: number }> }).rows[0]!.n;
+  return (r as unknown as { rows: Array<{ n: number }> }).rows[0]!.n;
 }
 async function all_events(): Promise<string> {
   const r = await t.db.with_tx(async (tx) => tx.query("select * from ops_event", []));
-  return JSON.stringify((r as { rows: unknown[] }).rows);
+  return JSON.stringify((r as unknown as { rows: unknown[] }).rows);
 }
 async function probe(base: string, headers: Record<string, string> = {}) {
   const res = await fetch(`${base}/healthz`, { headers });
@@ -76,7 +76,7 @@ describe(`NL-83 ${SERVICE} /healthz (WF-39)`, () => {
     const ev = await t.db.with_tx(async (tx) =>
       tx.query("select service, build_id from ops_event where kind='health.failure' order by at desc limit 1", []),
     );
-    expect((ev as { rows: Array<{ service: string; build_id: string }> }).rows[0]).toEqual({ service: SERVICE, build_id: "b-83" });
+    expect((ev as unknown as { rows: Array<{ service: string; build_id: string }> }).rows[0]).toEqual({ service: SERVICE, build_id: "b-83" });
     // second call inside 60 s: no second event
     now_ms += 59_000;
     expect((await probe(base)).status).toBe(503);

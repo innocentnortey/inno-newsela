@@ -26,6 +26,8 @@ const FORBIDDEN = /from\s+"(@ls\/llm|@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
 const DB_EXEMPT = new Set(["collab/src/start-event.ts", "worker/src/start-event.ts", "collab/src/health.ts", "worker/src/health.ts"]);
 function forbidden_for(root: string, f: string): RegExp {
   const rel = f.slice(root.length + 1);
+  // Composition roots under wiring/ build the Pg repositories and the PaidCaller, so they may import @ls/db and @ls/llm; a driver or provider SDK stays forbidden everywhere.
+  if (/(^|\/)wiring\/[^/]+\.ts$/.test(rel)) return /from\s+"(pg|@anthropic-ai\/sdk|openai)["/]/;
   return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
 }
 

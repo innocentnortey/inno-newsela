@@ -65,6 +65,7 @@ describe("NL-83 process.start events (WF-38)", () => {
       expect(r[0]).toEqual({ build_id: "nl83-test", service: svc });
     }
     Object.assign(process.env, env, { NEXT_RUNTIME: "nodejs" });
+    // eslint-disable-next-line boundaries/dependencies -- NL-83 AC-2 drives the web start event end to end
     const { register } = await import("../apps/web/instrumentation.ts");
     await register();
     const w = await wait_for("web");

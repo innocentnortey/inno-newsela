@@ -10,7 +10,7 @@ import { load_issued_grid } from "../../../core/tests/fixtures/outline/index.ts"
 import { create_test_db, type TestDb } from "../testing/test-db.ts";
 import { insert_row } from "../testing/insert-row.ts";
 import { seed_standards, seed_users } from "../testing/outline-seed.ts";
-import { NotBuiltYet, PgOutlineRepo, PgStandardRepo, row_hash_of } from "./outlines.ts";
+import { PgOutlineRepo, PgStandardRepo, row_hash_of } from "./outlines.ts";
 
 let tdb: TestDb;
 let repo: PgOutlineRepo;
@@ -48,7 +48,7 @@ describe("NL-26 AC-10", () => {
 });
 
 describe("NL-26 AC-11", () => {
-  it("row_context: stored choices, given choices, neighbours, links and the NL-77 stubs", async () => {
+  it("row_context: stored choices, given choices, neighbours, links", async () => {
     const id = "G6.U4.ov1";
     const lessons = (await repo.rows(id)).filter((r) => r.row.kind === "lesson");
     const target = lessons[3]!.row;
@@ -63,10 +63,6 @@ describe("NL-26 AC-11", () => {
     const ctx2 = await repo.row_context(id, target.lesson_id!, given);
     expect(ctx2.choices.map((c) => c.finding_id)).toEqual(["g1"]);
     await expect(repo.row_context(id, "G6.U4.L99", null)).rejects.toMatchObject({ name: "InvariantViolation" });
-    for (const call of [() => repo.upsert_choice(ctx.choices[0]!, {} as never), () => repo.mark_confirmed(id, new Date(), {} as never), () => repo.generate_gate_inputs(id)]) {
-      await expect(call()).rejects.toBeInstanceOf(NotBuiltYet);
-      await expect(call()).rejects.toMatchObject({ owner: "NL-77" });
-    }
   });
 
   it("roundtrip: rows() and outline() equal the normalizer output", async () => {
