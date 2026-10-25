@@ -17,8 +17,8 @@ def main(area: str, clause: str) -> None:
     assert len(hits) == 1, f"{len(hits)} rows named {area!r}"
     cells = lines[hits[0]].split(" | ")
     status = cells[-1][:-2] if cells[-1].endswith(" |") else cells[-1]
-    own = re.compile(rf"(?:^|; ){re.escape(ticket)} .*?(?=; (?:NL|S)-\d+ |$)")
-    status = own.sub("", status).strip("; ") if own.search(status) else status
+    own = re.compile(rf"(?<![^\s;.]){re.escape(ticket)} built .*?(?=[;.] (?:NL|S)-\d+ |\. [A-Z]|$)")
+    status = own.sub("", status).replace(";  ", "; ").replace(". .", ".").strip("; ") if own.search(status) else status
     cells[-1] = f"{status}; {clause} |" if status else f"{clause} |"
     lines[hits[0]] = " | ".join(cells)
     open(PATH, "w").write("\n".join(lines))
