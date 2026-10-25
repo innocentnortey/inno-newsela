@@ -1,9 +1,11 @@
-// Placeholder from NL-24. Owner ticket NL-61 replaces this file.
-export default function Page() {
+import { Suspense } from "react";
+import { BoardScreen } from "@/features/board/board-screen";
+
+export default async function Page({ params }: { params: Promise<{ unitKey: string }> }) {
+  const { unitKey } = await params;
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-page">Unit board</h1>
-      <p>Built by NL-61.</p>
-    </div>
+    <Suspense>
+      <BoardScreen unitKey={unitKey} />
+    </Suspense>
   );
 }
