@@ -1,7 +1,7 @@
 ---
 name: test-writer-agent
 description: Writes failing tests from a ticket's acceptance criteria BEFORE any implementation exists, so a different agent can build against frozen tests. Invoke only at the start of a `risk::security` ticket (auth, secrets, encryption, PII/PHI, untrusted input reaching a sink, network exposure, deploy config, money); every other build ticket is plan → implement → test → review with the implementer writing its tests (rule build-loop-test-scope). Never after the builder.
-model: opus
+model: sonnet
 tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 

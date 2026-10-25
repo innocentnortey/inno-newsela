@@ -1,7 +1,7 @@
 ---
 name: fanout-planner
 description: Plan one slice of a parallel (fan-out) coding task — read its specs and the current code, then write a Markdown implementation plan for a separate implementer. Writes no production code. Use for every fan-out coding slice that has no project-specific planner.
-model: inherit
+model: sonnet
 tools: Read, Write, Grep, Glob, Bash
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: inventory-verifier
 description: Advisory evidence gatherer invoked in parallel with research-brainstorm-agent at the start of a feature. Produces grep-verified proofs of claims the brief makes — inventory classifications, registry/symbol existence for things the brief says already exist, and best-effort next-migration-number suggestions. Does not own judgment; research-brainstorm-agent does. Never blocks builder dispatch on its own.
-model: haiku
+model: sonnet
 tools: Read, Grep, Glob, Bash
 ---
 

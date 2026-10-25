@@ -1,7 +1,7 @@
 ---
 name: research-brainstorm-agent
 description: PROACTIVELY invoke before any builder agent writes code for features touching more than 2 files, schema/data-model changes, pipeline modifications, or concurrency tuning — proposes one recommended approach (with alternatives only if the orchestrator explicitly asks) and validates against the project's architecture rules.
-model: opus
+model: sonnet
 tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 
