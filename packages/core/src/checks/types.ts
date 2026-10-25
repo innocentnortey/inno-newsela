@@ -145,6 +145,8 @@ export type CheckContext = {
   confirmations: AlignmentLinkRow[];
   previous_lesson_flags: SafetyFlagRow[];
   unit_coverage: CoverageCell[];
+  /** link_id -> content_hash of the linked lesson when this lesson recorded the link (NL-38 fills; absent = nothing to compare). */
+  recorded_link_hashes?: Readonly<Record<string, string>>;
 };
 
 export type CheckFinding = {
