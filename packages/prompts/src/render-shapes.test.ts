@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { LOCKED_DIR } from "./locked.ts";
+import { LOCKED_DIR, locked_hash } from "./locked.ts";
 import { PromptRenderer } from "./render.ts";
 import { SchemaRegistry } from "./schemas.ts";
 import { REPO_ROOT, TEMPLATE, assist_input, draft_input, judge_input, repair_input, unit_plan_input, wp2_row } from "./testing/fixtures.ts";
@@ -18,7 +18,7 @@ describe("draft_wp2", () => {
     expect(u.slice(1, -1).every((l) => l === "data")).toBe(true);
     const committed = readFileSync(`${REPO_ROOT}docs/contracts/schemas/lesson-draft.schema.json`, "utf8");
     expect(p.system_blocks[2]!.text).toBe(committed);
-    const ctx = p.user_blocks[0]!.text;
+    const ctx = p.user_blocks.find((b) => b.text.includes("kind=template"))!.text;
     let at = -1;
     for (const s of TEMPLATE.sections) {
       const idx = ctx.indexOf(`${s.name}, ${s.minutes} minutes`);
@@ -37,8 +37,8 @@ describe("unit_plan_repair_assist_judge", () => {
   it("unit plan: no schema block, rows delimited", () => {
     const p = r().render_unit_plan(unit_plan_input(wp2_row()));
     expect(labels(p.system_blocks)).toEqual(["locked", "guidance"]);
-    expect(p.user_blocks.filter((b) => b.label === "data")).toHaveLength(1);
-    expect(p.user_blocks[1]!.text).toContain("kind=row row=9");
+    expect(p.user_blocks.filter((b) => b.label === "data")).toHaveLength(2);
+    expect(p.user_blocks.some((b) => b.text.includes("kind=row row=9"))).toBe(true);
   });
   it("repair: schema block, findings, no outline row", () => {
     const p = r().render_repair(repair_input());
@@ -50,11 +50,11 @@ describe("unit_plan_repair_assist_judge", () => {
   it("assist: selected text and note are data", () => {
     const p = r().render_assist(assist_input("hello"));
     expect(labels(p.system_blocks)).toEqual(["locked", "guidance"]);
-    expect(p.user_blocks.filter((b) => b.label === "data")).toHaveLength(2);
+    expect(p.user_blocks.filter((b) => b.label === "data")).toHaveLength(3);
     expect(p.user_blocks[0]!.text).toContain("Practice");
   });
   it("judge: locked only, question in instruction", () => {
-    const p = r().render_judge(judge_input());
+    const p = r().render_judge(judge_input(locked_hash(LOCKED_DIR)));
     expect(labels(p.system_blocks)).toEqual(["locked"]);
     expect(p.prompt_version_id).toBe("judge:rubric_test_1");
     expect(p.user_blocks.at(-1)!.text).toContain("teaches_standard");

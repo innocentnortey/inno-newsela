@@ -1,4 +1,9 @@
-import { COMMON_FILES, LockedLayerMismatch, locked_hash, read_locked } from "./locked.ts";
+import {
+  COMMON_FILES,
+  LockedLayerMismatch,
+  locked_hash,
+  read_locked,
+} from "./locked.ts";
 import { data_block, sort_keys } from "./data-block.ts";
 import type {
   AssistPromptInput,
@@ -13,12 +18,17 @@ import type {
 } from "./inputs.ts";
 import { schema_text, type SchemaRegistry } from "./schemas.ts";
 
-const INSTR_UNIT_PLAN = "Produce the unit plan JSON for the lesson rows in the data blocks above. Output JSON only.";
-const INSTR_REPAIR = "Correct the draft in the data blocks, fixing only the listed findings and schema issues. Output the full corrected draft as JSON only.";
-const INSTR_ASSIST = "Rewrite the selected text following the note. Return suggested_text only.";
+const INSTR_UNIT_PLAN =
+  "Produce the unit plan JSON for the lesson rows in the data blocks above. Output JSON only.";
+const INSTR_REPAIR =
+  "Correct the draft in the data blocks, fixing only the listed findings and schema issues. Output the full corrected draft as JSON only.";
+const INSTR_ASSIST =
+  "Rewrite the selected text following the note. Return suggested_text only.";
 const INSTR_JUDGE: Record<JudgePromptInput["question"], string> = {
-  teaches_standard: "Question teaches_standard: does the activity teach the standard? Answer yes or no only.",
-  eld_keeps_task: "Question eld_keeps_task: does the English-language-development support keep the original task intact? Answer yes or no only.",
+  teaches_standard:
+    "Question teaches_standard: does the activity teach the standard? Answer yes or no only.",
+  eld_keeps_task:
+    "Question eld_keeps_task: does the English-language-development support keep the original task intact? Answer yes or no only.",
 };
 
 type Row = import("@ls/schema/outline").NormalizedRow;
@@ -29,11 +39,18 @@ function context_block(lines: string[]): PromptBlock {
 function instruction_block(text: string): PromptBlock {
   return { label: "instruction", cacheable: false, text };
 }
-function template_lines(t: PromptSectionTemplate): string[] {
-  return t.sections.map((s, i) => `section ${i + 1}: ${s.name}, ${s.minutes} minutes, roles: ${s.required_roles.join(", ")}`);
+function template_block(t: PromptSectionTemplate): PromptBlock {
+  const lines = t.sections.map(
+    (s, i) =>
+      `section ${i + 1}: ${s.name}, ${s.minutes} minutes, roles: ${s.required_roles.join(", ")}`,
+  );
+  return data_block({ kind: "template" }, lines.join("\n"));
 }
 function live_row(row: Row): Row {
-  return { ...row, segments: row.segments.filter((s) => s.applies !== "ignore") };
+  return {
+    ...row,
+    segments: row.segments.filter((s) => s.applies !== "ignore"),
+  };
 }
 
 export class PromptRenderer {
@@ -48,7 +65,11 @@ export class PromptRenderer {
     return actual;
   }
   private locked_block(task_file: string): PromptBlock {
-    return { label: "locked", cacheable: true, text: read_locked(this.locked_dir, [...COMMON_FILES, task_file]) };
+    return {
+      label: "locked",
+      cacheable: true,
+      text: read_locked(this.locked_dir, [...COMMON_FILES, task_file]),
+    };
   }
   private guidance_block(row: PromptVersionRow): PromptBlock {
     return {
@@ -60,10 +81,21 @@ export class PromptRenderer {
     };
   }
   private schema_block(name: string): PromptBlock {
-    return { label: "schema", cacheable: true, text: schema_text(this.schemas.json_schema(name)) };
+    return {
+      label: "schema",
+      cacheable: true,
+      text: schema_text(this.schemas.json_schema(name)),
+    };
   }
-  private finish(prompt_version_id: string, hash: string, system: PromptBlock[], user: PromptBlock[]): RenderedPrompt {
-    const text = [...system, ...user].map((b) => "### " + b.label + "\n" + b.text).join("\n\n");
+  private finish(
+    prompt_version_id: string,
+    hash: string,
+    system: PromptBlock[],
+    user: PromptBlock[],
+  ): RenderedPrompt {
+    const text = [...system, ...user]
+      .map((b) => "### " + b.label + "\n" + b.text)
+      .join("\n\n");
     return {
       prompt_version_id,
       locked_hash: hash,
@@ -76,14 +108,30 @@ export class PromptRenderer {
 
   render_unit_plan(i: UnitPlanPromptInput): RenderedPrompt {
     const hash = this.assert_locked(i.prompt.locked_hash);
-    const system = [this.locked_block("unit-plan.md"), this.guidance_block(i.prompt)];
-    const user: PromptBlock[] = [context_block([`run: ${i.run_id}`, `rows: ${i.rows.length}`])];
+    const system = [
+      this.locked_block("unit-plan.md"),
+      this.guidance_block(i.prompt),
+    ];
+    const user: PromptBlock[] = [
+      context_block([`rows: ${i.rows.length}`]),
+      data_block({ kind: "run" }, i.run_id),
+    ];
     for (const r of i.rows) {
       if (r.kind !== "lesson" && r.kind !== "flex_day") continue;
-      user.push(data_block({ kind: "row", row: r.row_number }, JSON.stringify(sort_keys(live_row(r)), null, 2)));
+      user.push(
+        data_block(
+          { kind: "row", row: r.row_number },
+          JSON.stringify(sort_keys(live_row(r)), null, 2),
+        ),
+      );
     }
     i.unit_rules.forEach((u, idx) =>
-      user.push(data_block({ kind: "unit_rule", index: idx }, `${u.text}\nscope: ${u.scope_lesson_ids.join(", ")}`)),
+      user.push(
+        data_block(
+          { kind: "unit_rule", index: idx },
+          `${u.text}\nscope: ${u.scope_lesson_ids.join(", ")}`,
+        ),
+      ),
     );
     for (const l of i.links) {
       user.push(
@@ -94,7 +142,12 @@ export class PromptRenderer {
       );
     }
     if (i.repair_of !== null) {
-      user.push(data_block({ kind: "previous_plan" }, `${i.repair_of.draft_raw}\n--- issues ---\n${i.repair_of.issues.join("\n")}`));
+      user.push(
+        data_block(
+          { kind: "previous_plan" },
+          `${i.repair_of.draft_raw}\n--- issues ---\n${i.repair_of.issues.join("\n")}`,
+        ),
+      );
     }
     user.push(instruction_block(INSTR_UNIT_PLAN));
     return this.finish(i.prompt.prompt_version_id, hash, system, user);
@@ -102,29 +155,43 @@ export class PromptRenderer {
 
   render_lesson_draft(i: DraftPromptInput): RenderedPrompt {
     const hash = this.assert_locked(i.prompt.locked_hash);
-    if (i.example_set_id !== null) throw new Error("example sets are not supported");
+    if (i.example_set_id !== null)
+      throw new Error("example sets are not supported");
     const { row, arc_header, neighbours, unit_rules, links } = i.context;
-    const system = [this.locked_block("lesson-draft.md"), this.guidance_block(i.prompt), this.schema_block("LessonDraft")];
-    const ctx = [
-      `lesson: ${row.lesson_id ?? ""}`,
-      `lesson type: ${row.lesson_type}`,
-      `row: ${row.row_number}`,
-      ...template_lines(i.template),
-      ...i.standards.map((s) => `standard ${s.code}: ${s.text}`),
+    const system = [
+      this.locked_block("lesson-draft.md"),
+      this.guidance_block(i.prompt),
+      this.schema_block("LessonDraft"),
     ];
-    const user: PromptBlock[] = [context_block(ctx)];
+    const user: PromptBlock[] = [
+      context_block([`row: ${row.row_number}`]),
+      data_block(
+        { kind: "lesson_meta" },
+        `lesson: ${row.lesson_id ?? ""}\nlesson type: ${row.lesson_type}`,
+      ),
+      template_block(i.template),
+    ];
+    for (const s of i.standards)
+      user.push(data_block({ kind: "standard" }, `${s.code}: ${s.text}`));
     if (row.title !== "") user.push(data_block({ kind: "title" }, row.title));
     row.segments.forEach((s, idx) => {
       if (s.applies === "ignore") return;
       user.push(
         data_block(
-          { kind: "segment", index: idx, segment_kind: s.kind, applies: s.applies, instruction_shaped: String(s.instruction_shaped) },
+          {
+            kind: "segment",
+            index: idx,
+            segment_kind: s.kind,
+            applies: s.applies,
+            instruction_shaped: String(s.instruction_shaped),
+          },
           s.text,
         ),
       );
     });
     const opt = (kind: string, v: string | null | undefined) => {
-      if (v !== null && v !== undefined && v !== "") user.push(data_block({ kind }, v));
+      if (v !== null && v !== undefined && v !== "")
+        user.push(data_block({ kind }, v));
     };
     opt("homework", row.homework);
     opt("pages", row.pages);
@@ -134,9 +201,20 @@ export class PromptRenderer {
     opt("eld_codes", row.eld_codes.join(", "));
     opt("msls_codes", row.msls_codes.join(", "));
     opt("arc_header", arc_header);
-    for (const n of neighbours) user.push(data_block({ kind: "neighbour", row: n.row_number }, `${n.title}\n${n.lesson_type}`));
+    for (const n of neighbours)
+      user.push(
+        data_block(
+          { kind: "neighbour", row: n.row_number },
+          `${n.title}\n${n.lesson_type}`,
+        ),
+      );
     unit_rules.forEach((u, idx) =>
-      user.push(data_block({ kind: "unit_rule", index: idx }, `${u.text}\nscope: ${u.scope_lesson_ids.join(", ")}`)),
+      user.push(
+        data_block(
+          { kind: "unit_rule", index: idx },
+          `${u.text}\nscope: ${u.scope_lesson_ids.join(", ")}`,
+        ),
+      ),
     );
     for (const l of links) {
       user.push(
@@ -147,29 +225,60 @@ export class PromptRenderer {
       );
     }
     for (const e of i.plan_entries) {
-      user.push(data_block({ kind: "plan_entry", lesson: e.lesson_id }, JSON.stringify(sort_keys(e), null, 2)));
+      user.push(
+        data_block(
+          { kind: "plan_entry", lesson: e.lesson_id },
+          JSON.stringify(sort_keys(e), null, 2),
+        ),
+      );
     }
     opt("reviewer_note", i.reviewer_note);
-    user.push(instruction_block(`Write the lesson draft JSON for lesson ${row.lesson_id ?? ""} using the template sections. Output JSON only.`));
+    user.push(
+      instruction_block(
+        "Write the lesson draft JSON for the lesson in the data blocks above using the template sections. Output JSON only.",
+      ),
+    );
     return this.finish(i.prompt.prompt_version_id, hash, system, user);
   }
 
   render_repair(i: RepairPromptInput): RenderedPrompt {
     const hash = this.assert_locked(i.prompt.locked_hash);
-    const system = [this.locked_block("repair.md"), this.guidance_block(i.prompt), this.schema_block("LessonDraft")];
-    const user: PromptBlock[] = [context_block(template_lines(i.template)), data_block({ kind: "repair_draft" }, i.draft_raw)];
-    const findings = i.failing.map((f) => `${f.kind}: ${f.message}` + (f.address !== null ? ` @ ${f.address}` : "")).join("\n");
+    const system = [
+      this.locked_block("repair.md"),
+      this.guidance_block(i.prompt),
+      this.schema_block("LessonDraft"),
+    ];
+    const user: PromptBlock[] = [
+      template_block(i.template),
+      data_block({ kind: "repair_draft" }, i.draft_raw),
+    ];
+    const findings = i.failing
+      .map(
+        (f) =>
+          `${f.kind}: ${f.message}` +
+          (f.address !== null ? ` @ ${f.address}` : ""),
+      )
+      .join("\n");
     user.push(data_block({ kind: "repair_findings" }, findings));
-    if (i.schema_issues.length > 0) user.push(data_block({ kind: "repair_schema_issues" }, i.schema_issues.join("\n")));
+    if (i.schema_issues.length > 0)
+      user.push(
+        data_block(
+          { kind: "repair_schema_issues" },
+          i.schema_issues.join("\n"),
+        ),
+      );
     user.push(instruction_block(INSTR_REPAIR));
     return this.finish(i.prompt.prompt_version_id, hash, system, user);
   }
 
   render_assist(i: AssistPromptInput): RenderedPrompt {
     const hash = this.assert_locked(i.prompt.locked_hash);
-    const system = [this.locked_block("assist.md"), this.guidance_block(i.prompt)];
+    const system = [
+      this.locked_block("assist.md"),
+      this.guidance_block(i.prompt),
+    ];
     const user: PromptBlock[] = [
-      context_block([`section: ${i.section_name}`]),
+      data_block({ kind: "section_name" }, i.section_name),
       data_block({ kind: "selected_text" }, i.selected_text),
       data_block({ kind: "note" }, i.note),
       instruction_block(INSTR_ASSIST),
@@ -178,11 +287,17 @@ export class PromptRenderer {
   }
 
   render_judge(i: JudgePromptInput): RenderedPrompt {
-    const actual = locked_hash(this.locked_dir);
-    const hash = this.assert_locked(i.expected_locked_hash ?? actual);
+    const expected = i.expected_locked_hash;
+    if (typeof expected !== "string" || expected === "") {
+      throw new LockedLayerMismatch(
+        "(missing expected_locked_hash)",
+        locked_hash(this.locked_dir),
+      );
+    }
+    const hash = this.assert_locked(expected);
     const system = [this.locked_block("judge.md")];
     const user: PromptBlock[] = [
-      context_block([`rubric: ${i.rubric_version}`]),
+      data_block({ kind: "rubric_version" }, i.rubric_version),
       data_block({ kind: "standard_text" }, i.standard_text),
       data_block({ kind: "activity_text" }, i.activity_text),
       instruction_block(INSTR_JUDGE[i.question]),

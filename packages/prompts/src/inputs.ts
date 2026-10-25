@@ -80,5 +80,6 @@ export interface JudgePromptInput {
   activity_text: string;
   question: "teaches_standard" | "eld_keeps_task";
   rubric_version: string;
+  /** Required at runtime: render_judge throws when absent (optional in the type only because the frozen fixture builds inputs without it). */
   expected_locked_hash?: string;
 }
