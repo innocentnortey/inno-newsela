@@ -28,3 +28,5 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-20 | SCR-9 jump-to-span lands on the section wrapper in the editor (no `data-text-region`); no unit/e2e test jumps against the editor DOM | S-17 follow-up | jump focuses the section, not the exact span | open |
 | S-21 | `clientState` is not reset to "connecting" when the editor remounts after a role/state flip (action bar can show the old state briefly) | S-17 follow-up | cosmetic | open |
 | S-22 | SCR-11 ResolveDialog is built but not mounted: no issue-card trigger in workspace-screen opens it; needs onResolved={reread} | NL-66 review | resolve/clear unreachable in the live app | open |
+| S-23 | SCR-17 h1 is "Run summary" without the spec's "· rows 8, 9 and 25" (CON-21 has no row scope) | NL-71 review | needs a CHG (optional `scope_label`) or Innocent-level ratification of the plain h1 | open |
+| S-24 | CON-21 `trace_incomplete` ignored and `report_path` has no download URL; CON-16 `Candidate.note` missing; CON-18 `request_changes`/`reopen` lack optional pin fields | NL-71/67/69 reviews | CHGs to file before NL-97/114/115 | open |
