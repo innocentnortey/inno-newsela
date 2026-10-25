@@ -1,0 +1,26 @@
+# NL-23: Next.js standalone web image. The build needs no secret.
+FROM node:24-bookworm-slim AS deps
+WORKDIR /app
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+COPY apps/collab/package.json apps/collab/package.json
+COPY packages packages
+COPY ops/package.json ops/package.json
+COPY evals/package.json evals/package.json
+COPY load/package.json load/package.json
+RUN npm ci --ignore-scripts
+
+FROM deps AS build
+ARG BUILD_ID=dev
+COPY apps/web apps/web
+RUN npm run build -w @ls/web
+
+FROM node:24-bookworm-slim AS runner
+ARG BUILD_ID=dev
+ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 BUILD_ID=$BUILD_ID RENDER_GIT_COMMIT=$BUILD_ID
+WORKDIR /app
+COPY --from=build --chown=node:node /app/apps/web/.next/standalone /app
+COPY --from=build --chown=node:node /app/apps/web/.next/static /app/apps/web/.next/static
+USER node
+CMD ["node", "apps/web/server.js"]

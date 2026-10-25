@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+**/node_modules
+**/.next
+evals/local/
+docs/source/restricted/
+.claude/
+ops/vps-run/
+test-results/
+playwright-report/
+coverage/
+**/*.log
+**/*.tsbuildinfo

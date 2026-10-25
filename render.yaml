@@ -1,0 +1,65 @@
+# Render blueprint: committed, NOT provisioned (no Render API calls from this repo).
+# Hosting default: .claude/rules/gauntlet-hosting-default.md. Web Starter $7/month, Render Postgres
+# Basic-256mb $6/month + $0.30/GB-month; Innocent's total Render approval is $40/month across all projects.
+# Secrets live in the Render environment group `ls-secrets` (incl. COLLAB_INTERNAL_URL), never here.
+# Render keeps one connection string (owner); the non-owner runtime role split is Compose-only for now.
+services:
+  - type: web
+    name: ls-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile.web
+    dockerContext: .
+    plan: starter
+    region: ohio
+    autoDeploy: false
+    healthCheckPath: /
+    envVars:
+      - fromGroup: ls-secrets
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ls-db
+          property: connectionString
+      - key: MODEL_PROVIDER_MODE
+        value: stub
+  - type: worker
+    name: ls-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile.node
+    dockerContext: .
+    dockerCommand: node_modules/.bin/tsx apps/worker/src/main.ts
+    plan: starter
+    region: ohio
+    autoDeploy: false
+    envVars:
+      - fromGroup: ls-secrets
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ls-db
+          property: connectionString
+      - key: MODEL_PROVIDER_MODE
+        value: stub
+      - key: RUN_MIGRATIONS
+        value: "1"
+  - type: web
+    name: ls-collab
+    runtime: docker
+    dockerfilePath: ./Dockerfile.node
+    dockerContext: .
+    dockerCommand: node_modules/.bin/tsx apps/collab/src/main.ts
+    plan: starter
+    region: ohio
+    autoDeploy: false
+    healthCheckPath: /healthz
+    envVars:
+      - fromGroup: ls-secrets
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ls-db
+          property: connectionString
+      - key: MODEL_PROVIDER_MODE
+        value: stub
+databases:
+  - name: ls-db
+    plan: basic-256mb
+    region: ohio
+    ipAllowList: []
