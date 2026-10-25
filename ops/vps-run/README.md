@@ -25,6 +25,8 @@ bash ops/vps-run/run.sh                         # starts the launcher in tmux se
 | Stop | `python3 ops/vps-run/launcher.py stop` (stops the session and tmux; the conversation and state are kept) |
 | Resume after a stop, a crash or a reboot | `bash ops/vps-run/run.sh` (continues the same session; read `state/RESUME.md` first) |
 
+Sessions start from the workspace root (`/home/linuxuser/workspaces`, `session_cwd` in `config.json`) so they are listed with your other sessions there; each turn tells the session to work inside `inno-newsela`, and `--settings` passes Newsela's `claudeMdExcludes`. The workspace agents and skills that load from there are in the workflow lock.
+
 If you type into the attached session, the launcher just waits: it checks the phase only when the session's turn ends.
 
 ## How the phases end

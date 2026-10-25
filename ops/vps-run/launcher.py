@@ -108,6 +108,10 @@ def lock_targets() -> list[Path]:
     # Parent rules listed in Newsela's `claudeMdExcludes` do not load (Newsela pins its own copy), so they
     # are not part of its workflow; shared edits reach Newsela only through adopt_updates.py.
     t += sorted(p for p in (WORKSPACE / ".claude/rules").glob("*.md") if not excluded(p))
+    # Sessions start from the workspace root (config session_cwd), so its agents and skills load too.
+    for base in (WORKSPACE / ".claude/agents", WORKSPACE / ".claude/skills/zero-to-hero", WORKSPACE / ".claude/skills/ux-pipeline"):
+        if base.exists():
+            t += sorted(p for p in base.rglob("*") if p.is_file() and "__pycache__" not in p.parts and ".pytest_cache" not in p.parts)
     t += [WORKSPACE / "CLAUDE.md", Path.home() / ".claude/settings.json",
           Path.home() / ".claude/hooks/zero-to-hero-guard.py"]
     icm = Path.home() / ".claude/skills/icm-project"
@@ -295,6 +299,21 @@ def phase_env(phase: str) -> dict:
     return env
 
 
+WORKSPACE_PREAMBLE = """You are started from the workspace root ({ws}) so that you are listed with Innocent's other
+sessions there. All of your work is in the Newsela repo, {root}:
+- `cd {root}` before any command, and treat every relative path in these instructions as relative to it;
+- read `{root}/CLAUDE.md` and every file in `{root}/.claude/rules/` first (they do not load automatically from the
+  workspace root);
+- Newsela's pinned copies under `{root}/.claude/` win over workspace-level skills, rules and agents of the same name;
+  use only the agent names Newsela defines (never `cerbo-*` or `equinox-*`).
+
+"""
+
+
+def session_cwd() -> Path:
+    return Path(CONFIG.get("session_cwd") or ROOT)
+
+
 def run_once_bg(phase: str, st: dict) -> dict:
     """One run as a background session: attachable with `claude attach <name>`; same checks as print mode."""
     cfg = PHASES[phase]
@@ -303,16 +322,22 @@ def run_once_bg(phase: str, st: dict) -> dict:
     if row and row.get("kind") != "background":
         return {"init_model": None, "model_usage": {}, "cost": 0.0, "subtype": "error_duplicate",
                 "detail": f"session {sid} is live elsewhere ({row.get('kind')}, {row.get('status')}, pid {row.get('pid')})"}
-    bgsession.retire(CLAUDE, sid, ROOT, STATE_DIR / "transcript-backups", log)
+    cwd = session_cwd()
+    bgsession.retire(CLAUDE, sid, cwd, STATE_DIR / "transcript-backups", log)
     st["attempts"][phase] += 1
     n = st["attempts"][phase]
-    transcript = bgsession.transcript_dir(ROOT) / f"{sid}.jsonl"
-    session_args = ["--resume", sid] if transcript.exists() else ["--session-id", sid]
-    args = ["--model", cfg["model"], *session_args, "--name", cfg["name"], "--permission-mode", CONFIG["permission_mode"]]
+    transcript = bgsession.transcript_dir(cwd) / f"{sid}.jsonl"
+    seen = transcript.exists() or (bgsession.transcript_dir(ROOT) / f"{sid}.jsonl").exists()
+    session_args = ["--resume", sid] if seen else ["--session-id", sid]
+    args = ["--model", cfg["model"], *session_args, "--name", cfg["name"], "--permission-mode", CONFIG["permission_mode"],
+            "--settings", str(ROOT / ".claude/settings.json")]       # keeps Newsela's claudeMdExcludes from any cwd
     since = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
     started = time.time()
     try:
-        short, real_sid = bgsession.start(CLAUDE, ROOT, phase_env(phase), args, turn_prompt(phase, n))
+        prompt = turn_prompt(phase, n)
+        if cwd != ROOT:
+            prompt = WORKSPACE_PREAMBLE.format(ws=cwd, root=ROOT) + prompt
+        short, real_sid = bgsession.start(CLAUDE, cwd, phase_env(phase), args, prompt)
     except Exception as exc:                              # noqa: BLE001 - reported, then the loop's bounded retry
         st["attempts"][phase] -= 1                        # nothing ran, so it does not use up an attempt
         log(f"phase {phase} run {n}: background start failed: {exc}")
@@ -320,7 +345,7 @@ def run_once_bg(phase: str, st: dict) -> dict:
     if real_sid != sid:                                   # fresh --bg sessions pick their own id
         log(f"phase {phase}: session id is {real_sid} (launcher had reserved {sid})")
         st["sessions"][phase] = sid = real_sid
-        transcript = bgsession.transcript_dir(ROOT) / f"{sid}.jsonl"
+        transcript = bgsession.transcript_dir(cwd) / f"{sid}.jsonl"
     st["bg_id"], st["child_pid"] = short, None
     st["status"] = f"running phase {phase} run {n} (background session {short}: `claude attach {cfg['name']}`)"
     save_state(st)
@@ -328,7 +353,7 @@ def run_once_bg(phase: str, st: dict) -> dict:
         {"bg_id": short, "session_id": sid, "started": since, "transcript": str(transcript)}, indent=2))
     log(f"phase {phase} run {n}: background session {short} ({cfg['model']}, session {sid}); "
         f"attach: claude attach {cfg['name']}")
-    info = bgsession.wait(CLAUDE, ROOT, short, sid, since,
+    info = bgsession.wait(CLAUDE, cwd, short, sid, since,
                           max_hours=CONFIG.get("bg_max_hours_per_run", 10), forbid=("opus", "haiku") if phase == "B" else (),
                           poll_s=CONFIG.get("bg_poll_seconds", 60), log=log)
     st["spend_usd"][phase] = round(st["spend_usd"][phase] + info["cost"], 2)

@@ -16,5 +16,7 @@
   "session_mode": "bg",
   "bg_poll_seconds": 60,
   "bg_max_hours_per_run": 16,
-  "note_session_mode": "bg (2026-10-25, Innocent asked for the run to be a real session): each run is a `claude --bg` session, attachable with `claude attach newsela-phase-b`; cost is a transcript estimate (bgsession.py). \"print\" restores the old `claude -p` runs."
+  "note_session_mode": "bg (2026-10-25, Innocent asked for the run to be a real session): each run is a `claude --bg` session, attachable with `claude attach newsela-phase-b`; cost is a transcript estimate (bgsession.py). \"print\" restores the old `claude -p` runs.",
+  "session_cwd": "/home/linuxuser/workspaces",
+  "note_session_cwd": "Innocent, 2026-10-25: run from the workspace root so the session is listed with his other sessions; it works inside inno-newsela (prompt preamble), with Newsela's settings passed by --settings."
 }
