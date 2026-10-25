@@ -41,7 +41,7 @@ Mirrors DO-3 §4 row for row (waves in dependency order; each area's cross-area 
 | 2 | A11b collab client | `apps/web/src/server/adapters/collab-commands.ts` | built (NL-36) |
 | 2 | A13b metrics writer | `apps/web/src/server/services/metrics-writer.ts` | built (NL-48) |
 | 3 | A4 intake service | `apps/web/src/server/services/outline-service.ts`, `apps/web/src/server/adapters/google-sheets.ts`, `apps/web/app/api/units/route.ts`, `apps/web/app/api/outline-versions/**`, `apps/web/src/server/wiring/outlines.ts` | NL-26 built: `outline-service.ts` (list/upload/import), `google-sheets.ts`, `units/route.ts`, `outline-versions/{route,import/route,http}.ts`, `wiring/outlines.ts`; NL-77 adds report/choices |
-| 3 | A6 check runner | `apps/worker/src/checks/**`, `apps/worker/src/wiring/checks.ts` | planned |
+| 3 | A6 check runner | `apps/worker/src/checks/**`, `apps/worker/src/wiring/checks.ts` | NL-81 built: `checks/{check-job-runner,check-lane,rule-failure}.ts`; `wiring/checks.ts` fills `CheckWiring{check_runner,check_lane}`; lane not started by `main.ts` yet |
 | 3 | A9 generation | `apps/worker/src/{queue,generation}/**`, `packages/core/src/pipeline/**` (built, NL-22), claim-loop + run-finalizer (built, NL-30), `unit-plan-job.ts` (built, NL-31), `apps/worker/src/wiring/generation.ts` | planned |
 | 3 | A10 runs | `apps/web/src/server/services/run-service.ts`, `apps/web/app/api/runs/**`, `apps/web/src/server/wiring/runs.ts` | NL-27 built: `run-service.ts` (`start`; other methods `NotBuiltYet`, NL-78), `run-start-route.ts`, `app/api/runs/route.ts`, `services/testing/run-service-fakes.ts`; `wiring/runs.ts` planned |
 | 3 | A11 collab server | `apps/collab/**` (except `main.ts`, `health.ts`; incl. `frozen-docs.ts`, `wiring/collab.ts`) | planned |
@@ -79,3 +79,5 @@ Built (NL-39): `packages/core/src/checks/rules/{alignment,safety,links}/**` bodi
 
 Built (NL-07): `apps/{worker,collab}/src/{main,health,drain,deps,deps-types}.ts`, `apps/worker/src/wiring/{generation,checks,judge}.ts`, `apps/collab/src/wiring/{server,commands}.ts`, `apps/collab/src/commands/{routes,apply-edit,set-mode,lock-and-snapshot}.ts` shells.
 Built (NL-29): `apps/worker/src/generation/lesson-job-runner.ts`, `apps/worker/src/generation/nodes/{draft,compile-check,repair,store,fail}-node.ts` with `collaborators.ts` (structural ports for PaidCaller, recorder checkpoint, check-context loader, run finalizer), `job-state.ts`, `front-matter-standards.ts`; test doubles in `nodes/testing/`. `DraftNode`/`RepairNode` take a trailing `recorder: CheckpointPort`; `CompileCheckNode` fills `front_matter.standards` and recomputes `content_hash`. Wired to real collaborators at NL-79.
+
+Built (NL-81): `apps/worker/src/checks/{check-job-runner,check-lane,rule-failure}.ts` (own check lane, no generation semaphore); `wiring/checks.ts` returns `CheckWiring{check_runner,check_lane}`. Ctor drops DO-4's `settings` (unused); the lane takes `check_poll_ms`.
