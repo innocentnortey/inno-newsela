@@ -48,39 +48,50 @@ Each row links the card; the card owns fields, states, permissions, errors, guar
 | [CON-2](../contracts/INTERFACE.md#con-2) | `listUnits`, `uploadOutline`, `importOutlineLink` | `app/api/units/route.ts`, `app/api/outline-versions/route.ts`, `app/api/outline-versions/import/route.ts` | `OutlineService.list_units` / `upload` / `import_link` | `parse_workbook`, `normalize_outline`, `compute_lesson_links`, `SheetFetcher` |
 | [CON-3](../contracts/INTERFACE.md#con-3) | `getValidationReport` | `app/api/outline-versions/[outlineVersionId]/report/route.ts` | `OutlineService.report` | `build_validation_report` |
 | [CON-4](../contracts/INTERFACE.md#con-4) | `recordIntakeChoice` | `app/api/outline-versions/[outlineVersionId]/choices/route.ts` | `OutlineService.record_choice` | `generate_gate` |
-| [CON-5](../contracts/INTERFACE.md#con-5) | `startRun` | `app/api/runs/route.ts` | `RunService.start` | `JobQueue.create_run_jobs`, `SpendLedger.check_day_cap`, `run_cap_for` |
+| [CON-5](../contracts/INTERFACE.md#con-5) | `startRun` | `app/api/runs/route.ts` | `RunService.start` | `JobQueue.create_run_jobs`, `SpendLedger.check_day_cap`, `run_cap_for`, `LessonStateRepo.ensure_lessons` |
 | [CON-6](../contracts/INTERFACE.md#con-6) | `getRunProgress` | `app/api/runs/[runId]/progress/route.ts` | `RunService.progress` | `derive_run_state`, `tile_state`; rows written by `LessonJobRunner` |
 | [CON-7](../contracts/INTERFACE.md#con-7) | `controlRun` | `app/api/runs/[runId]/actions/route.ts` | `RunService.control` | `decide_run_control`, `JobQueue.requeue_failed` / `cancel_run`; worker honours cancel at the next node |
 | [CON-8](../contracts/INTERFACE.md#con-8) | `getUnitPlan` | `app/api/runs/[runId]/plan/route.ts` | `RunService.plan` | `UnitPlanJob` writes it |
-| [CON-9](../contracts/INTERFACE.md#con-9) | `getUnitBoard` | `app/api/units/[unitId]/board/route.ts` | `BoardService.board` | `LessonRepo.board_rows`, `IssueRepo.counts_by_lesson` |
+| [CON-9](../contracts/INTERFACE.md#con-9) | `getUnitBoard` | `app/api/units/[unitId]/board/route.ts` | `BoardService.board` | `BoardReadRepo.board_rows`, `IssueRepo.counts_by_lesson` |
 | [CON-10](../contracts/INTERFACE.md#con-10) | `getUnitMetrics` | `app/api/units/[unitId]/metrics/route.ts` | `BoardService.metrics` | `MetricsRepo.unit_metrics_rows` (aggregate only) |
 | [CON-11](../contracts/INTERFACE.md#con-11) | `getLesson` | `app/api/lessons/[lessonId]/route.ts` | `LessonReadService.get_lesson` | `LessonDocStore.latest_derived`, `assert_known_nodes` |
-| [CON-12](../contracts/INTERFACE.md#con-12) | socket `lesson:<lesson_id>` (`x-collaboration-channel`) | `apps/collab/src/main.ts` | `CollabAuthenticator`, `WriteGuard`, `LessonPersistence`, `AckBroadcaster` | `LessonDocStore.store` (one transaction), `CheckQueue.enqueue` inside it |
+| [CON-12](../contracts/INTERFACE.md#con-12) | socket `lesson:<lesson_id>` (`x-collaboration-channel`) | `apps/collab/src/main.ts` | `CollabAuthenticator`, `WriteGuard` (`can_write` at connect, `on_update` per message), `FrozenDocs`, `LessonPersistence`, `AckBroadcaster` | `LessonDocStore.store` (one transaction), `CheckQueue.enqueue` inside it |
 | [CON-13](../contracts/INTERFACE.md#con-13) | `getLessonIssues` | `app/api/lessons/[lessonId]/issues/route.ts` | `IssueService.get_issues` | `CheckJobRunner` writes issues; `CheckQueue.pending_for` gives `pending` |
 | [CON-14](../contracts/INTERFACE.md#con-14) | `recordResolution`, `clearSafetyFlag`, `decideStandard` | `app/api/lessons/[lessonId]/issues/[issueId]/resolution/route.ts`, `…/safety-flags/[flagId]/clear/route.ts`, `…/standards/decision/route.ts` | `IssueService.record_resolution` / `clear_safety_flag` / `decide_standard` | `CollabCommands.apply_edit` (`StandardEdit`) for front-matter changes |
 | [CON-15](../contracts/INTERFACE.md#con-15) | `fillSlot` | `app/api/lessons/[lessonId]/slots/[slotId]/fill/route.ts` | `SlotService.fill` | `CollabCommands.apply_edit` (`SlotFillEdit`) |
 | [CON-16](../contracts/INTERFACE.md#con-16) | `regenerateLesson`, `getCandidate`, `adoptCandidate` | `app/api/lessons/[lessonId]/candidates/**/route.ts` | `CandidateService.regenerate` / `get` / `adopt` | `JobQueue.create_candidate_job`, `LessonJobRunner`, `CollabCommands.apply_edit` (`AdoptEdit`) |
 | [CON-17](../contracts/INTERFACE.md#con-17) | `listSuggestions`, `requestSuggestion`, `decideSuggestion` | `app/api/lessons/[lessonId]/suggestions/**/route.ts` | `SuggestionService.list_pending` / `request` / `decide` | `ModelCallRecorder.call`, `CollabCommands.apply_edit` (`SuggestionAcceptEdit`) |
-| [CON-18](../contracts/INTERFACE.md#con-18) | `transitionLesson` | `app/api/lessons/[lessonId]/transitions/route.ts` | `TransitionService.transition` | `decide_transition`, `approve_gate`, `run_checks`, `CheckContextLoader`; Submit → `CollabCommands.lock_and_snapshot` (which runs `submit_gate` on the stored row); Withdraw, Request changes, Reopen → `CollabCommands.set_mode`; Approve → `MetricsWriter.write_first_approval`, no collaboration hop |
+| [CON-18](../contracts/INTERFACE.md#con-18) | `transitionLesson` | `app/api/lessons/[lessonId]/transitions/route.ts` | `TransitionService.transition` (Approve delegated to `ApproveService.approve`) | `transition_roles`, `decide_transition`, `merge_resolutions`, `approve_gate`, `run_checks` over `CHECK_RULES`, `CheckContextLoader`; Submit → `CollabCommands.lock_and_snapshot` (which runs `submit_gate` on the stored row); Withdraw, Request changes, Reopen → `CollabCommands.set_mode`; Approve → `MetricsWriter.write_first_approval`, no collaboration hop |
 | [CON-19](../contracts/INTERFACE.md#con-19) | `getLessonHistory` | `app/api/lessons/[lessonId]/history/route.ts` | `LessonReadService.history` | `AuditLog.history` (view `audit_log_v`) |
 | [CON-20](../contracts/INTERFACE.md#con-20) | `sendHeartbeat` | `app/api/lessons/[lessonId]/heartbeats/route.ts` | `HeartbeatService.record` | `merge_heartbeats` |
 | [CON-21](../contracts/INTERFACE.md#con-21) | `getRunSummary` | `app/api/runs/[runId]/summary/route.ts` | `RunService.summary` | `ModelCallLog.totals_for_run`, `RunRepo.summary_rows` |
-| [CON-22](../contracts/INTERFACE.md#con-22) | `getCoverageMatrix` | `app/api/units/[unitId]/coverage/route.ts` | `BoardService.coverage` | `AlignmentRepo.coverage_rows` |
-| [CON-23](../contracts/INTERFACE.md#con-23) | `listExports`, `createExport`, `downloadExport` | `app/api/units/[unitId]/exports/route.ts`, `app/api/exports/[exportId]/download/route.ts` | `ExportService.list` / `create` / `download` | `LessonRepo.approved_snapshots` |
+| [CON-22](../contracts/INTERFACE.md#con-22) | `getCoverageMatrix` | `app/api/units/[unitId]/coverage/route.ts` | `CoverageService.coverage` | `AlignmentRepo.coverage_rows` |
+| [CON-23](../contracts/INTERFACE.md#con-23) | `listExports`, `createExport`, `downloadExport` | `app/api/units/[unitId]/exports/route.ts`, `app/api/exports/[exportId]/download/route.ts` | `ExportService.list` / `create` / `download` | `LessonVersionRepo.approved_snapshots` |
 | [CON-24](../contracts/INTERFACE.md#con-24) | `listPromptVersions`, `saveGuidance` | `app/api/prompt-versions/route.ts` | `PromptService.list` / `save_guidance` | `PromptRepo` |
 
 **How this design carries the System review's mechanisms** (the card states each promise; these are the code paths):
 the `stored` acknowledgement is a Hocuspocus stateless message sent by `AckBroadcaster` after the store transaction
-commits; the Submit freeze is `CollabCommands.lock_and_snapshot` (internal HTTP), which stores at once, checks the
-`client_state_vector` cover, re-runs the blocking checks on the stored row and writes snapshot, state and transition in
-one transaction (SP-2's fallback closes every connection instead of locking in place); Approve stays inside the web app
-(lesson row locked, pin compared, checks re-run on the snapshot, one transaction); `pending` on CON-13 comes from
+commits; the Submit freeze is `CollabCommands.lock_and_snapshot` (internal HTTP), which **SP-2 proved with option A**
+(server-side read-only flip plus a per-update guard; option B, closing every connection, was rejected because refused
+keystrokes came back on reconnect, 120 in 20 trials): it adds the lesson to `FrozenDocs` *before* it stores, so
+`WriteGuard.on_update` (called from Hocuspocus `beforeHandleMessage`) refuses every later update with a `refused` message
+carrying CON-12's `refused_from`; then it stores at once, checks the `client_state_vector` cover, re-runs the blocking
+checks on the stored row and writes snapshot, state and transition in one transaction, then broadcasts `mode: read_only`;
+on any refusal it removes the lesson from `FrozenDocs` again. In the browser, `apps/web/src/editor/refusals.ts` undoes the
+local updates after `refused_from`, switches the editor to read-only and tells the typist which text was refused. The
+card's close-every-connection fallback is not built (DO-3 §5). Approve stays inside the web app (`ApproveService`: lesson
+row locked, pin compared, checks re-run on the snapshot, one transaction); `pending` on CON-13 comes from
 `CheckQueue.pending_for`; checks run in the worker's check lane (DO-1 D-6); a regenerate is a one-lesson `run` of kind
-`candidate` with its own cap, counted against the day cap, one in flight per lesson; a suggestion accept is checked
-against the live document by `CollabCommandHandler.apply_edit`; `startRun` copies the intake choices (`choices_hash`) and
-the lesson links into the run in its creating transaction; `SERVICE_BUSY` comes from a pool wait past
-`PG_ACQUIRE_TIMEOUT_MS` and `INVALID_REQUEST` from a failed Zod parse, both in `with_route`; a refused call writes no
-audit row (only an application-log line), per INTERFACE shared guarantee 2.
+`candidate` with its own cap, counted against the day cap, one in flight per lesson; **a suggestion accept is applied by
+the collaboration server, never by the browser** (CON-17): `SuggestionService.decide` sends a `SuggestionAcceptEdit` to
+`CollabCommandHandler.apply_edit`, which resolves the stored anchor against the live document, compares the text there
+with the stored `selected_text` (`ANCHOR_CHANGED` on a mismatch; the client's `anchored_text_now` is never trusted) and
+applies the replacement as one Yjs transaction tagged `ai-assist`, attributed to the acceptor, then stores; `startRun`
+copies the intake choices (`choices_json`, `choices_hash`) and the lesson links into the run in its creating
+transaction; `SERVICE_BUSY` comes from a pool wait past `PG_ACQUIRE_TIMEOUT_MS` and `INVALID_REQUEST` from a failed Zod
+parse, both in `with_route`; **a refused call writes no audit row** (only an application-log line), per INTERFACE shared
+guarantee 2 and the agreed cards (spec dry run G-15); every service writes inside one `TxRunner.with_tx` and rolls back
+on refusal.
 
 ---
 
@@ -119,7 +130,10 @@ IssueLevelName = Literal["blocking", "confirmation", "advisory"]
 CheckKind = Literal["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link", "standard_not_taught", "standard_not_checked", "code_not_allowed", "minutes_out_of_range", "section_missing", "schema_invalid", "quote_unmatched", "page_out_of_range", "proper_noun_unsourced", "quote_without_source", "quote_too_long", "rights_to_clear", "suggestion_pending", "safety_flag_open", "safety_note_without_tip", "safety_text_in_student_block", "disclosure_prompt", "standard_confirmation", "standard_add_suggestion", "eld_label_mismatch", "arc_repeat", "vocabulary_over_cap", "vocabulary_word_missing", "linked_text_changed", "judge_no"]
 ModelAlias = Literal["GENERATION", "REPAIR", "ASSIST", "JUDGE"]
 CallPurpose = Literal["unit_plan", "lesson_draft", "truncation_retry", "repair", "assist", "judge", "spike"]
-BrakeName = Literal["repair_round", "rate_limit_retries", "truncation_retry", "job_wall_clock", "spend_run_cap", "spend_day_cap", "spend_build_cap", "circuit_breaker", "cancelled"]
+BrakeName = Literal["repair_round", "rate_limit_retries", "truncation_retry", "job_wall_clock", "spend_run_cap", "spend_day_cap", "spend_project_cap", "circuit_breaker", "cancelled"]
+CapName = Literal["run_cap", "day_cap", "project_cap"]   # one name everywhere: CON-6 capped_by, refusals, brakes (spec dry run G-4)
+DayCapScope = Literal["user", "project"]                 # DAY_CAP_REACHED details.scope (CON-5): day_cap -> "user", project_cap -> "project"
+FailureCheck = Literal["schema_invalid", "truncated", "rate_limited", "provider_error", "timeout", "compile_error", "check_failed", "cancelled", "capped"]   # = OpenAPI FailureReason.check
 SheetKind = Literal["csv", "xlsx"]
 DraftRating = Literal["usable_as_drafted", "usable_with_edits", "rewritten"]
 CollabMode = Literal["editable", "read_only"]
@@ -146,11 +160,21 @@ class TokenUsage:
 
 class ModelPrice:
     model_id: str
-    input_per_mtok: Usd
-    output_per_mtok: Usd
-    cache_read_per_mtok: Usd
+    input_per_mtok: Usd                  # claude-sonnet-5-5: 2.00 (SP-1, checked 2026-10-25)
+    output_per_mtok: Usd                 # 10.00 (thinking tokens bill as output)
+    cache_read_per_mtok: Usd             # 0.20
+    cache_write_per_mtok: Usd            # 2.50 (5-minute cache write; GP-33 sets cache_control)
 
-class Tx(Protocol): ...  # an open transaction handle from PgDatabase.with_tx; repos accept it to join one commit
+class Tx(Protocol): ...  # an open transaction handle from TxRunner.with_tx; repos accept it to join one commit
+
+class TxRunner(Protocol):  # packages/core/src/ports/tx.ts (S1): services and nodes depend on this, never on PgDatabase
+    async def with_tx(self, fn: TxFunction, advisory_lock: str | None) -> TxResult: ...
+    # PgDatabase implements it; FakeTxRunner (test helper) calls fn with a dummy Tx
+
+class FakeTxRunner(TxRunner):  # implements TxRunner; packages/core/src/testing/fake-tx.ts (A1); test helper only, never wired in a composition root
+    def __init__(self) -> None: ...
+    async def with_tx(self, fn: TxFunction, advisory_lock: str | None) -> TxResult: ...
+    # calls fn with a dummy Tx once and returns its result; records advisory_lock so a test can assert the lock name
 ```
 
 Lesson-level OpenAPI shapes used below without redefinition: `Session`, `UnitList`, `OutlineVersion`,
@@ -164,7 +188,12 @@ Lesson-level OpenAPI shapes used below without redefinition: `Session`, `UnitLis
 `TileState`, `LessonState`, `ProseMirrorDoc`, `Section`, `Anchor`, `SourceRef`, `RightsStatus`, `FailureReason`,
 `LessonLink`, `IssueCounts`, `SnapshotRef`, `VersionRef`, `Standard`, `AlignmentEntry`.
 
-## 3. Ports (`packages/core/src/ports.ts`)
+## 3. Ports (`packages/core/src/ports/<port>.ts`)
+
+One port and the records it owns per file (`ports/model-client.ts`, `ports/lesson-docs.ts`, `ports/spend.ts`, …;
+Metz S5). A1 writes every file in wave 0 straight from this section; after wave 0 each file belongs to the area that
+implements the port (DO-3 §4), and a change to it is a `CHG` through that owner. `packages/core` exports them by subpath
+(`@ls/core/ports/spend`); there is no barrel file that every area appends to.
 
 ### 3.1 Model providers
 
@@ -175,9 +204,14 @@ class StructuredCallRequest:
     user_blocks: list[PromptBlock]       # outline data only inside labelled delimiters (R-6)
     output_schema_name: str              # e.g. "LessonDraft"; the JSON Schema comes from packages/schema
     output_json_schema: JsonValue
-    max_output_tokens: int
-    timeout_ms: int
-    temperature: float
+    output_mode: Literal["schema_enforced", "prompt_embedded"]
+    # SP-1: the API's schema-enforced output rejected LessonDraft ("compiled grammar is too large"), so lesson draft and
+    # repair calls are "prompt_embedded" (the JSON Schema is a "schema" system block; Zod validates in code; one repair);
+    # UnitPlanDraft, assist and judge stay "schema_enforced" (their schemas compile)
+    max_output_tokens: int               # DRAFT_OUTPUT_TOKEN_CAP 32000; truncation retry 48000 (SP-1)
+    timeout_ms: int                      # MODEL_CALL_TIMEOUT_MS 240000 (SP-1)
+    effort: Literal["low", "medium", "high"] | None   # MODEL_EFFORT "low" (SP-1); None = provider default
+    temperature: float | None            # None = provider default, as SP-1 measured; no setting overrides it (G-28)
 
 class PromptBlock:
     text: str
@@ -324,13 +358,20 @@ class ModeResult:
 
 class CollabCommands(Protocol):
     async def lock_and_snapshot(self, cmd: SubmitCommand) -> SnapshotResult: ...
-    # lock → store at once → covers(stored, client) else unlock + NOT_STORED → CheckContextLoader + run_checks +
-    # submit_gate on the stored row (BLOCKED, CONFIRMATION_OPEN, SUGGESTION_PENDING) else unlock → one tx:
-    # lesson_version(kind submit), lesson.state, review_event → broadcast mode read_only.
+    # SP-2 option A: FrozenDocs.freeze(lesson_id) FIRST (from here WriteGuard.on_update refuses every update, with
+    # refused_from) → store at once → covers(stored, client) else unfreeze + NOT_STORED → CheckContextLoader.load +
+    # run_checks(CHECK_RULES) on the stored row → merge_resolutions(findings, IssueRepo.resolutions_for) → submit_gate
+    # (SUGGESTION_PENDING, BLOCKED, CONFIRMATION_OPEN in CON-18's order) else unfreeze → one tx: lesson row locked,
+    # decide_transition re-checked, lesson_version(kind submit), lesson.state = submitted, review_event → commit →
+    # AckBroadcaster.mode(read_only). Nothing else; there is no close-every-connection path (SP-2 rejected option B).
     # Refusals: LESSON_LOCKED, NOT_STORED, BLOCKED, CONFIRMATION_OPEN, SUGGESTION_PENDING, INVALID_TRANSITION.
     async def apply_edit(self, cmd: EditCommand) -> StoreAck: ...
-    # one Yjs transaction with origin {actor, tag} through a direct connection, then an immediate store (no debounce).
-    # Refusals: LESSON_LOCKED, ANCHOR_CHANGED, NOT_FOUND.
+    # one Yjs transaction with origin {actor, tag} through a server-side direct connection (openDirectConnection), then an
+    # immediate store (no debounce). LESSON_LOCKED if FrozenDocs.is_frozen or the state is not editable (is_editable).
+    # SuggestionAcceptEdit (CON-17): the server resolves `anchor` against the LIVE document, compares the text there with
+    # expected_text (the stored suggestion's selected_text, never the browser's anchored_text_now) and on a match replaces
+    # it with replacement_text in the same tagged transaction attributed to the acceptor; else ANCHOR_CHANGED, nothing
+    # applied. Refusals: LESSON_LOCKED, ANCHOR_CHANGED, NOT_FOUND.
     async def set_mode(self, cmd: ModeCommand) -> ModeResult: ...
     # idempotent; called after the web app commits Withdraw, Request changes or Reopen (unfreeze). Approve needs no call.
 # Any transport failure or timeout surfaces as CollabUnavailable → COLLAB_UNAVAILABLE; nothing was changed (A-1).
@@ -338,14 +379,33 @@ class CollabCommands(Protocol):
 class HttpCollabCommandClient(CollabCommands): ...  # implements CollabCommands; apps/web/src/server/adapters/collab-commands.ts
 class CollabCommandHandler(CollabCommands): ...  # implements CollabCommands; apps/collab/src/commands/routes.ts (server side)
 
-class CollabCommandHandler_ctor:  # apps/collab/src/commands/routes.ts
-    docs: LessonDocStore
-    lessons: LessonRepo
+# collab_refusal_from (apps/web/src/server/adapters/collab-commands.ts)
+def collab_refusal_from(status: int, body: JsonValue, command: str, lesson_id: LessonId, request_id: RequestId) -> DomainRefusal | CollabUnavailable: ...
+# How HttpCollabCommandClient maps a collab answer (spec dry run G-16): 2xx → the command's result record. A non-2xx whose
+# body parses as the OpenAPI Error envelope → DomainRefusal with the SAME code, message and details (so NOT_STORED,
+# BLOCKED with details.issues, LESSON_LOCKED with details.state, ANCHOR_CHANGED reach the browser unchanged; with_route
+# re-derives the HTTP status from the code); details.request_id is replaced by the web request's id and the collab
+# request id is logged as collab_request_id. Timeout (5 s), connection failure, a body that is not an envelope, or 401
+# from the command route (a token mismatch: a deploy fault, logged as InvariantViolation) → CollabUnavailable →
+# COLLAB_UNAVAILABLE. The client never retries.
+
+class HocuspocusServerRef(Protocol): ...  # marker: the @hocuspocus/server Server instance (openDirectConnection, documents)
+
+class CollabCommandHandler_ctor:  # apps/collab/src/commands/routes.ts; built by apps/collab/src/wiring/commands.ts
+    store: LessonDocStore
+    reader: LessonDocReader
+    states: LessonStateRepo
+    versions: LessonVersionRepo
+    issues: IssueRepo                    # resolutions for merge_resolutions (G-14)
     audit: AuditLog
-    checks: CheckContextLoader
+    loader: CheckContextLoader
+    rules: Sequence[CheckRule]           # CHECK_RULES
     policy: CheckPolicy
+    frozen: FrozenDocs
     acks: AckBroadcaster
-    db: PgDatabase
+    hocuspocus: HocuspocusServerRef
+    tx: TxRunner
+    clock: Clock
     token: SecretStr                     # COLLAB_INTERNAL_TOKEN; constant-time compare
 ```
 
@@ -389,15 +449,30 @@ class SeedResult:
     store_id: StoreId | None
     content_hash: Sha256
 
-class LessonDocStore(Protocol):
-    async def store(self, req: StoreRequest) -> StoreAck: ...
-    # ONE transaction (HP-4): INSERT lesson_doc (seq+1), UPSERT the coalesced check_job for the new hash,
-    # UPDATE lesson.last_editor_id, INSERT audit_event('lesson.store', store_id). The only writer of lesson_doc.
-    async def seed_initial(self, lesson_id: LessonId, lesson: StoredLesson, actor: Actor) -> SeedResult: ...
+class LessonDocReader(Protocol):  # ports/lesson-docs.ts; readers never see the write methods (I in SOLID)
     async def latest(self, lesson_id: LessonId) -> StoredDoc | None: ...
     async def latest_derived(self, lesson_id: LessonId) -> DerivedRow | None: ...
 
+class LessonDocStore(Protocol):  # ports/lesson-docs.ts; the only writer of lesson_doc
+    async def store(self, req: StoreRequest) -> StoreAck: ...
+    # ONE transaction (HP-4): INSERT lesson_doc (seq+1) → CheckQueue.enqueue(lesson_id, content_hash, store_id, tx) (the
+    # one coalescing rule lives in PgCheckQueue) → LessonStateRepo.record_last_editor(lesson_id, stored_by, tx) when
+    # stored_by is set → AuditLog.append(action "lesson.store", store_id, tx). It calls those ports; it never writes their
+    # tables in its own SQL (Metz S2).
+    async def seed_initial(self, lesson_id: LessonId, lesson: StoredLesson, actor: Actor, tx: Tx) -> SeedResult: ...
+    # joins the caller's transaction (StoreNode, G-25): lesson_to_ydoc → INSERT lesson_doc seq 1 ON CONFLICT
+    # (lesson_id, seq) DO NOTHING (seeded = False on the conflict path) → CheckQueue.enqueue in the same tx
+
+class PgLessonDocReader(LessonDocReader): ...  # implements LessonDocReader; packages/db/src/repos/lesson-doc-reads.ts
 class PgLessonDocStore(LessonDocStore): ...  # implements LessonDocStore; packages/db/src/repos/lesson-docs.ts
+
+class PgLessonDocStore_ctor:  # packages/db/src/repos/lesson-docs.ts
+    db: PgDatabase
+    ids: IdGenerator
+    clock: Clock
+    checks: CheckQueue
+    states: LessonStateRepo
+    audit: AuditLog
 
 class NewJob:
     run_id: RunId
@@ -409,9 +484,11 @@ class NewJob:
 class ClaimedJob:
     job_id: JobId
     run_id: RunId
+    unit_id: UnitId                      # from the run row (G-23): CompileContext.unit_id, NewGeneratedVersion.unit_id
     kind: JobKind
     lesson_id: LessonId | None
-    attempt: int
+    attempt: int                         # claim count: claim() sets attempt + 1, requeue_expired keeps it; for logs and
+                                         # lease ownership only, never the checkpoint key (G-19)
     lease_until: datetime
     prompt_version_id: str
     schema_version: int
@@ -453,8 +530,7 @@ class JobRow:
 
 class RequeueReport:
     requeued: int
-    lost_calls_marked: int
-    job_ids: list[JobId]
+    job_ids: list[JobId]                 # ClaimLoop.start then calls ModelCallLog.mark_lost and SpendLedger.release_for_jobs
 
 class JobQueue(Protocol):
     async def create_run_jobs(self, jobs: Sequence[NewJob], tx: Tx) -> int: ...
@@ -466,8 +542,12 @@ class JobQueue(Protocol):
     async def set_tile_state(self, job_id: JobId, tile_state: TileState) -> None: ...
     async def finish(self, outcome: JobOutcome) -> None: ...
     async def requeue_expired(self, now: datetime) -> RequeueReport: ...
+    # running jobs whose lease_until < now → queued; touches only lesson_job (model_call and spend_reservation are their
+    # owners' to change: ClaimLoop.start does it, G-9)
     async def requeue_failed(self, run_id: RunId, tx: Tx) -> int: ...
-    async def cancel_run(self, run_id: RunId, tx: Tx) -> int: ...
+    async def cancel_run(self, run_id: RunId, reason: Literal["cancelled", "capped"], tx: Tx) -> int: ...
+    # queued jobs of the run → status cancelled, tile failed, failure_reasons [{check: reason}] (CON-6: capped and
+    # cancelled tiles of jobs that never started have no lesson row); running jobs stop at their next node
     async def jobs_for_run(self, run_id: RunId) -> list[JobRow]: ...
     async def is_cancelled(self, job_id: JobId) -> bool: ...
 
@@ -496,33 +576,58 @@ class CheckQueue(Protocol):
 class PgCheckQueue(CheckQueue): ...  # implements CheckQueue; packages/db/src/repos/check-queue.ts
 
 class ReservationRequest:
-    run_id: RunId | None                 # None for AI assist (no run); then only day and build caps apply
-    user_id: UserId
+    run_id: RunId | None                 # None for AI assist (no run); then only day and project caps apply
+    job_id: JobId | None                 # set for worker calls, so release_for_jobs finds a killed job's open row (G-9)
+    user_id: UserId                      # the run's started_by for worker calls; the requester for assist
     purpose: CallPurpose
-    amount_usd: Usd                      # max_call_cost(...) for this call
+    amount_usd: Usd                      # max_call_cost(...) for this one call (each call reserves its own worst case)
 
 class SpendSnapshot:
     run_cap_usd: Usd | None
     run_settled_usd: Usd
     run_reserved_usd: Usd
-    user_day_cap_usd: Usd
-    user_day_settled_usd: Usd
+    user_day_cap_usd: Usd                # user_day_cap_for(RUN_CAP_DEFAULT_USD, USER_DAY_CAP_MULTIPLIER) = 26.00 (G-2)
+    user_day_settled_usd: Usd            # this user's rows whose day = today (UTC calendar day, CON-5)
     user_day_reserved_usd: Usd
-    build_ceiling_usd: Usd
-    build_settled_usd: Usd
-    build_reserved_usd: Usd
+    project_ceiling_usd: Usd             # BUILD_SPEND_CEILING_USD = 75 (PD-29): CON-5's "project ceiling", scope "project"
+    project_settled_usd: Usd             # all time: settled_usd of every spend_reservation row + cost_usd of model_call rows
+                                         # with reservation_id null (imported spike calls, WF-32) (G-5)
+    project_reserved_usd: Usd            # reserved_usd of rows still status "reserved"
 
 class ReservationDecision:
     allowed: bool
     reservation_id: ReservationId | None
-    refused_by: Literal["run_cap", "day_cap", "build_cap"] | None
+    refused_by: CapName | None           # the FIRST failing cap in the order run_cap → day_cap → project_cap (G-6)
+    scope: DayCapScope | None            # day_cap → "user", project_cap → "project"; None when allowed or run_cap (G-3)
+    remaining_usd: Usd | None            # headroom left on the refusing cap: DAY_CAP_REACHED details.remaining_usd
     snapshot: SpendSnapshot
+
+SpendReservationStatus = Literal["reserved", "settled", "released"]
+# moves: reserved → settled | released; released → settled (a lost call that completed after release_for_jobs: real
+# spend is always recorded); settled is terminal (G-8)
+
+class SpendReservationRow:
+    reservation_id: ReservationId
+    run_id: RunId | None
+    job_id: JobId | None
+    user_id: UserId
+    purpose: CallPurpose
+    model_call_id: ModelCallId | None
+    reserved_usd: Usd
+    settled_usd: Usd
+    overshoot_usd: Usd
+    status: SpendReservationStatus
+    day: str                             # UTC calendar date "YYYY-MM-DD", set from Clock at reserve
+    created_at: datetime
+    closed_at: datetime | None
 
 class SettledReservation:
     reservation_id: ReservationId
+    status: SpendReservationStatus
     reserved_usd: Usd
     settled_usd: Usd
-    released_usd: Usd
+    released_usd: Usd                    # max(0, reserved - settled)
+    overshoot_usd: Usd                   # max(0, settled - reserved)
 
 class RunSpend:
     run_id: RunId
@@ -532,19 +637,36 @@ class RunSpend:
 
 class SpendLedger(Protocol):
     async def reserve(self, req: ReservationRequest) -> ReservationDecision: ...
-    # one tx under pg_advisory_xact_lock(spend): read sums → decide_reservation (pure) → INSERT spend_reservation
+    # one tx under pg_advisory_xact_lock('spend'): read the three sums → decide_reservation (pure) → INSERT
+    # spend_reservation (status reserved). A refusal writes nothing (shared guarantee 2).
     async def settle(self, reservation_id: ReservationId, actual_usd: Usd, model_call_id: ModelCallId) -> SettledReservation: ...
+    # → settled with settled_usd = actual_usd. actual > reserved (the input estimate ran low) is recorded, never refused:
+    # overshoot_usd = actual - reserved and a warn line spend.overshoot (G-7); DO-5 S6 counts overshoot rows as cap overshoot.
+    # Idempotent: repeating it with the same model_call_id returns the stored result.
     async def release(self, reservation_id: ReservationId) -> SettledReservation: ...
+    # reserved → released (settled 0); on a settled or released row it is a no-op returning the stored result, so
+    # PaidCaller can always release in `finally`
+    async def release_for_jobs(self, job_ids: Sequence[JobId]) -> int: ...
+    # releases every "reserved" row of these jobs; ClaimLoop.start calls it after requeue_expired (G-9)
     async def run_totals(self, run_id: RunId) -> RunSpend: ...
-    async def check_day_cap(self, user_id: UserId, amount_usd: Usd) -> ReservationDecision: ...  # dry run, writes nothing
+    async def check_day_cap(self, user_id: UserId, amount_usd: Usd) -> ReservationDecision: ...
+    # dry run, writes nothing: day_cap then project_cap (no run cap); RunService.start and CandidateService.regenerate
+    # turn a refusal into DAY_CAP_REACHED with details.scope and details.remaining_usd
 
 class PgSpendLedger(SpendLedger): ...  # implements SpendLedger; packages/db/src/repos/spend.ts
+
+class PgSpendLedger_ctor:  # packages/db/src/repos/spend.ts (G-1)
+    db: PgDatabase
+    ids: IdGenerator
+    clock: Clock
+    settings: SpendSettings              # project ceiling, day-cap multiplier, default run cap
 
 class ModelCallStart:
     run_id: RunId | None
     lesson_id: LessonId | None
     job_id: JobId | None
-    attempt: int
+    attempt: int                         # the call's ordinal for (job_id, purpose), starting at 1; NOT ClaimedJob.attempt.
+                                         # job_id survives a requeue, so the checkpoint lookup hits after a kill (G-19)
     purpose: CallPurpose
     alias: ModelAlias
     requested_model: str
@@ -598,6 +720,7 @@ class ModelCallLog(Protocol):
     async def fail(self, model_call_id: ModelCallId, error: ProviderErrorRecord) -> None: ...
     async def mark_lost(self, job_id: JobId) -> int: ...
     async def completed_for(self, job_id: JobId, purpose: CallPurpose, attempt: int) -> RecordedCall | None: ...
+    # attempt = the call ordinal above; a "completed" row with raw_output is returned, never re-sent
     async def totals_for_run(self, run_id: RunId) -> RunCallTotals: ...
 
 class PgModelCallLog(ModelCallLog): ...  # implements ModelCallLog; packages/db/src/repos/model-calls.ts
@@ -704,7 +827,9 @@ class OutlineRepo(Protocol):
     async def upsert_choice(self, choice: IntakeChoiceRow, tx: Tx) -> IntakeChoiceRow: ...
     async def mark_confirmed(self, outline_version_id: OutlineVersionId, at: datetime, tx: Tx) -> None: ...
     async def generate_gate_inputs(self, outline_version_id: OutlineVersionId) -> GateInputs: ...
-    async def row_context(self, outline_version_id: OutlineVersionId, lesson_id: LessonId) -> RowContext: ...
+    async def row_context(self, outline_version_id: OutlineVersionId, lesson_id: LessonId, choices: Sequence[IntakeChoiceRow] | None) -> RowContext: ...
+    # choices given → they are applied (DraftNode passes RunRepo.pinned_choices: the run's copied set, UXQ-9, G-24);
+    # None → the outline version's stored choices (CheckContextLoader, outside a run)
     async def links(self, outline_version_id: OutlineVersionId) -> list[LessonLinkRecord]: ...
 
 class PgOutlineRepo(OutlineRepo): ...  # implements OutlineRepo; packages/db/src/repos/outlines.ts
@@ -750,7 +875,7 @@ class RunRow:
     parent_run_id: RunId | None
     plan_stored_at: datetime | None
     paused_check: str | None
-    capped_by: Literal["run_cap", "day_cap", "build_cap"] | None
+    capped_by: CapName | None
     choices_hash: Sha256
     created_at: datetime
     finished_at: datetime | None
@@ -776,6 +901,8 @@ class RunRepo(Protocol):
     async def find_by_idempotency_key(self, user_id: UserId, key: str, within_hours: int) -> RunRow | None: ...
     async def lock_for_update(self, run_id: RunId, tx: Tx) -> RunRow: ...   # CON-7 row lock
     async def set_state(self, run_id: RunId, state: RunStateName, paused_check: str | None, tx: Tx) -> RunRow: ...
+    async def mark_capped(self, run_id: RunId, capped_by: CapName, tx: Tx) -> RunRow: ...   # state capped + capped_by (G-10)
+    async def pinned_choices(self, run_id: RunId) -> list[IntakeChoiceRow]: ...   # run.choices_json, copied at start (G-24)
     async def mark_plan_failed(self, run_id: RunId, tx: Tx) -> RunRow: ...  # run → paused, paused_check = unit_plan (CON-5)
     async def store_unit_plan(self, run_id: RunId, plan: UnitPlanDraft, model_call_id: ModelCallId) -> UnitPlanRow: ...
     async def unit_plan(self, run_id: RunId) -> UnitPlanRow | None: ...
@@ -892,25 +1019,39 @@ class LessonStateInfo:
     editable: bool
     reviewer_id: UserId | None
 
-class LessonRepo(Protocol):
+class GeneratedVersionWrite:
+    version: LessonVersionRow            # the stored row: the new one, or the existing one on the conflict path
+    created: bool                        # False when idempotency_key already existed (ON CONFLICT DO NOTHING, G-25)
+
+# LessonRepo is split by who asks (Metz S3); one Pg class implements the three at first.
+class LessonStateRepo(Protocol):  # ports/lesson-state.ts
     async def get(self, lesson_id: LessonId) -> LessonRow | None: ...
     async def lock_for_update(self, lesson_id: LessonId, tx: Tx) -> LessonRow: ...
     async def state_of(self, lesson_id: LessonId) -> LessonStateInfo: ...
     async def ensure_lessons(self, rows: Sequence[NormalizedRow], unit_id: UnitId, tx: Tx) -> int: ...
     async def set_state(self, lesson_id: LessonId, to_state: LessonStateName, reviewer_id: UserId | None, tx: Tx) -> LessonRow: ...
-    async def write_generated_version(self, v: NewGeneratedVersion, tx: Tx) -> LessonVersionRow: ...
+    async def append_review_event(self, e: NewReviewEvent, tx: Tx) -> ReviewEventRow: ...
+    async def record_last_editor(self, lesson_id: LessonId, user_id: UserId, tx: Tx) -> None: ...
+
+class LessonVersionRepo(Protocol):  # ports/lesson-versions.ts
+    async def write_generated_version(self, v: NewGeneratedVersion, tx: Tx) -> GeneratedVersionWrite: ...
     async def write_snapshot(self, s: NewSnapshot, tx: Tx) -> LessonVersionRow: ...
     async def version(self, version_id: VersionId) -> LessonVersionRow | None: ...
     async def latest_snapshot(self, lesson_id: LessonId) -> LessonVersionRow | None: ...
     async def candidate(self, lesson_id: LessonId, candidate_id: VersionId) -> LessonVersionRow | None: ...
-    async def append_review_event(self, e: NewReviewEvent, tx: Tx) -> ReviewEventRow: ...
-    async def record_last_editor(self, lesson_id: LessonId, user_id: UserId, tx: Tx) -> None: ...
-    async def dependencies(self, lesson_id: LessonId) -> list[DependencyState]: ...
-    async def dependants(self, lesson_id: LessonId) -> list[LessonId]: ...
-    async def board_rows(self, unit_id: UnitId, state: LessonStateName | None) -> list[BoardRowRecord]: ...
+    async def has_generated_version(self, lesson_id: LessonId) -> bool: ...   # FailNode's candidate branch (G-26)
     async def approved_snapshots(self, unit_id: UnitId) -> list[LessonVersionRow]: ...
 
-class PgLessonRepo(LessonRepo): ...  # implements LessonRepo; packages/db/src/repos/lessons.ts
+class LessonGraphRepo(Protocol):  # ports/lesson-graph.ts
+    async def dependencies(self, lesson_id: LessonId) -> list[DependencyState]: ...
+    async def dependants(self, lesson_id: LessonId) -> list[LessonId]: ...
+
+class BoardReadRepo(Protocol):  # ports/board-reads.ts; implemented in packages/db/src/repos/metrics.ts (A13a)
+    async def board_rows(self, unit_id: UnitId, state: LessonStateName | None) -> list[BoardRowRecord]: ...
+
+class PgBoardReadRepo(BoardReadRepo): ...  # implements BoardReadRepo; packages/db/src/repos/metrics.ts (A13a), beside PgMetricsRepo
+
+class PgLessonRepo(LessonStateRepo): ...  # implements LessonStateRepo; also implements LessonVersionRepo and LessonGraphRepo; packages/db/src/repos/lessons.ts
 
 class IssueRow:
     issue_id: IssueId
@@ -922,6 +1063,7 @@ class IssueRow:
     address: str | None
     span_anchor: str | None
     related_lesson_id: LessonId | None
+    code: str | None                     # the standard code a finding is about (part of the resolution key, G-14)
     resolved_by: UserId | None
     resolution_reason: str | None
     resolved_at: datetime | None
@@ -952,6 +1094,9 @@ class IssueRepo(Protocol):
     async def current(self, lesson_id: LessonId) -> IssueSet: ...
     async def get(self, issue_id: IssueId) -> IssueRow | None: ...
     async def resolve(self, r: NewResolution, tx: Tx) -> IssueRow: ...
+    async def resolutions_for(self, lesson_id: LessonId) -> list[IssueRow]: ...
+    # the latest resolved row per (kind, address, code) on any hash of the lesson; merge_resolutions matches the re-run's
+    # findings against it at Submit and Approve (G-14)
     async def counts_by_lesson(self, unit_id: UnitId) -> list[LessonIssueCounts]: ...
 
 class PgIssueRepo(IssueRepo): ...  # implements IssueRepo; packages/db/src/repos/check-queue.ts
@@ -1258,7 +1403,8 @@ class PrefixedIdGenerator(IdGenerator): ...  # implements IdGenerator; "<prefix>
 
 ## 4. Model-call wrapper and prompts (`packages/llm`, `packages/prompts`)
 
-Every model call in the system goes through `ModelCallRecorder.call` (rule `pydantic-ai-agents` §7, translated). It owns
+Every model call in the system goes through `ModelCallRecorder.call` (rule `agent-architecture`: one logged, retried
+call path), and every paid call through `PaidCaller.call` (Metz S6). The recorder owns
 retries on 429 / 529 / 5xx (≤ `PROVIDER_MAX_RETRIES`, honouring `retry-after`, with jitter), the per-call timeout and the
 `model_call` rows. It never retries a truncation or a schema failure: those are the caller's decisions (§6).
 
@@ -1274,11 +1420,31 @@ class ModelCallContext:
     reservation_id: ReservationId | None
 
 class ModelCallRecorder:
-    def __init__(self, client: ModelClient, log: ModelCallLog, clock: Clock, prices: PriceTable, settings: SharedSettings) -> None: ...
+    def __init__(self, client: ModelClient, log: ModelCallLog, clock: Clock, prices: PriceTable, settings: ModelSettings) -> None: ...
     async def call(self, ctx: ModelCallContext, req: StructuredCallRequest, rendered: RenderedPrompt) -> RecordedCall: ...
     # 1 insert_sent (rendered prompt) → 2 client.complete with retries → 3 complete(raw, usage, cost via settle_cost,
     # served model, provider request id) the moment the response arrives; on final failure fail() and raise ProviderError
     async def checkpoint(self, job_id: JobId, purpose: CallPurpose, attempt: int) -> RecordedCall | None: ...
+    # = ModelCallLog.completed_for; attempt is the call ordinal for (job, purpose) (G-19)
+
+class PaidCallRequest:
+    ctx: ModelCallContext
+    req: StructuredCallRequest
+    rendered: RenderedPrompt
+    run_id: RunId | None
+    job_id: JobId | None
+    user_id: UserId
+
+class PaidCaller:  # packages/llm/src/paid-call.ts (Metz S6): the one reserve → call → settle | release protocol
+    def __init__(self, recorder: ModelCallRecorder, spend: SpendLedger, prices: PriceTable) -> None: ...
+    async def call(self, p: PaidCallRequest) -> RecordedCall: ...
+    # amount = max_call_cost(price_for(alias model), rendered.input_tokens_estimate, req.max_output_tokens) → spend.reserve
+    # (refused → raise SpendRefused(refused_by, scope, amount); nothing sent, no model_call row) → recorder.call with
+    # ctx.reservation_id → spend.settle(reservation_id, recorded.cost_usd, model_call_id); on any exception
+    # spend.release(reservation_id) in `finally` (a no-op once settled). Every call reserves its OWN worst case, so the
+    # draft (32000), the truncation retry (48000) and the repair each reserve right before they are sent (G-17, G-18).
+    # Callers: DraftNode, RepairNode, UnitPlanJob, SuggestionService. JudgeJob (cut #2) uses the ledger the same way
+    # around JudgeClient.
 
 class PriceTable:
     prices: list[ModelPrice]
@@ -1291,7 +1457,8 @@ class RenderedPrompt:
     system_blocks: list[PromptBlock]
     user_blocks: list[PromptBlock]
     text: str                            # the exact text stored on model_call.rendered_prompt
-    input_tokens_estimate: int
+    input_tokens_estimate: int           # ceil(characters / 3.5 × 1.10): a 10% margin over the tokenizer estimate [A],
+                                         # so a reservation is a true worst case (G-6, G-7)
 
 class UnitPlanPromptInput:
     run_id: RunId
@@ -1306,13 +1473,15 @@ class DraftPromptInput:
     plan_entries: list[UnitPlanEntryDraft]   # own entry and neighbours (DIR-4)
     standards: list[StandardRow]
     template: SectionTemplate
-    example_set_id: str
+    example_set_id: str | None               # None: SP-1 ran with no few-shot examples (the only ones are in the restricted
+                                             # folder, GR-9); ProvenanceRecord.example_set_id is then null (G-28)
     reviewer_note: str | None                # candidate regenerate note (CON-16)
 
 class RepairPromptInput:
     prompt: PromptVersionRow
     draft_raw: str
     failing: list[CheckFinding]              # the draft and the failing checks only (DO-1 §4.2 step 5)
+    schema_issues: list[str]                 # Zod issue paths when the draft failed validation (SP-1: 2 of 3 lessons)
     template: SectionTemplate
 
 class AssistPromptInput:
@@ -1331,7 +1500,8 @@ class PromptRenderer:
     def __init__(self, locked_dir: str, schemas: SchemaRegistry) -> None: ...
     def render_unit_plan(self, i: UnitPlanPromptInput) -> RenderedPrompt: ...
     def render_lesson_draft(self, i: DraftPromptInput) -> RenderedPrompt: ...
-    def render_repair(self, i: RepairPromptInput) -> RenderedPrompt: ...
+    # embeds the LessonDraft JSON Schema as a "schema" system block and asks for JSON only (SP-1 output_mode prompt_embedded)
+    def render_repair(self, i: RepairPromptInput) -> RenderedPrompt: ...   # same embedding as the draft
     def render_assist(self, i: AssistPromptInput) -> RenderedPrompt: ...
     def render_judge(self, i: JudgePromptInput) -> RenderedPrompt: ...
 
@@ -1343,14 +1513,21 @@ class SchemaRegistry:
 
 Every service method takes the resolved `RequestUser` first and checks its role on the server (INTERFACE shared
 guarantee 1). Refusals raise `DomainRefusal(code, …)`; `with_route` turns them into the card's envelope and status.
-Where a method writes, it writes inside one `PgDatabase.with_tx` and writes nothing on refusal (shared guarantee 2).
+Where a method writes, it writes inside one `TxRunner.with_tx` and writes nothing on refusal, not even an audit row: a
+refusal is one application-log line (shared guarantee 2; spec dry run G-15). Services receive `tx: TxRunner`, never the
+concrete `PgDatabase` (Metz S1).
 
 ```python
 class RouteSpec:
     operation_id: str
     roles: list[RoleName] | None         # None = any signed-in role
-    request_schema: str | None           # Zod mirror name, e.g. "StartRunRequest"
+    request_schema: str | None           # Zod mirror name, e.g. "StartRunRequest"; transitionLesson uses "TransitionRequestInput"
     success_status: int
+# TransitionRequestInput (packages/schema/src/api/transition.ts, G-11): the Zod mirror of TransitionRequest with
+# Approve.rating, RequestChanges.note and Reopen.reason optional and nullable, every other field strict. A missing or
+# empty one then reaches decide_transition, which raises the card's RATING_REQUIRED / NOTE_REQUIRED / REASON_REQUIRED in
+# CON-18's precedence (after ROLE_FORBIDDEN, NOT_FOUND, INVALID_TRANSITION) instead of an INVALID_REQUEST from the parse.
+# A contract test asserts it accepts every valid TransitionRequest and differs from it only in those three fields.
 
 class RouteHandler(Protocol):
     async def __call__(self, request: HttpRequest) -> HttpResponse: ...
@@ -1399,7 +1576,7 @@ class RequestMeta:
     ip_hash: Sha256 | None
 
 class SessionService:
-    def __init__(self, sessions: SessionRepo, audit: AuditLog, db: PgDatabase, clock: Clock, ids: IdGenerator, settings: WebSettings) -> None: ...
+    def __init__(self, sessions: SessionRepo, audit: AuditLog, tx: TxRunner, clock: Clock, ids: IdGenerator, settings: WebSettings) -> None: ...
     async def sign_in(self, req: SignInRequest, meta: RequestMeta) -> SignInOutcome: ...
     # unknown email → NOT_ON_ALLOW_LIST; wrong password → INVALID_CREDENTIALS; refusals log a hashed email only
     async def require(self, cookie_token: str | None, request_id: RequestId) -> RequestUser: ...  # UNAUTHENTICATED
@@ -1412,7 +1589,7 @@ class UploadedFile:
     data: bytes
 
 class OutlineService:
-    def __init__(self, outlines: OutlineRepo, standards: StandardRepo, sheets: SheetFetcher, audit: AuditLog, db: PgDatabase, ids: IdGenerator, clock: Clock, settings: WebSettings) -> None: ...
+    def __init__(self, outlines: OutlineRepo, standards: StandardRepo, sheets: SheetFetcher, audit: AuditLog, tx: TxRunner, ids: IdGenerator, clock: Clock, settings: WebSettings) -> None: ...
     async def list_units(self, user: RequestUser) -> UnitList: ...
     async def upload(self, user: RequestUser, file: UploadedFile, unit_id: UnitId | None) -> OutlineVersion: ...
     # over OUTLINE_MAX_BYTES → UNSUPPORTED_FILE per the card; filed under the unit the sheet writes (CON-2)
@@ -1422,33 +1599,42 @@ class OutlineService:
     # INVALID_CHOICE (kind does not fit the target), INVALID_TRANSITION (late unit change); revert restores the default
 
 class RunService:
-    def __init__(self, runs: RunRepo, queue: JobQueue, outlines: OutlineRepo, lessons: LessonRepo, prompts: PromptRepo, spend: SpendLedger, calls: ModelCallLog, audit: AuditLog, db: PgDatabase, ids: IdGenerator, clock: Clock, settings: WebSettings) -> None: ...
+    def __init__(self, runs: RunRepo, queue: JobQueue, outlines: OutlineRepo, states: LessonStateRepo, prompts: PromptRepo, spend: SpendLedger, calls: ModelCallLog, audit: AuditLog, tx: TxRunner, ids: IdGenerator, clock: Clock, settings: WebSettings) -> None: ...
     async def start(self, user: RequestUser, req: StartRunRequest, idempotency_key: str | None) -> Run: ...
     # same key within IDEMPOTENCY_WINDOW_H → the first run, nothing new; one tx: generate_gate (VALIDATION_INCOMPLETE)
-    # → check_day_cap(cap_usd) for user and project (DAY_CAP_REACHED, details.scope) → insert_run (choices and
-    # choices_hash copied; unit_plan row with the lesson links) → ensure_lessons → create_run_jobs (one unit_plan job for
-    # a full run + one job per lesson in scope; trial = one candidate job) → audit; NOTIFY lesson_job after commit
+    # → spend.check_day_cap(user, cap_usd): refused → DAY_CAP_REACHED with details.scope (DayCapScope) and
+    # details.remaining_usd → PromptRepo.current pinned → insert_run (choices_json and choices_hash copied; unit_plan row
+    # with the lesson links) → states.ensure_lessons → create_run_jobs (one unit_plan job for a full run + one job per
+    # lesson in scope; trial = one candidate job) → audit; NOTIFY lesson_job after commit. The dialog's suggested cap is
+    # run_cap_for(...) = 13.00 for 47 lessons (SP-1).
     async def progress(self, user: RequestUser, run_id: RunId) -> RunProgress: ...
+    # RunRow.capped_by is a CapName, the same three values as CON-6's capped_by (no mapping, G-4)
     async def control(self, user: RequestUser, run_id: RunId, req: RunControlRequest) -> RunControlResult: ...
-    # RunRepo.lock_for_update → decide_run_control (INVALID_TRANSITION) → requeue_failed / cancel_run / resume (re-queues a failed plan)
+    # RunRepo.lock_for_update → decide_run_control (INVALID_TRANSITION) → requeue_failed / cancel_run(reason "cancelled")
+    # / resume (re-queues a failed plan)
     async def plan(self, user: RequestUser, run_id: RunId) -> UnitPlan: ...
     async def summary(self, user: RequestUser, run_id: RunId) -> RunSummary: ...
     # totals come from ModelCallLog.totals_for_run; a mismatch with run spend sets the "trace incomplete" flag (DO-6 check 1)
+    # RunSummary.calls_lost_in_flight = sum(JobRow.calls_lost) over summary_rows.jobs: lesson_job.calls_lost is the stored
+    # per-job count (ModelCallLog.mark_lost), the OpenAPI field is its run total; one name per layer, no other mapping (G-20)
 
 class BoardService:
-    def __init__(self, lessons: LessonRepo, issues: IssueRepo, metrics: MetricsRepo, alignment: AlignmentRepo) -> None: ...
+    def __init__(self, board: BoardReadRepo, issues: IssueRepo, metrics: MetricsRepo) -> None: ...
     async def board(self, user: RequestUser, unit_id: UnitId, state: LessonState | None) -> UnitBoard: ...
     async def metrics(self, user: RequestUser, unit_id: UnitId) -> UnitMetrics: ...
+
+class CoverageService:  # apps/web/src/server/services/coverage-service.ts (A18, cut #4): its own file, no edit to BoardService
+    def __init__(self, alignment: AlignmentRepo) -> None: ...
     async def coverage(self, user: RequestUser, unit_id: UnitId) -> CoverageMatrix: ...
 
 class LessonReadService:
-    def __init__(self, lessons: LessonRepo, docs: LessonDocStore, outlines: OutlineRepo, alignment: AlignmentRepo, suggestions: SuggestionRepo, audit: AuditLog) -> None: ...
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, reader: LessonDocReader, outlines: OutlineRepo, alignment: AlignmentRepo, suggestions: SuggestionRepo, audit: AuditLog) -> None: ...
     async def get_lesson(self, user: RequestUser, lesson_id: LessonId) -> Lesson: ...
     # derived row for editable states, the latest snapshot for frozen ones; assert_known_nodes → SCHEMA_UNKNOWN; never writes
     async def history(self, user: RequestUser, lesson_id: LessonId) -> LessonHistory: ...
 
 class IssueService:
-    def __init__(self, issues: IssueRepo, checks: CheckQueue, flags: SafetyFlagRepo, alignment: AlignmentRepo, lessons: LessonRepo, collab: CollabCommands, audit: AuditLog, db: PgDatabase, clock: Clock, settings: WebSettings) -> None: ...
+    def __init__(self, issues: IssueRepo, checks: CheckQueue, flags: SafetyFlagRepo, alignment: AlignmentRepo, states: LessonStateRepo, collab: CollabCommands, audit: AuditLog, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
     async def get_issues(self, user: RequestUser, lesson_id: LessonId) -> IssueList: ...
     async def record_resolution(self, user: RequestUser, lesson_id: LessonId, issue_id: IssueId, req: ResolutionRequest) -> ResolveResult: ...
     # NOT_RESOLVABLE (the kind clears only by a fix), REASON_REQUIRED; written outside the document (issue + audit_event)
@@ -1458,25 +1644,31 @@ class IssueService:
     # alignment_link; audit. undo: within UNDO_WINDOW_S and no later decision on the code, else UNDO_EXPIRED
 
 class SlotService:
-    def __init__(self, lessons: LessonRepo, collab: CollabCommands, policy: CheckPolicy) -> None: ...
+    def __init__(self, states: LessonStateRepo, collab: CollabCommands, policy: CheckPolicy) -> None: ...
     async def fill(self, user: RequestUser, lesson_id: LessonId, slot_id: str, req: FillSlotRequest) -> FillSlotResult: ...
     # SOURCE_REQUIRED / QUOTE_TOO_LONG checked here before any edit; LESSON_LOCKED from collab
 
 class CandidateService:
-    def __init__(self, lessons: LessonRepo, runs: RunRepo, queue: JobQueue, spend: SpendLedger, collab: CollabCommands, audit: AuditLog, db: PgDatabase, ids: IdGenerator, settings: WebSettings) -> None: ...
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, runs: RunRepo, queue: JobQueue, spend: SpendLedger, collab: CollabCommands, audit: AuditLog, tx: TxRunner, ids: IdGenerator, settings: WebSettings) -> None: ...
     async def regenerate(self, user: RequestUser, lesson_id: LessonId, req: RegenerateRequest) -> Candidate: ...
     # LESSON_LOCKED on submitted/approved; INVALID_TRANSITION while a candidate job is in flight (partial unique index);
-    # DAY_CAP_REACHED; one-lesson run of kind candidate with its own cap = one lesson's reservation
+    # DAY_CAP_REACHED (check_day_cap, scope as in RunService.start); one-lesson run of kind candidate with its own cap =
+    # one lesson's worst case (draft + truncation retry + repair reservations)
     async def get(self, user: RequestUser, lesson_id: LessonId, candidate_id: VersionId) -> Candidate: ...
     async def adopt(self, user: RequestUser, lesson_id: LessonId, candidate_id: VersionId, req: AdoptRequest) -> AdoptResult: ...
 
 class SuggestionService:
-    def __init__(self, recorder: ModelCallRecorder, renderer: PromptRenderer, prompts: PromptRepo, spend: SpendLedger, suggestions: SuggestionRepo, lessons: LessonRepo, collab: CollabCommands, audit: AuditLog, db: PgDatabase, settings: WebSettings) -> None: ...
+    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, prompts: PromptRepo, suggestions: SuggestionRepo, states: LessonStateRepo, collab: CollabCommands, audit: AuditLog, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
     async def list_pending(self, user: RequestUser, lesson_id: LessonId) -> SuggestionList: ...
     async def request(self, user: RequestUser, lesson_id: LessonId, req: SuggestionRequest) -> Suggestion: ...
-    # synchronous call (ASSIST alias, ASSIST_CALL_TIMEOUT_MS = 20 s); MODEL_UNAVAILABLE on ProviderError; reservation
-    # released on failure; expires_at = now + SUGGESTION_TTL_MIN
+    # synchronous PaidCaller.call (ASSIST alias, run_id None, ASSIST_CALL_TIMEOUT_MS = 20 s); SpendRefused → DAY_CAP_REACHED
+    # is not a CON-17 code, so it surfaces as MODEL_UNAVAILABLE with details.reason "spend_cap"; ProviderError →
+    # MODEL_UNAVAILABLE; expires_at = now + SUGGESTION_TTL_MIN
     async def decide(self, user: RequestUser, lesson_id: LessonId, suggestion_id: SuggestionId, req: SuggestionDecisionRequest) -> Suggestion: ...
+    # accept → collab.apply_edit(EditCommand{edit: SuggestionAcceptEdit{anchor, expected_text = the STORED selected_text,
+    # replacement_text = suggested_text}, tag "ai-assist", actor = the acceptor}): the collaboration server applies it
+    # against the live document (CON-17); ANCHOR_CHANGED → decide(closed); COLLAB_UNAVAILABLE → stays pending.
+    # reject → decide(rejected) + audit. Not pending → INVALID_TRANSITION.
 
 class MetricsWriteResult:
     written: bool                        # False on a later approval (rework never edits the first row)
@@ -1488,17 +1680,30 @@ class MetricsWriter:
     async def write_first_approval(self, lesson_id: LessonId, version: LessonVersionRow, rating: DraftRating, tx: Tx) -> MetricsWriteResult: ...
 
 class TransitionService:
-    def __init__(self, lessons: LessonRepo, issues: IssueRepo, checks: CheckQueue, suggestions: SuggestionRepo, alignment: AlignmentRepo, docs: LessonDocStore, outlines: OutlineRepo, collab: CollabCommands, metrics_writer: MetricsWriter, audit: AuditLog, db: PgDatabase, clock: Clock, settings: WebSettings) -> None: ...
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, collab: CollabCommands, approvals: ApproveService, audit: AuditLog, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
     async def transition(self, user: RequestUser, lesson_id: LessonId, req: TransitionRequest) -> TransitionResult: ...
-    # decide_transition (role, state) → per action:
-    #   submit: role and state here → collab.lock_and_snapshot (stores, checks the cover, re-runs the blocking checks on
-    #           the stored row, writes snapshot + state + review_event); COLLAB_UNAVAILABLE if it cannot be reached
-    #   approve: one tx with the lesson row locked: snapshot pin (STALE_PIN) → CheckContextLoader + run_checks on the
-    #           snapshot → approve_gate in the card's precedence (BLOCKED lists confirmations too; FOUR_EYES,
-    #           RATING_REQUIRED, DEPENDENCY_UNAPPROVED, SUGGESTION_PENDING) → snapshot(kind approve) + set_state +
-    #           review_event + MetricsWriter; no collaboration hop (already frozen)
-    #   withdraw / request_changes / reopen: one tx (NOTE_REQUIRED, REASON_REQUIRED; reopen writes a new version with
-    #           derived_from_version_id) → commit → collab.set_mode(editable)
+    # CON-18 precedence: transition_roles(action) (ROLE_FORBIDDEN) → states.get (NOT_FOUND) → decide_transition(action,
+    # role, from_state, note, reason, tag, rating) (INVALID_TRANSITION, NOTE_REQUIRED / REASON_REQUIRED / RATING_REQUIRED)
+    # → per action:
+    #   start_review: one tx, set_state(in_review, reviewer) + review_event
+    #   submit: collab.lock_and_snapshot (freeze first, store, cover check, blocking checks on the stored row, snapshot +
+    #           state + review_event); COLLAB_UNAVAILABLE if it cannot be reached; its refusals pass through unchanged
+    #   approve: approvals.approve(user, lesson_id, req)
+    #   withdraw / request_changes / reopen: one tx (reopen writes a new version with derived_from_version_id) → commit →
+    #           collab.set_mode(editable); the review_event id is the response's audit_id
+
+class ApproveService:  # apps/web/src/server/services/approve-service.ts (Metz C2): Approve only, risk::security
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, graph: LessonGraphRepo, issues: IssueRepo, loader: CheckContextLoader, rules: Sequence[CheckRule], policy: CheckPolicy, metrics_writer: MetricsWriter, tx: TxRunner, clock: Clock, settings: WebSettings) -> None: ...
+    async def approve(self, user: RequestUser, lesson_id: LessonId, req: TransitionRequest) -> TransitionResult: ...
+    # one tx with the lesson row locked: decide_transition re-checked on the locked row → versions.latest_snapshot (kind
+    # submit) and the pin (snapshot_hash AND snapshot_state_vector) else STALE_PIN → loader.load(snapshot.lesson,
+    # snapshot.content_hash) + run_checks(CHECK_RULES, policy) on the SNAPSHOT → merge_resolutions(findings,
+    # issues.resolutions_for(lesson_id)) → GateState{action approve, issues, pending_check False (the snapshot is frozen and
+    # was just checked synchronously), pending_suggestions from the loaded context, open_confirmations, last_editor_id,
+    # approver_id, four_eyes_enabled = FOUR_EYES_ENABLED, dependencies = graph.dependencies} → approve_gate (FOUR_EYES →
+    # SUGGESTION_PENDING → BLOCKED → CONFIRMATION_OPEN → DEPENDENCY_UNAPPROVED) → write_snapshot(kind approve,
+    # dependency_record) + set_state(approved) + append_review_event + MetricsWriter.write_first_approval → commit.
+    # No collaboration hop (already frozen). Refused → rollback, one log line, no row of any kind.
 
 class HeartbeatService:
     def __init__(self, metrics: MetricsRepo, clock: Clock, settings: WebSettings) -> None: ...
@@ -1506,12 +1711,12 @@ class HeartbeatService:
     # authors → ROLE_FORBIDDEN; beats closer than HEARTBEAT_MIN_SPACING_S are dropped; active = focused, visible, input within the idle window
 
 class PromptService:
-    def __init__(self, prompts: PromptRepo, audit: AuditLog, db: PgDatabase) -> None: ...
+    def __init__(self, prompts: PromptRepo, audit: AuditLog, tx: TxRunner) -> None: ...
     async def list(self, user: RequestUser) -> PromptVersions: ...
     async def save_guidance(self, user: RequestUser, req: SaveGuidanceRequest) -> GuidanceVersion: ...   # REASON_REQUIRED, STALE_BASE
 
 class ExportService:
-    def __init__(self, lessons: LessonRepo, exports: ExportRepo, audit: AuditLog, db: PgDatabase, ids: IdGenerator, clock: Clock) -> None: ...
+    def __init__(self, versions: LessonVersionRepo, exports: ExportRepo, audit: AuditLog, tx: TxRunner, ids: IdGenerator, clock: Clock) -> None: ...
     async def list(self, user: RequestUser, unit_id: UnitId) -> ExportList: ...
     async def create(self, user: RequestUser, unit_id: UnitId) -> ExportCreated: ...   # unchanged payload → the previous version, nothing written
     async def download(self, user: RequestUser, export_id: str) -> LessonExportFile: ...
@@ -1521,19 +1726,23 @@ class WebServices:
     outlines: OutlineService
     runs: RunService
     board: BoardService
+    coverage: CoverageService | None     # None while cut #4 is cut
     lesson_reads: LessonReadService
     issues: IssueService
     slots: SlotService
     candidates: CandidateService
-    suggestions: SuggestionService
+    suggestions: SuggestionService | None   # None while its cut item is cut (same for prompts, exports, coverage)
     transitions: TransitionService
+    approvals: ApproveService
     heartbeats: HeartbeatService
-    prompts: PromptService
-    exports: ExportService
+    prompts: PromptService | None
+    exports: ExportService | None
     logger: Logger
 
 # build_web_services (apps/web/src/server/container.ts)
 def build_web_services(settings: WebSettings) -> WebServices: ...
+# builds WebDeps once (§12), then calls every apps/web/src/server/wiring/<area>.ts function and merges the results;
+# A0 writes it in wave 0 with every wiring import, and it never changes after that (Metz B2)
 ```
 
 ## 6. Worker (`apps/worker`): typed state, nodes, pure router
@@ -1542,68 +1751,111 @@ The run and lesson loops follow DO-2 §5.1: code decides *what next* and *done*;
 
 ```python
 class LessonJobState:
-    job: ClaimedJob
-    context: RowContext | None
-    reservation_id: ReservationId | None
+    job: ClaimedJob                      # carries unit_id (G-23)
+    context: RowContext | None           # built with RunRepo.pinned_choices (G-24)
     draft_call: RecordedCall | None
+    call_ids: list[ModelCallId]          # every call of the job, in order (provenance model_call_ids)
     draft: LessonDraft | None
+    schema_issues: list[str]             # Zod issue paths of the last parse (empty when valid)
     compiled: CompiledLesson | None
+    compile_error: str | None            # CompileError message when compile_draft refused the draft
     check_result: CheckResult | None
     repair_rounds: int                   # brake: ≤ 1
     truncation_retries: int              # brake: ≤ 1, separate from repair
     rate_limit_retries: int              # counted from RecordedCall.retries
     brakes_fired: list[BrakeName]
     started_at: datetime                 # brake: JOB_WALL_CLOCK_MS from here
-    cost_usd: Usd
+    cost_usd: Usd                        # sum of the job's settled call costs
     outcome: JobOutcome | None
+# There is no reserve or settle node: every call goes through PaidCaller, which reserves that call's own worst case
+# right before it is sent and settles it on arrival (G-17, G-18). The lesson job's money protocol is therefore the same
+# as the unit plan's and AI assist's.
 
 NextStep = Literal["store", "repair", "fail"]
 
 class RouteInput:
-    check_passed: bool                   # no blocking finding
+    schema_valid: bool                   # the draft parsed as LessonDraft
+    compiled: bool                       # compile_draft succeeded (False on CompileError)
+    check_passed: bool                   # no blocking finding (meaningful only when compiled)
     repair_rounds: int
-    max_repair_rounds: int
-    schema_valid: bool
+    max_repair_rounds: int               # 1 (R-19)
 
 # route_after_checks (packages/core/src/pipeline/route-after-checks.ts)
 def route_after_checks(i: RouteInput) -> NextStep: ...
+# Decision table (G-22), first matching row wins:
+#   schema_valid and compiled and check_passed                 → store
+#   repair_rounds < max_repair_rounds (any failure: invalid schema, CompileError or a blocking finding) → repair
+#   otherwise                                                  → fail
+# The repair gets the draft and only what failed (schema issues, the compile error, the blocking findings).
 
-class ReserveNode:
-    def __init__(self, spend: SpendLedger, prices: PriceTable, settings: WorkerSettings) -> None: ...
-    async def run(self, state: LessonJobState) -> LessonJobState: ...   # refused → brake spend_* and run capped
+class FailureInput:
+    brakes_fired: list[BrakeName]
+    provider_error: ProviderErrorKind | None
+    schema_valid: bool
+    compile_error: str | None
+    first_failing_kind: CheckKind | None
+
+# failure_reasons_for (packages/core/src/pipeline/failure-reasons.ts)
+def failure_reasons_for(i: FailureInput) -> list[FailureReasonRecord]: ...
+# Pure map to OpenAPI FailureReason.check (G-20), in this order, one reason per row that applies:
+#   brake cancelled → cancelled · brake spend_run_cap / spend_day_cap / spend_project_cap → capped · brake job_wall_clock
+#   → timeout · brake truncation_retry exhausted (truncated twice) → truncated · provider_error rate_limited or
+#   overloaded after the retries (brake rate_limit_retries) → rate_limited · provider_error timeout → timeout · any other
+#   provider_error → provider_error · compile_error set → compile_error · schema_valid false → schema_invalid ·
+#   first_failing_kind set → check_failed with check_kind = that kind. circuit_breaker pauses the run; it adds no reason
+#   to the job that tripped it (that job already has its own).
+
+class FailureReasonRecord:
+    check: FailureCheck
+    check_kind: CheckKind | None
+    message: str
 
 class DraftNode:
-    def __init__(self, recorder: ModelCallRecorder, renderer: PromptRenderer, outlines: OutlineRepo, runs: RunRepo, standards: StandardRepo, prompts: PromptRepo, settings: WorkerSettings) -> None: ...
+    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, outlines: OutlineRepo, runs: RunRepo, standards: StandardRepo, prompts: PromptRepo, settings: WorkerSettings) -> None: ...
     async def run(self, state: LessonJobState) -> LessonJobState: ...
-    # checkpoint first (raw output already stored → no call); stop_reason max_tokens → one truncation retry at TRUNCATION_RETRY_TOKEN_CAP
+    # RunRepo.pinned_choices → OutlineRepo.row_context(ov, lesson_id, pinned) → render_lesson_draft (schema embedded,
+    # example_set_id None) → checkpoint(job, "lesson_draft", 1) first (stored raw output → no call) → PaidCaller.call
+    # (GENERATION, output_mode prompt_embedded, max_output_tokens DRAFT_OUTPUT_TOKEN_CAP 32000, effort MODEL_EFFORT) →
+    # stop_reason max_tokens → one truncation retry (purpose truncation_retry, TRUNCATION_RETRY_TOKEN_CAP 48000, its own
+    # reservation); truncated twice → brake truncation_retry, route to fail. SpendRefused → brake spend_<cap>, fail.
 
 class CompileCheckNode:
-    def __init__(self, check_loader: CheckContextLoader, policy: CheckPolicy) -> None: ...
-    async def run(self, state: LessonJobState) -> LessonJobState: ...   # Zod parse → compile_draft → run_checks
+    def __init__(self, loader: CheckContextLoader, rules: Sequence[CheckRule], policy: CheckPolicy) -> None: ...
+    async def run(self, state: LessonJobState) -> LessonJobState: ...
+    # Zod parse (issues → schema_issues) → compile_draft(draft, CompileContext{row, template, unit_id = job.unit_id,
+    # schema_version}) (CompileError → compile_error) → loader.load(lesson_id, compiled.lesson, compiled.content_hash) →
+    # run_checks(ctx, rules = CHECK_RULES, policy)
 
 class RepairNode:
-    def __init__(self, recorder: ModelCallRecorder, renderer: PromptRenderer, spend: SpendLedger, prompts: PromptRepo, prices: PriceTable, settings: WorkerSettings) -> None: ...
-    async def run(self, state: LessonJobState) -> LessonJobState: ...   # REPAIR alias, once
+    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, prompts: PromptRepo, settings: WorkerSettings) -> None: ...
+    async def run(self, state: LessonJobState) -> LessonJobState: ...
+    # REPAIR alias (MODEL_REPAIR_ID), once: checkpoint(job, "repair", 1) → render_repair(draft_raw, failing findings,
+    # schema_issues) → PaidCaller.call (prompt_embedded, DRAFT_OUTPUT_TOKEN_CAP) → repair_rounds + 1
 
 class StoreNode:
-    def __init__(self, lessons: LessonRepo, docs: LessonDocStore, flags: SafetyFlagRepo, db: PgDatabase) -> None: ...
+    def __init__(self, versions: LessonVersionRepo, states: LessonStateRepo, docs: LessonDocStore, flags: SafetyFlagRepo, tx: TxRunner) -> None: ...
     async def run(self, state: LessonJobState) -> LessonJobState: ...
-    # lesson job: write_generated_version(kind generated) ON CONFLICT DO NOTHING + seed_initial + safety flags + lesson.state=draft
-    # candidate job: write_generated_version(kind candidate, adopted=false); for a generation_failed lesson it becomes v1 (CON-16 [I])
-
-class SettleNode:
-    def __init__(self, spend: SpendLedger) -> None: ...
-    async def run(self, state: LessonJobState) -> LessonJobState: ...
+    # ONE tx (G-25). lesson job: write_generated_version(kind generated, ON CONFLICT (idempotency_key) DO NOTHING) →
+    # created False → the earlier run already stored v1: return its version, write nothing else; created True →
+    # docs.seed_initial(lesson_id, lesson, system actor, tx) + flags.create_for_lesson(…, tx) + set_state(draft, tx).
+    # candidate job: write_generated_version(kind candidate, adopted false); if the lesson is generation_failed and has no
+    # generated version, the candidate becomes v1 the same way as a lesson job (CON-16 [I]).
 
 class FailNode:
-    def __init__(self, lessons: LessonRepo, db: PgDatabase) -> None: ...
-    async def run(self, state: LessonJobState) -> LessonJobState: ...   # generation_failed with FailureReason per failing check
+    def __init__(self, states: LessonStateRepo, versions: LessonVersionRepo, tx: TxRunner) -> None: ...
+    async def run(self, state: LessonJobState) -> LessonJobState: ...
+    # outcome.failure_reasons = failure_reasons_for(...). lesson job → set_state(generation_failed). candidate job (G-26):
+    # if versions.has_generated_version(lesson_id) the lesson's state is NOT touched (an in_review lesson stays in_review;
+    # only the candidate job is failed and the tile shows the reasons); with no version yet it becomes generation_failed.
+    # A job refused before its first call (capped, cancelled) writes no lesson row at all (CON-6).
 
 class LessonJobRunner:
-    def __init__(self, reserve: ReserveNode, draft: DraftNode, compile_check: CompileCheckNode, repair: RepairNode, store: StoreNode, settle: SettleNode, fail: FailNode, queue: JobQueue, finalizer: RunFinalizer, clock: Clock, settings: WorkerSettings) -> None: ...
+    def __init__(self, draft: DraftNode, compile_check: CompileCheckNode, repair: RepairNode, store: StoreNode, fail: FailNode, queue: JobQueue, finalizer: RunFinalizer, clock: Clock, settings: WorkerSettings) -> None: ...
     async def run(self, job: ClaimedJob) -> JobOutcome: ...
-    # reserve → draft → compile_check → route_after_checks → (repair → compile_check → route) → store | fail → settle →
-    # queue.finish → finalizer.after_job. Checks queue.is_cancelled between nodes; wall clock checked before each node.
+    # draft → compile_check → route_after_checks → (repair → compile_check → route) → store | fail → queue.finish →
+    # finalizer.after_job(run_id, outcome). Checks queue.is_cancelled between nodes; wall clock checked before each node;
+    # a ProviderError that survived the recorder's retries or a SpendRefused goes straight to fail (no repair);
+    # LeaseLost stops the job and leaves it to requeue_expired.
 
 class UnitPlanOutcome:
     run_id: RunId
@@ -1613,10 +1865,11 @@ class UnitPlanOutcome:
     failure: FailureReason | None
 
 class UnitPlanJob:
-    def __init__(self, recorder: ModelCallRecorder, renderer: PromptRenderer, runs: RunRepo, outlines: OutlineRepo, prompts: PromptRepo, spend: SpendLedger, prices: PriceTable, settings: WorkerSettings) -> None: ...
+    def __init__(self, paid: PaidCaller, renderer: PromptRenderer, runs: RunRepo, outlines: OutlineRepo, prompts: PromptRepo, settings: WorkerSettings) -> None: ...
     async def run(self, job: ClaimedJob) -> UnitPlanOutcome: ...
-    # one call + at most one repair; valid → store entries, run.plan_stored_at, state running; still invalid →
-    # RunRepo.mark_plan_failed (run paused, paused_check = unit_plan; Resume re-queues it)
+    # one PaidCaller.call (output_mode schema_enforced: UnitPlanDraft compiles, SP-1) + at most one repair; valid → store
+    # entries, run.plan_stored_at, state running; still invalid → RunRepo.mark_plan_failed (run paused, paused_check =
+    # unit_plan; Resume re-queues it). SpendRefused → RunRepo.mark_capped.
 
 class RunStateChange:
     run_id: RunId
@@ -1630,14 +1883,18 @@ class CompletenessReport:
     summary_matches_calls: bool
 
 class RunFinalizer:
-    def __init__(self, runs: RunRepo, queue: JobQueue, calls: ModelCallLog, db: PgDatabase, settings: WorkerSettings) -> None: ...
-    async def after_job(self, run_id: RunId) -> RunStateChange | None: ...   # should_pause_run, derive_run_state
+    def __init__(self, runs: RunRepo, queue: JobQueue, calls: ModelCallLog, tx: TxRunner, settings: WorkerSettings) -> None: ...
+    async def after_job(self, run_id: RunId, outcome: JobOutcome) -> RunStateChange | None: ...
+    # one tx: a spend_* brake in the outcome → runs.mark_capped(run_id, cap) + queue.cancel_run(run_id, "capped") (G-10);
+    # else should_pause_run (CIRCUIT_BREAKER_SAME_CHECK) → set_state(paused, check); else derive_run_state
     async def completeness(self, run_id: RunId) -> CompletenessReport: ...  # DO-6 missing-instrumentation check 2
 
 class TickReport:
     claimed: int
     in_flight: int
     requeued_at_start: int
+    lost_calls_marked: int               # ModelCallLog.mark_lost over the requeued job ids
+    reservations_released: int           # SpendLedger.release_for_jobs over the same ids (G-9)
 
 class LoopExit:
     reason: Literal["sigterm", "fatal"]
@@ -1648,10 +1905,12 @@ class StopSignal(Protocol):
     def is_set(self) -> bool: ...
 
 class ClaimLoop:
-    def __init__(self, queue: JobQueue, runner: LessonJobRunner, unit_plans: UnitPlanJob, clock: Clock, logger: Logger, settings: WorkerSettings) -> None: ...
-    async def start(self) -> TickReport: ...                 # requeue_expired once, then claim
+    def __init__(self, queue: JobQueue, calls: ModelCallLog, spend: SpendLedger, runner: LessonJobRunner, unit_plans: UnitPlanJob, clock: Clock, logger: Logger, settings: WorkerSettings) -> None: ...
+    async def start(self) -> TickReport: ...
+    # requeue_expired once → for its job_ids: calls.mark_lost + spend.release_for_jobs → then claim
     async def run_until(self, stop: StopSignal) -> LoopExit: ...
-    # semaphore GENERATION_CONCURRENCY; lease renewal every 30 s per in-flight job; on SIGTERM stop claiming, let calls finish
+    # claim(settings.worker_id, MAX_ACTIVE_RUNS, JOB_LEASE_MS) (G-27); semaphore GENERATION_CONCURRENCY (6, SP-1); lease
+    # renewal every 30 s per in-flight job; on SIGTERM stop claiming, let calls finish
 
 class CheckContext:
     lesson_id: LessonId
@@ -1669,7 +1928,7 @@ class CheckContext:
     confirmations: list[AlignmentLinkRow]
 
 class CheckContextLoader:
-    def __init__(self, outlines: OutlineRepo, standards: StandardRepo, lessons: LessonRepo, docs: LessonDocStore, suggestions: SuggestionRepo, flags: SafetyFlagRepo, alignment: AlignmentRepo) -> None: ...
+    def __init__(self, outlines: OutlineRepo, standards: StandardRepo, graph: LessonGraphRepo, reader: LessonDocReader, suggestions: SuggestionRepo, flags: SafetyFlagRepo, alignment: AlignmentRepo, clock: Clock) -> None: ...
     async def load(self, lesson_id: LessonId, lesson: StoredLesson, content_hash: Sha256) -> CheckContext: ...
 
 class CheckRunReport:
@@ -1682,10 +1941,10 @@ class CheckRunReport:
     duration_ms: int
 
 class CheckJobRunner:
-    def __init__(self, checks: CheckQueue, docs: LessonDocStore, issues: IssueRepo, alignment: AlignmentRepo, lessons: LessonRepo, loader: CheckContextLoader, policy: CheckPolicy, db: PgDatabase, clock: Clock, settings: WorkerSettings) -> None: ...
+    def __init__(self, checks: CheckQueue, reader: LessonDocReader, issues: IssueRepo, alignment: AlignmentRepo, graph: LessonGraphRepo, loader: CheckContextLoader, rules: Sequence[CheckRule], policy: CheckPolicy, tx: TxRunner, clock: Clock, settings: WorkerSettings) -> None: ...
     async def run_once(self) -> CheckRunReport | None: ...
-    # claim → latest_derived (skip if a newer hash is queued) → run_checks → replace issues + alignment for the hash →
-    # finish → enqueue dependants whose cross_lesson_link result may change
+    # claim → latest_derived (skip if a newer hash is queued) → run_checks(CHECK_RULES) → replace issues + alignment for the
+    # hash → finish → enqueue dependants (graph.dependants) whose cross_lesson_link result may change
 
 class JudgeRunReport:
     lesson_id: LessonId
@@ -1694,8 +1953,9 @@ class JudgeRunReport:
     cost_usd: Usd
 
 class JudgeJob:
-    def __init__(self, judge: JudgeClient, calls: ModelCallLog, verdicts: JudgeRepo, issues: IssueRepo, renderer: PromptRenderer, spend: SpendLedger, db: PgDatabase) -> None: ...
+    def __init__(self, judge: JudgeClient, calls: ModelCallLog, verdicts: JudgeRepo, issues: IssueRepo, renderer: PromptRenderer, spend: SpendLedger, prices: PriceTable, tx: TxRunner) -> None: ...
     async def run(self, lesson_id: LessonId, content_hash: Sha256) -> JudgeRunReport: ...   # cut #2; advisory judge_no issues only
+    # reserve → JudgeClient.verdict → settle | release, the PaidCaller protocol around a different client
 
 class WorkerRuntime:
     claim_loop: ClaimLoop
@@ -1724,22 +1984,38 @@ class SocketAuthRequest:
     token_param: str | None
 
 class SocketContext:
+    socket_id: str
     user: AppUserRow
     lesson_id: LessonId
     lesson_state: LessonStateName
-    read_only: bool                      # WriteGuard's decision at connect
+    read_only: bool                      # WriteGuard.can_write's decision at connect
 
 class CollabAuthenticator:
-    def __init__(self, sessions: SessionRepo, lessons: LessonRepo, guard: WriteGuard, clock: Clock, settings: CollabSettings) -> None: ...
+    def __init__(self, sessions: SessionRepo, states: LessonStateRepo, guard: WriteGuard, frozen: FrozenDocs, clock: Clock, settings: CollabSettings) -> None: ...
     async def authenticate(self, req: SocketAuthRequest) -> SocketContext: ...   # raises DomainRefusal(UNAUTHENTICATED) → connection refused
+    # also seeds FrozenDocs from lesson.state on the first connection to a document (frozen states: submitted, approved,
+    # exported, and draft before start_review)
 
 class WriteDecision:
     allowed: bool
-    refusal: ApiErrorCode | None         # LESSON_LOCKED when the document is locked or frozen
+    refusal: ApiErrorCode | None         # LESSON_LOCKED when the document is frozen, the state is not editable, or the role is not reviewer
 
-class WriteGuard:
-    def can_write(self, role: RoleName, state: LessonStateName, locked: bool) -> WriteDecision: ...
-    # writes only from reviewer connections in in_review / changes_requested / reopened (CON-12); every other connection read-only
+class FrozenDocs:  # apps/collab/src/frozen-docs.ts: the per-document frozen flag, in memory, one collaboration process (PD-9)
+    def is_frozen(self, lesson_id: LessonId) -> bool: ...
+    def freeze(self, lesson_id: LessonId) -> None: ...        # lock_and_snapshot calls it BEFORE it stores (SP-2 option A)
+    def unfreeze(self, lesson_id: LessonId) -> None: ...      # a refused Submit, or set_mode(editable) after Withdraw / Request changes / Reopen
+    def seed(self, lesson_id: LessonId, state: LessonStateName) -> None: ...   # on load: frozen unless is_editable(state, "reviewer")
+
+class WriteGuard:  # apps/collab/src/permissions.ts
+    def __init__(self, frozen: FrozenDocs) -> None: ...
+    def can_write(self, role: RoleName, state: LessonStateName, lesson_id: LessonId) -> WriteDecision: ...
+    # at connect: allowed only if is_editable(state, role) (the lesson machine decides; WriteGuard keeps no state list,
+    # Metz C3) and not frozen.is_frozen(lesson_id); otherwise the connection is read-only
+    def on_update(self, ctx: SocketContext, frozen: bool) -> WriteDecision: ...
+    # per message, from Hocuspocus beforeHandleMessage (SP-2): frozen = FrozenDocs.is_frozen(ctx.lesson_id); a frozen
+    # document or a read-only connection → refuse BEFORE the update is applied; the caller then sends
+    # AckBroadcaster.refused(ctx.socket_id, LESSON_LOCKED, message, refused_from = the client's state vector before the
+    # refused update) and drops the update
 
 class LoadedDoc:
     lesson_id: LessonId
@@ -1748,7 +2024,7 @@ class LoadedDoc:
     schema_version: int
 
 class LessonPersistence:
-    def __init__(self, docs: LessonDocStore, acks: AckBroadcaster, logger: Logger, settings: CollabSettings) -> None: ...
+    def __init__(self, store: LessonDocStore, reader: LessonDocReader, frozen: FrozenDocs, acks: AckBroadcaster, logger: Logger, settings: CollabSettings) -> None: ...
     async def load(self, document_name: str) -> LoadedDoc: ...      # unknown schema_version → fail loudly with the lesson id
     async def store(self, document_name: str, ydoc_bytes: YDocBytes, last_editor: UserId | None, request_id: RequestId | None) -> StoreAck: ...
     # ydoc_to_lesson → content_hash → LessonDocStore.store (one tx) → AckBroadcaster.stored
@@ -1760,7 +2036,26 @@ class ModeMessage:
 class AckBroadcaster:
     def stored(self, lesson_id: LessonId, ack: StoreAck) -> int: ...      # stateless {type:"stored", content_hash, state_vector, stored_at}
     def mode(self, lesson_id: LessonId, msg: ModeMessage) -> int: ...
-    def refused(self, socket_id: str, code: ApiErrorCode, message: str) -> None: ...
+    def refused(self, socket_id: str, code: ApiErrorCode, message: str, refused_from: StateVector) -> None: ...
+    # stateless {type:"refused", code, message, refused_from} exactly as CON-12 / x-collaboration-channel; the editor's
+    # refusals.ts undoes local updates after refused_from, turns read-only and tells the typist
+
+class RefusedMessage:
+    code: ApiErrorCode
+    message: str
+    refused_from: StateVector
+
+class RefusalOutcome:
+    dropped_updates: int
+    refused_text: list[str]              # the text runs that were undone, shown to the typist
+    read_only: bool                      # always True after a refusal
+
+class EditorHandle(Protocol): ...  # marker: the ProseMirror view, Y.Doc and HocuspocusProvider of one open lesson (browser)
+
+# apply_refusal (apps/web/src/editor/refusals.ts; owner A14)
+def apply_refusal(editor: EditorHandle, msg: RefusedMessage) -> RefusalOutcome: ...
+# SP-2's design rule: undoes the local updates made after refused_from (a Yjs UndoManager scoped to the local origin),
+# switches the editor to read-only and tells the typist which text was refused; nothing is resent on reconnect
 
 class CollabRuntime:
     port: int
@@ -1987,14 +2282,21 @@ class CompiledLesson:
 
 # compile_draft (packages/core/src/compile/compile-draft.ts)
 def compile_draft(draft: LessonDraft, ctx: CompileContext) -> CompiledLesson: ...
+# raises CompileError (§10.2) when a schema-valid draft cannot be placed: a block in a section the template lacks, a
+# role the allow-list forbids in that section, or a node assert_known_nodes rejects; CompileCheckNode turns it into
+# compile_error (G-21). content_hash is computed by content_hash() from packages/schema (below), the same function
+# packages/ydoc uses, so the compiled hash and the stored hash are identical by construction (G-29).
 # assign_addresses (packages/core/src/compile/addresses.ts)
 def assign_addresses(lesson: StoredLesson, unit_id: UnitId) -> StoredLesson: ...
 
 # --- checks (packages/core/src/checks/) ---
 class CheckPolicy:
-    quote_span_min_words: int            # 3 [A] → SP-3
+    quote_span_min_words: int            # 3 [M] (SP-3: every quote plant caught, 0 false flags on SP-1's real drafts)
     reviewer_quote_max_words: int        # 12
-    name_scan_scope: Literal["blocking_everywhere", "blocking_in_checks_only"]   # [A] → SP-3
+    quote_and_page_scans: Literal["blocking_everywhere"]   # SP-3: blocking in every block role
+    name_scan_scope: Literal["blocking_in_cfu_items", "blocking_everywhere"]   # "blocking_in_cfu_items" (SP-3, option B):
+                                         # a flag inside a cfu_item block is blocking; anywhere else it is advisory
+    name_scan_engine: Literal["heuristic_plus_compromise"]  # capitalised-token heuristic + the `compromise` npm library
     minutes_target: int                  # 50
     minutes_tolerance: int               # 5
     vocabulary_cap: int
@@ -2025,46 +2327,88 @@ class CheckRule(Protocol):
 
 class GateState:
     action: Literal["submit", "approve"]
-    issues: list[IssueRow]
-    pending_check: bool
+    issues: list[GateIssue]              # from merge_resolutions over the synchronous re-run (stored row or snapshot)
+    pending_check: bool                  # always False at Submit and Approve: both re-run the checks synchronously on
+                                         # the exact content they freeze or pin, so nothing is pending (G-14)
     pending_suggestions: int
     open_confirmations: int
     last_editor_id: UserId | None
     approver_id: UserId | None
     four_eyes_enabled: bool
-    rating: DraftRating | None
     dependencies: list[DependencyState]
+# RATING_REQUIRED is decided earlier, by decide_transition (missing-input codes come before the card's own conditions in
+# CON-18's precedence), so GateState carries no rating (G-11)
+
+CHECK_POLICY = CheckPolicy             # packages/core/src/checks/policy.ts: the SP-3 values above, plus minutes 50 ± 5
+CHECK_RULES = CheckRuleList             # packages/core/src/checks/registry.ts (G-13): one entry per CheckKind, in CheckKind
+                                         # order; the first A6a ticket writes all 28 rule files as stubs returning [] (Metz C1),
+                                         # later tickets fill bodies only; judge_no's rule reads stored verdicts (cut #2)
+
+class CheckRuleList:
+    rules: list[CheckRule]
+
+class GateIssue:
+    kind: CheckKind
+    level: IssueLevelName
+    message: str
+    address: str | None
+    code: str | None
+    related_lesson_id: LessonId | None
+    resolved: bool                       # a recorded resolution with the same (kind, address, code) exists
+
+# merge_resolutions (packages/core/src/checks/gates.ts)
+def merge_resolutions(findings: Sequence[CheckFinding], recorded: Sequence[IssueRow]) -> list[GateIssue]: ...
+# pure (G-14): each re-run finding becomes a GateIssue, resolved when IssueRepo.resolutions_for holds a resolution with
+# the same (kind, address, code) and the kind is resolvable; resolutions never carry to a finding of a different key, so
+# Submit and Approve block on exactly what the issue list would show unresolved
 
 # run_checks (packages/core/src/checks/registry.ts)
 def run_checks(ctx: CheckContext, rules: Sequence[CheckRule], policy: CheckPolicy) -> CheckResult: ...
 # submit_gate (packages/core/src/checks/gates.ts)
-def submit_gate(state: GateState) -> GateDecision: ...
+def submit_gate(state: GateState) -> GateDecision: ...   # SUGGESTION_PENDING → BLOCKED (lists blocking and confirmation) → CONFIRMATION_OPEN
 # approve_gate (packages/core/src/checks/gates.ts)
-def approve_gate(state: GateState) -> GateDecision: ...
+def approve_gate(state: GateState) -> GateDecision: ...  # FOUR_EYES → SUGGESTION_PENDING → BLOCKED → CONFIRMATION_OPEN → DEPENDENCY_UNAPPROVED
 
 # --- spend (packages/core/src/spend/reservation.ts) ---
+# Money is Decimal; every result is rounded to 6 dp (numeric(12,6)) as stated per function (G-6).
 # max_call_cost (packages/core/src/spend/reservation.ts)
 def max_call_cost(price: ModelPrice, input_tokens_estimate: int, output_cap: int) -> Usd: ...
+# = (input_tokens_estimate × max(input_per_mtok, cache_write_per_mtok) + output_cap × output_per_mtok) / 1,000,000,
+# rounded UP (ceiling) to 6 dp: the worst case, so a reservation never under-reserves for a priced token.
+# Example: 5,700 input, cap 32,000 at $2/$10 (cache write $2.50) → 0.014250 + 0.320000 = $0.334250
 # decide_reservation (packages/core/src/spend/reservation.ts)
 def decide_reservation(snapshot: SpendSnapshot, amount_usd: Usd) -> ReservationDecision: ...
+# caps are inclusive (CON-6: spent + reserved ≤ cap); checked in the order run_cap (skipped when run_cap_usd is None) →
+# day_cap → project_cap; refused_by is the first that fails, scope and remaining_usd describe it; reservation_id is None
+# (the ledger assigns it after an allowed decision)
 # settle_cost (packages/core/src/spend/reservation.ts)
 def settle_cost(price: ModelPrice, usage: TokenUsage) -> Usd: ...
+# = (input_tokens × input + output_tokens × output + cache_read_tokens × cache_read + cache_write_tokens × cache_write)
+#   / 1,000,000, rounded half-up to 6 dp
 # run_cap_for (packages/core/src/spend/reservation.ts)
-def run_cap_for(cost_per_lesson: Usd, lessons: int, multiplier: Decimal) -> Usd: ...
+def run_cap_for(cost_per_lesson: Usd, lessons: int, multiplier: Decimal, unit_plan_cost: Usd) -> Usd: ...
+# PD-14 as SP-1 fixed it: cost_per_lesson × lessons × multiplier + unit_plan_cost, rounded UP to the next whole dollar.
+# Example: 0.182 × 47 × 1.5 + 0.16 = 12.991 → $13.00 (RUN_CAP_DEFAULT_USD)
+# user_day_cap_for (packages/core/src/spend/reservation.ts)
+def user_day_cap_for(run_cap_default: Usd, multiplier: Decimal) -> Usd: ...
+# G-2: USER_DAY_CAP_MULTIPLIER × RUN_CAP_DEFAULT_USD = 2 × 13.00 = $26.00 per user per UTC day [C]
 
 # --- lifecycle (packages/core/src/lifecycle/) ---
+TransitionAction = Literal["start_review", "submit", "withdraw", "approve", "request_changes", "reopen"]
+
 class TransitionInput:
-    action: Literal["start_review", "submit", "withdraw", "approve", "request_changes", "reopen"]
+    action: TransitionAction
     role: RoleName
     from_state: LessonStateName
     note: str | None
     reason: str | None
     tag: str | None
+    rating: DraftRating | None           # approve: None → RATING_REQUIRED (G-11)
 
 class TransitionDecision:
     allowed: bool
     to_state: LessonStateName | None
-    refusal: ApiErrorCode | None         # ROLE_FORBIDDEN, INVALID_TRANSITION, NOTE_REQUIRED, REASON_REQUIRED
+    refusal: ApiErrorCode | None         # ROLE_FORBIDDEN, INVALID_TRANSITION, NOTE_REQUIRED, REASON_REQUIRED, RATING_REQUIRED
     writes_snapshot: Literal["submit", "approve", "reopen"] | None
     collab_mode_after: CollabMode | None
 
@@ -2100,7 +2444,11 @@ class PauseDecision:
     lesson_ids: list[LessonId]
 
 # decide_transition (packages/core/src/lifecycle/lesson-machine.ts)
-def decide_transition(i: TransitionInput) -> TransitionDecision: ...
+def decide_transition(i: TransitionInput) -> TransitionDecision: ...   # role → state → missing input, CON-18's order
+# transition_roles (packages/core/src/lifecycle/lesson-machine.ts)
+def transition_roles(action: TransitionAction) -> list[RoleName]: ...  # checked before the lesson is loaded (ROLE_FORBIDDEN precedes NOT_FOUND)
+# is_editable (packages/core/src/lifecycle/lesson-machine.ts)
+def is_editable(state: LessonStateName, role: RoleName) -> bool: ...  # reviewer in in_review / changes_requested / reopened (CON-12); WriteGuard and apply_edit ask it
 # derive_run_state (packages/core/src/lifecycle/run-machine.ts)
 def derive_run_state(jobs: Sequence[JobStatusView], run: RunStateInput) -> RunStateName: ...
 # tile_state (packages/core/src/lifecycle/run-machine.ts)
@@ -2127,8 +2475,10 @@ def compute_lesson_metrics(sessions: Sequence[ReviewSessionRow], version: Lesson
 def lesson_to_ydoc(lesson: StoredLesson) -> YDocBytes: ...
 # ydoc_to_lesson (packages/ydoc/src/convert.ts)
 def ydoc_to_lesson(data: YDocBytes, schema_version: int) -> StoredLesson: ...
-# content_hash (packages/ydoc/src/hash.ts)
-def content_hash(lesson: StoredLesson) -> Sha256: ...   # SHA-256 of canonical JSON (sorted keys, no whitespace)
+# content_hash (packages/schema/src/content-hash.ts)
+def content_hash(lesson: StoredLesson) -> Sha256: ...   # SHA-256 (@noble/hashes, pure JS) of canonical JSON (sorted keys, no whitespace)
+# G-29: it lives in packages/schema (A2, wave 0) because both packages/core (compile_draft, which may not import
+# packages/ydoc) and packages/ydoc need it; packages/ydoc/src/hash.ts re-exports it and adds only the Yjs functions
 # state_vector_of (packages/ydoc/src/hash.ts)
 def state_vector_of(data: YDocBytes) -> StateVector: ...
 # covers (packages/ydoc/src/hash.ts)
@@ -2138,49 +2488,69 @@ def covers(stored: StateVector, client: StateVector) -> bool: ...
 ## 9. Settings, database, logging and scripts
 
 ```python
-class SharedSettings:
+class SharedSettings:  # every process, including collab
     database_url: SecretStr
     pg_pool_max: int
     build_id: str
     log_level: Literal["debug", "info", "warn", "error"]
+
+class ModelSettings:  # web and worker only (Metz S4): collab never calls a model and never needs the key
     model_provider_mode: Literal["real", "stub"]
-    anthropic_api_key: SecretStr | None
-    model_generation_id: str
-    model_repair_id: str
-    model_call_timeout_ms: int
+    anthropic_api_key: SecretStr | None  # required when model_provider_mode = real
+    model_generation_id: str             # "claude-sonnet-5-5" (SP-1)
+    model_repair_id: str                 # "claude-sonnet-5-5" (SP-1 repaired on the same model)
+    model_assist_id: str                 # "claude-sonnet-5-5" [A]
+    model_effort: Literal["low", "medium", "high"]   # "low" (SP-1)
+    model_call_timeout_ms: int           # 240000 (SP-1)
     provider_max_retries: int
-    build_spend_ceiling_usd: Decimal
-    user_day_cap_multiplier: Decimal
-    cost_per_lesson_estimate_usd: Decimal
-    run_cap_multiplier: Decimal
+
+class SpendSettings:  # web and worker only; PgSpendLedger's constructor takes it (G-1)
+    build_spend_ceiling_usd: Decimal     # 75 (PD-29): the project ceiling
+    run_cap_default_usd: Decimal         # 13.00 (SP-1, PD-14)
+    user_day_cap_multiplier: Decimal     # 2 → user day cap $26.00 (G-2)
+    cost_per_lesson_estimate_usd: Decimal   # 0.182 (SP-1 mean, repairs included)
+    unit_plan_cost_estimate_usd: Decimal # 0.16 (SP-1)
+    run_cap_multiplier: Decimal          # 1.5 (PD-14)
 
 class WebSettings:
     shared: SharedSettings
+    model: ModelSettings
+    spend: SpendSettings
     pg_acquire_timeout_ms: int
+    busy_retry_after_s: int
+    app_origin: str
     session_cookie_name: str
     session_ttl_hours: int
     audit_hash_salt: SecretStr
     four_eyes_enabled: bool
     outline_max_rows: int
+    outline_max_bytes: int
     sheets_fetch_timeout_ms: int
+    idempotency_window_h: int
+    undo_window_s: int
     assist_call_timeout_ms: int
+    suggestion_ttl_min: int
     collab_internal_url: str
     collab_internal_token: SecretStr
     heartbeat_merge_gap_s: int
+    heartbeat_min_spacing_s: int
     unchecked_after_s: int
 
 class WorkerSettings:
     shared: SharedSettings
+    model: ModelSettings
+    spend: SpendSettings
+    worker_id: str                       # WORKER_ID, default "<hostname>-<pid>" filled at start (G-27)
     openrouter_api_key: SecretStr | None
     model_judge_id: str | None
-    generation_concurrency: int
+    generation_concurrency: int          # 6 (SP-1)
     max_active_runs: int
     job_wall_clock_ms: int
     job_lease_ms: int
     job_poll_ms: int
     check_poll_ms: int
-    draft_output_token_cap: int
-    truncation_retry_token_cap: int
+    draft_output_token_cap: int          # 32000 (SP-1)
+    truncation_retry_token_cap: int      # 48000 (SP-1)
     circuit_breaker_same_check: int
     health_port: int
 
@@ -2192,7 +2562,7 @@ class CollabSettings:
     store_debounce_ms: int
     store_max_debounce_ms: int
 
-class PgDatabase:
+class PgDatabase(TxRunner):  # implements TxRunner; packages/db/src/pool.ts + tx.ts; named only in composition roots, repositories, health and scripts
     def __init__(self, settings: SharedSettings, pool_max: int, acquire_timeout_ms: int) -> None: ...
     async def with_tx(self, fn: TxFunction, advisory_lock: str | None) -> TxResult: ...
     async def ping(self) -> bool: ...
@@ -2375,7 +2745,7 @@ class ApiErrorCode(StrEnum):
 | `UNAUTHENTICATED` | `SessionService.require`, `with_route` (foreign `Origin` on a mutation), `CollabAuthenticator.authenticate` |
 | `INVALID_CREDENTIALS` | `SessionService.sign_in` (`verify_password` false) |
 | `NOT_ON_ALLOW_LIST` | `SessionService.sign_in` |
-| `ROLE_FORBIDDEN` | `with_route` (`RouteSpec.roles`), `decide_transition`, `HeartbeatService.record` (authors) |
+| `ROLE_FORBIDDEN` | `with_route` (`RouteSpec.roles`), `transition_roles` / `decide_transition` (via `TransitionService`), `HeartbeatService.record` (authors) |
 | `INVALID_CHOICE` | `OutlineService.record_choice` |
 | `NOT_RESOLVABLE` | `IssueService.record_resolution` |
 | `UNDO_EXPIRED` | `IssueService.decide_standard` (undo) |
@@ -2389,23 +2759,26 @@ class ApiErrorCode(StrEnum):
 | `UNSUPPORTED_FILE` | `parse_workbook`; `OutlineService.upload` (over `OUTLINE_MAX_BYTES`, `details.reason = too_large`) |
 | `HEADER_NOT_FOUND`, `TOO_MANY_ROWS` | `normalize_outline` |
 | `VALIDATION_INCOMPLETE` | `generate_gate` (via `RunService.start`) |
-| `DAY_CAP_REACHED` | `SpendLedger.check_day_cap` (via `RunService.start`, `CandidateService.regenerate`) |
+| `DAY_CAP_REACHED` | `RunService.start`, `CandidateService.regenerate`, from a refused `SpendLedger.check_day_cap`: `details.scope` = the decision's `DayCapScope` (`user` for `day_cap`, `project` for `project_cap`), `details.remaining_usd` |
 | `SCHEMA_UNKNOWN` | `assert_known_nodes` (via `LessonReadService.get_lesson`) |
-| `LESSON_LOCKED` | `WriteGuard.can_write`, `CollabCommandHandler.apply_edit`, `CandidateService`, `SuggestionService` |
-| `REASON_REQUIRED` | `IssueService.record_resolution`, `decide_transition` (reopen), `PromptService.save_guidance` |
+| `LESSON_LOCKED` | `WriteGuard.can_write` (connect), `WriteGuard.on_update` (per message, sent as `refused` with `refused_from`), `CollabCommandHandler.apply_edit` / `lock_and_snapshot`, `CandidateService`, `SuggestionService` |
+| `REASON_REQUIRED` | `IssueService.record_resolution`, `decide_transition` (reopen; reachable because the route parses `TransitionRequestInput`), `PromptService.save_guidance` |
 | `NOTE_REQUIRED` | `IssueService.clear_safety_flag`, `decide_transition` (request changes) |
 | `SOURCE_REQUIRED`, `QUOTE_TOO_LONG` | `SlotService.fill` |
 | `ANCHOR_CHANGED` | `CollabCommandHandler.apply_edit` (`SuggestionAcceptEdit`) |
 | `MODEL_UNAVAILABLE` | `SuggestionService.request` (on `ProviderError`) |
-| `BLOCKED`, `CONFIRMATION_OPEN`, `SUGGESTION_PENDING` | `submit_gate` (inside `CollabCommandHandler.lock_and_snapshot`), `approve_gate` (inside `TransitionService`) |
+| `BLOCKED`, `CONFIRMATION_OPEN`, `SUGGESTION_PENDING` | `submit_gate` (inside `CollabCommandHandler.lock_and_snapshot`, passed through unchanged by `HttpCollabCommandClient`), `approve_gate` (inside `ApproveService`) |
 | `NOT_STORED` | `CollabCommandHandler.lock_and_snapshot` |
-| `STALE_PIN`, `FOUR_EYES`, `RATING_REQUIRED`, `DEPENDENCY_UNAPPROVED` | `TransitionService.transition` (approve), `approve_gate` |
+| `RATING_REQUIRED` | `decide_transition` only (missing input, before `STALE_PIN` in CON-18's order; reachable because `TransitionRequestInput` lets a missing rating through the parse, G-11) |
+| `STALE_PIN` | `ApproveService.approve` (pin compare on the locked row) |
+| `FOUR_EYES`, `DEPENDENCY_UNAPPROVED` | `approve_gate` (inside `ApproveService`) |
 
 ### 10.2 Internal error types
 
 ```python
 ProviderErrorKind = Literal["rate_limited", "overloaded", "server_error", "timeout", "connection", "bad_request", "auth", "refusal"]
-GenerationFailureCheck = Literal["schema_invalid", "truncated", "rate_limited", "timeout", "provider_unavailable", "checks_failed", "spend_capped", "cancelled"]
+# A failed job's reasons use FailureCheck (§2), the OpenAPI FailureReason.check enum exactly; failure_reasons_for (§6)
+# is the one map from brakes, provider errors, compile errors and findings to it (G-20).
 
 class DomainRefusal(Exception):
     code: ApiErrorCode
@@ -2430,7 +2803,8 @@ class ModelOutputInvalid(Exception):
     issues: list[str]                    # Zod issue paths, never the raw text
 
 class SpendRefused(Exception):
-    refused_by: Literal["run_cap", "day_cap", "build_cap"]
+    refused_by: CapName
+    scope: DayCapScope | None
     amount_usd: Usd
 
 class LeaseLost(Exception):
@@ -2448,14 +2822,20 @@ class ConfigError(Exception):
     variable: str                        # the name, never the value
     problem: str
 
+class CompileError(Exception):  # packages/core/src/compile/compile-draft.ts (G-21)
+    lesson_id: LessonId
+    reason: Literal["section_not_in_template", "role_not_allowed", "unknown_node"]
+    address: str | None
+
 class InvariantViolation(Exception):
     invariant: str                       # e.g. "lesson_doc written outside LessonDocStore", "summary != sum(model_call)"
     details: JsonValue
 ```
 
-How internal errors surface: `ProviderError` and `ModelOutputInvalid` become a job's `FailureReason` (check =
-a `GenerationFailureCheck`) or `MODEL_UNAVAILABLE` for AI assist; `SpendRefused` becomes run `capped` (with `capped_by`)
-in the worker and `DAY_CAP_REACHED` at the API; `SchemaUnknownError` becomes `SCHEMA_UNKNOWN`; `CollabUnavailable`
+How internal errors surface: `ProviderError`, `ModelOutputInvalid` and `CompileError` become a job's `FailureReason`
+through `failure_reasons_for` or `MODEL_UNAVAILABLE` for AI assist; `SpendRefused` becomes run `capped` (with
+`capped_by`, written by `RunFinalizer` through `RunRepo.mark_capped`) in the worker, `DAY_CAP_REACHED` at `startRun` and
+`regenerateLesson`, and `MODEL_UNAVAILABLE` with `details.reason = "spend_cap"` for AI assist (CON-17 names no cap code); `SchemaUnknownError` becomes `SCHEMA_UNKNOWN`; `CollabUnavailable`
 becomes `COLLAB_UNAVAILABLE` with nothing changed (the web app never falls back to writing content itself, A-1);
 `PoolExhausted` becomes `SERVICE_BUSY` with `Retry-After`; `LeaseLost` stops the node and leaves the job to
 `requeue_expired`; `InvariantViolation` fails the test or the completeness query that found it.
@@ -2475,20 +2855,20 @@ and written through the repo method shown.
 | `run` table | `RunRepo.insert_run`, `RunRepo.set_state` | WF-4, 6, 17, 21, 25 |
 | `lesson_job` table | `JobQueue.create_run_jobs`, `JobQueue.finish` | WF-4, 5, 6, 13, 20, 22, 28 |
 | `unit_plan` table | `RunRepo.store_unit_plan` | WF-5, 21 |
-| `lesson` table | `LessonRepo.ensure_lessons`, `LessonRepo.set_state` | WF-7 |
+| `lesson` table | `LessonStateRepo.ensure_lessons`, `LessonStateRepo.set_state` | WF-7 |
 | `issue` table | `IssueRepo.replace_for_hash`, `IssueRepo.resolve` | WF-7, 10, 11, 22, 23 |
 | `lesson_metrics` table | `MetricsRepo.write_lesson_metrics` | WF-7, 15 |
-| `lesson_version` table | `LessonRepo.write_generated_version`, `LessonRepo.write_snapshot` | WF-8, 13, 15, 18, 22 |
+| `lesson_version` table | `LessonVersionRepo.write_generated_version`, `LessonVersionRepo.write_snapshot` | WF-8, 13, 15, 18, 22 |
 | `lesson_doc` table | `LessonDocStore.store`, `LessonDocStore.seed_initial` | WF-9, 12 |
 | `check_job` table | `CheckQueue.enqueue` (inside the store transaction) | WF-9, 10 |
 | `alignment_link` table | `AlignmentRepo.replace_for_hash`, `AlignmentRepo.confirm` | WF-10, 11, 18 |
 | `suggestion` table | `SuggestionRepo.insert`, `SuggestionRepo.decide` | WF-14 |
 | `model_call` table | `ModelCallLog.insert_sent`, `complete`, `fail`, `mark_lost` | WF-13, 14, 17, 20, 21, 22, 23, 25, 28, 32 |
-| `review_event` table | `LessonRepo.append_review_event` | WF-15 |
+| `review_event` table | `LessonStateRepo.append_review_event` | WF-15 |
 | `heartbeat` table, `review_session` table | `MetricsRepo.insert_heartbeat`, `MetricsRepo.extend_session` | WF-16 |
 | `export_bundle` table | `ExportRepo.insert` | WF-19 |
 | `prompt_version` table | `PromptRepo.insert_guidance` (locked versions by migration) | WF-20 |
-| `spend_reservation` table | `SpendLedger.reserve`, `settle`, `release` | WF-22, 28 |
+| `spend_reservation` table | `SpendLedger.reserve`, `settle`, `release`, `release_for_jobs` | WF-22, 28 |
 | `judge_verdict` table | `JudgeRepo.insert_verdict` | WF-23 |
 | `eval_run` table, `eval_case_result` table | `EvidenceRepo.start_eval_run`, `add_case_result`, `finish_eval_run` | WF-24, 25, 26, 27, 28, 31 |
 | `probe_run` table (p95s, error rate, connection counts as `max_db_connections`, event-loop lag, lost updates, *n*, machine) | `EvidenceRepo.insert_probe_run` | WF-29, 30 |
@@ -2500,9 +2880,17 @@ and written through the repo method shown.
 ## 12. Constructors
 
 Summarised in DO-3 §8; the exact parameter lists are the `__init__` signatures above. Rules: every service and adapter
-receives its ports through its constructor; only `build_web_services`, `build_worker_runtime`, `build_collab_runtime`
-and the scripts' `main` functions name concrete classes; `MODEL_PROVIDER_MODE` picks `AnthropicMessagesAdapter` or
-`StubModelClient` in exactly those places; tests construct services with fakes.
+receives its ports through its constructor; only the composition roots (`build_web_services`, `build_worker_runtime`,
+`build_collab_runtime`), the **per-area wiring files** below and the scripts' `main` functions name concrete classes;
+`MODEL_PROVIDER_MODE` picks `AnthropicMessagesAdapter` or `StubModelClient` in the composition roots only (it arrives
+in the wiring files as `deps.model_client`); tests construct services with fakes (`FakeTxRunner`, `FakeJobQueue`,
+`FakeSpendLedger`, `FakeCollabCommands`, `StubModelClient`, `FakeClock`).
+
+**Per-area wiring (Metz B2).** A0 creates every wiring file below as a stub in wave 0 (returning its record with the
+area's services unset) and the composition root that imports them all; after wave 0 each wiring file belongs to the
+area named beside it, and the composition root never changes again. A wiring file builds the concrete repositories and
+adapters it needs from `deps` (repositories are stateless over the one `PgDatabase`, so two wiring files constructing
+`PgLessonRepo` share nothing but the pool).
 
 ```python
 class AnthropicMessagesAdapter_ctor:  # constructor record for the adapter (packages/llm/src/anthropic.ts)
@@ -2524,10 +2912,102 @@ class OpenRouterJudgeAdapter_ctor:  # packages/llm/src/openrouter-judge.ts (cut 
     model_id: str                        # MODEL_JUDGE_ID
     timeout_ms: int
 
-class PgRepo_ctor:  # every Pg* repository and PgLessonDocStore / PgJobQueue / PgSpendLedger / PgModelCallLog
+class PgRepo_ctor:  # every Pg* repository, PgLessonDocReader, PgJobQueue, PgModelCallLog (PgSpendLedger and PgLessonDocStore have their own records in §3.4)
     db: PgDatabase
     ids: IdGenerator
     clock: Clock
+
+class WebDeps:  # built once by apps/web/src/server/container.ts (A0)
+    settings: WebSettings
+    logger: Logger
+    db: PgDatabase
+    ids: IdGenerator
+    clock: Clock
+    model_client: ModelClient            # AnthropicMessagesAdapter or StubModelClient, chosen here only
+
+class SessionWiring:
+    sessions: SessionService
+class OutlineWiring:
+    outlines: OutlineService
+class RunWiring:
+    runs: RunService
+class ReviewWiring:
+    lesson_reads: LessonReadService
+    issues: IssueService
+    slots: SlotService
+    candidates: CandidateService
+    transitions: TransitionService
+    approvals: ApproveService
+class MetricsWiring:
+    board: BoardService
+    heartbeats: HeartbeatService
+class AssistWiring:
+    suggestions: SuggestionService | None
+class PromptWiring:
+    prompts: PromptService | None
+class ExportWiring:
+    exports: ExportService | None
+class CoverageWiring:
+    coverage: CoverageService | None
+
+# wire_sessions (apps/web/src/server/wiring/sessions.ts; owner A3)
+def wire_sessions(d: WebDeps) -> SessionWiring: ...
+# wire_outlines (apps/web/src/server/wiring/outlines.ts; owner A4)
+def wire_outlines(d: WebDeps) -> OutlineWiring: ...
+# wire_runs (apps/web/src/server/wiring/runs.ts; owner A10)
+def wire_runs(d: WebDeps) -> RunWiring: ...
+# wire_review (apps/web/src/server/wiring/review.ts; owner A12)
+def wire_review(d: WebDeps) -> ReviewWiring: ...
+# wire_metrics (apps/web/src/server/wiring/metrics.ts; owner A13)
+def wire_metrics(d: WebDeps) -> MetricsWiring: ...
+# wire_assist (apps/web/src/server/wiring/assist.ts; owner A15)
+def wire_assist(d: WebDeps) -> AssistWiring: ...
+# wire_prompts (apps/web/src/server/wiring/prompts.ts; owner A16)
+def wire_prompts(d: WebDeps) -> PromptWiring: ...
+# wire_exports (apps/web/src/server/wiring/exports.ts; owner A17)
+def wire_exports(d: WebDeps) -> ExportWiring: ...
+# wire_coverage (apps/web/src/server/wiring/coverage.ts; owner A18)
+def wire_coverage(d: WebDeps) -> CoverageWiring: ...
+
+class WorkerDeps:  # built once by apps/worker/src/main.ts (A0)
+    settings: WorkerSettings
+    logger: Logger
+    db: PgDatabase
+    ids: IdGenerator
+    clock: Clock
+    model_client: ModelClient
+
+class GenerationWiring:
+    claim_loop: ClaimLoop
+class CheckWiring:
+    check_runner: CheckJobRunner
+class JudgeWiring:
+    judge: JudgeJob | None
+
+# wire_generation (apps/worker/src/wiring/generation.ts; owner A9)
+def wire_generation(d: WorkerDeps) -> GenerationWiring: ...
+# wire_checks (apps/worker/src/wiring/checks.ts; owner A6)
+def wire_checks(d: WorkerDeps) -> CheckWiring: ...
+# wire_judge (apps/worker/src/wiring/judge.ts; owner A19)
+def wire_judge(d: WorkerDeps) -> JudgeWiring: ...
+
+class CollabDeps:  # built once by apps/collab/src/main.ts (A0)
+    settings: CollabSettings
+    logger: Logger
+    db: PgDatabase
+    ids: IdGenerator
+    clock: Clock
+
+class CollabWiring:
+    frozen: FrozenDocs
+    guard: WriteGuard
+    authenticator: CollabAuthenticator
+    persistence: LessonPersistence
+    acks: AckBroadcaster
+    commands: CollabCommandHandler
+
+# wire_collab (apps/collab/src/wiring/collab.ts; owner A11)
+def wire_collab(d: CollabDeps, hocuspocus: HocuspocusServerRef) -> CollabWiring: ...
 ```
 
 ## 13. Open items
@@ -2536,10 +3016,15 @@ class PgRepo_ctor:  # every Pg* repository and PgLessonDocStore / PgJobQueue / P
    `load_test_run`). DO-3 §6.1 maps each to its canonical table; the DO-7 owner updates the column.
 2. **Foreign `Origin` on a mutation** (CON-1 System support) has no named code on the card. This design returns
    `UNAUTHENTICATED`; if the UX side wants a distinct screen response, that is a `CHG-N`.
-3. **DO-6 capture-verification text vs INTERFACE shared guarantee 2.** The agreed cards say a refused call writes no
-   audit row (application log only). DO-6's WF-1 *Required records* cell is updated to match; the *Capture
-   verification* cells of WF-1 and WF-2 still mention refusal audit events and should be reworded by the DO-6 owner
-   (this run may edit only the *Required records* cells).
+3. **Closed (spec dry run G-15):** a refused call writes no audit row (application log only), as the agreed cards say;
+   DO-4 §1 and §5 follow the cards, and DO-6's *Capture verification* says the same (verified 2026-10-25).
 4. **DO-5 command names** use `pnpm`; the build uses npm workspaces (FW record), so they run as `npm run <same name>`.
-5. Values the spikes set (`[A] → SP-N` in DO-1 and on the cards) appear here only as settings defaults; SP-1, SP-2 and
-   SP-3 replace them, and a spike result that changes a promise becomes a `CHG-N`.
+5. **Spike values are in.** SP-1 (model, effort, token caps, timeout, concurrency, prices, run cap), SP-2 (option A
+   freeze) and SP-3 (quote span 3, name scan blocking in `cfu_item`s) replaced the `[A] → SP-N` defaults here and in
+   DO-3 §7. None changed a card promise, so no `CHG-N` was needed.
+6. **Proposed card clean-ups (not required by this design, raised for the contract owner):** (a) CON-12 and CON-18 still
+   describe the SP-2 close-every-connection fallback, which SP-2 rejected; the promise is unchanged, so removing the text
+   is a presentation-only `CHG`. (b) The OpenAPI `Approve` schema lists `rating` as required while CON-18 names
+   `RATING_REQUIRED`; this design keeps the card's code reachable with `TransitionRequestInput` (§5) and a contract test,
+   and a `CHG` could instead drop `rating` from `required` (likewise `note`, `reason`). (c) AI assist past a spend cap
+   answers `MODEL_UNAVAILABLE` with `details.reason = "spend_cap"`, since CON-17 names no cap code.

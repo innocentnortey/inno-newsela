@@ -168,7 +168,8 @@ Silence must never look like "no traffic". Four checks make a missing record vis
    up is visible as a missing start event for the current `build_id`.
 
 The fault-injection script (WF-28) kills the worker mid-call on purpose and asserts that the lost calls are *counted*
-(`lesson_job.calls_lost`), not missing.
+(`lesson_job.calls_lost`), not missing. The run summary (CON-21) reports their run total as `calls_lost_in_flight`
+(the sum of `lesson_job.calls_lost` over the run's jobs; DO-4 §5 `RunService.summary`).
 
 ## Capture verification
 
