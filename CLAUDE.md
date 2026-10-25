@@ -36,6 +36,8 @@ snapshot. Innocent's standing authorization (PD-32) lets Claude adopt its recomm
 | Build a review page | [html-files-not-artifacts](.claude/rules/html-files-not-artifacts.md) and the zero-to-hero `references/visual-review-pages.md` |
 | Anything that moves a file, route or owner | [maintenance rule](.claude/rules/context-maintenance.md) |
 | Start or resume work | [`.claude/state/resume.md`](.claude/state/resume.md), then [PROJECT-CHECKLIST.md](PROJECT-CHECKLIST.md) |
+| Build or plan a ticket (§8) | [Phase B handoff](docs/plans/HANDOFF-PHASE-B.md), the ticket in [`docs/plans/tickets/`](docs/plans/tickets/), the [area map](.claude/reference/area-map.md) |
+| Change a shared contract | [`docs/contracts/CHANGES.md`](docs/contracts/CHANGES.md) (every change to an agreed card is a `CHG-N`) |
 
 ## How this project is governed
 Entry points **route**, rules **prohibit**, references **explain**, canonical documents **prove**.
