@@ -51,6 +51,8 @@ export async function apply_edit(deps: CollabCommandHandlerDeps, cmd: EditComman
   try {
     const doc = conn.document;
     if (doc === null) throw new DomainRefusal("COLLAB_UNAVAILABLE", "The document is not loaded", {});
+    // The freeze may have landed while the direct connection was opening (SP-2: no edit may be applied after the lock).
+    if (deps.frozen.is_frozen(id)) throw new DomainRefusal("LESSON_LOCKED", "This lesson is locked", { state: row.state });
     // Resolve against the live document and mutate in the same tick: a refusal leaves no transaction behind.
     const mutate = prepare_edit(doc, edit, pre);
     await conn.transact(() => mutate());

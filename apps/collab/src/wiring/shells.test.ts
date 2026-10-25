@@ -36,8 +36,8 @@ function forbidden_for(root: string, f: string): RegExp {
 describe("collab shells", () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it("the remaining shell names its filler", () => {
-    expect([lockSnap.FILLER]).toEqual(["NL-106"]);
+  it("lock_and_snapshot is built", () => {
+    expect(typeof lockSnap.lock_and_snapshot).toBe("function");
   });
 
   it("collab starts with ANTHROPIC_API_KEY unset and no model settings", async () => {

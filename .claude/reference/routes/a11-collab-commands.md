@@ -21,9 +21,9 @@ lock and snapshot on submit), so review actions and the editor's document stay o
 | Port (shared with the web client) | `packages/core/src/ports/collab-commands.ts` `CollabCommands` (`lock_and_snapshot`, `apply_edit`, `set_mode`) | built (NL-12) |
 | Web-side client | `apps/web/src/server/adapters/collab-commands.ts` `HttpCollabCommandClient` | verified at merge (NL-36) |
 | Server dispatch | `apps/collab/src/commands/routes.ts` `is_internal_path`, `handle_internal` (dispatch only, 20 lines) | built (NL-07) |
-| Command bodies | `apps/collab/src/commands/{apply-edit,set-mode}.ts` (FILLER NL-105), `lock-and-snapshot.ts` (FILLER NL-106): 2-line stubs | stub |
-| Server-side handler class | `CollabCommandHandler` | **planned**: the name is in DO-3/DO-4 and the area map's port list, not in code |
-| Wiring | `apps/collab/src/wiring/commands.ts` `wire_collab_commands` (stub, FILLER NL-105); called from `apps/collab/src/main.ts` | stub |
+| Command bodies | `apps/collab/src/commands/{apply-edit,set-mode}.ts` (NL-105), `lock-and-snapshot.ts` + `submit-gate.ts` + `live-doc.ts` (NL-106, Submit freeze) | built (NL-105, NL-106) |
+| Server-side handler class | `CollabCommandHandler` in `commands/routes.ts` | built (NL-105) |
+| Wiring | `apps/collab/src/wiring/commands.ts` `wire_collab_commands` (real tx, loader, rules, policy, issues); called from `apps/collab/src/main.ts` | built (NL-105, NL-106) |
 | Collab building blocks | `apps/collab/src/frozen-docs.ts` `FrozenDocs`; `acks.ts` `AckBroadcaster`; `persistence.ts` `LessonPersistence.store`; `auth.ts`, `permissions.ts` | verified at merge (NL-80) |
 | Checks used by the freeze | `packages/core/src/checks/context-loader.ts` (`CheckContextLoader`), `packages/core/src/checks/gates.ts` `submit_gate` | verified at merge (NL-38, NL-20) |
 
@@ -36,9 +36,7 @@ lock and snapshot on submit), so review actions and the editor's document stay o
 
 ## Check before planning
 
-- NL-105 and NL-106 are **not** ordered (NL-106's *Blocked by* is NL-20, 21, 38, 42, 80), yet both fill files that
-  `routes.ts` dispatches and `wiring/commands.ts` (FILLER NL-105) wires. Check the slice plan's collision map for who
-  owns the handler class and the wiring line before assuming either; if neither plan owns them, raise it, don't block.
+- NL-105 then NL-106 (ordered): NL-105 owns the handler class and wiring; NL-106 added the Submit deps to `types.ts` and `wiring/commands.ts` (resolved).
 - **S-9:** a revoked session keeps write rights until lock because the socket is not re-checked after connect. NL-105
   is named as its fix.
 - Whether a `CHG-N` touched CON-12 or CON-18 since the tickets were cut.
