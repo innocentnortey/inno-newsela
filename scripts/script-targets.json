@@ -13,5 +13,6 @@
   "load:spike":           { "target": "load/spike.ts",    "owner": "NL-49", "run": ["npx", "tsx", "load/spike.ts"] },
   "ops:backup":           { "target": "ops/backup.sh",    "owner": "NL-83", "run": ["bash", "ops/backup.sh"] },
   "ops:import-spike":    { "target": "ops/import-spike.ts", "owner": "NL-87", "run": ["npx", "tsx", "ops/import-spike.ts"] },
+  "eval:kickoff":        { "target": "evals/src/kickoff/cli.ts", "owner": "NL-108", "run": ["npx", "tsx", "evals/src/kickoff/cli.ts"] },
   "dev":                  { "target": "Dockerfile.node",  "owner": "NL-23", "run": ["docker", "compose", "up", "--build"] }
 }
