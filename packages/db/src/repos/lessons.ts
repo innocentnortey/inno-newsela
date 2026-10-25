@@ -155,7 +155,7 @@ export class PgLessonRepo implements LessonStateRepo, LessonVersionRepo, LessonG
     const t = assert_tx(tx);
     let created = 0;
     for (const r of rows) {
-      if (r.kind !== "lesson" || r.lesson_id === null) continue;
+      if ((r.kind !== "lesson" && r.kind !== "flex_day") || r.lesson_id === null) continue;
       const res = await t.query(
         `INSERT INTO lesson (id, unit_id, number, type, title, state, schema_version)
          VALUES ($1,$2,$3,$4,$5,'draft',$6) ON CONFLICT (id) DO NOTHING RETURNING id`,

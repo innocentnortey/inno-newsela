@@ -27,10 +27,10 @@ export class PgCandidateLookup {
     return (r[0]?.["run_id"] as RunId | undefined) ?? null;
   }
 
-  // Run of the lesson's newest kind='lesson' job (the lesson's own generation run).
+  // Run of the lesson's newest kind='lesson' job (its own generation run); a never-generated lesson falls back to its newest candidate job (a trial run).
   async latest_lesson_run(lesson_id: LessonId): Promise<RunId | null> {
     const r = await this.rows(
-      "SELECT run_id FROM lesson_job WHERE lesson_id = $1 AND kind = 'lesson' ORDER BY queued_at DESC, id DESC LIMIT 1",
+      "SELECT run_id FROM lesson_job WHERE lesson_id = $1 AND kind IN ('lesson','candidate') ORDER BY (kind = 'lesson') DESC, queued_at DESC, id DESC LIMIT 1",
       [lesson_id],
     );
     return (r[0]?.["run_id"] as RunId | undefined) ?? null;

@@ -76,6 +76,12 @@ describe("PgLessonRepo", () => {
     expect(await q("SELECT * FROM lesson WHERE unit_id='G6.U4' ORDER BY id")).toEqual(before);
   });
 
+  it("ensure_lessons_flex_day_with_lesson_id: a flex day that carries a lesson id gets a draft lesson row", async () => {
+    const flex = { kind: "flex_day", lesson_id: "G6.U5.L9", number: 9, title: "Flex", lesson_type: "Flex Day" } as unknown as NormalizedRow;
+    expect(await t.db.with_tx((tx) => repo.ensure_lessons([flex], "G6.U5", tx))).toBe(1);
+    expect((await q("SELECT state FROM lesson WHERE id='G6.U5.L9'"))[0]?.["state"]).toBe("draft");
+  });
+
   it("lock_for_update_serializes", async () => {
     const id = "G6.U4.L1";
     let locked!: () => void;

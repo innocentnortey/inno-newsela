@@ -78,8 +78,8 @@ export class StoreNode {
   ): Promise<VersionId> {
     const has = await this.versions.has_generated_version(lesson_id);
     const row = await this.states.lock_for_update(lesson_id, tx);
-    // CON-16: a candidate for a lesson whose own generation failed becomes v1.
-    if (!has && row.state === "generation_failed") return as_generated();
+    // CON-16: a candidate for a lesson whose own generation failed, or that was never generated (trial run), becomes v1.
+    if (!has && (row.state === "generation_failed" || row.state === "draft")) return as_generated();
     const w = await this.versions.write_generated_version({ ...base, kind: "candidate" }, tx);
     return w.version.version_id;
   }
