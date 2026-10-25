@@ -6,13 +6,14 @@ import { write_start_event } from "./start-event.ts";
 import { build_worker_deps } from "./deps.ts";
 import type { WorkerDeps } from "./deps-types.ts";
 import { create_inflight_tracker, install_drain, type InflightTracker, type SignalHost } from "./drain.ts";
-import { serve_health, type HealthServer } from "./health.ts";
+import { open_health_db, serve_health, type HealthDb, type HealthServer } from "./health.ts";
 import { wire_generation, type GenerationWiring } from "./wiring/generation.ts";
 import { wire_checks, type CheckWiring } from "./wiring/checks.ts";
 import { wire_judge, type JudgeWiring } from "./wiring/judge.ts";
 
 export interface WorkerRuntimeOptions {
   health_port?: number;
+  health_db?: HealthDb;
   log_write?: (line: string) => void;
   exit?: (code: number) => void;
   signal_host?: SignalHost;
@@ -40,7 +41,8 @@ export async function build_worker_runtime(settings: WorkerSettings, opts: Worke
   const generation = wire_generation(deps);
   const checks = wire_checks(deps);
   const judge = wire_judge(deps);
-  const health = await serve_health(opts.health_port ?? 8081);
+  const health_db: HealthDb = opts.health_db ?? open_health_db(settings);
+  const health = await serve_health(health_db, opts.health_port ?? 8081, "worker", { build_id: settings.shared.build_id, logger });
   logger.info("process.start", { extra: { worker_id: settings.worker_id } });
   const tracker = create_inflight_tracker();
   const real_exit = opts.exit ?? ((c: number) => process.exit(c));
@@ -59,7 +61,11 @@ export async function build_worker_runtime(settings: WorkerSettings, opts: Worke
     },
     off: (sig, fn) => upstream.off?.(sig, fn),
   };
-  install_drain({ tracker, close: () => health.close(), exit, logger, host });
+  install_drain({ tracker, close: async () => {
+      await health.close();
+      if (!opts.health_db && "close" in health_db) await (health_db as { close(): Promise<void> }).close().catch(() => undefined);
+    },
+    exit, logger, host });
   return {
     settings, deps, health, logger, generation, checks, judge, tracker,
     stop() {

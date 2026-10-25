@@ -1,4 +1,4 @@
-// NL-23 AC-6: each process writes one process_start ops_event on start; a failed write is not fatal.
+// NL-23 AC-6: each process writes one process.start ops_event on start; a failed write is not fatal.
 import { spawn, type ChildProcess } from "node:child_process";
 import net from "node:net";
 import path from "node:path";
@@ -25,7 +25,7 @@ async function rows(service: string): Promise<Array<{ build_id: string; details_
   const c = new pg.Client({ connectionString: t.url });
   await c.connect();
   try {
-    const r = await c.query("select build_id, details_json from ops_event where kind='process_start' and service=$1", [service]);
+    const r = await c.query("select build_id, details_json from ops_event where kind='process.start' and service=$1", [service]);
     return r.rows;
   } finally {
     await c.end();
@@ -36,7 +36,7 @@ async function wait_for(service: string) {
   for (;;) {
     const r = await rows(service);
     if (r.length > 0) return r;
-    if (Date.now() > end) throw new Error(`no process_start for ${service}`);
+    if (Date.now() > end) throw new Error(`no process.start for ${service}`);
     await new Promise((x) => setTimeout(x, 300));
   }
 }
