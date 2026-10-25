@@ -87,6 +87,15 @@ export async function run_migrations(
             );
           }
         }
+        const on_disk = new Set(files.map((f) => f.id));
+        for (const id of applied.keys()) {
+          if (!on_disk.has(id)) {
+            throw new MigrationError(
+              id,
+              "applied migration has no matching file (deleted or renamed after it was applied)",
+            );
+          }
+        }
         if (applied.has(file.id)) {
           return;
         }

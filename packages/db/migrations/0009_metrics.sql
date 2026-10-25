@@ -31,3 +31,5 @@ create table lesson_metrics (
 );
 create trigger lesson_metrics_append_only before update or delete on lesson_metrics
   for each row execute function reject_mutation();
+create trigger lesson_metrics_no_truncate before truncate on lesson_metrics
+  for each statement execute function reject_mutation();

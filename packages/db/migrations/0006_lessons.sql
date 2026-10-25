@@ -38,12 +38,7 @@ begin
   if tg_op = 'DELETE' then
     raise exception 'append-only: lesson_version';
   end if;
-  if new.content_hash is distinct from old.content_hash
-     or new.state_vector is distinct from old.state_vector
-     or new.lesson_json is distinct from old.lesson_json
-     or new.draft_json is distinct from old.draft_json
-     or new.provenance_json is distinct from old.provenance_json
-     or new.dependency_record_json is distinct from old.dependency_record_json
+  if to_jsonb(new) - 'adopted' is distinct from to_jsonb(old) - 'adopted'
      or (old.adopted and not new.adopted)
   then
     raise exception 'append-only: lesson_version';
@@ -53,6 +48,12 @@ end $$;
 
 create trigger lesson_version_guard before update or delete on lesson_version
   for each row execute function lesson_version_guard();
+create function lesson_version_no_truncate() returns trigger language plpgsql as $$
+begin
+  raise exception 'append-only: lesson_version';
+end $$;
+create trigger lesson_version_no_truncate before truncate on lesson_version
+  for each statement execute function lesson_version_no_truncate();
 
 create table lesson_doc (
   lesson_id text not null,

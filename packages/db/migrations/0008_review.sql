@@ -52,6 +52,10 @@ create trigger review_event_append_only before update or delete on review_event
   for each row execute function reject_mutation();
 create trigger audit_event_append_only before update or delete on audit_event
   for each row execute function reject_mutation();
+create trigger review_event_no_truncate before truncate on review_event
+  for each statement execute function reject_mutation();
+create trigger audit_event_no_truncate before truncate on audit_event
+  for each statement execute function reject_mutation();
 
 create view audit_log_v as
 select * from (

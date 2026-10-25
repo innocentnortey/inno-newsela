@@ -92,6 +92,10 @@ export default [
     },
   },
   {
+    files: ["packages/db/src/testing/**"],
+    rules: { "@typescript-eslint/no-explicit-any": "off" },
+  },
+  {
     files: ["apps/web/**/*.{ts,tsx,js,jsx}"],
     languageOptions: {
       parser: tseslint.parser,
