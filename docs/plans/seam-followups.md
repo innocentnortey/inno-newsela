@@ -11,7 +11,7 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-5 | `example_set_id` always null in draft and store nodes | NL-29 | provenance field empty | open |
 | S-6 | No unique index on `lesson_job.idempotency_key`; `job_ids_with_calls` missing on model-call port; no `lesson_job (run_id)` index | NL-08 migration owner | AC-4 of NL-78 left as `it.todo` | open |
 | S-7 | `CheckQueue` has no release/retry cap; check lease not renewed | NL-37 / NL-81 | failed rule retries only on lease expiry | open |
-| S-8 | `main.ts` of worker does not start `claim_loop.run_until` or NL-81's `check_lane` | NL-79 / NL-83 | worker idle until wired (db and model_client still `unbuilt`) | open |
+| S-8 | `main.ts` of worker does not start `claim_loop.run_until` or NL-81's `check_lane` | NL-79 / NL-83 | worker idle until wired (db and model_client still `unbuilt`) | done 2026-10-25 (devlog 2026-10-25-rt-1-runtime-wiring) |
 | S-9 | Collab socket not re-checked after connect | NL-105 | revoked session keeps write rights until lock | open |
 | S-10 | `RunSummary.trace_incomplete` extra field; SCR-4 ELD number (16 findings vs 7 codes) | CHG requests | contract wording | open |
 | S-11 | `trace_check.py` accepts only `TEST-N` ids; SCR rows hold spec paths | TRACEABILITY | UX-5a evidence check fails by format | open |
@@ -23,7 +23,7 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-16 | `apps/worker/src/wiring/generation.int.test.ts` concurrency_and_fair_share is timing-sensitive: failed once in a full run under heavy machine load, passes alone | NL-79 | make it event-driven (barriers) instead of time-based | open |
 | S-17 | SCR-9 shows the read view only: the live editor (NL-63) is mounted hidden in workspace-screen.tsx (its report drives the action bar); needs LessonEditor to replace LessonText for editable roles/states, with onPresence/viewer wired | NL-62 + NL-63 integration | the core "edit" screen is not visible in the product until done | done 2026-10-25 (devlog 2026-10-25-s17-editor-integration) |
 | S-18 | heartbeat hook needs the lesson version id (`lv-N-M`) from the loaded lesson; contract may lack a source | NL-64 | see NL-64 devlog | open |
-| S-19 | Web container: `model_client` still unbuilt and `MODEL_PROVIDER_MODE=real` throws "NOT BUILT" (web only needs it for NL-116 suggestions); db/ids/clock were unbuilt stubs until NL-90 exposed it (fixed on main 2026-10-25) | NL-116 / NL-102 wiring | web cannot start in real mode yet | open |
+| S-19 | Web container: `model_client` still unbuilt and `MODEL_PROVIDER_MODE=real` throws "NOT BUILT" (web only needs it for NL-116 suggestions); db/ids/clock were unbuilt stubs until NL-90 exposed it (fixed on main 2026-10-25) | NL-116 / NL-102 wiring | web cannot start in real mode yet | done 2026-10-25 (devlog 2026-10-25-rt-1-runtime-wiring) |
 | S-18 | CON-20 heartbeat needs `version_id` but `Lesson` carries none; SCR-9 sends `lv-<version_number>` (only once the lesson has loaded) | NL-64 / CHG on CON-11 or CON-20 | add `version_id` to `Lesson` (or relax the heartbeat field) | open |
 | S-20 | SCR-9 jump-to-span lands on the section wrapper in the editor (no `data-text-region`); no unit/e2e test jumps against the editor DOM | S-17 follow-up | jump focuses the section, not the exact span | open |
 | S-21 | `clientState` is not reset to "connecting" when the editor remounts after a role/state flip (action bar can show the old state briefly) | S-17 follow-up | cosmetic | open |

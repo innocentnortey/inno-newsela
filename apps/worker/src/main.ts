@@ -11,6 +11,7 @@ import { open_health_db, serve_health, type HealthDb, type HealthServer } from "
 import { wire_generation, type GenerationWiring } from "./wiring/generation.ts";
 import { wire_checks, type CheckWiring } from "./wiring/checks.ts";
 import { wire_judge, type JudgeWiring } from "./wiring/judge.ts";
+import { start_worker_loops } from "./loops.ts";
 
 export interface WorkerRuntimeOptions {
   health_port?: number;
@@ -28,6 +29,7 @@ export interface WorkerRuntime {
   checks: CheckWiring;
   judge: JudgeWiring;
   tracker: InflightTracker;
+  exit(code: number): void;
   stop(): Promise<void>;
 }
 
@@ -65,10 +67,11 @@ export async function build_worker_runtime(settings: WorkerSettings, opts: Worke
   install_drain({ tracker, close: async () => {
       await health.close();
       if (!opts.health_db && "close" in health_db) await (health_db as { close(): Promise<void> }).close().catch(() => undefined);
+      await (deps.db as unknown as { close(): Promise<void> }).close().catch(() => undefined);
     },
     exit, logger, host });
   return {
-    settings, deps, health, logger, generation, checks, judge, tracker,
+    settings, deps, health, logger, generation, checks, judge, tracker, exit,
     stop() {
       if (!tracker.draining) fire?.();
       return done;
@@ -81,6 +84,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   Promise.resolve()
     .then(() => build_worker_runtime(load_worker_settings(process.env), { health_port: Number(process.env.WORKER_HEALTH_PORT ?? 8081) }))
     .then((rt) => {
+      start_worker_loops({ tracker: rt.tracker, generation: rt.generation, checks: rt.checks, logger: rt.logger, settings: rt.settings, exit: rt.exit });
       void write_start_event(rt.settings, rt.logger);
     })
     .catch((e) => {
