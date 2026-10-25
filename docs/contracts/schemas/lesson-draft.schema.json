@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "blocks": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "cfu": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "key_index": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "options": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "rationales": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "standard_code": {
+                    "type": "string"
+                  },
+                  "stem": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "stem",
+                  "options",
+                  "key_index",
+                  "rationales",
+                  "standard_code"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code_origins": {
+            "items": {
+              "enum": [
+                "outline",
+                "narrowed",
+                "added"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "part": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "enum": [
+              "routine_heading",
+              "teacher_talk",
+              "sample_response",
+              "callout_purpose",
+              "callout_say",
+              "callout_watch",
+              "support_table",
+              "cfu_item",
+              "quick_write",
+              "text_evidence_needed",
+              "excerpt_slot",
+              "teacher_tip",
+              "homework",
+              "paragraph",
+              "list"
+            ],
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "standard_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "section",
+          "part",
+          "text",
+          "standard_codes",
+          "code_origins",
+          "cfu",
+          "minutes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "lesson_id": {
+      "pattern": "^G\\d{1,2}\\.U\\d{1,2}\\.(L\\d{1,3}|FLEX-\\d{1,2}[a-z]?)$",
+      "type": "string"
+    },
+    "text_cards": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "author": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "chapter": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_available": {
+            "type": "boolean"
+          },
+          "edition": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "off-platform-text",
+              "newsela-article",
+              "public-domain"
+            ],
+            "type": "string"
+          },
+          "pages": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "author",
+          "edition",
+          "chapter",
+          "pages",
+          "kind",
+          "content_available"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lesson_id",
+    "title",
+    "blocks",
+    "text_cards"
+  ],
+  "title": "LessonDraft",
+  "type": "object"
+}

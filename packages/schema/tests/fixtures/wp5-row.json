@@ -1,0 +1,20 @@
+{
+  "row_number": 10,
+  "kind": "lesson",
+  "lesson_id": "G6.U4.L6",
+  "number": 6,
+  "title": "Lesson 6",
+  "lesson_type": "Core Reading",
+  "arc": "Investigation 1",
+  "segments": [
+    { "kind": "content", "text": "Students cite details about Percy's behavior, Grover's nervousness, and Mr. Brunner's lecture to analyze what is explicitly happening at the museum and what is being hinted at.", "instruction_shaped": false, "applies": "apply" },
+    { "kind": "content", "text": "Morphology mini-lessons tied to the unit vocabulary.", "instruction_shaped": false, "applies": "apply" }
+  ],
+  "focus_codes": ["RL.6.1"],
+  "eld_codes": ["ELD.PI.6.6b", "ELD.PI.6.7", "ELD.PII.6.2b"],
+  "msls_codes": [],
+  "vocabulary": ["hallucination (16)", "eavesdropper (19)", "solstice (19)", "ignorance (19)", "sarcastic (21)", "juvenile (22)"],
+  "homework": "Read and annotate The Lightning Thief Ch. 2 (pp. 23–28)",
+  "pages": "pp. 16–22",
+  "text_set": "The Lightning Thief"
+}
