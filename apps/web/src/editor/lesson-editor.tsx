@@ -14,13 +14,19 @@ import type { EditorClientState, StoredAck } from "./client-state";
 import { CollabSession, type SessionSnapshot } from "./collab-session";
 import { collab_url } from "./collab-url";
 import { initials_of, presence_entries, slot_of, type PresenceEntry } from "./presence";
+import type { AssistSelection } from "@/features/assist/use-suggestions";
+import { selectionAnchor } from "./selection-anchor";
 import { SectionEditor } from "./section-editor";
 import { Toolbar } from "./toolbar";
 
 export type { EditorClientState } from "./client-state";
 
 export interface EditorClientReport { state: EditorClientState; state_vector: string | null; stored: StoredAck | null }
-export interface LessonEditorHandle { focus_section(address: string): void }
+export interface LessonEditorHandle {
+  focus_section(address: string): void;
+  /** NL-116: the current selection as an AI-assist anchor, or null when there is none the server could resolve. */
+  getSelection(): AssistSelection | null;
+}
 
 export interface LessonEditorProps {
   lessonId: string;
@@ -156,7 +162,26 @@ export function LessonEditor(props: LessonEditorProps) {
       setActive((a) => (a === old ? (views.values().next().value ?? null) : a));
     }
   }, [views]);
-  useImperativeHandle(ref, () => ({ focus_section: (address: string) => views.get(address)?.focus() }), [views]);
+  const active_ref = useRef(active);
+  useEffect(() => {
+    active_ref.current = active;
+  });
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus_section: (address: string) => views.get(address)?.focus(),
+      // The last focused section first, then any other with a non-empty selection.
+      getSelection: () => {
+        const order = [active_ref.current, ...views.values()].filter((v): v is EditorView => v !== null);
+        for (const v of order) {
+          if (v.state.selection.empty) continue;
+          return selectionAnchor(v);
+        }
+        return null;
+      },
+    }),
+    [views],
+  );
 
   const state = snap.state;
   const read_only = prop_read_only || snap.read_only;
