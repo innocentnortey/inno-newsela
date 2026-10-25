@@ -20,9 +20,9 @@ export function findBlock(
 export function declarations(body: string): Map<string, string> {
   const out = new Map<string, string>();
   for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-    const value = m[2].trim();
+    const value = m[2]!.trim();
     if (m[1] === "--color-*" || value === "initial") continue;
-    out.set(m[1], value);
+    out.set(m[1]!, value);
   }
   return out;
 }

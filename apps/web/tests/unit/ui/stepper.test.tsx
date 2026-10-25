@@ -9,8 +9,8 @@ describe("Stepper", () => {
     const { container } = render(<Stepper current={2} />);
     const cur = container.querySelectorAll("[aria-current='step']");
     expect(cur).toHaveLength(1);
-    expect(cur[0].textContent).toMatch(/Step 2 of 5, In review/);
-    expect(cur[0].textContent).toContain("In review");
+    expect(cur[0]!.textContent).toMatch(/Step 2 of 5, In review/);
+    expect(cur[0]!.textContent).toContain("In review");
   });
   it("is an ordered list of five steps in order, not interactive", () => {
     const { container } = render(<Stepper current={2} />);

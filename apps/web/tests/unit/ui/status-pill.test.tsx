@@ -20,12 +20,12 @@ const keys = Object.keys(STATUS_SPECS) as StatusKey[];
 describe("design.md section 2 coverage", () => {
   it("every state named in the section 2 table exists in STATUS_SPECS", () => {
     const md = readFileSync(path.resolve(__dirname, "../../../../../docs/design/design.md"), "utf8");
-    const section = md.split("## 2. Status vocabulary")[1].split("\n## 3.")[0];
+    const section = md.split("## 2. Status vocabulary")[1]!.split("\n## 3.")[0]!;
     const names = new Set<string>();
     for (const row of section.split("\n").filter((l) => /^\| (Lesson|Tile|Run|Issue|Standard origin|Validation row) \|/.test(l))) {
       const cells = row.split("|").map((c) => c.trim());
-      const thing = { Lesson: "lesson", Tile: "tile", Run: "run", Issue: "issue", "Standard origin": "origin", "Validation row": "validation" }[cells[1]]!;
-      const states = cells[2].replace(/`/g, "").split(/\s*·\s*|\s+or\s+/).map((x) => x.trim().toLowerCase());
+      const thing = { Lesson: "lesson", Tile: "tile", Run: "run", Issue: "issue", "Standard origin": "origin", "Validation row": "validation" }[cells[1]!]!;
+      const states = cells[2]!.replace(/`/g, "").split(/\s*·\s*|\s+or\s+/).map((x) => x.trim().toLowerCase());
       for (const st of states) names.add(`${thing}.${st}`);
     }
     for (const n of names) expect(Object.keys(STATUS_SPECS), n).toContain(n);

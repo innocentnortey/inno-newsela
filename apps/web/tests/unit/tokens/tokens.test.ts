@@ -23,7 +23,7 @@ type Pair = { kind: "text" | "ui"; fg: string; bg: string; needs: number };
 const pairs: Pair[] = [];
 for (const line of md.split("\n")) {
   const m = line.match(/^\|\s*(text|ui)\s*\|\s*`([\w-]+)`\s+on\s+`([\w-]+)`\s*\|\s*(4\.5|3):1\s*\|/);
-  if (m) pairs.push({ kind: m[1] as Pair["kind"], fg: m[2], bg: m[3], needs: Number(m[4]) });
+  if (m) pairs.push({ kind: m[1] as Pair["kind"], fg: m[2]!, bg: m[3]!, needs: Number(m[4]) });
 }
 
 describe("tokens.css", () => {
