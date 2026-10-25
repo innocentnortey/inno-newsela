@@ -5,7 +5,7 @@ import fs from "node:fs";
 import { mkdtempSync, readFileSync, rmSync, cpSync, statSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { create_test_db, type TestDb } from "@ls/db/testing/test-db";
 import { SeedInputError, seed_reference_data } from "./seed.ts";
 
@@ -213,7 +213,7 @@ describe("seed_reference_data", () => {
     const seen: string[] = [];
     for (const m of ["readFileSync", "readdirSync", "existsSync", "statSync", "openSync", "readFile", "readdir", "createReadStream"] as const) {
       const orig = (fs as unknown as Record<string, (...a: unknown[]) => unknown>)[m]!;
-      vi.spyOn(fs as never, m as never).mockImplementation(((...a: unknown[]) => (seen.push(String(a[0])), orig.apply(fs, a))) as never);
+      (vi.spyOn as unknown as (o: unknown, k: string) => { mockImplementation: (f: unknown) => void })(fs, m).mockImplementation((...a: unknown[]) => (seen.push(String(a[0])), orig.apply(fs, a)));
     }
     try {
       await seed_reference_data(t.db, opts());

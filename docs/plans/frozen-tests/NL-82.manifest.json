@@ -2,7 +2,7 @@
   "ticket": "NL-82",
   "risk": "security",
   "frozen": {
-    "ops/seed.test.ts": "da0cab238c79b1426046e25f87b0bd6444ded2da93d07bad295dcecd8ba0c533",
+    "ops/seed.test.ts": "512221bad61acb7445374d9f33791d19a39652d18618a642791717c8d8ffcb3c",
     "ops/wf-37-obligations.test.ts": "9e09f9e640e8f1e5490a7a63c96bdd893b73b2980b6608e325b37999b0dd3e55",
     "apps/web/src/server/http/seeded-accounts.int.test.ts": "380df3aa6febc301b9151f78d02e9c7e018cd0b22eaaa8b7cc668ad8cb29e7e0"
   },
@@ -38,5 +38,8 @@
       "ops/wf-37-obligations.test.ts"
     ]
   },
-  "not_frozen": []
+  "not_frozen": [],
+  "notes": [
+    "REFREEZE (orchestrator, PD-32, 2026-10-25): ops/seed.test.ts type/lint only (unused beforeAll import; spyOn cast); assertions unchanged"
+  ]
 }
