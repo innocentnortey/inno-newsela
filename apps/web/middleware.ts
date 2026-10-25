@@ -6,6 +6,7 @@ const OPEN = /^\/(sign-in|api|_next|healthz|favicon\.ico)(\/|$)/;
 
 export function middleware(request: NextRequest): NextResponse {
   const { pathname, search } = request.nextUrl;
+  if (process.env.NODE_ENV !== "production" && pathname.startsWith("/gallery")) return NextResponse.next(); // dev/test component gallery
   if (OPEN.test(pathname) || /\.[^/]+$/.test(pathname)) return NextResponse.next();
   const name = process.env["SESSION_COOKIE_NAME"] ?? "ls_session";
   if ((request.cookies.get(name)?.value ?? "") !== "") return NextResponse.next();
