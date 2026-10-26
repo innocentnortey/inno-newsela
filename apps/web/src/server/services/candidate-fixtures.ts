@@ -138,6 +138,8 @@ export function make_world(state = "in_review"): World {
       current_version_id: "ver_current",
       reviewer_id: null,
       last_editor_id: null,
+      reviewer_name: null,
+      last_editor_name: null,
       schema_version: 1,
     } as unknown as LessonRow,
     collab_calls: [],

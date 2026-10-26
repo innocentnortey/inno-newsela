@@ -12,6 +12,7 @@ import { TwoPane } from "@/components/layout/two-pane";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
 import { SendBackDialog } from "@/features/send-back/send-back-dialog";
+import { SEND_BACK_TAG_LABEL } from "@/features/workspace/state-model";
 import { DISCLOSURE } from "@/features/workspace/actions/copy";
 import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
 import { api } from "@/lib/api-client";
@@ -158,7 +159,7 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
         <div className="text-body text-ink flex flex-col items-start gap-2">
           <p>{COPY.notSubmitted(n, lesson.state, lesson.reviewer)}</p>
           {lesson.state === "changes_requested" && lesson.send_back ? (
-            <p className="text-ink2">{lesson.send_back.tag}: {lesson.send_back.note}</p>
+            <p className="text-ink2">Changes requested by {lesson.send_back.by} · {SEND_BACK_TAG_LABEL[lesson.send_back.tag]}: {lesson.send_back.note}</p>
           ) : null}
           <Link href={`/units/${unitKey}/lessons/${lessonKey}`}>{COPY.openReadOnly(n)}</Link>
         </div>

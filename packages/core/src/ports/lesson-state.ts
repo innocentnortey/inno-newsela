@@ -12,6 +12,9 @@ export interface LessonRow {
   current_version_id: VersionId | null;
   reviewer_id: UserId | null;
   last_editor_id: UserId | null;
+  /** Display names (app_user.name); set by `get` only, absent elsewhere. Never an id. */
+  reviewer_name?: string | null;
+  last_editor_name?: string | null;
   schema_version: number;
 }
 

@@ -49,6 +49,8 @@ function row_to_lesson(r: Row): LessonRow {
     current_version_id: r["current_version_id"],
     reviewer_id: r["reviewer_id"],
     last_editor_id: r["last_editor_id"],
+    reviewer_name: r["reviewer_name"] ?? null,
+    last_editor_name: r["last_editor_name"] ?? null,
     schema_version: r["schema_version"],
   };
 }
@@ -129,7 +131,12 @@ export class PgLessonRepo implements LessonStateRepo, LessonVersionRepo, LessonG
   // ---- LessonStateRepo ----
 
   async get(lesson_id: LessonId): Promise<LessonRow | null> {
-    const rows = await this.read("SELECT * FROM lesson WHERE id=$1", [lesson_id]);
+    const rows = await this.read(`SELECT l.*, r.name AS reviewer_name, e.name AS last_editor_name FROM lesson l
+       LEFT JOIN app_user r ON r.id = l.reviewer_id
+       LEFT JOIN app_user e ON e.id = l.last_editor_id
+       WHERE l.id=$1`,
+      [lesson_id],
+    );
     return rows[0] ? row_to_lesson(rows[0]) : null;
   }
 

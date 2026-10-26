@@ -16,7 +16,7 @@ import { assert_known_nodes, SchemaUnknownError, type ProseMirrorDoc as PMJson }
 import type { Lesson, Standard, TextCard, AlignmentEntry, ChecklistItem, Dependency } from "@ls/schema/api/lessons";
 import type { LessonHistory } from "@ls/schema/api/review";
 import type { Segment } from "@ls/schema/api/outlines";
-import type { SendBack } from "@ls/schema/api/board";
+import { SendBackTag, type SendBack } from "@ls/schema/api/board";
 import type { StoredLesson } from "@ls/schema/lesson";
 
 /** Seam NL-44 needs (plan R1): not on LessonVersionRepo yet. Oldest first by `number`. */
@@ -124,9 +124,10 @@ export class LessonReadService implements LessonReadApi {
       const hits = history.filter((h) => h.to_state === "changes_requested");
       const newest = hits.reduce<HistoryRow | null>((a, h) => (a === null || h.at > a.at ? h : a), null);
       if (newest !== null) {
+        const parsed = SendBackTag.safeParse(newest.reason_tag);
         send_back = {
-          tag: "other",
-          note: newest.reason ?? "",
+          tag: parsed.success ? parsed.data : "other",
+          note: newest.note ?? newest.reason ?? "",
           by: newest.actor_name ?? "system",
           at: newest.at.toISOString(),
         };
@@ -150,7 +151,7 @@ export class LessonReadService implements LessonReadApi {
       content_hash: src.hash,
       state_vector: src.vector,
       schema_version: src.schema_version,
-      last_editor: row.last_editor_id,
+      last_editor: row.last_editor_name ?? null,
       snapshot: src.snapshot,
       front_matter: { ...src.content.front_matter, standards },
       sections: src.content.sections.map((s) => ({
@@ -162,7 +163,7 @@ export class LessonReadService implements LessonReadApi {
       text_cards,
       outline_row,
       alignment_map: alignment_map(current_links),
-      reviewer: row.reviewer_id,
+      reviewer: row.reviewer_name ?? null,
       send_back,
       checklist,
       dependencies,

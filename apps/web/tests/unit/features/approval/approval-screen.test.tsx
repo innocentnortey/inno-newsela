@@ -114,6 +114,35 @@ describe("ApprovalScreen", () => {
     expect(screen.getByLabelText("Usable as drafted")).toBeChecked();
   });
 
+  it("approve refused 422 BLOCKED keeps the screen, shows the Approve refused banner and the rating", async () => {
+    ctl.post = () => errRes("BLOCKED", { issues: [{ kind: "standard_confirmation", level: "confirmation", message: "L.6.4.b is AI-proposed: confirm or remove", address: null, code: "L.6.4.b", related_lesson_id: null, resolved: false }] });
+    mount();
+    await ready();
+    await userEvent.click(screen.getByLabelText("Usable with edits"));
+    await userEvent.click(approve());
+    expect(await screen.findByText("Approve refused: L.6.4.b is AI-proposed: confirm or remove.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Usable with edits")).toBeChecked();
+    expect(screen.getByText("Standards taught and checked").closest("li")).toHaveTextContent("Blocking");
+    expect(screen.queryByText(/couldn't load/i)).toBeNull();
+  });
+
+  it("Standards confirmed row never reads Done beside \"not all confirmed\"", async () => {
+    const l = lesson5Submitted();
+    l.front_matter.standards = l.front_matter.standards.map((x, i) => (i === 0 ? { ...x, confirmation: null } : x));
+    mount("approver", l);
+    await ready();
+    const row = screen.getByText("Standards taught and checked").closest("li")!;
+    expect(row).toHaveTextContent(/Not all confirmed: W\.6\.2\.a/);
+    expect(row).toHaveTextContent("Blocking");
+    expect(row).not.toHaveTextContent("Done");
+  });
+
+  it("changes_requested lesson prints Changes requested by name, Content safety label and note", async () => {
+    const l = { ...lesson5Submitted(), state: "changes_requested" as const, snapshot: null, send_back: { tag: "content_safety" as const, note: "Check the safety note before resubmitting.", by: "D. Park", at: "2026-10-25T10:00:00Z" } };
+    mount("approver", l);
+    expect(await screen.findByText("Changes requested by D. Park · Content safety: Check the safety note before resubmitting.")).toBeInTheDocument();
+  });
+
   it("roles hide the decision controls", async () => {
     for (const role of ["author", "reviewer"] as const) {
       mount(role);

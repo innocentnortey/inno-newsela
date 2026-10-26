@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ApiError } from "@/lib/api-client";
-import { approveDisabledReason, checklistRows, screenMode, shortHash, viewFromError, type Issue, type Lesson } from "@/features/approval/derive";
+import { approveDisabledReason, standardsUnconfirmed, checklistRows, screenMode, shortHash, viewFromError, type Issue, type Lesson } from "@/features/approval/derive";
 import { lesson4Submitted, lesson5Submitted } from "../../../../e2e/approval/fixtures";
 
 const err = (code: ApiError["code"], details: Record<string, unknown> = {}) => new ApiError({ status: 422, code, message: "m " + code, details });
@@ -60,5 +60,48 @@ describe("derive", () => {
     expect(rows[0]?.evidence).toBe("G6.U4.L5.LearningInAction.PartA");
     expect(rows.find((r) => r.key === "content_safety")?.evidence).toBe("No issues found");
     expect(rows[0]?.jump?.href).toBe("#sec-G6.U4.L5.LearningInAction.PartA");
+  });
+
+  it("viewFromError BLOCKED tolerates issues without blocks", () => {
+    const v = viewFromError(err("BLOCKED", { issues: [{ kind: "standard_confirmation", level: "confirmation", message: "L.6.4.b is AI-proposed", address: null }, "junk", null] }));
+    expect(v).toMatchObject({ kind: "blocked", message: "L.6.4.b is AI-proposed" });
+    if (v.kind === "blocked") expect(v.issues).toHaveLength(1);
+  });
+
+  it("viewFromError BLOCKED with non-array details yields message from the error", () => {
+    expect(viewFromError(err("BLOCKED", { issues: "nope" }))).toEqual({ kind: "blocked", issues: [], message: "m BLOCKED" });
+    expect(viewFromError(err("BLOCKED"))).toMatchObject({ kind: "blocked", message: "m BLOCKED" });
+  });
+
+  it("checklistRows flips rows from blockedIssues that carry no blocks field", () => {
+    const blocked = viewFromError(err("BLOCKED", { issues: [{ kind: "standard_confirmation", level: "confirmation", message: "confirm L.6.4.b" }] }));
+    const rows = checklistRows({ lesson: lesson5Submitted(), issues: null, blockedIssues: blocked.kind === "blocked" ? blocked.issues : [], unitKey: "g6-u4" });
+    expect(rows.find((r) => r.key === "standards")).toMatchObject({ state: "blocking", evidence: "confirm L.6.4.b" });
+  });
+
+  it("checklistRows never throws on a lesson issue without blocks", () => {
+    const short = { ...issue("judge_no", "x"), blocks: undefined } as unknown as Issue;
+    expect(() => checklistRows({ lesson: lesson5Submitted(), issues: [short], blockedIssues: [], unitKey: "g6-u4" })).not.toThrow();
+  });
+
+  const withStandards = (confs: (string | null)[]): Lesson => {
+    const l = lesson5Submitted();
+    return { ...l, front_matter: { ...l.front_matter, standards: confs.map((c, i) => ({ ...l.front_matter.standards[0]!, code: `S.${i}`, confirmation: c as never })) } };
+  };
+  const standardsRow = (l: Lesson) => checklistRows({ lesson: l, issues: null, blockedIssues: [], unitKey: "g6-u4" }).find((r) => r.key === "standards")!;
+
+  it("standards row is Blocking when a focus standard is not confirmed even if the server marked it ok", () => {
+    const row = standardsRow(withStandards(["confirmed", null]));
+    expect(row).toMatchObject({ state: "blocking", stateWord: "Blocking", evidence: "Not all confirmed: S.1" });
+  });
+
+  it("standards row stays Done when every focus standard is confirmed", () => {
+    expect(standardsRow(withStandards(["confirmed", "confirmed"]))).toMatchObject({ state: "ok", stateWord: "Done" });
+  });
+
+  it("standards row ignores removed standards", () => {
+    const l = withStandards(["confirmed", "removed"]);
+    expect(standardsUnconfirmed(l)).toEqual([]);
+    expect(standardsRow(l).state).toBe("ok");
   });
 });

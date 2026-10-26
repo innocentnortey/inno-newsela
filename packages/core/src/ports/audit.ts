@@ -24,6 +24,9 @@ export interface HistoryRow {
   to_state: LessonStateName | null;
   version_hash: Sha256 | null;
   reason: string | null;
+  /** Send-back tag and note (review_event.reason_tag / note); null for audit_event rows. */
+  reason_tag?: string | null;
+  note?: string | null;
 }
 
 export interface StandardDecisionRow {
