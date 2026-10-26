@@ -22,21 +22,21 @@ Rows read back with `psql`: `probe_run` `pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) a
 | M-21 Board and progress poll p95 | < 300 ms | 20 ms, board only (n = 20,402) | met (progress poll not exercised, see Qualifiers) |
 | M-22 Error rate | < 0.5% | 0.00% of 38,909 HTTP; 0 socket errors in 22,533 Yjs samples | met |
 | M-23 Recovery after the plateau | <= 120 s | 100 s | met (see Qualifiers) |
-| M-19 Remote-edit p95 | < 500 ms | 6.7 ms (n = 44,612) | met |
+| M-19 Remote-edit p95 (collaboration latency) | < 500 ms | 6.7 ms (n = 44,612) | met |
 | M-27 Lost acknowledged updates | 0 | 0 lost, 0 duplicate tokens, 0 unacknowledged after drain (n = 22,533) | met |
-| Reconnect p95 | <= 10 s | 9.95 s | met by 0.05 s |
-| **M-24 Stored p95** | **< 3 s** | **6,008 ms (n = 22,533)** | **MISSED** |
+| M-24 Socket reconnect p95 | <= 10 s | 9.95 s | met by 0.05 s |
+| **Stored p95** (US-36 / M-19's durable-store half) | **< 3 s** | **6,008 ms (n = 22,533)** | **MISSED** |
 | Max DB connections | informational | 21 | n/a |
 
 ## Misses
 
-- **M-24 stored p95, 6.0 s against < 3 s.** Not tuned. The scale path has no step keyed to store latency; step 3 (a second
-  Hocuspocus process) is triggered by socket lag, and remote-edit lag was 6.7 ms, so it did not fire. **[A] Assumption, not
-  measured:** the collab store debounce is 2.0 s with a 4.0 s ceiling (`STORE_DEBOUNCE_MS`, `STORE_MAX_DEBOUNCE_MS`), and 140
-  editors typing continuously reach the ceiling, so most of the 6.0 s may be the debounce rather than the Postgres write.
-  The NL-125 integrity suite reports its own store p95 net of the debounce (142 ms there, n = 80) for that reason. The
-  honest statement is: *stored p95 as defined here missed; what part is debounce is unproven*. Next step: diagnose the
-  store path (log the debounce wait separately from the write) and re-run on a quiet machine before any scale step.
+- **Stored p95, 6.0 s against < 3 s** (the run record labelled it M-24; M-24 is reconnect time, met at 9.95 s; stored p95 belongs to
+  US-36 / M-19). Not tuned in the run. The scale path has no step keyed to store latency; step 3 (a second Hocuspocus process) is
+  triggered by socket lag, and remote-edit lag was 6.7 ms, so it did not fire. **Diagnosis since the run**
+  (`docs/devlog/2026-10-26-nl127-followup.md`): outage contamination explains about 0 ms (about 15 of 22,533 stored samples crossed
+  a drop); the shipped `STORE_MAX_DEBOUNCE_MS=4000` with typers sending every 2 s puts p95 near 3.8 s plus store time, which is
+  above the 3 s target by construction. The residual after the debounce is **not measured**. The decision (lower the store
+  debounce and max debounce, or relax the target) and a quiet-machine re-run are open.
 
 ## Qualifiers (these make the passes weaker than they look)
 
@@ -46,8 +46,8 @@ Rows read back with `psql`: `probe_run` `pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) a
    `planning`, so the worker was idle and the progress poll was not exercised (the board was polled instead).
 3. **Recovery reading.** The 100 s is computed from windows that overlap the ramp down; the 5 extra minutes of sampling the
    ticket asks for were not added.
-4. **Check failures.** 1,310 `check.failed` lines on the Yjs load lessons (fixture clones or typed-token edits); not
-   investigated, and the likeliest place to look when diagnosing M-24.
+4. **Check failures.** 1,310 `check.failed` lines on the Yjs load lessons were `no_outline_version`: the load unit had no outline, so
+   every check failed and was retried every 30 s. Fixed in the load fixture afterwards (NL-127 follow-up F-B); the run itself still carried them.
 5. **Contention.** Another agent used the machine during the run (load average about 8 at the start); not a quiet-machine figure.
 6. **Scope.** A single instance on a VPS, not production hosting. Render (PD-37) sizes differ: Starter instances are
    0.5 CPU / 512 MB, so these figures do not transfer; nothing here was measured on Render.
