@@ -37,6 +37,8 @@ afterAll(async () => {
   await s?.close();
 });
 
+// review_event has no seq column (migration 0008: id text, at timestamptz default now()). Each transition commits in its own
+// transaction, so `at` differs between transitions of one lesson; `id` is only a tie-break and is not an ordering key.
 const review_states = async (id: string) =>
   (await s.world.query<{ from_state: string; to_state: string }>("select from_state, to_state from review_event where lesson_id=$1 order by at, id", [id])).map((r) => `${r.from_state}->${r.to_state}`);
 
@@ -141,7 +143,14 @@ describe("valid supported content through the real lifecycle", () => {
     expect((await state_report(s, id)).lesson_state).toBe("exported");
   }, T);
 
-  it("V3.human_work_then_dependency_order", async () => {
+  // The V3 steps form one lifecycle (fill slots, submit L4, approve in dependency order). Each test awaits the memoized step(s) it
+  // needs, so it also runs alone (-t), shuffled or concurrent: whichever test starts first runs the step, the others wait for it.
+  // A failed step rejects the same promise, so every test that depends on it reports the failure.
+  const once = <A>(fn: () => Promise<A>): (() => Promise<A>) => {
+    let p: Promise<A> | undefined;
+    return () => (p ??= fn());
+  };
+  const v3_human_work = once(async () => {
     const L5 = "G6.U4.L5";
     const L4 = "G6.U4.L4";
     const blocking_kinds = (r: { details: Details }): string[] =>
@@ -238,24 +247,29 @@ describe("valid supported content through the real lifecycle", () => {
     // The waiting phase: slot filled, source lesson not yet approved. Not "waits on an empty slot".
     const waiting = await s.world.query<{ message: string }>("select message from issue where lesson_id=$1 and kind='cross_lesson_link' and content_hash=$2", [L4, g4b.content_hash]);
     expect(waiting.map((w) => w.message).join(" ")).toMatch(new RegExp(`Waiting for ${L5}`, "i"));
-  }, T);
+  });
+  it("V3.human_work_then_dependency_order", v3_human_work, T);
 
   // R-F3-7 (fixed): the waiting phase (slot filled, source not yet approved) passes Submit; Approve refuses DEPENDENCY_UNAPPROVED.
-  let submitted_l4: { content_hash: string; state_vector: string } | null = null;
-  it("V3.waiting_phase_submit_passes_per_gates_contract", async () => {
+  const v3_waiting_submit = once(async () => {
+    await v3_human_work();
     const sub4 = await submit(s, "G6.U4.L4", "strict");
     expect(sub4.ok, JSON.stringify(sub4)).toBe(true);
-    if (sub4.ok) submitted_l4 = sub4.result.version;
+    return sub4.ok ? sub4.result.version : null;
+  });
+  it("V3.waiting_phase_submit_passes_per_gates_contract", async () => {
+    await v3_waiting_submit();
   }, T);
 
   it("V3.dependency_order_to_export", async () => {
+    const submitted_l4 = await v3_waiting_submit();
     const L5 = "G6.U4.L5";
     const L4 = "G6.U4.L4";
     const d4 = wp1_draft();
     const g4b = await stored(s, L4);
     const g5d = await stored(s, L5);
     // The strict gate lets the waiting phase through (R-F3-7); approval's own dependency gate then refuses it.
-    expect(submitted_l4, "V3.waiting_phase_submit... ran first and submitted L4").not.toBeNull();
+    expect(submitted_l4, "the waiting-phase submit of L4 returned a version").not.toBeNull();
     const early = await approve(s, L4, submitted_l4!);
     expect(early.ok).toBe(false);
     if (early.ok) return;

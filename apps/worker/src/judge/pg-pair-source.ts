@@ -7,7 +7,7 @@ import type { JudgeLessonContext, JudgePair, JudgePairSource } from "./pair-sour
 
 export const SYSTEM_JUDGE_USER = "usr_judge_system" as UserId;
 
-// NL-110. Pairs are the I/P alignment_link rows of the hash. The prompt gets activity text, official standard text,
+// NL-110. Pairs are the distinct (code, address) of the I/P alignment_link rows of the hash (a code both Introduced and Practised at one address is one pair, not two: migration 0016 keys the row on role). The prompt gets activity text, official standard text,
 // code and address only (AC-5): never other sections, outline notes or the title.
 export class PgJudgePairSource implements JudgePairSource {
   private readonly db: PgDatabase;
@@ -23,7 +23,7 @@ export class PgJudgePairSource implements JudgePairSource {
   async load(lesson_id: LessonId, content_hash: Sha256): Promise<JudgeLessonContext> {
     const meta = await this.db.with_tx(async (tx) => {
       const links = await tx.query(
-        "SELECT code, address FROM alignment_link WHERE lesson_id=$1 AND content_hash=$2 AND role IN ('I','P') ORDER BY code, address",
+        "SELECT DISTINCT code, address FROM alignment_link WHERE lesson_id=$1 AND content_hash=$2 AND role IN ('I','P') ORDER BY code, address",
         [lesson_id, content_hash],
       );
       const run = await tx.query("SELECT run_id FROM lesson_version WHERE lesson_id=$1 AND content_hash=$2 ORDER BY number DESC LIMIT 1", [lesson_id, content_hash]);

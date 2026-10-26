@@ -25,6 +25,21 @@ describe("name scan residual", () => {
     }
   });
 
+  // The opposite limit, a MISSED name: a name the tagger reads as a verb, adjective or noun when written in lower case
+  // is not flagged as the first word after a label (first_word_is_name returns false). Recorded, not fixed.
+  it("missed_names_that_read_as_ordinary_words_are_not_flagged_after_a_label", () => {
+    for (const name of ["Hunter", "Storm", "Hope", "Bishop", "Dash", "Sparky"]) {
+      expect(scan_names(`B. Incorrect: ${name} would wait.`, empty()), name).toEqual([]);
+    }
+  });
+
+  it("lowercase_use_elsewhere_in_the_lesson_clears_a_capitalised_form", () => {
+    expect(scan_names("B. Incorrect: Brindle would wait.", empty())).toEqual(["Brindle"]);
+    const used = build_name_index(["Percy fights."], ["A brindle coat is striped."]);
+    expect(scan_names("B. Incorrect: Brindle would wait.", used)).toEqual([]);
+    expect(scan_names("B. Incorrect: The dog Brindle would wait.", used)).toEqual([]);
+  });
+
   const finding = () => {
     const ctx = build_ctx("wp1", { mutate: (d) => { d.blocks[16]!.cfu!.rationales[1] = "Length does not matter."; } });
     return proper_noun_unsourced_rule.run(ctx, CHECK_POLICY).filter((f) => f.matched === "Length");

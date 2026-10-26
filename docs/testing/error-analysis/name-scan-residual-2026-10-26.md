@@ -31,3 +31,26 @@ is not warranted by that number. Reopen if a real run's final drafts show any of
 the count then.
 
 **Not covered.** Names later in a sentence; the existing `surface-forms` and `name-scan` tests cover them.
+
+## Second limit: missed names read as ordinary words (added 2026-10-26, review follow-up)
+
+This is a **missed-name** limit, the opposite error to the three false positives above. It is recorded as a limit,
+not fixed; detection is unchanged.
+
+**Words probed (first word after a label, in no source, no lowercase use in the lesson; none flagged).** `Hunter`,
+`Storm`, `Hope`, `Bishop`, `Dash`, `Sparky`. Test: `missed_names_that_read_as_ordinary_words_are_not_flagged_after_a_label`
+in `name-scan-residual.test.ts`. By contrast `Medusa`, `Brindle` and `Quillon` are flagged in the same position.
+
+**Why.** After a label the scan decides by the word's class in lower case (`first_word_is_name`): if the tagger reads
+the lower-case form as a verb, adjective, noun it knows, or another function word, the word is not treated as a
+name. A real character called Hunter or Storm reads as the common word.
+
+**Policy (same as the false-positive residual).** Stay blocking where the scan does flag; the finding is resolvable
+by a named reviewer; no whitelist and no word-class exemption; the missed name is a recorded limit of the automatic
+check, so a reviewer reading the CFU rationales remains the backstop.
+
+**Lowercase use clears a capitalised form.** Any lowercase occurrence of the word in a source or in the lesson's own
+fields (`index.L`) clears every capitalised occurrence, after a label or mid-sentence. Test:
+`lowercase_use_elsewhere_in_the_lesson_clears_a_capitalised_form` (`Brindle` flagged alone, cleared by "a brindle
+coat"). **Exploitability: low.** An invented name escapes only if the same word also appears as an ordinary lowercase
+word in the lesson or its sources; the model does not choose that on purpose, and a reviewer sees the lesson text.

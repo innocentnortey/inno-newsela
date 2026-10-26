@@ -121,6 +121,13 @@ function merge_and_dedupe(text: string, cands: Cand[]): string[] {
  * Preference, Describes) cannot be told from an invented name by the tagger and is flagged. It stays blocking in CFU
  * text: Medusa, Brindle and Quillon fall in the same class and must stay caught. Policy: repair is told the exact
  * word; a reviewer can resolve it; no word list.
+ *
+ * Known residual, the other direction (2026-10-26, same file): a MISSED name. A name the tagger reads as a verb,
+ * adjective or noun when written in lower case (Hunter, Storm, Hope, Bishop, Dash, Sparky) is not flagged as the first
+ * word after a label, because `first_word_is_name` decides by that lower-case class. Not fixed: stays blocking where
+ * flagged, a reviewer can resolve, no word list. Likewise a capitalised form is cleared by any lower-case use of the
+ * same word in a source or in the lesson's own text (`index.L`); exploitability low (the invented name must also
+ * appear as an ordinary word elsewhere in the same lesson).
  */
 const OPTION_LABEL = /(^|\n)(\s*(?:[A-Za-z][.)]\s+)?(?:Correct|Incorrect)\s*[:.\-–—]\s*)/g;
 export function blank_option_labels(text: string): string {
