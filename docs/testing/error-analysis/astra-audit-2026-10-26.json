@@ -1,0 +1,406 @@
+{
+  "date": "2026-10-26",
+  "kind": "offline independent audit, not a new generation run",
+  "base_commit": "e7e72a3da607946683473acef0f706928570e71f",
+  "pending_patch_sha256": "057c0b39e6b6d828dfeb4db8ae76505d52de7a2e99996910f837b741f198f3b4",
+  "scope": "Read-only stored calls, jobs, outlines, standards and generated versions from the two named VPS databases; local schema/compiler/check replay. No paid calls or production writes.",
+  "replay_limitations": [
+    "Checks use reconstructed stored outline, arc and standards context. Cross-lesson links and mutable review/lifecycle records were not loaded.",
+    "Generation replay cleanliness is not a stored ready outcome or a semantic-quality judgment.",
+    "Original run counts and replay counts are kept separately."
+  ],
+  "runs": [
+    {
+      "database": "ls_nl112_dev",
+      "run_id": "run_01M5W6JK5XJQ7VE0WMR7HR1Z11",
+      "lessons": 47,
+      "stored_status_counts": {
+        "generation_failed": 39,
+        "ready": 8
+      },
+      "initial_and_repair_validation": {
+        "lesson_draft": {
+          "total": 47,
+          "valid": 11,
+          "compiled": 11
+        },
+        "repair": {
+          "total": 47,
+          "valid": 47,
+          "compiled": 47
+        }
+      },
+      "initial_invalid_issue_paths": {
+        "cfu": 71,
+        "code_origins": 30
+      },
+      "recorded_repairs": 47,
+      "recorded_ready_without_repair": 0,
+      "blocking_names_baseline_lessons": 13,
+      "blocking_names_patched_lessons": 4,
+      "baseline_page_failure_lessons": 6,
+      "stored_ready_with_full_rule_blockers": 8,
+      "full_rule_kinds_on_stored_ready_by_lesson": {
+        "code_not_allowed": 7,
+        "schema_invalid": 8,
+        "quote_placeholder_open": 6
+      },
+      "saved_version_slot_nodes": {
+        "quote_placeholder": 6
+      },
+      "saved_versions_with_slots": 6
+    },
+    {
+      "database": "ls_nl112c",
+      "run_id": "run_01M5W7VQFD6AEVPMPZA2Z4S9ZK",
+      "lessons": 47,
+      "stored_status_counts": {
+        "ready": 30,
+        "generation_failed": 17
+      },
+      "initial_and_repair_validation": {
+        "lesson_draft": {
+          "total": 47,
+          "valid": 44,
+          "compiled": 44
+        },
+        "repair": {
+          "total": 28,
+          "valid": 28,
+          "compiled": 28
+        }
+      },
+      "initial_invalid_issue_paths": {
+        "code_origins": 7
+      },
+      "recorded_repairs": 28,
+      "recorded_ready_without_repair": 19,
+      "blocking_names_baseline_lessons": 15,
+      "blocking_names_patched_lessons": 0,
+      "baseline_page_failure_lessons": 2,
+      "stored_ready_with_full_rule_blockers": 27,
+      "full_rule_kinds_on_stored_ready_by_lesson": {
+        "schema_invalid": 27,
+        "excerpt_slot_open": 7,
+        "code_not_allowed": 23,
+        "quote_placeholder_open": 13
+      },
+      "saved_version_slot_nodes": {
+        "quote_placeholder": 13,
+        "excerpt_slot": 7
+      },
+      "saved_versions_with_slots": 16,
+      "patched_generation_replay_without_blockers": 47,
+      "failed_lesson_replay": [
+        {
+          "lesson_id": "G6.U4.FLEX-1b",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Switching",
+            "Waiting"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.FLEX-2b",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Copying",
+            "Listing",
+            "Naming"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L10",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Ignoring",
+            "Skipping"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L19",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Dismissive",
+            "Length",
+            "Too"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L20",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Nothing"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L21",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "page_out_of_range"
+            }
+          ],
+          "blocking_name_tokens_before": [],
+          "page_refs_before": [
+            "pp. 219-233"
+          ],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L22",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "page_out_of_range"
+            }
+          ],
+          "blocking_name_tokens_before": [],
+          "page_refs_before": [
+            "Chapter 15 and one"
+          ],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L23",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Changing"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L24",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Copying"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L28",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Retelling"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L32",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Predicting",
+            "Repeating",
+            "Retelling",
+            "Staying",
+            "Walking"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L33",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Nothing"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L35",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Describes",
+            "Dismissive",
+            "Preference",
+            "Too"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L4",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Nothing"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L40",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Changing",
+            "Copying",
+            "Extra",
+            "Repeating",
+            "Switching"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L8",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Appearing",
+            "Nothing"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        },
+        {
+          "lesson_id": "G6.U4.L9",
+          "stored_reasons": [
+            {
+              "check": "check_failed",
+              "message": "The draft failed a required lesson check.",
+              "check_kind": "proper_noun_unsourced"
+            }
+          ],
+          "blocking_name_tokens_before": [
+            "Skipping"
+          ],
+          "page_refs_before": [],
+          "blocking_names_after": [],
+          "generation_blockers_after": []
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "npx vitest run packages/core/src/checks/rules/grounding/surface-forms.test.ts packages/core/src/checks/rules/grounding/name-scan.test.ts packages/core/src/checks/rules/grounding/plants.test.ts packages/core/src/checks/rules/grounding/clean-drafts.test.ts",
+    "files_passed": 4,
+    "tests_passed": 37
+  },
+  "source_snapshots": {
+    "ls_nl112_dev/versions.json": "5a7ccf9b6937fe5f877216381381dc2eeb981b4768ff83f6518698d793fef84b",
+    "ls_nl112_dev/standards.json": "38d2d9ffbbc04039dc350c8394affbf6b5860427d791f1737cf2f8ff45746c51",
+    "ls_nl112_dev/outlines.json": "1289b311e9c59ea025957e7315e1badede9b89f7a9bb9e49d16aa1ff9edb48c7",
+    "ls_nl112_dev/jobs.json": "8d6224c1a7f07ed110b32fed5a13ed35b6c51e53b08c1a812a0f1cee52319e7f",
+    "ls_nl112_dev/calls.json": "71e40e1601f8fd7558e91a549d8a1a8935dc8f7873a2acc80bea4120213bd366",
+    "ls_nl112c/versions.json": "4449508ce506b723cc79b2dbafab43ecb85f6bf7781d96d737032e86b6dac3e4",
+    "ls_nl112c/standards.json": "38d2d9ffbbc04039dc350c8394affbf6b5860427d791f1737cf2f8ff45746c51",
+    "ls_nl112c/outlines.json": "1289b311e9c59ea025957e7315e1badede9b89f7a9bb9e49d16aa1ff9edb48c7",
+    "ls_nl112c/jobs.json": "5d61cb813a89247d645c3c8af16c0f94f02d8f5f7a5a5b779eec776edc88b95f",
+    "ls_nl112c/calls.json": "21ce1ed30a6ab6fb55d93ab19296fb87f4f38ab88619be924bdcda9eb75541ea"
+  },
+  "local_raw_evidence_directory": "/var/folders/c5/kd13qz9n6yzc2qs01vc75s9r0000gn/T/newsela-astra-evidence-zavhl53i"
+}
