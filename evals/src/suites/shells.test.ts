@@ -6,7 +6,7 @@ import type { EvalCase, EvalOptions, SuiteName } from "../types.ts";
 
 const TICKETS: [SuiteName, string][] = [
   ["S3", "NL-109"], ["S5", "NL-125"],
-  ["S8", "NL-127"], ["S11", "NL-121"], ["S12", "NL-111"], ["S14", "NL-118/NL-119"],
+  ["S8", "NL-127"], ["S12", "NL-111"], ["S14", "NL-118/NL-119"],
 ];
 const OPTS: EvalOptions = { repeat: 1, provider_mode: "stub", git_sha: "x", unit: null };
 const CASE = {} as EvalCase;

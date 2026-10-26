@@ -1,6 +1,6 @@
 {
  "ticket": "NL-121",
- "note": "Frozen before implementation (risk::security). Tests are red because evals/src/heldout/{schema,compare,published,generated,guard,cli}.ts and evals/src/suites/s11.ts make_s11(deps) do not exist yet. Fixtures are synthetic (canary CANARY-HELDOUT-7f3a). AC-6 (real run) is blocked on NL-112 and has no test. AC-8 is docs. The shells.test.ts S11 entry removal and the eslint.config.js block are implementer edits. Worktree was checked out sparse (apps/web/e2e/__screenshots__ excluded) because the disk was full; run `git sparse-checkout disable` once space is free.",
+ "note": "Frozen before implementation (risk::security). Tests are red because evals/src/heldout/{schema,compare,published,generated,guard,cli}.ts and evals/src/suites/s11.ts make_s11(deps) do not exist yet. Fixtures are synthetic (carry a synthetic canary string). AC-6 (real run) is blocked on NL-112 and has no test. AC-8 is docs. The shells.test.ts S11 entry removal and the eslint.config.js block are implementer edits. Worktree was checked out sparse (apps/web/e2e/__screenshots__ excluded) because the disk was full; run `git sparse-checkout disable` once space is free.",
  "files": {
   "evals/src/heldout/compare.test.ts": "2ee60cf8c435e4d5f4c40cff176b6794b99470b194fd79b3c2644ff04ca1feac",
   "evals/src/heldout/generated.int.test.ts": "94bc47044fe665e7c1c63524397eef57eb68a3e2453346e0b7160f0755caf653",
