@@ -70,9 +70,13 @@ export class CheckContextLoader {
       ...new Set([...allowed_codes, ...lesson.front_matter.standards.map((s) => s.code)]),
     ]);
 
+    const deps = await this.graph.dependencies(lesson_id);
+    const linked_states = Object.fromEntries(
+      deps.filter((d) => d.direction === "waits_on").map((d) => [d.lesson_id, d.source_state]),
+    );
     const linked_ids = [
       ...new Set([
-        ...(await this.graph.dependencies(lesson_id)).map((d) => d.lesson_id),
+        ...deps.map((d) => d.lesson_id),
         ...(await this.graph.dependants(lesson_id)),
       ]),
     ].filter((id) => id !== lesson_id);
@@ -112,6 +116,7 @@ export class CheckContextLoader {
       text_cards: lesson.text_cards,
       links: rc.links,
       linked_lessons,
+      linked_states,
       pending_suggestions,
       safety_flags,
       confirmations,

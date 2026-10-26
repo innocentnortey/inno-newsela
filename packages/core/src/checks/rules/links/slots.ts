@@ -1,24 +1,49 @@
 import type { PMNode, StoredLesson } from "@ls/schema/lesson";
-import { section_nodes, walk } from "../structural/doc-walk.ts";
+import { walk } from "../structural/doc-walk.ts";
 
 export type SlotState = "open" | "filled" | "absent";
 
-export function slot_state(lesson: StoredLesson, slot_id: string): SlotState {
+type Sections = readonly { content: PMNode }[];
+
+/** The one definition of "filled": a rights status other than unset and a non-blank source string. */
+export function is_excerpt_filled(attrs: PMNode["attrs"]): boolean {
+  const ref = attrs?.source_ref;
+  return attrs?.rights !== undefined && attrs.rights !== "unset" && typeof ref === "string" && ref.trim() !== "";
+}
+
+// A fill turns an excerpt_slot into a `quote` node that keeps the slot id, so a filled slot is still a slot.
+function is_slot_node(n: PMNode): boolean {
+  return (
+    n.type === "quote_placeholder" ||
+    n.type === "excerpt_slot" ||
+    (n.type === "quote" && typeof n.attrs?.slot_id === "string")
+  );
+}
+
+/** The one id-matching rule: exact slot_id first, then the `<lesson>.excerpt-N` ordinal over excerpt_slot nodes. */
+export function find_slot_node(sections: Sections, slot_id: string): PMNode | undefined {
   const slots: PMNode[] = [];
-  for (const s of lesson.sections) {
-    for (const top of section_nodes(s)) {
+  for (const s of sections) {
+    for (const top of s.content.content ?? []) {
       walk(top, (n) => {
-        if (n.type === "quote_placeholder" || n.type === "excerpt_slot") slots.push(n);
+        if (is_slot_node(n)) slots.push(n);
       });
     }
   }
-  let node = slots.find((n) => n.attrs?.slot_id === slot_id);
-  if (node === undefined) {
-    // lesson-links names slots `<lesson>.excerpt-N`, compile names them `<lesson>.slot<n>`; ordinal fallback until NL-46 reconciles.
-    const m = /\.excerpt-(\d+)$/.exec(slot_id);
-    if (m !== null) node = slots.filter((n) => n.type === "excerpt_slot")[Number(m[1]) - 1];
-  }
+  const exact = slots.find((n) => n.attrs?.slot_id === slot_id);
+  if (exact !== undefined) return exact;
+  // lesson-links names slots `<lesson>.excerpt-N`, compile names them `<lesson>.slot<n>`; ordinal fallback until NL-46 reconciles.
+  const m = /\.excerpt-(\d+)$/.exec(slot_id);
+  return m === null ? undefined : slots.filter((n) => n.type !== "quote_placeholder")[Number(m[1]) - 1];
+}
+
+export function slot_state_of(sections: Sections, slot_id: string): SlotState {
+  const node = find_slot_node(sections, slot_id);
   if (node === undefined) return "absent";
   if (node.type === "quote_placeholder") return "open";
-  return node.attrs?.rights === "unset" || node.attrs?.source_ref == null ? "open" : "filled";
+  return is_excerpt_filled(node.attrs) ? "filled" : "open";
+}
+
+export function slot_state(lesson: StoredLesson, slot_id: string): SlotState {
+  return slot_state_of(lesson.sections, slot_id);
 }

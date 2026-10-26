@@ -18,6 +18,7 @@ import { is_editable } from "@ls/core/lifecycle/lesson-machine";
 import type { LessonState } from "@ls/schema/api/board";
 import type { NormalizedRow } from "@ls/schema/outline";
 import type { StoredLesson } from "@ls/schema/lesson";
+import { slot_state_of } from "@ls/core/checks/rules/links/slots";
 import { SCHEMA_VERSION } from "@ls/editor-schema/schema";
 import type { PgDatabase } from "../pool.ts";
 import { Tx as DbTx } from "../tx.ts";
@@ -100,15 +101,11 @@ function count_words_total(lesson: StoredLesson): number {
   return lesson.sections.reduce((s, sec) => s + count_words(sec.content as PMNode), 0);
 }
 
-function node_fills_slot(n: PMNode, slot_id: string): boolean {
-  if (n.type === "excerpt_slot" && n.attrs?.["slot_id"] === slot_id && typeof n.attrs?.["source_ref"] === "string") return true;
-  return (n.content ?? []).some((k) => node_fills_slot(k, slot_id));
-}
-
 function slot_is_filled(derived: unknown, slot_id: string): boolean {
-  const sections = (derived as { sections?: { content?: PMNode }[] } | null)?.sections;
+  const sections = (derived as { sections?: { content?: unknown }[] } | null)?.sections;
   if (!Array.isArray(sections)) return false;
-  return sections.some((s) => s.content !== undefined && node_fills_slot(s.content, slot_id));
+  const typed = sections.filter((s) => s.content !== undefined) as unknown as Parameters<typeof slot_state_of>[0];
+  return slot_state_of(typed, slot_id) === "filled";
 }
 
 const SOURCE_FILTER = `(kind='generated' OR (kind='candidate' AND adopted))`;

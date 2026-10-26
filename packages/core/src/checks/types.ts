@@ -140,6 +140,8 @@ export type CheckContext = {
   text_cards: TextCardRecord[];
   links: LessonLinkRecord[];
   linked_lessons: DerivedRow[];
+  // State of each lesson this one waits on, keyed by lesson id. Absent means unknown: the waiting phase emits nothing.
+  linked_states?: Readonly<Record<string, string>>;
   pending_suggestions: SuggestionRow[];
   safety_flags: SafetyFlagRow[];
   confirmations: AlignmentLinkRow[];

@@ -70,39 +70,26 @@ export class PgIssueRepo implements IssueRepo {
     const existing = (await q.query<Raw>(`SELECT ${COLS} FROM issue WHERE lesson_id=$1`, [lesson_id])).rows;
     const same_hash = existing.some((r) => r.content_hash === content_hash);
 
+    const fresh = new Set(findings.map(key));
     if (same_hash) {
-      // Retry or an edit back to an earlier hash: same hash means same findings; re-affirm as newest.
+      // Retry, a re-check at an unchanged hash (S-33), or an edit back to an earlier hash: re-affirm as newest,
+      // clear open rows the re-check no longer produces (cleared_by='fix', never DELETE), add new findings.
       await q.query(
         `UPDATE issue SET created_at=$3::timestamptz,
            cleared_by = CASE WHEN cleared_by='fix' THEN NULL ELSE cleared_by END
          WHERE lesson_id=$1 AND content_hash=$2`,
         [lesson_id, content_hash, iso],
       );
+      const here = existing.filter((r) => r.content_hash === content_hash);
+      const gone = here.filter((r) => r.resolved_at === null && !fresh.has(key(r))).map((r) => r.id);
+      if (gone.length > 0) await q.query(`UPDATE issue SET cleared_by='fix' WHERE id = ANY($1)`, [gone]);
+      const have = new Set(here.map(key));
+      await this.#insert_findings(q, lesson_id, content_hash, findings.filter((f) => !have.has(key(f))), existing, iso);
     } else {
-      const latest = new Map<string, Raw>();
-      const resolved = existing
-        .filter((r) => r.resolved_at !== null)
-        .sort((a, b) => a.resolved_at!.getTime() - b.resolved_at!.getTime() || (a.id < b.id ? -1 : 1));
-      for (const r of resolved) latest.set(key(r), r);
-      for (const f of findings) {
-        const carried = latest.get(key(f));
-        await q.query(
-          `INSERT INTO issue (id, lesson_id, content_hash, level, kind, message, address, span_anchor,
-             related_lesson_id, code, resolved_by, resolution_reason, resolved_at, cleared_by, created_at)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::timestamptz,$14,$15::timestamptz)`,
-          [
-            this.#ids.new_id("iss"), lesson_id, content_hash, f.level, f.kind, f.message, f.address,
-            f.span_anchor, f.related_lesson_id, f.code,
-            carried?.resolved_by ?? null, carried?.resolution_reason ?? null,
-            carried?.resolved_at ? carried.resolved_at.toISOString() : null,
-            carried ? "resolution" : null, iso,
-          ],
-        );
-      }
+      await this.#insert_findings(q, lesson_id, content_hash, findings, existing, iso);
     }
 
     // Fix-clearing: open rows of other hashes whose key is gone from the new findings.
-    const fresh = new Set(findings.map(key));
     const stale = existing
       .filter((r) => r.content_hash !== content_hash && r.resolved_at === null && r.cleared_by === null)
       .filter((r) => !fresh.has(key(r)))
@@ -111,11 +98,41 @@ export class PgIssueRepo implements IssueRepo {
 
     const rows = (
       await q.query<Raw>(
-        `SELECT ${COLS} FROM issue WHERE lesson_id=$1 AND content_hash=$2 ORDER BY created_at, id`,
+        `SELECT ${COLS} FROM issue WHERE lesson_id=$1 AND content_hash=$2 AND cleared_by IS DISTINCT FROM 'fix' ORDER BY created_at, id`,
         [lesson_id, content_hash],
       )
     ).rows;
     return { lesson_id, checked_hash: content_hash, checked_at: now, issues: rows.map(to_row) };
+  }
+
+  async #insert_findings(
+    q: DbTx,
+    lesson_id: LessonId,
+    content_hash: Sha256,
+    findings: readonly CheckFinding[],
+    existing: readonly Raw[],
+    iso: string,
+  ): Promise<void> {
+    const latest = new Map<string, Raw>();
+    const resolved = existing
+      .filter((r) => r.resolved_at !== null)
+      .sort((a, b) => a.resolved_at!.getTime() - b.resolved_at!.getTime() || (a.id < b.id ? -1 : 1));
+    for (const r of resolved) latest.set(key(r), r);
+    for (const f of findings) {
+      const carried = latest.get(key(f));
+      await q.query(
+        `INSERT INTO issue (id, lesson_id, content_hash, level, kind, message, address, span_anchor,
+           related_lesson_id, code, resolved_by, resolution_reason, resolved_at, cleared_by, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::timestamptz,$14,$15::timestamptz)`,
+        [
+          this.#ids.new_id("iss"), lesson_id, content_hash, f.level, f.kind, f.message, f.address,
+          f.span_anchor, f.related_lesson_id, f.code,
+          carried?.resolved_by ?? null, carried?.resolution_reason ?? null,
+          carried?.resolved_at ? carried.resolved_at.toISOString() : null,
+          carried ? "resolution" : null, iso,
+        ],
+      );
+    }
   }
 
   async current(lesson_id: LessonId): Promise<IssueSet> {
@@ -124,7 +141,7 @@ export class PgIssueRepo implements IssueRepo {
       if (!ch) return { lesson_id, checked_hash: null, checked_at: null, issues: [] };
       const rows = (
         await tx.query<Raw>(
-          `SELECT ${COLS} FROM issue WHERE lesson_id=$1 AND content_hash=$2 ORDER BY created_at, id`,
+          `SELECT ${COLS} FROM issue WHERE lesson_id=$1 AND content_hash=$2 AND cleared_by IS DISTINCT FROM 'fix' ORDER BY created_at, id`,
           [lesson_id, ch.content_hash],
         )
       ).rows;
@@ -173,6 +190,7 @@ export class PgIssueRepo implements IssueRepo {
          FROM lesson l
          LEFT JOIN LATERAL (${checked_hash_sql("l.id")}) ch ON true
          LEFT JOIN issue i ON i.lesson_id = l.id AND i.content_hash = ch.content_hash
+           AND i.cleared_by IS DISTINCT FROM 'fix'
          WHERE l.unit_id=$1
          GROUP BY l.id, l.number
          ORDER BY l.number NULLS LAST, l.id`,

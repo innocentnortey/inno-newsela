@@ -163,7 +163,7 @@ describe("CheckContextLoader", () => {
     expect(ctx.content_hash).toBe(HASH);
     expect(Object.keys(ctx).sort()).toEqual(
       ["lesson_id", "content_hash", "outline_version_id", "lesson", "row", "arc_header",
-        "allowed_codes", "standards", "text_cards", "links", "linked_lessons",
+        "allowed_codes", "standards", "text_cards", "links", "linked_lessons", "linked_states",
         "pending_suggestions", "safety_flags", "confirmations", "previous_lesson_flags",
         "unit_coverage"].sort());
   });
@@ -174,6 +174,11 @@ describe("CheckContextLoader", () => {
       const { loader } = build({ deps: [L5], stored: { [L5]: stored } });
       const ctx = await loader.load(L4, lesson(), HASH);
       expect(ctx.linked_lessons).toEqual([stored]);
+    });
+    it("linked_states maps each waits_on dependency to its source state", async () => {
+      const { loader } = build({ deps: [L5], dependants: [L3], stored: {} });
+      const ctx = await loader.load(L4, lesson(), HASH);
+      expect(ctx.linked_states).toEqual({ [L5]: "approved" });
     });
     it("omits a lesson with no stored doc", async () => {
       const { loader } = build({ deps: [L5], stored: {} });

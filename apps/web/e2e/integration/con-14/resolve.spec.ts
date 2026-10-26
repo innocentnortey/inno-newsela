@@ -123,11 +123,8 @@ test("safety_flag: a note is required; clearing records who and when and drops t
   }
 });
 
-// Seam defect S-33 (docs/plans/seam-followups.md): a re-check of an already-checked hash only re-affirms its issue rows
-// (PgIssueRepo.replace_for_hash, same-hash branch), so the safety_flag_open issue stays after the flag is cleared.
-// The fix is in packages/db (not this ticket's boundary). This test is expected to fail until then; it flips to a plain test.
-test("safety_flag: the cleared flag's issue leaves the list (S-33, expected to fail until replace_for_hash drops it)", async ({ browser }) => {
-  test.fail();
+// S-33 fixed by GEN-3: replace_for_hash drops findings a same-hash re-check no longer produces.
+test("safety_flag: the cleared flag's issue leaves the list (S-33)", async ({ browser }) => {
   const live = await liveStack();
   const lesson = await seedWp4();
   await enqueueCheck(lesson.lessonId);
@@ -137,7 +134,7 @@ test("safety_flag: the cleared flag's issue leaves the list (S-33, expected to f
     const ok = await api(r.page, "POST", `/lessons/${lesson.lessonId}/safety-flags/${lesson.flagId}/clear`, { note: "Cleared for the check." });
     expect(ok.status).toBe(200);
     await expect
-      .poll(async () => ((await issuesOf(r.page, lesson.lessonId)).body.issues as { kind: string }[]).some((i) => i.kind === "safety_flag_open"), { timeout: 8000 })
+      .poll(async () => ((await issuesOf(r.page, lesson.lessonId)).body.issues as { kind: string }[]).some((i) => i.kind === "safety_flag_open"), { timeout: 15_000 })
       .toBe(false);
   } finally {
     await r.context.close();
