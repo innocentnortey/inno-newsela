@@ -122,7 +122,8 @@ export function useTrial(opts: {
             kind: "made",
             number: lesson.number,
             lessonKey: lesson.lessonKey,
-            candidateId: found.version_id,
+            // CON-16: a candidate is addressed by its run id (the route answers NOT_FOUND for a lesson version id).
+            candidateId: run.run_id,
           });
           return;
         }
