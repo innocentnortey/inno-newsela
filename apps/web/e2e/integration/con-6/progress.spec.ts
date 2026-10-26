@@ -34,10 +34,12 @@ test("test_progress_reflects_jobs: each state appears within 3 s, polls every 2 
   });
   // The screen waits 2 s AFTER each response before the next poll (use-poll.ts), so the interval is measured from the end of one
   // request to the start of the next; the fetch duration (load-dependent) is logged separately.
-  const starts: number[] = [];
-  const ends: number[] = [];
-  page.on("request", (r) => { if (/\/api\/runs\/[^/]+\/progress/.test(r.url())) starts.push(Date.now()); });
-  page.on("requestfinished", (r) => { if (/\/api\/runs\/[^/]+\/progress/.test(r.url())) ends.push(Date.now()); });
+  // Only THIS run's polls count: the listeners are attached before startRun signs in, and the home page that sign-in lands on reads
+  // /progress once for any other active run left in the shared DB; that one-off read is not a poll and used to show up as a ~1 s first gap.
+  const reqs: { url: string; start: number; end?: number }[] = [];
+  const open = new Map<unknown, { url: string; start: number; end?: number }>();
+  page.on("request", (r) => { if (/\/api\/runs\/[^/]+\/progress/.test(r.url())) { const x = { url: r.url(), start: Date.now() }; open.set(r, x); reqs.push(x); } });
+  page.on("requestfinished", (r) => { const x = open.get(r); if (x) x.end = Date.now(); });
 
   const run = await startRun(page);
   // draft call of L4 held: tile stays Drafting; its repair call held: Repairing; L5 held so it stays out of the way
@@ -83,6 +85,9 @@ test("test_progress_reflects_jobs: each state appears within 3 s, polls every 2 
     expect(hit, `${must} never shown`).toBeDefined();
     expect(hit!.t - t0, `${must} latency`).toBeLessThanOrEqual(3000);
   }
+  const mine = reqs.filter((x) => x.url.includes(`/api/runs/${run.run_id}/progress`) && x.end !== undefined);
+  const starts = mine.map((x) => x.start);
+  const ends = mine.map((x) => x.end!);
   const gaps = starts.slice(1).map((t, i) => t - (ends[i] ?? starts[i]!)).filter((g) => g < 10_000);
   console.log("AC-1 poll intervals, response end to next request (ms):", gaps.join(","), "| fetch durations (ms):", ends.map((e, i) => e - starts[i]!).join(","), "| request-start to request-start (ms):", starts.slice(1).map((t, i) => t - starts[i]!).join(","));
   expect(gaps.length).toBeGreaterThanOrEqual(4); // the screen stops polling once the run is terminal
