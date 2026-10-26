@@ -31,6 +31,7 @@ import {
   SESSION_ENDED_CODE,
   SESSION_ENDED_REASON,
   SessionRecheck,
+  type CurrentAccess,
   type LiveHashes,
 } from "../session-recheck.ts";
 
@@ -46,6 +47,8 @@ export interface ServerPorts {
   doc_reader: LessonDocReader;
   /** Batched session liveness for the S-9 sweep; falls back to one `sessions.resolve` per hash. */
   live_hashes?: LiveHashes;
+  /** Batched current role and lesson state for the S-29 sweep; absent = the sweep checks sessions only. */
+  current_access?: CurrentAccess;
 }
 export interface CollabServerWiring {
   frozen: FrozenDocs;
@@ -173,6 +176,10 @@ function default_ports(d: CollabDeps): {
     ports: {
       sessions: session_repo,
       live_hashes: (hashes, now) => session_repo.live_hashes(hashes, now),
+      current_access: async (u, l) => {
+        const [roles, st] = await Promise.all([session_repo.roles_of(u), states.states_of(l)]);
+        return { roles, states: st };
+      },
       states,
       doc_store,
       doc_reader: new PgLessonDocReader({ db }),
@@ -326,7 +333,7 @@ export function wire_collab_server(
           if ((await ports.sessions.resolve(x, now)) !== null) ok.add(x);
         return ok;
       });
-    const recheck = new SessionRecheck(live_hashes, d.clock, d.logger);
+    const recheck = new SessionRecheck(live_hashes, d.clock, d.logger, ports.current_access);
     recheck_timer = setInterval(() => {
       void recheck.tick(() =>
         [...live.documents.values()].flatMap((doc) =>
@@ -334,6 +341,10 @@ export function wire_collab_server(
             ctx: c.context?.ctx,
             close: () =>
               c.close({ code: SESSION_ENDED_CODE, reason: SESSION_ENDED_REASON }),
+            downgrade: (dg) => {
+              c.readOnly = true;
+              acks.mode_to(c.socketId, { mode: "read_only", state: dg.state });
+            },
           })),
         ),
       );

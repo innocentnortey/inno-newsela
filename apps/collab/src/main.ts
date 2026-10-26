@@ -10,7 +10,7 @@ import { create_inflight_tracker, DrainingError, install_drain, type InflightTra
 import { create_health_handler, is_health_path, open_health_db, type HealthDb } from "./health.ts";
 import { handle_internal, is_internal_path } from "./commands/routes.ts";
 import { wire_collab_server } from "./wiring/server.ts";
-import { wire_collab_commands } from "./wiring/commands.ts";
+import { wire_collab_commands, type CollabCommandWiring } from "./wiring/commands.ts";
 
 export interface CollabRuntimeOptions {
   port?: number;
@@ -70,7 +70,13 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
   });
   const ref = { hocuspocus: server.hocuspocus };
   const sw = wire_collab_server(deps, ref);
-  void wire_collab_commands(deps, sw, ref); // mounting is NL-80 / NL-105
+  let cmds: CollabCommandWiring;
+  try {
+    cmds = wire_collab_commands(deps, sw, ref);
+  } catch (e) {
+    await sw.close().catch(() => undefined);
+    throw e; // startup fails loudly: the entry point's .catch prints the error name and exits 1
+  }
   await server.listen();
   const port = server.address.port;
   logger.info("process.start", { extra: { port } });
@@ -94,6 +100,7 @@ export async function build_collab_runtime(settings: CollabSettings, opts: Colla
   install_drain({ tracker, close: async () => {
       await server.destroy();
       await sw.close().catch(() => undefined);
+      await cmds.close().catch(() => undefined);
       if (!opts.health_db && "close" in health_db) await (health_db as { close(): Promise<void> }).close().catch(() => undefined);
     },
     exit, logger, host });

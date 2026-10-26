@@ -127,6 +127,16 @@ export class PgLessonRepo implements LessonStateRepo, LessonVersionRepo, LessonG
 
   // ---- LessonStateRepo ----
 
+  /** Current state of each lesson id: one query for any number of ids (collab S-29 sweep). Absent id = no such lesson. */
+  async states_of(lesson_ids: LessonId[]): Promise<Map<LessonId, LessonStateName>> {
+    if (lesson_ids.length === 0) return new Map();
+    const rows = await this.read<{ id: string; state: LessonStateName }>(
+      "SELECT id, state FROM lesson WHERE id = ANY($1::text[])",
+      [lesson_ids],
+    );
+    return new Map(rows.map((r) => [r.id as LessonId, r.state]));
+  }
+
   async get(lesson_id: LessonId): Promise<LessonRow | null> {
     const rows = await this.read(`SELECT l.*, r.name AS reviewer_name, e.name AS last_editor_name FROM lesson l
        LEFT JOIN app_user r ON r.id = l.reviewer_id

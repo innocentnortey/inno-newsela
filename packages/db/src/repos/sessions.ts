@@ -83,6 +83,18 @@ export class PgSessionRepo implements SessionRepo {
     });
   }
 
+  /** Current role of each user id: one query for any number of ids (collab S-29 sweep). Absent id = no such user. */
+  async roles_of(user_ids: UserId[]): Promise<Map<UserId, RoleName>> {
+    if (user_ids.length === 0) return new Map();
+    return this.db.with_tx(async (tx) => {
+      const { rows } = await (tx as DbTx).query<{ id: string; role: RoleName }>(
+        "SELECT id, role FROM app_user WHERE id = ANY($1::text[])",
+        [user_ids],
+      );
+      return new Map(rows.map((r) => [r.id as UserId, r.role]));
+    });
+  }
+
   async revoke(token_hash: Sha256, now: Date): Promise<void> {
     await this.db.with_tx(async (tx) => {
       await (tx as DbTx).query("UPDATE app_session SET revoked_at = $2 WHERE token_hash = $1 AND revoked_at IS NULL", [
