@@ -17,6 +17,15 @@ test("test_progress_reflects_jobs: each state appears within 3 s, polls every 2 
     const w = window as unknown as { __tiles: { t: number; lesson: string; pill: string }[]; __live: { t: number; text: string }[] };
     w.__tiles = [];
     w.__live = [];
+    // Diagnostic (poll first-gap hunt): who issues each /progress fetch and when, with the caller's stack.
+    const wf = window as unknown as { __pf: { t: number; url: string; stack: string }[] };
+    wf.__pf = [];
+    const realFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = typeof input === "string" ? input : input instanceof Request ? input.url : String(input);
+      if (/\/progress/.test(url)) wf.__pf.push({ t: Date.now(), url, stack: (new Error().stack ?? "").split("\n").slice(2, 7).join(" | ") });
+      return realFetch(input, init);
+    };
     const scan = () => {
       for (const li of document.querySelectorAll('ul[aria-label="Lessons in this run"] > li')) {
         const lesson = li.querySelector("span")?.textContent ?? "";
@@ -90,6 +99,8 @@ test("test_progress_reflects_jobs: each state appears within 3 s, polls every 2 
   const ends = mine.map((x) => x.end!);
   const gaps = starts.slice(1).map((t, i) => t - (ends[i] ?? starts[i]!)).filter((g) => g < 10_000);
   console.log("AC-1 poll intervals, response end to next request (ms):", gaps.join(","), "| fetch durations (ms):", ends.map((e, i) => e - starts[i]!).join(","), "| request-start to request-start (ms):", starts.slice(1).map((t, i) => t - starts[i]!).join(","));
+  const pf = await page.evaluate(() => (window as unknown as { __pf: unknown[] }).__pf);
+  console.log("AC-1 progress fetch callers:", JSON.stringify(pf).slice(0, 3500));
   expect(gaps.length).toBeGreaterThanOrEqual(4); // the screen stops polling once the run is terminal
   // Every interval is at least 1.7 s; all but one outlier are within 2 s +- 0.3 s (a browser timer can slip when the host is busy
   // with other suites; the outlier is logged above, never hidden).

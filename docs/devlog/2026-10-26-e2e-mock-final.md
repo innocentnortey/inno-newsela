@@ -20,3 +20,11 @@
 - Which axe tests failed in run 1 varied between runs; the fixes above explain progress, unit-plan and prompt-guidance. insert-quote's 4 failures were the test bug.
 - Screenshot files under `e2e/__screenshots__` were restored (rendering noise on this host), except `integration/`, which belongs to another agent's real-stack run.
 - `assist` flake and the cold-start hydration races are timing, so expect an occasional first-test failure on a cold `next dev`.
+
+## Follow-up: the 5 failures of mock-final2.log (781 passed, 5 failed, 2 skipped)
+
+All five are flakes, none caused by Astra slices A to D (those touch worker, core and reports; `apps/web` has no source change, and these specs only use the mock web, Prism on 4010 and the mock collab on 4020). Rerun once on a free port (`E2E_PORT=3190 npx playwright test --project=mock e2e/assist/assist.spec.ts:125 e2e/workspace-editor/workspace-editor.spec.ts`): 7 passed (29.7 s), so all five pass.
+
+1. `assist.spec.ts:125` INVALID_TRANSITION re-reads the list: the Accept button never appeared in 60 s. Passed on rerun. Flake (host load during the full run).
+2. `workspace-editor.spec.ts:86` refused: after `b.reload()` the Part A textbox was not found in 5 s. Passed on rerun. Flake.
+3. to 5. `workspace-editor.spec.ts:104`, `:116`, `:174` (unauth, readonly, @axe): the Part B textbox did not appear in 15 s, in three consecutive tests right after failure 2. Likely a cascade: test 2 failed before closing its contexts and left the shared mock collab (4020) in the locked state it sets with `/__mock/lock`, so later documents did not load. All three passed in a fresh run. Not changed; if it recurs, add an `afterEach` that POSTs a mock reset or closes contexts in a `finally`.
