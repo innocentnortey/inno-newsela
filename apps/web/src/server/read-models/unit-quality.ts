@@ -79,7 +79,7 @@ async function build(q: Q, unit_id: string): Promise<UnitQuality> {
   const v1 = await one(
     `SELECT count(*)::int AS n,
             count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM issue i WHERE i.lesson_id = lv.lesson_id
-              AND i.content_hash = lv.content_hash AND i.level = 'blocking'))::int AS clean
+              AND i.content_hash = lv.content_hash AND i.level = 'blocking' AND i.cleared_by IS DISTINCT FROM 'fix'))::int AS clean
        FROM lesson_version lv JOIN lesson l ON l.id = lv.lesson_id
       WHERE l.unit_id = $1 AND lv.number = 1 AND lv.kind = 'generated'`,
   );

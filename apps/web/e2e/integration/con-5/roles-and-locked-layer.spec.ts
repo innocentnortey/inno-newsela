@@ -79,9 +79,23 @@ test("roles-and-locked-layer: a guidance save leaves every locked hash unchanged
   for (const r of before) expect(after).toContainEqual(r);
 });
 
-// Route gap: with_route's role gate (roles ["author"]) answers first with "Your role cannot do this."; the service's own
-// "Only authors can start a run." is never reached for these roles. The dialog banner is keyed by code, so the screen is right.
-test.fixme("roles-and-locked-layer: a direct start by a reviewer says 'Only authors can start a run.'", async () => {
-  // see the comment above; expected value kept from the ticket (AC-6), not weakened. Message check: COPY.roleForbidden.
-  void COPY.roleForbidden;
-});
+// Ruling (GEN-3, PD-32 recommendation): the route-level role gate answering first IS the contract for a reviewer or approver
+// starting a run directly. The service's "Only authors can start a run." stays only as defence in depth.
+for (const role of ["reviewer", "approver"] as const satisfies Role[]) {
+  test(`roles-and-locked-layer: a direct start by a ${role} is answered by the route gate with 'Your role cannot do this.'`, async ({ page }) => {
+    const { up } = await authorWithConfirmedUpload(page);
+    const body = await runBody(page, up.outline_version_id, { kind: "rows", rows: [8, 9, 25] });
+    await page.context().clearCookies();
+    const user = await createUser(role);
+    await signInAs(page, user);
+    const before = await rowCounts(user.user_id);
+    const total = await db().count("run");
+    const res = await startRunApi(page, body, uniqueKey());
+    expect(res.status()).toBe(403);
+    const e = ((await res.json()) as { error: { code: string; message: string } }).error;
+    expect(e.code).toBe("ROLE_FORBIDDEN");
+    expect(e.message).toBe("Your role cannot do this.");
+    expect(await rowCounts(user.user_id)).toEqual(before);
+    expect(await db().count("run")).toBe(total);
+  });
+}

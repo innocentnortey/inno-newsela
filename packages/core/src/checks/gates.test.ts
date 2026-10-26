@@ -117,6 +117,30 @@ describe("submit_precedence", () => {
   });
 });
 
+describe("waiting phase of a cross-lesson link", () => {
+  const dep = (slot_filled: boolean) => ({
+    direction: "waits_on" as const, lesson_id: "G6.U4.L5", slot_id: "s",
+    source_state: "draft", slot_filled, source_approved_hash: null,
+  });
+  const link_issue = () => issue("cross_lesson_link", { related_lesson_id: "G6.U4.L5" });
+  it("submit is allowed when the only blocking issue waits on a filled slot", () => {
+    const d = submit_gate(gate_state({ issues: [link_issue()], dependencies: [dep(true)] }));
+    expect(d.allowed).toBe(true);
+  });
+  it("submit is refused BLOCKED when the slot is empty", () => {
+    const d = submit_gate(gate_state({ issues: [link_issue()], dependencies: [dep(false)] }));
+    expect(d.refusals).toEqual(["BLOCKED"]);
+  });
+  it("approve is refused DEPENDENCY_UNAPPROVED in the filled case", () => {
+    const d = approve_gate(gate_state({ action: "approve", four_eyes_enabled: false, issues: [], dependencies: [dep(true)] }));
+    expect(d.refusals).toEqual(["DEPENDENCY_UNAPPROVED"]);
+  });
+  it("approve is still refused while the waiting issue is open, by the dependency check", () => {
+    const d = approve_gate(gate_state({ action: "approve", four_eyes_enabled: false, issues: [link_issue()], dependencies: [dep(true)] }));
+    expect(d.refusals).toEqual(["DEPENDENCY_UNAPPROVED"]);
+  });
+});
+
 describe("approve_precedence", () => {
   it("matches the oracle over all 32 combinations", () => {
     for (let n = 0; n < 32; n += 1) {

@@ -44,8 +44,7 @@ test("test_fill_slot_capture [fill]: a reviewer fills the excerpt slot; one new 
     expect(rowsNow.some((a) => a.actor_id === r.user.user_id)).toBe(true);
     console.log(`fill: slot issue left the rail ${elapsed} ms after submit; hash ${before.content_hash.slice(0, 12)} -> ${after.content_hash.slice(0, 12)}; audit rows ${audits} -> ${rowsNow.length}`);
 
-    // Lesson 4's own list is not refreshed by this: a re-check at an unchanged hash only re-affirms rows (S-33), so the finding
-    // stays with its old blocks. Printed for the devlog; the expectation lives in the S-34 test below.
+    // Lesson 4 is re-checked at the same hash after the fill; S-33 (fixed by GEN-3) makes its list refresh. Printed for the devlog.
     await new Promise((res) => setTimeout(res, 3000));
     const l4Link = (await issuesOf(r.page, l4.lessonId)).body.issues.find((i: { kind: string }) => i.kind === "cross_lesson_link");
     console.log(`fill: after the fill, L4 cross_lesson_link ${JSON.stringify(l4Link ? { blocks: l4Link.blocks } : null)}`);
@@ -55,13 +54,8 @@ test("test_fill_slot_capture [fill]: a reviewer fills the excerpt slot; one new 
   }
 });
 
-// Seam defect S-34 (docs/plans/seam-followups.md): UXP-2 says a filled slot whose source lesson is not approved blocks approve only
-// ("waiting for Lesson 5's approval"). Two things stop that on a real link: the check rule drops the finding once the slot is filled,
-// and PgLessonRepo.dependencies() reports slot_filled by an exact slot id match, while real links name `<lesson>.excerpt-N` and the
-// document names its slots `hare-lion` (checks/rules/links/slots.ts has an ordinal fallback for this; lessons.ts does not).
-// Expected to fail until the two agree; the fix is in packages/db and the check rules, outside this ticket.
-test("fill: Lesson 4 waits for Lesson 5's approval, blocking approve only (S-34, expected to fail until slot ids agree)", async ({ browser }) => {
-  test.fail();
+// S-34 fixed by GEN-3: one slot-state function (core slots.ts) shared by the rule and PgLessonRepo.dependencies(); the waiting finding blocks approve only.
+test("fill: Lesson 4 waits for Lesson 5's approval, blocking approve only (S-34)", async ({ browser }) => {
   const live = await liveStack();
   const { l4, l5 } = await seedWp1WithL5();
   await enqueueCheck(l4.lessonId);

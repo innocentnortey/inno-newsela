@@ -109,6 +109,18 @@ function decide(
   };
 }
 
+// The waiting phase of a cross-lesson link (slot filled, source not approved) is not a BLOCKED issue: Submit passes, and
+// Approve is refused by the dependency check (DEPENDENCY_UNAPPROVED), which names the source lesson.
+function blocks_submit(i: GateIssue, state: GateState): boolean {
+  if (i.level !== "blocking" || i.resolved) return false;
+  return !(
+    i.kind === "cross_lesson_link" &&
+    state.dependencies.some(
+      (d) => d.direction === "waits_on" && d.lesson_id === i.related_lesson_id && d.slot_filled,
+    )
+  );
+}
+
 function shared_conditions(state: GateState): {
   pending: boolean;
   blocked: boolean;
@@ -116,7 +128,7 @@ function shared_conditions(state: GateState): {
 } {
   return {
     pending: state.pending_suggestions > 0,
-    blocked: state.issues.some((i) => i.level === "blocking" && !i.resolved),
+    blocked: state.issues.some((i) => blocks_submit(i, state)),
     confirm_open: state.open_confirmations > 0,
   };
 }

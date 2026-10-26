@@ -46,8 +46,34 @@ test("CON-G8: no minutes, review time or duration key in the Run or prompt-list 
   }
 });
 
-test.fixme("SCR-21: /prompt-guidance lists guidance versions and the read-only locked layer", async () => {
-  // Reason: the route is still NL-24's placeholder ("Built by NL-76", apps/web/app/(app)/prompt-guidance/page.tsx); NL-76/NL-103 own it.
+test("SCR-21: /prompt-guidance lists guidance versions and the read-only locked layer", async ({ page }) => {
+  await signInAs(page, "author");
+  const res = await page.request.get("/api/prompt-versions");
+  expect(res.status()).toBe(200);
+  const pv = (await res.json()) as { locked_layer: { text: string }; guidance_versions: unknown[] };
+  expect(pv.guidance_versions.length).toBeGreaterThan(0);
+  const h1 = (p: import("@playwright/test").Page) => p.getByRole("heading", { level: 1, name: "Prompt guidance" });
+  const rows = (p: import("@playwright/test").Page) => p.getByRole("list", { name: "Guidance versions" }).getByRole("listitem");
+
+  await page.goto("/prompt-guidance");
+  await expect(h1(page)).toBeVisible();
+  const locked = page.locator("section[aria-labelledby='pg-locked']");
+  await expect(locked.getByRole("heading", { name: "Locked rules (read-only)" })).toBeVisible();
+  await expect(locked.locator("pre")).toContainText(pv.locked_layer.text.slice(0, 40).replace(/\s+/g, " ").trim());
+  await expect(locked.getByRole("textbox")).toHaveCount(0);
+  await expect(locked.getByRole("button")).toHaveCount(0);
+  await expect(rows(page)).toHaveCount(pv.guidance_versions.length);
+  await expect(rows(page).last()).toContainText("v1");
+
+  // a reviewer sees the same lists but no editor
+  await page.context().clearCookies();
+  await signInAs(page, "reviewer");
+  await page.goto("/prompt-guidance");
+  await expect(h1(page)).toBeVisible();
+  await expect(locked.getByRole("heading", { name: "Locked rules (read-only)" })).toBeVisible();
+  await expect(rows(page)).toHaveCount(pv.guidance_versions.length);
+  await expect(page.getByLabel("Guidance text")).toHaveCount(0);
+  await expect(page.getByText("Only authors edit guidance.")).toBeVisible();
 });
 
 test("R-54: no session is 401 UNAUTHENTICATED; a reviewer start is 403", async ({ page, playwright }) => {

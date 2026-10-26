@@ -256,6 +256,36 @@ describe("PgLessonRepo", () => {
     expect(d5[0]).toMatchObject({ direction: "depended_on_by", lesson_id: l4, slot_id: "L5.excerpt_1" });
   });
 
+  it("dependencies_ordinal_slot_id: a link naming .excerpt-N finds the document's own slot id", async () => {
+    const unit = "G6.U13";
+    await seed(unit, 4, 5);
+    const l4 = `${unit}.L4`, l5 = `${unit}.L5`;
+    await t.db.with_tx(async (tx) => {
+      await insert_row(tx, "outline_version", { id: `${unit}.ov1`, unit_id: unit, number: 1 });
+      await insert_row(tx, "lesson_link", {
+        outline_version_id: `${unit}.ov1`, from_lesson_id: l4, to_lesson_id: l5, kind: "excerpt_slot", slot_id: `${l5}.excerpt-1`,
+      });
+    });
+    const put = async (seq: number, rights: string) => {
+      const derived = {
+        sections: [{ content: { type: "doc", content: [{ type: "excerpt_slot", attrs: { slot_id: "hare-lion", rights, source_ref: "Synthetic Reader" } }] } }],
+      };
+      await t.db.with_tx(async (tx) => {
+        await insert_row(tx, "lesson_doc", { lesson_id: l5, seq, derived_json: JSON.stringify(derived) });
+      });
+    };
+    await put(1, "unset");
+    expect((await repo.dependencies(l4))[0]!.slot_filled).toBe(false);
+    await put(2, "public-domain");
+    expect((await repo.dependencies(l4))[0]!.slot_filled).toBe(true);
+    // after a real fill the node is a `quote` that keeps the slot id
+    const filled = { sections: [{ content: { type: "doc", content: [{ type: "quote", attrs: { slot_id: "hare-lion", origin: "excerpt_slot", rights: "public-domain", source_ref: '{"title":"Synthetic Reader"}' } }] } }] };
+    await t.db.with_tx(async (tx) => {
+      await insert_row(tx, "lesson_doc", { lesson_id: l5, seq: 3, derived_json: JSON.stringify(filled) });
+    });
+    expect((await repo.dependencies(l4))[0]!.slot_filled).toBe(true);
+  });
+
   it("mark_adopted_and_source_outline_version", async () => {
     const unit = "G6.U12";
     await seed(unit, 1, 2);
