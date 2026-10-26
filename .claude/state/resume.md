@@ -13,6 +13,9 @@ Updated 2026-10-25 late (VPS, Phase B, Sonnet). Replace at each handoff; history
 - **Open for Innocent (human-only):** spike results, DO-1/DO-2/Stage 6 review; lane::human tickets NL-02/NL-03 (provider keys, voice key), UX-5b walkthrough, recording, portal submission.
 - **Data boundary:** `docs/source/restricted/` git-ignored; never quote into tracked files.
 
+## NL-126 walk done (2026-10-26)
+QA_REPORT.md written, 18 findings filed (#148–#165: 4 blocking, 6 major, 8 minor), none fixed; stack removed. Next for NL-133: fix F-1…F-4 (unit-confirm value, Compose `COLLAB_INTERNAL_URL` `/internal`, editor socket route, stub generation), then re-walk the NOT WALKED rows (SCR-7, SCR-12, SCR-13, approve success, reopen, pause/resume) on the NL-112 unit.
+
 ## Usage-limit stop (2026-10-25, late)
 Merged and pushed through NL-66 (07269a6); NL-65 merged locally (not yet gated or pushed).
 In flight: NL-69 review (branch ticket/NL-69, 3ac5b0f; CHG for optional pin fields to log), NL-67 and NL-70 implementers, NL-71 unconfirmed.
