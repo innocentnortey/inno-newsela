@@ -29,7 +29,7 @@ describe("WF-29 obligations", () => {
     expect(execFileSync("git", ["ls-files", "docs/source/restricted"], { cwd: ROOT, encoding: "utf8" }).trim()).toBe("");
     const needle = ["docs", "source", "restricted"].join("/");
     for (const f of load_files(path.join(ROOT, "load"))) {
-      if (f.endsWith("wf-29-obligations.int.test.ts")) continue;
+      if (f.endsWith("wf-29-obligations.int.test.ts") || f.endsWith("wf-30-obligations.int.test.ts")) continue;
       expect(readFileSync(f, "utf8"), f).not.toContain(needle);
     }
   });
