@@ -102,3 +102,42 @@ describe("store behaviour [invariant, AC-5/AC-6 unit half]", () => {
     expect(wp1().title).not.toBe(edited(3).title);
   });
 });
+
+describe("store split timing [GEN-4]", () => {
+  const stored_lines = (lines: string[]) => lines.map((l) => JSON.parse(l) as { event: string; extra: Record<string, unknown> }).filter((o) => o.event === "collab.stored");
+
+  it("note_change then store logs a numeric store_wait_ms and db_write_ms and no document content", async () => {
+    const { p, lines } = persistence(new FakeReader(stored_doc()));
+    await p.load(DOC_NAME);
+    p.note_change(LESSON, performance.now() - 50);
+    await p.store(DOC_NAME, bytes_of(edited(1)), "u-rev-2", null);
+    const [line] = stored_lines(lines);
+    expect(line!.extra["store_wait_ms"]).toBeGreaterThanOrEqual(50);
+    expect(typeof line!.extra["db_write_ms"]).toBe("number");
+    for (const k of Object.keys(line!.extra)) expect(["text", "content", "ydoc"]).not.toContain(k);
+  });
+
+  it("a store with no note_change logs store_wait_ms null; a later store does not reuse an old first-change time", async () => {
+    const { p, lines } = persistence(new FakeReader(stored_doc()));
+    await p.load(DOC_NAME);
+    await p.store(DOC_NAME, bytes_of(edited(1)), "u", null);
+    p.note_change(LESSON);
+    await p.store(DOC_NAME, bytes_of(edited(2)), "u", null);
+    await p.store(DOC_NAME, bytes_of(edited(3)), "u", null);
+    const w = stored_lines(lines).map((l) => l.extra["store_wait_ms"]);
+    expect(w[0]).toBeNull();
+    expect(typeof w[1]).toBe("number");
+    expect(w[2]).toBeNull();
+  });
+
+  it("forget clears a pending first-change entry", async () => {
+    const { p, lines } = persistence(new FakeReader(stored_doc()));
+    await p.load(DOC_NAME);
+    p.note_change(LESSON, performance.now() - 5000);
+    p.forget(LESSON);
+    await p.load(DOC_NAME);
+    await p.store(DOC_NAME, bytes_of(edited(1)), "u", null);
+    expect(stored_lines(lines)[0]!.extra["store_wait_ms"]).toBeNull();
+  });
+});
+

@@ -277,6 +277,10 @@ export function wire_collab_server(
       });
     },
 
+    async onChange({ documentName }) {
+      persistence.note_change(lesson_id_of(documentName));
+    },
+
     async onStoreDocument({ document, documentName, lastContext }) {
       const editor =
         (lastContext as { ctx?: SocketContext } | undefined)?.ctx?.user

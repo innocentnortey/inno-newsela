@@ -41,6 +41,14 @@ type RetryAwareLog = ModelCallLog & { record_retry?(id: ModelCallId): Promise<vo
 const RETRY_AFTER_CAP_S = 120;
 
 // Thrown after the raw output is saved when the served model has no price: the provider was paid but the cost is unknown.
+/** A reason safe to store and log: a class name, or a `safe_reason` an error carries; never `e.message`. */
+export function safe_reason(e: unknown): string {
+  if (typeof e === "object" && e !== null && typeof (e as { safe_reason?: unknown }).safe_reason === "string") {
+    return (e as { safe_reason: string }).safe_reason;
+  }
+  return e instanceof Error ? e.name : "unknown";
+}
+
 export class UnpricedModelError extends InvariantViolation {
   constructor(readonly model_call_id: ModelCallId) {
     super("no price for served model", { model_call_id });
@@ -94,8 +102,8 @@ export class ModelCallRecorder {
         resp = await this.client.complete(req);
       } catch (e) {
         if (!(e instanceof ProviderError)) {
-          await this.safe_fail(id, { kind: "server_error", http_status: null, message: "unexpected client error", retry_after_s: null });
-          this.emit_failed(ctx, req, id, retries, "unexpected", null);
+          await this.safe_fail(id, { kind: "server_error", http_status: null, message: "unexpected client error: " + safe_reason(e), retry_after_s: null });
+          this.emit_failed(ctx, req, id, retries, "unexpected", null, safe_reason(e));
           throw e;
         }
         if (e.retryable && retries < this.settings.provider_max_retries) {
@@ -152,10 +160,10 @@ export class ModelCallRecorder {
     }
   }
 
-  private emit_failed(ctx: ModelCallContext, req: StructuredCallRequest, id: ModelCallId, retries: number, error_kind: string, http_status: number | null): void {
+  private emit_failed(ctx: ModelCallContext, req: StructuredCallRequest, id: ModelCallId, retries: number, error_kind: string, http_status: number | null, reason?: string): void {
     this.logger?.info("model_call", {
       request_id: ctx.request_id, run_id: ctx.run_id, lesson_id: ctx.lesson_id, job_id: ctx.job_id,
-      extra: { model_call_id: id, purpose: ctx.purpose, alias: req.alias, retries, status: "failed", error_kind, http_status },
+      extra: { model_call_id: id, purpose: ctx.purpose, alias: req.alias, retries, status: "failed", error_kind, http_status, ...(reason === undefined ? {} : { reason }) },
     });
   }
 }

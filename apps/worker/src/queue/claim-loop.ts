@@ -10,6 +10,13 @@ import type { WorkerSettings } from "@ls/config/settings";
 import type { Logger } from "@ls/obs/logger";
 import type { FailureReason } from "@ls/schema/api/runs";
 
+// Same rule as packages/llm recorder.safe_reason (the lint rule keeps the worker queue off the recorder import):
+// a `safe_reason` an error carries, else the class name; never the message.
+function safe_reason(e: unknown): string {
+  if (typeof e === "object" && e !== null && typeof (e as { safe_reason?: unknown }).safe_reason === "string") return (e as { safe_reason: string }).safe_reason;
+  return e instanceof Error ? e.name : "unknown";
+}
+
 export const LEASE_RENEW_MS = 30000;
 
 export interface TickReport {
@@ -169,7 +176,7 @@ export class ClaimLoop {
           this.logger.error("claim_loop.job_failed", {
             run_id: job.run_id,
             job_id: job.job_id,
-            extra: { name: err instanceof Error ? err.name : "unknown" },
+            extra: { name: err instanceof Error ? err.name : "unknown", reason: safe_reason(err) },
           });
           abandoned += 1;
         }
