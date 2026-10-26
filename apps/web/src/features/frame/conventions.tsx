@@ -16,12 +16,12 @@ export function CantLoad({ thing, onRetry }: { thing: string; onRetry: () => voi
 
 export function NotFound({
   what,
-  boardHref = "/units/g6-u4/board",
-  where = "Grade 6 · Unit 4",
+  boardHref,
+  where,
 }: {
   what: string;
-  boardHref?: string;
-  where?: string;
+  boardHref: string;
+  where: string;
 }) {
   return (
     <div className="flex flex-col items-start gap-3 text-body text-ink">

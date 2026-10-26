@@ -14,6 +14,7 @@ import { IssueActions } from "@/features/workspace/actions/standards/issue-actio
 import { StandardDecisionButtons } from "@/features/workspace/actions/standard-decision";
 import { WorkspaceActionsProvider } from "@/features/workspace/actions/toast-host";
 import { useReviewHeartbeat } from "@/features/workspace/actions/use-review-heartbeat";
+import { heartbeatArgs } from "@/features/workspace/actions/heartbeat-args";
 import { useSetBreadcrumb } from "@/features/frame/breadcrumb";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
@@ -64,9 +65,8 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
   const applied = useRef(false);
 
   const lesson = load.kind === "ready" ? load.lesson : null;
-  // The lesson carries no version id (S-18); the version number stands in until the contract adds one.
-  // Nothing is sent until the lesson has loaded, so no invented id ever reaches the server.
-  useReviewHeartbeat({ lessonId: lesson?.lesson_id ?? "", versionId: `lv-${lesson?.version_number ?? 0}`, enabled: lesson !== null });
+  // The version id comes from CON-11 (CHG-7); a lesson without one sends no heartbeat. No id is invented.
+  useReviewHeartbeat(heartbeatArgs(lesson));
   const reread = useCallback(() => {
     retry();
     issuesPoll.retry();

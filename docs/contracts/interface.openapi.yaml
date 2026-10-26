@@ -854,6 +854,7 @@ paths:
                     type: Reading
                     state: in_review
                     version_number: 1
+                    version_id: lv-4-1
                     content_hash: 9f00000000000000000000000000000000000000000000000000000000000405
                     state_vector: AQKH6qQEAA==
                     schema_version: 1
@@ -2309,7 +2310,7 @@ components:
         state_vector: { $ref: '#/components/schemas/StateVector' }
     Lesson:
       type: object
-      required: [lesson_id, lesson_key, unit_id, number, title, type, state, version_number, content_hash, state_vector, schema_version, last_editor, snapshot, front_matter, sections, text_cards, outline_row, alignment_map, reviewer, send_back, checklist, dependencies, allowed_actions]
+      required: [lesson_id, lesson_key, unit_id, number, title, type, state, version_number, version_id, content_hash, state_vector, schema_version, last_editor, snapshot, front_matter, sections, text_cards, outline_row, alignment_map, reviewer, send_back, checklist, dependencies, allowed_actions]
       properties:
         lesson_id: { type: string }
         lesson_key: { type: string, description: 'L4, or F1…F6 for flex days (UXQ-2).' }
@@ -2319,6 +2320,7 @@ components:
         type: { type: string }
         state: { $ref: '#/components/schemas/LessonState' }
         version_number: { type: integer }
+        version_id: { type: [string, 'null'], description: "The id of the version shown: the snapshot's id for submitted and later, else the current working version's id; null only when the lesson has no version yet. The review heartbeat (CON-20) sends this value. CHG-7." }
         content_hash: { $ref: '#/components/schemas/Sha256' }
         state_vector: { $ref: '#/components/schemas/StateVector' }
         schema_version: { type: integer }

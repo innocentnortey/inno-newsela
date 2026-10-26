@@ -10,6 +10,6 @@ export function CoverageGate({
   fired?: readonly number[];
   children: ReactNode;
 }) {
-  if (fired.includes(4)) return <NotFound what="page" />;
+  if (fired.includes(4)) return <NotFound what="page" where="this app" boardHref="/units" />;
   return <>{children}</>;
 }

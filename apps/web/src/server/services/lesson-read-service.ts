@@ -148,6 +148,7 @@ export class LessonReadService implements LessonReadApi {
       type: row.type,
       state: row.state,
       version_number: src.version_number,
+      version_id: src.version_id,
       content_hash: src.hash,
       state_vector: src.vector,
       schema_version: src.schema_version,

@@ -1221,6 +1221,8 @@ export interface components {
             type: string;
             state: components["schemas"]["LessonState"];
             version_number: number;
+            /** @description The id of the version shown: the snapshot's id for submitted and later, else the current working version's id; null only when the lesson has no version yet. The review heartbeat (CON-20) sends this value. CHG-7. */
+            version_id: string | null;
             content_hash: components["schemas"]["Sha256"];
             state_vector: components["schemas"]["StateVector"];
             schema_version: number;

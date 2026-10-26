@@ -50,3 +50,47 @@ test("one rail item is current", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Units", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(page.locator('nav[aria-label="Primary"] [aria-current="page"]')).toHaveCount(1);
 });
+
+const unitFor = (unit_key: string, created_at: string) => ({
+  unit_id: unit_key.toUpperCase(),
+  unit_key,
+  title: unit_key,
+  versions: [{
+    outline_version_id: `ov-${unit_key}`, unit_id: unit_key.toUpperCase(), unit_key, version_number: 1, sha256: "a".repeat(64),
+    same_as_version: null, changed_lessons: 0, row_counts: { lessons: 30, flex_days: 6, arc_headers: 4, total_rows: 40 },
+    created_at, created_by: "Author A (demo)",
+  }],
+  latest_run: null,
+});
+
+async function stubUnits(page: import("@playwright/test").Page, units: ReturnType<typeof unitFor>[]) {
+  await page.route(apiGlob("/units"), async (route) => {
+    // The glob also matches the page URL /units; only the API call (fetch) is stubbed.
+    if (route.request().method() !== "GET" || route.request().resourceType() !== "fetch") return route.fallback();
+    await route.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ units }) });
+  });
+}
+
+test("Unit board points at the most recent unit and opens its board", async ({ page }) => {
+  await signInAs(page, "reviewer");
+  await stubUnits(page, [unitFor("g6-u4", "2026-10-01T00:00:00Z"), unitFor("g7-u2", "2026-10-20T00:00:00Z")]);
+  await page.goto("/units");
+  const link = page.getByRole("link", { name: "Unit board" });
+  await expect(link).toHaveAttribute("href", "/units/g7-u2/board");
+  await link.click();
+  await expect(page).toHaveURL(/\/units\/g7-u2\/board$/);
+});
+
+test("Unit board falls back to /units when there are no units", async ({ page }) => {
+  await signInAs(page, "reviewer");
+  await stubUnits(page, []);
+  await page.goto("/units");
+  await expect(page.getByRole("link", { name: "Unit board" })).toHaveAttribute("href", "/units");
+});
+
+test("Unit board stays on the unit in view even when another is newer", async ({ page }) => {
+  await signInAs(page, "reviewer");
+  await stubUnits(page, [unitFor("g6-u4", "2026-10-01T00:00:00Z"), unitFor("g7-u2", "2026-10-20T00:00:00Z")]);
+  await page.goto("/units/g6-u4/board");
+  await expect(page.getByRole("link", { name: "Unit board" })).toHaveAttribute("href", "/units/g6-u4/board");
+});

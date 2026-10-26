@@ -18,6 +18,7 @@ export const LESSON4: Lesson = {
   type: "Reading",
   state: "in_review",
   version_number: 1,
+  version_id: "lv-5-1",
   content_hash: "9f00000000000000000000000000000000000000000000000000000000000405",
   state_vector: "AQKH6qQEAA==",
   schema_version: 1,

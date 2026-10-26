@@ -22,7 +22,7 @@ const SECTIONS: [string, string, number][] = [
 function lessonBase(id: string, key: string, n: number): Lesson {
   return {
     lesson_id: id, lesson_key: key, unit_id: "G6.U4", number: n, title: `Lesson ${n}: Comparing Percy and Soongoora`,
-    type: "Writing", state: "submitted", version_number: 2, content_hash: HASH_A, state_vector: SV_A, schema_version: 1,
+    type: "Writing", state: "submitted", version_number: 2, version_id: "lv-5-2", content_hash: HASH_A, state_vector: SV_A, schema_version: 1,
     last_editor: "M. Okafor",
     snapshot: { version_id: "lv-5-2", content_hash: HASH_A, state_vector: SV_A },
     front_matter: {
@@ -53,7 +53,7 @@ function lessonBase(id: string, key: string, n: number): Lesson {
 
 export const lesson5Submitted = (): Lesson => lessonBase("G6.U4.L5", "L5", 5);
 export const lesson5Changed = (): Lesson => ({
-  ...lesson5Submitted(), content_hash: HASH_B, state_vector: SV_B, version_number: 3,
+  ...lesson5Submitted(), content_hash: HASH_B, state_vector: SV_B, version_number: 3, version_id: "lv-5-3",
   snapshot: { version_id: "lv-5-3", content_hash: HASH_B, state_vector: SV_B },
 });
 export const lesson5Approved = (): Lesson => ({ ...lesson5Submitted(), state: "approved" });
