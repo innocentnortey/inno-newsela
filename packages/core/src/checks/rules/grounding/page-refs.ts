@@ -17,7 +17,7 @@ UNITS.forEach((w, i) => {
 });
 for (const [t, v] of TENS) {
   NUM_WORDS[t] = v;
-  if (v < 40) UNITS.slice(0, 9).forEach((w, i) => { NUM_WORDS[`${t}-${w}`] = v + i + 1; });
+  UNITS.slice(0, 9).forEach((w, i) => { NUM_WORDS[`${t}-${w}`] = v + i + 1; });
 }
 const NUM = `\\d{1,3}|${Object.keys(NUM_WORDS)
   .sort((x, y) => y.length - x.length)

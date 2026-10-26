@@ -64,6 +64,47 @@ describe("names_after_labels", () => {
     expect(scan_names("B. Incorrect: Grover would wait.", idx())).toEqual(["Grover"]);
     expect(scan_names("B. Incorrect: Athena would wait.", idx())).toEqual(["Athena"]);
   });
+  it.each(["B. Incorrect:", "Incorrect:", "Correct:", "D. Correct:"])(
+    "flags an invented name first after '%s'",
+    (label) => {
+      for (const name of ["Medusa", "Zeus", "Hades", "Brindle", "Quillon"]) {
+        expect(scan_names(`${label} ${name} would wait.`, idx())).toEqual([name]);
+      }
+    },
+  );
+  it("flags an invented name first after a label on a later line", () => {
+    expect(scan_names("A. Correct: Percy fights.\nB. Incorrect: Hades rules below.", idx())).toEqual(["Hades"]);
+  });
+  it.each([
+    "A. Correct: Because the text says so.",
+    "B. Incorrect: The author uses a metaphor.",
+    "C. Incorrect: This detail shows courage.",
+    "D. Incorrect: Both choices are wrong.",
+    "A. Correct: Students should reread the clue.",
+    "B. Incorrect: Water is not the focus.",
+    "C. Incorrect: Strategies should be tried first.",
+    "Correct: Nothing else fits the evidence.",
+    "D. Incorrect: Appearing calm is not the same.",
+    "A. Incorrect: Staying quiet. Walking away. Repeating the word.",
+    "B. Incorrect: Extra pronouns can make references less clear.",
+  ])("does not flag the ordinary opener in: %s", (t) => {
+    expect(scan_names(t, idx())).toEqual([]);
+  });
+  it("lets the lesson's own lowercase use clear a capitalised plain noun", () => {
+    const index = build_name_index(["Percy fights."], ["The preference is clear.", "It describes the setting.", "Its length is short."]);
+    expect(scan_names("B. Incorrect: Preference is not evidence.", index)).toEqual([]);
+    expect(scan_names("B. Incorrect: Describes the setting only.", index)).toEqual([]);
+    expect(scan_names("B. Incorrect: Length does not matter.", index)).toEqual([]);
+    expect(scan_names("B. Incorrect: Brindle would wait.", index)).toEqual(["Brindle"]);
+  });
+  it("flags a plain noun the tagger cannot tell from a name when nothing in the lesson uses it", () => {
+    // Known residual: "Length" is not in the tagger's lexicon and is tagged a plain noun like "Medusa".
+    expect(scan_names("B. Incorrect: Length does not matter.", idx())).toEqual(["Length"]);
+  });
+  it("lets a name in the sources clear", () => {
+    const index = build_name_index(["Medusa appears in myth."], []);
+    expect(scan_names("B. Incorrect: Medusa would wait.", index)).toEqual([]);
+  });
   it("flags a later name after a label", () => {
     expect(scan_names("C. Incorrect: Waiting is what Medusa would do.", idx())).toEqual(["Medusa"]);
   });

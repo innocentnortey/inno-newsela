@@ -110,13 +110,47 @@ function merge_and_dedupe(text: string, cands: Cand[]): string[] {
  * with spaces (offsets stay the same) so that word is an ordinary sentence start. A name later in the sentence,
  * mid-sentence and capitalised, is still scanned as before.
  *
- * Known limit (D-1): a name that is the first word after a label is flagged only when the tagger knows it as a
- * person, place or organisation ("Grover", "Athena"), exactly as for any sentence-initial word. An unknown invented
- * name ("Medusa", "Zeus") in that position is not tagged. No word list is added for it.
+ * The first word after a stripped label is a sentence start, so the sentence-initial pass alone would miss an
+ * invented name there ("B. Incorrect: Medusa would wait."). `label_first_words` + `first_word_is_name` decide it
+ * by the word's class when written in lower case: a function or inflected word (pronoun, determiner, gerund,
+ * adverb...) or a common word the tagger's own lexicon knows is not a name; anything else stays a candidate and is
+ * checked against the sources and the lesson's own text like every other candidate. No word list is added.
  */
 const OPTION_LABEL = /(^|\n)(\s*(?:[A-Za-z][.)]\s+)?(?:Correct|Incorrect)\s*[:.\-–—]\s*)/g;
 export function blank_option_labels(text: string): string {
   return text.replace(OPTION_LABEL, (_m, lead: string, label: string) => lead + " ".repeat(label.length));
+}
+
+const FUNCTION_TAGS = [
+  "Pronoun", "Determiner", "Preposition", "Conjunction", "Adverb", "Adjective", "Gerund", "Verb", "Infinitive",
+  "Modal", "Auxiliary", "Value", "Possessive", "Copula", "QuestionWord", "Negative",
+];
+const NAME_LEXICON_TAGS = ["Person", "FirstName", "LastName", "MaleName", "FemaleName", "Place", "Country", "City", "Region", "Organization", "ProperNoun"];
+type Lex = Record<string, string | undefined>;
+const lexicon = (): Lex => (nlp as unknown as { world(): { model: { one: { lexicon: Lex } } } }).world().model.one.lexicon;
+
+/** Position of the first word after each label in `raw_text`, with the rest of its line (for tagging in context). */
+function label_first_words(raw_text: string): Array<{ start: number; end: number; line_rest: string }> {
+  const out: Array<{ start: number; end: number; line_rest: string }> = [];
+  for (const m of raw_text.matchAll(OPTION_LABEL)) {
+    const from = (m.index ?? 0) + m[0].length;
+    const w = /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ’']*/.exec(raw_text.slice(from));
+    if (w === null) continue;
+    const nl = raw_text.indexOf("\n", from);
+    out.push({ start: from, end: from + w[0].length, line_rest: raw_text.slice(from, nl === -1 ? undefined : nl) });
+  }
+  return out;
+}
+
+/** Decide by the word's class in lower case whether a capitalised word right after a label may be a name. */
+function first_word_is_name(word: string, line_rest: string): boolean {
+  const lower = line_rest.charAt(0).toLowerCase() + line_rest.slice(1);
+  const sentences = nlp(lower).json({ offset: true }) as Array<{ terms: Term[] }>;
+  const tags = sentences[0]?.terms[0]?.tags ?? [];
+  if (tags.some((g) => PROPER.includes(g))) return true;
+  if (tags.some((g) => FUNCTION_TAGS.includes(g))) return false;
+  const known = lexicon()[word.toLowerCase().replace(/(?:’s|'s)$/, "")];
+  return known === undefined || NAME_LEXICON_TAGS.includes(known);
 }
 
 /** Distinct capitalised names in `text` that no source (or lowercase use) accounts for. */
@@ -149,6 +183,14 @@ export function scan_names(raw_text: string, index: NameIndex): string[] {
     if (w !== "" && !ALLOW.has(w) && !index.S.has(w)) {
       result.push({ start: s, end: s + w.length });
     }
+  }
+  for (const f of label_first_words(raw_text)) {
+    const word = raw_text.slice(f.start, f.end);
+    const w = word.replace(/(?:’s|'s)$/, "").toLowerCase();
+    if (!/^[A-ZÀ-ÖØ-Þ]/.test(word) || word.length === 1 || /^[A-Z]{2,}$/.test(word)) continue;
+    if (ALLOW.has(w) || STARTERS.has(w) || index.S.has(w) || index.L.has(w)) continue;
+    if (result.some((c) => c.start < f.end && c.end > f.start)) continue;
+    if (first_word_is_name(word, f.line_rest)) result.push({ start: f.start, end: f.end });
   }
   return merge_and_dedupe(text, result);
 }
