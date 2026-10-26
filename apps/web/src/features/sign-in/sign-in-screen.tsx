@@ -8,7 +8,7 @@ import { DemoAccounts } from "./demo-accounts";
 import { resolveLanding } from "./next-param";
 import { SignInForm } from "./sign-in-form";
 
-export function SignInScreen() {
+export function SignInScreen({ showDemoAccounts = false }: { showDemoAccounts?: boolean }) {
   const router = useRouter();
   const next = useSearchParams()?.get("next") ?? null;
   const [checked, setChecked] = useState(false);
@@ -36,7 +36,7 @@ export function SignInScreen() {
           <h1 className="text-page text-ink">Sign in</h1>
           {checked ? <SignInForm next={next} /> : <div aria-busy="true" className="min-h-40" />}
           <p className="text-small text-ink2">Staff only. Use your Newsela email.</p>
-          {process.env.NEXT_PUBLIC_DEMO_ACCOUNTS === "1" ? <DemoAccounts /> : null}
+          {showDemoAccounts ? <DemoAccounts /> : null}
         </div>
       </main>
     </AnnounceProvider>

@@ -5,6 +5,7 @@ export const COLLAB_DOWN = "Couldn't reach the editor server. Nothing changed. T
 export const DRAFTING = "Drafting a candidate… The current lesson is unchanged.";
 export const UNDO_GONE = "Undo is no longer available. Make the opposite decision instead.";
 export const REGEN_LOCKED = "This lesson is locked. Withdraw it first to regenerate.";
+export const REGEN_NO_RUN = "This lesson has no generation run yet, so there is nothing to regenerate from. Start a run for this unit first.";
 export const REGEN_CAP = "Daily spend cap reached. Regenerate is off until tomorrow.";
 
 interface Labelled {

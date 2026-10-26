@@ -92,6 +92,7 @@ test("errors: QUOTE_TOO_LONG sits on Text", async ({ page }) => {
   await respondWithError(page, "fillSlot", "QUOTE_TOO_LONG", { word_count: 13 });
   await open(page);
   await text(page).fill(THIRTEEN_WORDS);
+  await bookField(page).fill("Synthetic Reader");
   await insert(page).click();
   const msg = page.getByText(/13 of 12 words: a short-quote-commentary quote/);
   await expect(msg).toBeVisible();
@@ -114,6 +115,7 @@ test("server-authority: 13 words are sent once and the server decides", async ({
   });
   await open(page);
   await text(page).fill(THIRTEEN_WORDS);
+  await bookField(page).fill("Synthetic Reader");
   await insert(page).click();
   await expect(page.getByText(/13 of 12 words: a short-quote-commentary/)).toBeVisible();
   expect(posts).toBe(1);
@@ -141,6 +143,7 @@ for (const [name, sentence] of [
     else await respondWithError(page, "fillSlot", name);
     await open(page);
     await text(page).fill(NINE_WORDS);
+    await bookField(page).fill("Synthetic Reader");
     await insert(page).click();
     await expect(page.getByText(sentence)).toBeVisible();
     await expect(text(page)).toHaveValue(NINE_WORDS);
@@ -212,3 +215,16 @@ for (const st of STATES) {
     }
   }
 }
+
+test("empty insert shows field messages", async ({ page }) => {
+  const fills = await serve(page);
+  await open(page);
+  await page.getByRole("button", { name: "Insert", exact: true }).click();
+  await expect(page.getByText("Add the quote text.")).toBeVisible();
+  await expect(page.getByText("The request is not valid.")).toHaveCount(0);
+  await page.getByLabel("Text").fill(NINE_WORDS);
+  await page.getByRole("button", { name: "Insert", exact: true }).click();
+  await expect(page.getByText("A quote needs a source: add the book and page, or the URL.")).toBeVisible();
+  await expect(page.getByLabel("Book or title")).toBeFocused();
+  expect(fills).toHaveLength(0);
+});

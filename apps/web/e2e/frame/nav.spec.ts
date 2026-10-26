@@ -40,3 +40,13 @@ test("nav skip link focuses the main region, and sign out returns to sign-in", a
   await respondWithError(page, "getSession", "UNAUTHENTICATED");
   await expect(page).toHaveURL(/\/sign-in$/);
 });
+
+test("one rail item is current", async ({ page }) => {
+  await signInAs(page, "reviewer");
+  await page.goto("/units/g6-u4/board");
+  await expect(page.getByRole("link", { name: "Unit board" })).toHaveAttribute("aria-current", "page");
+  await expect(page.locator('nav[aria-label="Primary"] [aria-current="page"]')).toHaveCount(1);
+  await page.goto("/units");
+  await expect(page.getByRole("link", { name: "Units", exact: true })).toHaveAttribute("aria-current", "page");
+  await expect(page.locator('nav[aria-label="Primary"] [aria-current="page"]')).toHaveCount(1);
+});
