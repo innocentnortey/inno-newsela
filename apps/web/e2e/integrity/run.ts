@@ -7,7 +7,7 @@
 // `npm run test:e2e -- integrity --trials n` cannot reach this (scripts/script-targets.json routes test:e2e to the mock config and is not
 // owned by NL-125): see seam-followups S-23. Use this form until then.
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 // apps/web is a CommonJS package (Playwright loads e2e as CJS), so the ESM evals helpers are imported dynamically.
@@ -68,6 +68,10 @@ async function main(): Promise<number> {
     return 2;
   }
   const testDb = JSON.parse(made.stdout) as { url: string; name: string };
+  // A fault-fixture run must not overwrite the full-run evidence: remember the existing integrity reports and put them back.
+  const reportsDir = join(ROOT, "evals/reports");
+  const before = new Map<string, string>();
+  if (existsSync(reportsDir)) for (const f of readdirSync(reportsDir)) if (/^integrity-.*\.md$/.test(f)) before.set(f, readFileSync(join(reportsDir, f), "utf8"));
   try {
     const scored = sh("npx", ["tsx", "evals/src/cli.ts", "golden", "--suite", "S5", "--repeat", String(trials), "--provider", "stub"], {
       cwd: ROOT, env: { ...env, DATABASE_URL: testDb.url, MODEL_PROVIDER_MODE: "stub" },
@@ -77,7 +81,7 @@ async function main(): Promise<number> {
     code = Math.max(code, scored.status ?? 2);
     const m = /report=(\S+)/.exec(scored.stdout);
     if (m === null) return Math.max(code, 2);
-    const rows = sh("npx", ["tsx", "-e", `import pg from "pg"; const c = new pg.Client({connectionString: process.env.DATABASE_URL}); await c.connect(); const r = await c.query("select count(*)::int n from eval_case_result"); console.log(r.rows[0].n); await c.end();`], {
+    const rows = sh("node", ["--input-type=module", "-e", `import pg from "pg"; const c = new pg.Client({connectionString: process.env.DATABASE_URL}); await c.connect(); const r = await c.query("select count(*)::int n from eval_case_result"); console.log(r.rows[0].n); await c.end();`], {
       cwd: ROOT, env: { ...process.env, DATABASE_URL: testDb.url },
     });
     process.stdout.write(`eval_case_result rows stored: ${rows.stdout.trim()}\n`);
@@ -87,7 +91,13 @@ async function main(): Promise<number> {
     const lines = await make_read_trials(ROOT)();
     const sha = /integrity-(.+)\.md$/.exec(m[1]!)![1]!;
     const notes = integrity_notes({ lines, git_sha: sha, available, ...(grep === null ? {} : { tokens: [grep] }) });
-    writeFileSync(report, add_notes(readFileSync(report, "utf8"), notes));
+    const text = add_notes(readFileSync(report, "utf8"), notes);
+    if (fault) {
+      writeFileSync(report.replace(/\.md$/, "-fault-fixture.md"), text);
+      const was = before.get(report.split("/").pop()!);
+      if (was === undefined) rmSync(report);
+      else writeFileSync(report, was);
+    } else writeFileSync(report, text);
     process.stdout.write(`${notes}\n`);
   } finally {
     const name = testDb.name;

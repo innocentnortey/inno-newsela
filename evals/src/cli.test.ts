@@ -29,7 +29,7 @@ afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
 describe("cli", () => {
   it.each([
-    ["drafts", "S3"], ["S5", "S5"], ["load", "S14"],
+    ["drafts", "S3"], ["load", "S14"], // S5 was filled by NL-125
   ])("empty_suite_never_green: %s", async (alias, suite) => {
     expect(await run_cli(["golden", "--suite", alias], deps(default_suite_factory))).toBe(2);
     expect(errs).toContain(`suite has no cases: ${suite}`);
