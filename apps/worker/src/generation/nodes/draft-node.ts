@@ -38,7 +38,10 @@ export class DraftNode {
     const row_context = await this.outlines.row_context(job.outline_version_id, lesson_id, pinned);
     const row = row_context.row;
     const codes = [...new Set([...row.focus_codes, ...row.eld_codes, ...row.msls_codes])];
-    const standards = await this.standards.texts(codes);
+    // Narrowing is allowed (F2-D3): the prompt also shows the sub-codes of the listed parents. leaves_of is empty for a leaf.
+    const idx = await this.standards.index();
+    const sub_codes = [...new Set(row.focus_codes.flatMap((c) => idx.leaves_of(c)))].filter((c) => !codes.includes(c));
+    const standards = await this.standards.texts([...codes, ...sub_codes]);
 
     // A candidate run reuses its parent's plan (R-8).
     const run = await this.runs.get(job.run_id);

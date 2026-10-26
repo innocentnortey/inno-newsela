@@ -12,4 +12,4 @@ A name or reference that appears only in the draft's own cards is not supported 
 
 Output the full corrected draft as JSON only, conforming to the schema in the schema block, with no prose around it.
 
-The corrected draft is checked again with every rule in the lesson shape, and there is no second repair. While you fix the listed items, also make sure the draft meets the lesson shape: each cfu_item has its cfu field filled, every focus code is the standard_code of some cfu_item, and the minutes of each section add up to the template. If you find another name or page or chapter number that the data blocks do not support, remove it too.
+The corrected draft is checked again with every rule in the lesson shape, and there is no second repair. While you fix the listed items, also make sure the draft meets the lesson shape: each cfu_item has its cfu field filled, every focus code is checked by a cfu_item whose standard_code names it or by a quick_write that lists it, and the minutes of each section add up to the template. If you find another name or page or chapter number that the data blocks do not support, remove it too.

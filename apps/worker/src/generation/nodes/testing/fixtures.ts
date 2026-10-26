@@ -86,8 +86,12 @@ export function row_context_of(row: NormalizedRow): RowContext {
 
 export function standard_rows(row: NormalizedRow): StandardRow[] {
   const mk = (code: string, set: StandardRow["set"]): StandardRow => ({ code, set, text: `Official text of ${code}`, parent_code: null, is_leaf: true, eld_strand: null });
-  return [...row.focus_codes.map((c) => mk(c, "CA_CCSS_ELA_6")), ...row.msls_codes.map((c) => mk(c, "MSLS_6")), ...row.eld_codes.map((c) => mk(c, "CA_ELD_6"))];
+  const leaves = row.focus_codes.includes("L.6.4") ? LEAVES["L.6.4"]!.map((c) => ({ ...mk(c, "CA_CCSS_ELA_6"), parent_code: "L.6.4" })) : [];
+  return [...row.focus_codes.map((c) => mk(c, "CA_CCSS_ELA_6")), ...leaves, ...row.msls_codes.map((c) => mk(c, "MSLS_6")), ...row.eld_codes.map((c) => mk(c, "CA_ELD_6"))];
 }
+
+/** Sub-codes of listed parents in the standards double (the real index answers leaves_of from the official rows). */
+const LEAVES: Record<string, string[]> = { "L.6.4": ["L.6.4.a", "L.6.4.b"] };
 
 export interface Repos {
   outlines: OutlineRepo;
@@ -107,7 +111,10 @@ export function make_repos(row: NormalizedRow, plan: UnitPlanDraft | null = null
     get: async () => ({ parent_run_id }) as RunRow,
     unit_plan: async (run_id: string) => (unit_plan_requests.push(run_id), plan === null ? null : ({ plan } as UnitPlanRow)),
   } as unknown as Repos["runs"];
-  const standards = { texts: async (codes: readonly string[]) => standard_rows(row).filter((s) => codes.includes(s.code)) } as unknown as StandardRepo;
+  const standards = {
+    texts: async (codes: readonly string[]) => standard_rows(row).filter((s) => codes.includes(s.code)),
+    index: async () => ({ leaves_of: (c: string) => LEAVES[c] ?? [], text_of: () => null, resolve: () => { throw new Error("unused"); } }),
+  } as unknown as StandardRepo;
   const prompts = { get: async () => prompt_row() } as unknown as PromptRepo;
   return { outlines, runs, standards, prompts };
 }

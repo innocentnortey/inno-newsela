@@ -48,4 +48,20 @@ describe("DraftNode", () => {
     expect(repos.runs.unit_plan_requests).toEqual([parent]);
     expect(seen).toEqual([{ reviewer_note: "make it shorter", example_set_id: null, plan_ids: ["G6.U4.L4"] }]);
   });
+
+  it("sub_codes_of_listed_parents_reach_the_prompt", async () => {
+    const parent_row = { ...load_row("wp1"), focus_codes: ["L.6.4"] };
+    const caller = new ScriptedPaidCaller([]);
+    const job = make_job();
+    caller.seed_completed(job.job_id, "lesson_draft", 1, JSON.stringify(good_wp1_draft()));
+    const s = await node(caller, make_repos(parent_row)).run(initial_state(job, 0) as JobState);
+    expect(s.context!.standards.map((x) => x.code).sort()).toEqual(["L.6.4", "L.6.4.a", "L.6.4.b"]);
+    // A row that lists only leaves adds nothing.
+    const leaf_row = load_row("wp1");
+    const caller2 = new ScriptedPaidCaller([]);
+    caller2.seed_completed(job.job_id, "lesson_draft", 1, JSON.stringify(good_wp1_draft()));
+    const s2 = await node(caller2, make_repos(leaf_row)).run(initial_state(job, 0) as JobState);
+    expect(s2.context!.standards.map((x) => x.code).sort()).toEqual([...leaf_row.focus_codes].sort());
+  });
 });
+

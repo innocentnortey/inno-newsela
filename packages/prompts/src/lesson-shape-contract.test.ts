@@ -17,7 +17,16 @@ describe("lesson-shape contract text", () => {
       "does not count toward that limit of two",
       "does not count as teaching",
       "callout_say",
+      "Sub-codes.",
+      "narrowed in code_origins",
+      "must confirm",
+      "also counts as a check",
+      "do not choose standards yourself",
+      "either stays empty or lists the same codes",
     ]) expect(shape, phrase).toContain(phrase);
+  });
+  it("no longer forbids narrowing", () => {
+    expect(shape).not.toContain("Do not narrow");
   });
   it("no longer points at text cards as a source of names or quotations", () => {
     expect(shape).not.toContain("text card");
