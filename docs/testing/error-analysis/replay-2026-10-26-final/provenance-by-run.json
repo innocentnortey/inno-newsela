@@ -1,0 +1,472 @@
+{
+ "base-e7e72a3": {
+  "commit": "e7e72a3da607946683473acef0f706928570e71f",
+  "dirty_files": [
+   [
+    "evals/src/replay-finals-lesson.ts",
+    "??",
+    "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f"
+   ],
+   [
+    "evals/src/replay-finals-main.ts",
+    "??",
+    "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835"
+   ],
+   [
+    "evals/src/replay-finals-pin.ts",
+    "??",
+    "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb"
+   ],
+   [
+    "evals/src/replay-finals-provenance.ts",
+    "??",
+    "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e"
+   ],
+   [
+    "evals/src/replay-finals-readonly.ts",
+    "??",
+    "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31"
+   ],
+   [
+    "evals/src/replay-finals.ts",
+    "??",
+    "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+   ]
+  ],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "ba763679fec9f72cdd869e3f8097325c4718a430ac1fc17dfb554f27e06e124e",
+   "template_and_compile": "3c43b1b197d567f28ca74a5838f666be8ccbd0999cef035579ec859c46266887",
+   "checks": "f6d99f403d51b3a4d26323e56c9f65b80a04f628f6f818f5a725e88fb22f8b75",
+   "check_wiring": "2e6d3163645d7bf0f0c817d42909282620906c2be908b590e1d0798150d1073b",
+   "prompt_locked_hash_current": "c8fb93065d882c24bfe6ba95a6161e1d0a602c8f98e278bb109d221ef6de0bf7"
+  },
+  "db_now": "2026-10-26T18:07:57.512949Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-3b",
+   "G6.U4.L11",
+   "G6.U4.L13",
+   "G6.U4.L14",
+   "G6.U4.L16",
+   "G6.U4.L18",
+   "G6.U4.L25",
+   "G6.U4.L27",
+   "G6.U4.L29",
+   "G6.U4.L3",
+   "G6.U4.L30",
+   "G6.U4.L34",
+   "G6.U4.L37",
+   "G6.U4.L41",
+   "G6.U4.L5",
+   "G6.U4.L6",
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-3a",
+   "G6.U4.FLEX-3b",
+   "G6.U4.L1",
+   "G6.U4.L11",
+   "G6.U4.L12",
+   "G6.U4.L13",
+   "G6.U4.L14",
+   "G6.U4.L15",
+   "G6.U4.L16",
+   "G6.U4.L17",
+   "G6.U4.L18",
+   "G6.U4.L2",
+   "G6.U4.L25",
+   "G6.U4.L26",
+   "G6.U4.L27",
+   "G6.U4.L29",
+   "G6.U4.L3",
+   "G6.U4.L30",
+   "G6.U4.L31",
+   "G6.U4.L34",
+   "G6.U4.L36",
+   "G6.U4.L37",
+   "G6.U4.L38",
+   "G6.U4.L39",
+   "G6.U4.L41",
+   "G6.U4.L5",
+   "G6.U4.L6",
+   "G6.U4.L7"
+  ]
+ },
+ "a-d727537": {
+  "commit": "d72753712bdfb19e23c77373948cc881c2890b29",
+  "dirty_files": [
+   [
+    "evals/src/replay-finals-lesson.ts",
+    "??",
+    "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f"
+   ],
+   [
+    "evals/src/replay-finals-main.ts",
+    "??",
+    "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835"
+   ],
+   [
+    "evals/src/replay-finals-pin.ts",
+    "??",
+    "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb"
+   ],
+   [
+    "evals/src/replay-finals-provenance.ts",
+    "??",
+    "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e"
+   ],
+   [
+    "evals/src/replay-finals-readonly.ts",
+    "??",
+    "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31"
+   ],
+   [
+    "evals/src/replay-finals.ts",
+    "??",
+    "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+   ]
+  ],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "ba763679fec9f72cdd869e3f8097325c4718a430ac1fc17dfb554f27e06e124e",
+   "template_and_compile": "65bd3416f50e1342d6f3a611a7ff5ad4c3260adf06de6b99d9f7d044c8404d25",
+   "checks": "7a7bd3931d9efc1c49acd4ef8c4fdd6f39c591dd6337e1a19638430d06c00758",
+   "check_wiring": "2b279bb51f26aa6e06a07fd8587eac06be963f997de6eec30623580400c42703",
+   "prompt_locked_hash_current": "540e31a3e4027b97d270c0389bbbc5438380918be7c23913dbf0731f7c63fa91"
+  },
+  "db_now": "2026-10-26T18:08:22.357150Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-1b",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-2b",
+   "G6.U4.FLEX-3a",
+   "G6.U4.FLEX-3b",
+   "G6.U4.L10",
+   "G6.U4.L11",
+   "G6.U4.L12",
+   "G6.U4.L13",
+   "G6.U4.L14",
+   "G6.U4.L15",
+   "G6.U4.L16",
+   "G6.U4.L18",
+   "G6.U4.L19",
+   "G6.U4.L20",
+   "G6.U4.L21",
+   "G6.U4.L22",
+   "G6.U4.L24",
+   "G6.U4.L25",
+   "G6.U4.L27",
+   "G6.U4.L29",
+   "G6.U4.L3",
+   "G6.U4.L30",
+   "G6.U4.L33",
+   "G6.U4.L34",
+   "G6.U4.L35",
+   "G6.U4.L37",
+   "G6.U4.L4",
+   "G6.U4.L40",
+   "G6.U4.L41",
+   "G6.U4.L5",
+   "G6.U4.L6",
+   "G6.U4.L7",
+   "G6.U4.L9"
+  ],
+  "final_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-1b",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-2b",
+   "G6.U4.FLEX-3a",
+   "G6.U4.FLEX-3b",
+   "G6.U4.L1",
+   "G6.U4.L10",
+   "G6.U4.L11",
+   "G6.U4.L12",
+   "G6.U4.L13",
+   "G6.U4.L14",
+   "G6.U4.L15",
+   "G6.U4.L16",
+   "G6.U4.L17",
+   "G6.U4.L18",
+   "G6.U4.L19",
+   "G6.U4.L2",
+   "G6.U4.L20",
+   "G6.U4.L21",
+   "G6.U4.L22",
+   "G6.U4.L23",
+   "G6.U4.L24",
+   "G6.U4.L25",
+   "G6.U4.L26",
+   "G6.U4.L27",
+   "G6.U4.L28",
+   "G6.U4.L29",
+   "G6.U4.L3",
+   "G6.U4.L30",
+   "G6.U4.L31",
+   "G6.U4.L32",
+   "G6.U4.L33",
+   "G6.U4.L34",
+   "G6.U4.L35",
+   "G6.U4.L36",
+   "G6.U4.L37",
+   "G6.U4.L38",
+   "G6.U4.L39",
+   "G6.U4.L4",
+   "G6.U4.L40",
+   "G6.U4.L41",
+   "G6.U4.L5",
+   "G6.U4.L6",
+   "G6.U4.L7",
+   "G6.U4.L8",
+   "G6.U4.L9"
+  ]
+ },
+ "a-follow-up-6cc5e07": {
+  "commit": "6cc5e07863fdd8ea501c6dc25c02d6d5bdbac80d",
+  "dirty_files": [
+   [
+    "evals/src/replay-finals-lesson.ts",
+    "??",
+    "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f"
+   ],
+   [
+    "evals/src/replay-finals-main.ts",
+    "M",
+    "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835"
+   ],
+   [
+    "evals/src/replay-finals-pin.ts",
+    "??",
+    "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb"
+   ],
+   [
+    "evals/src/replay-finals-provenance.ts",
+    "??",
+    "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e"
+   ],
+   [
+    "evals/src/replay-finals-readonly.ts",
+    "??",
+    "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31"
+   ],
+   [
+    "evals/src/replay-finals.ts",
+    "M",
+    "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+   ]
+  ],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e9b39e28d597454adf23d7ba6c13a6e4237e0be3a1b95e39fa83ee4f0e9cff3f",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "ba763679fec9f72cdd869e3f8097325c4718a430ac1fc17dfb554f27e06e124e",
+   "template_and_compile": "0412ea1035e38d74f5c5794a7ab0078ed3a59096c3c8b4a8b50a8d6723c2cc08",
+   "checks": "a1a2110af972e837815e43bd769405c14967ce618ccb41e8d493b68ba67d1e56",
+   "check_wiring": "23ffba31814bdf3b9ff5a4814c44895e0ccc4857adea795ede1cefb2c0dc49c4",
+   "prompt_locked_hash_current": "30fe769dd4373bfce33a4991551fb3edf8b60cbc527771df8df2ad890bd8b40b"
+  },
+  "db_now": "2026-10-26T18:10:57.775037Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-3a",
+   "G6.U4.L7"
+  ]
+ },
+ "pd39-45a2a63": {
+  "commit": "45a2a63a56a73eda805c5749497de2f0a6bf59c2",
+  "dirty_files": [
+   [
+    "evals/src/replay-finals-lesson.ts",
+    "??",
+    "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f"
+   ],
+   [
+    "evals/src/replay-finals-main.ts",
+    "M",
+    "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835"
+   ],
+   [
+    "evals/src/replay-finals-pin.ts",
+    "??",
+    "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb"
+   ],
+   [
+    "evals/src/replay-finals-provenance.ts",
+    "??",
+    "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e"
+   ],
+   [
+    "evals/src/replay-finals-readonly.ts",
+    "??",
+    "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31"
+   ],
+   [
+    "evals/src/replay-finals.ts",
+    "M",
+    "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+   ]
+  ],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e9b39e28d597454adf23d7ba6c13a6e4237e0be3a1b95e39fa83ee4f0e9cff3f",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "10754e71060e3a02f0f75a4d1274ddd06aa434c3fdd7ad7c15ba90eb99aba8b5",
+   "template_and_compile": "79883eca99670259a93ca05f7560005677502c3584103df9aca0d05b03d55f21",
+   "checks": "757d419ea807b580302dd33d96ba1e13695eef7410a4623f40176c5d3d568c22",
+   "check_wiring": "23ffba31814bdf3b9ff5a4814c44895e0ccc4857adea795ede1cefb2c0dc49c4",
+   "prompt_locked_hash_current": "4fb599e182da3b17be8afea4e2d65393e351b5b160efd1ba938e83736b65f669"
+  },
+  "db_now": "2026-10-26T18:11:15.436272Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.L25",
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.FLEX-1a",
+   "G6.U4.FLEX-2a",
+   "G6.U4.FLEX-3a",
+   "G6.U4.L25",
+   "G6.U4.L7"
+  ]
+ },
+ "f1-start-e8a7f27": {
+  "commit": "e8a7f27acb2ff420efebfca1e2cf68f7d406f38b",
+  "dirty_files": [],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "10754e71060e3a02f0f75a4d1274ddd06aa434c3fdd7ad7c15ba90eb99aba8b5",
+   "template_and_compile": "c41ea525faccd0afb0e2871269bbed926560bbfae3a6377bfa00028767ae11d2",
+   "checks": "6c8a80bf229bd75a4bf70603469cafb45da904e9fd35434a90c29c7884f67a94",
+   "check_wiring": "23ffba31814bdf3b9ff5a4814c44895e0ccc4857adea795ede1cefb2c0dc49c4",
+   "prompt_locked_hash_current": "4fb599e182da3b17be8afea4e2d65393e351b5b160efd1ba938e83736b65f669"
+  },
+  "db_now": "2026-10-26T18:09:07.098291Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.L7"
+  ]
+ },
+ "f2-end-8ed5e83": {
+  "commit": "8ed5e8318c886c77c1dc2f4be0c7884d0da75d3a",
+  "dirty_files": [],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "7e4896600725493b17889dbcc7ef8b50a46a7beb9109df0f61d8bc73c0ee6689",
+   "template_and_compile": "fb4e89b4342b63eab6c22eee408fc4002c194fc69daf8566b44b6eaee525cff6",
+   "checks": "372e208abf193ed34dc6dd967f261db641148432d727930ea07dcbf63c694493",
+   "check_wiring": "ad3e75541ae111c5e722058dcdb741db48c543372a91319a567c9c253f2e32cb",
+   "prompt_locked_hash_current": "cd5ec8bbb397987a8ea676976d0b615908131e63730af10f965892ec79687976"
+  },
+  "db_now": "2026-10-26T18:09:51.181159Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.L7"
+  ]
+ },
+ "template-62f372f": {
+  "commit": "62f372f294bbe2b6f595b3ea93306027256b04ce",
+  "dirty_files": [],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "7e4896600725493b17889dbcc7ef8b50a46a7beb9109df0f61d8bc73c0ee6689",
+   "template_and_compile": "7ec2c1253e4d9145ce5fbb111be76d86c413a7291be3456dc5d1abf16d312d2a",
+   "checks": "372e208abf193ed34dc6dd967f261db641148432d727930ea07dcbf63c694493",
+   "check_wiring": "ad3e75541ae111c5e722058dcdb741db48c543372a91319a567c9c253f2e32cb",
+   "prompt_locked_hash_current": "f1d29f98868a1d324b3271a43188ca305f5bc295b64cb3d3e9cd1dca66c26aa2"
+  },
+  "db_now": "2026-10-26T18:09:29.615031Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.L7"
+  ]
+ },
+ "f3-47549fe": {
+  "commit": "47549fe9d5863135e19506b4625fdbaa66b869a9",
+  "dirty_files": [],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "7e4896600725493b17889dbcc7ef8b50a46a7beb9109df0f61d8bc73c0ee6689",
+   "template_and_compile": "7ec2c1253e4d9145ce5fbb111be76d86c413a7291be3456dc5d1abf16d312d2a",
+   "checks": "372e208abf193ed34dc6dd967f261db641148432d727930ea07dcbf63c694493",
+   "check_wiring": "ad3e75541ae111c5e722058dcdb741db48c543372a91319a567c9c253f2e32cb",
+   "prompt_locked_hash_current": "f1d29f98868a1d324b3271a43188ca305f5bc295b64cb3d3e9cd1dca66c26aa2"
+  },
+  "db_now": "2026-10-26T18:10:12.256827Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.L7"
+  ]
+ },
+ "final-3bbe94f": {
+  "commit": "3bbe94f8ead657ea66c77d5129fceb9844b269fc",
+  "dirty_files": [],
+  "dirty_other_count": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "identities": {
+   "schema": "7e4896600725493b17889dbcc7ef8b50a46a7beb9109df0f61d8bc73c0ee6689",
+   "template_and_compile": "7ec2c1253e4d9145ce5fbb111be76d86c413a7291be3456dc5d1abf16d312d2a",
+   "checks": "cab20c45b82e0908abe424fdbd18ef3e9a454c465709e4a53c0ac1d8dd413cb3",
+   "check_wiring": "1c41d6e45d8a697df42a810b7693a5308628dfb6bb196f6d32b04268667b0908",
+   "prompt_locked_hash_current": "f1d29f98868a1d324b3271a43188ca305f5bc295b64cb3d3e9cd1dca66c26aa2"
+  },
+  "db_now": "2026-10-26T18:10:32.483795Z",
+  "row_counts_equal": true,
+  "write_probe": "rejected_25006",
+  "effective_passing": [
+   "G6.U4.L7"
+  ],
+  "final_passing": [
+   "G6.U4.L7"
+  ]
+ }
+}

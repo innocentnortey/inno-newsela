@@ -1,5 +1,21 @@
 # Resume checkpoint
 
+Updated 2026-10-26 (VPS, wrap-up at main 05ff31f). Full account: [docs/delivery/2026-10-26-final-status.md](../../docs/delivery/2026-10-26-final-status.md). Replace at each handoff; history in the [dev log](../../docs/devlog/README.md).
+
+## State at wrap-up
+- Astra fix slices A-D, F1-F4, template edit, F3 fixes and review follow-ups are on main (HEAD 05ff31f, **not pushed** unless the next session finds otherwise). Vitest at 3bbe94f: 569/572 files, 4130 tests; 2 load-timeout failures pass in isolation. No real-model measurement of the final candidate exists; the replay of old drafts (1/47 pass) is a reanalysis, not a forecast. No GitLab issue was closed.
+- Session spend about $10.1 of $20.
+
+## Next actions, in order
+1. Push done? Check `git status` / `git log origin/main..` (private GitLab; factory mode may push).
+2. Run the two paid commands (fresh migrated DB, `with-provider-env`): S3 `npm run eval:golden -- --suite drafts --repeat 3 --provider real --max-usd 3`; whole unit via `evals/src/full-run-main.ts --max-usd 5` (see docs/devlog/2026-10-26-nl112-full-run-3.md). NL-134 rerun rule fires (new locked hash f1d29f98868a...).
+3. Run `ops/e2e-real-stack.sh` on the final commit (filter bug fixed in 05ff31f; con-6 first-poll gap unresolved).
+4. Re-review the commits after 3bbe94f.
+5. Render (migrate 0016 before worker/collab; queue-compat inventory and the locked-prompt runbook, drain before swap).
+6. Human items: NL-02, NL-03, NL-122, NL-123, NL-124, NL-133, NL-138, NL-143; PD-36/PD-38; repo visibility.
+
+## Older notes (before the final fixes; the numbers below pre-date them)
+
 Updated 2026-10-26 (VPS, Phase B, Sonnet; real-model results folded into the docs). Replace at each handoff; history in the [dev log](../../docs/devlog/README.md).
 
 ## Where we are

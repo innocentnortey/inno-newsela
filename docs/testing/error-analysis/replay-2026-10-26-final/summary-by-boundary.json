@@ -1,0 +1,1051 @@
+{
+ "base-e7e72a3": {
+  "label": "base e7e72a3",
+  "file": "base-e7e72a3.json",
+  "commit": "e7e72a3da607946683473acef0f706928570e71f",
+  "dirty_files": 6,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {
+   "evals/src/replay-finals-lesson.ts": "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f",
+   "evals/src/replay-finals-main.ts": "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835",
+   "evals/src/replay-finals-pin.ts": "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb",
+   "evals/src/replay-finals-provenance.ts": "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e",
+   "evals/src/replay-finals-readonly.ts": "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31",
+   "evals/src/replay-finals.ts": "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+  },
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 47,
+  "effective": {
+   "pass_total": "19/47",
+   "pass_compiled": "19/44",
+   "gen_pass": 19,
+   "compiled": 44,
+   "review_pass": 2,
+   "kinds": {
+    "section_missing": [
+     2,
+     2
+    ],
+    "standard_not_taught": [
+     0,
+     0
+    ],
+    "standard_not_checked": [
+     0,
+     0
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     34,
+     14
+    ],
+    "page_out_of_range": [
+     5,
+     5
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-3b",
+    "G6.U4.L11",
+    "G6.U4.L13",
+    "G6.U4.L14",
+    "G6.U4.L16",
+    "G6.U4.L18",
+    "G6.U4.L25",
+    "G6.U4.L27",
+    "G6.U4.L28",
+    "G6.U4.L29",
+    "G6.U4.L3",
+    "G6.U4.L30",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L34",
+    "G6.U4.L37",
+    "G6.U4.L41",
+    "G6.U4.L5",
+    "G6.U4.L6",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "30/47",
+   "pass_compiled": "30/47",
+   "gen_pass": 30,
+   "compiled": 47,
+   "review_pass": 3,
+   "kinds": {
+    "section_missing": [
+     0,
+     0
+    ],
+    "standard_not_taught": [
+     0,
+     0
+    ],
+    "standard_not_checked": [
+     0,
+     0
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     37,
+     15
+    ],
+    "page_out_of_range": [
+     2,
+     2
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-3a",
+    "G6.U4.FLEX-3b",
+    "G6.U4.L1",
+    "G6.U4.L11",
+    "G6.U4.L12",
+    "G6.U4.L13",
+    "G6.U4.L14",
+    "G6.U4.L15",
+    "G6.U4.L16",
+    "G6.U4.L17",
+    "G6.U4.L18",
+    "G6.U4.L2",
+    "G6.U4.L25",
+    "G6.U4.L26",
+    "G6.U4.L27",
+    "G6.U4.L29",
+    "G6.U4.L3",
+    "G6.U4.L30",
+    "G6.U4.L31",
+    "G6.U4.L34",
+    "G6.U4.L36",
+    "G6.U4.L37",
+    "G6.U4.L38",
+    "G6.U4.L39",
+    "G6.U4.L41",
+    "G6.U4.L5",
+    "G6.U4.L6",
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "a-d727537": {
+  "label": "A d727537",
+  "file": "a-d727537.json",
+  "commit": "d72753712bdfb19e23c77373948cc881c2890b29",
+  "dirty_files": 6,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {
+   "evals/src/replay-finals-lesson.ts": "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f",
+   "evals/src/replay-finals-main.ts": "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835",
+   "evals/src/replay-finals-pin.ts": "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb",
+   "evals/src/replay-finals-provenance.ts": "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e",
+   "evals/src/replay-finals-readonly.ts": "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31",
+   "evals/src/replay-finals.ts": "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+  },
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 31,
+  "effective": {
+   "pass_total": "35/47",
+   "pass_compiled": "35/44",
+   "gen_pass": 35,
+   "compiled": 44,
+   "review_pass": 13,
+   "kinds": {
+    "section_missing": [
+     2,
+     2
+    ],
+    "standard_not_taught": [
+     0,
+     0
+    ],
+    "standard_not_checked": [
+     0,
+     0
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     2,
+     1
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-1b",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-2b",
+    "G6.U4.FLEX-3a",
+    "G6.U4.FLEX-3b",
+    "G6.U4.L10",
+    "G6.U4.L11",
+    "G6.U4.L12",
+    "G6.U4.L13",
+    "G6.U4.L14",
+    "G6.U4.L15",
+    "G6.U4.L16",
+    "G6.U4.L18",
+    "G6.U4.L19",
+    "G6.U4.L20",
+    "G6.U4.L21",
+    "G6.U4.L22",
+    "G6.U4.L24",
+    "G6.U4.L25",
+    "G6.U4.L27",
+    "G6.U4.L28",
+    "G6.U4.L29",
+    "G6.U4.L3",
+    "G6.U4.L30",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L33",
+    "G6.U4.L34",
+    "G6.U4.L35",
+    "G6.U4.L37",
+    "G6.U4.L4",
+    "G6.U4.L40",
+    "G6.U4.L41",
+    "G6.U4.L5",
+    "G6.U4.L6",
+    "G6.U4.L7",
+    "G6.U4.L9"
+   ]
+  },
+  "final": {
+   "pass_total": "47/47",
+   "pass_compiled": "47/47",
+   "gen_pass": 47,
+   "compiled": 47,
+   "review_pass": 20,
+   "kinds": {
+    "section_missing": [
+     0,
+     0
+    ],
+    "standard_not_taught": [
+     0,
+     0
+    ],
+    "standard_not_checked": [
+     0,
+     0
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     0,
+     0
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-1b",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-2b",
+    "G6.U4.FLEX-3a",
+    "G6.U4.FLEX-3b",
+    "G6.U4.L1",
+    "G6.U4.L10",
+    "G6.U4.L11",
+    "G6.U4.L12",
+    "G6.U4.L13",
+    "G6.U4.L14",
+    "G6.U4.L15",
+    "G6.U4.L16",
+    "G6.U4.L17",
+    "G6.U4.L18",
+    "G6.U4.L19",
+    "G6.U4.L2",
+    "G6.U4.L20",
+    "G6.U4.L21",
+    "G6.U4.L22",
+    "G6.U4.L23",
+    "G6.U4.L24",
+    "G6.U4.L25",
+    "G6.U4.L26",
+    "G6.U4.L27",
+    "G6.U4.L28",
+    "G6.U4.L29",
+    "G6.U4.L3",
+    "G6.U4.L30",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L33",
+    "G6.U4.L34",
+    "G6.U4.L35",
+    "G6.U4.L36",
+    "G6.U4.L37",
+    "G6.U4.L38",
+    "G6.U4.L39",
+    "G6.U4.L4",
+    "G6.U4.L40",
+    "G6.U4.L41",
+    "G6.U4.L5",
+    "G6.U4.L6",
+    "G6.U4.L7",
+    "G6.U4.L8",
+    "G6.U4.L9"
+   ]
+  }
+ },
+ "a-follow-up-6cc5e07": {
+  "label": "A follow-up 6cc5e07",
+  "file": "a-follow-up-6cc5e07.json",
+  "commit": "6cc5e07863fdd8ea501c6dc25c02d6d5bdbac80d",
+  "dirty_files": 6,
+  "tracked_diff_sha256": "e9b39e28d597454adf23d7ba6c13a6e4237e0be3a1b95e39fa83ee4f0e9cff3f",
+  "dirty_hashes": {
+   "evals/src/replay-finals-lesson.ts": "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f",
+   "evals/src/replay-finals-main.ts": "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835",
+   "evals/src/replay-finals-pin.ts": "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb",
+   "evals/src/replay-finals-provenance.ts": "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e",
+   "evals/src/replay-finals-readonly.ts": "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31",
+   "evals/src/replay-finals.ts": "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+  },
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 31,
+  "effective": {
+   "pass_total": "3/47",
+   "pass_compiled": "3/44",
+   "gen_pass": 3,
+   "compiled": 44,
+   "review_pass": 3,
+   "kinds": {
+    "section_missing": [
+     3,
+     3
+    ],
+    "standard_not_taught": [
+     110,
+     38
+    ],
+    "standard_not_checked": [
+     26,
+     10
+    ],
+    "code_not_allowed": [
+     3,
+     3
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "4/47",
+   "pass_compiled": "4/47",
+   "gen_pass": 4,
+   "compiled": 47,
+   "review_pass": 4,
+   "kinds": {
+    "section_missing": [
+     1,
+     1
+    ],
+    "standard_not_taught": [
+     118,
+     41
+    ],
+    "standard_not_checked": [
+     27,
+     11
+    ],
+    "code_not_allowed": [
+     2,
+     2
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-3a",
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "pd39-45a2a63": {
+  "label": "PD-39 45a2a63",
+  "file": "pd39-45a2a63.json",
+  "commit": "45a2a63a56a73eda805c5749497de2f0a6bf59c2",
+  "dirty_files": 6,
+  "tracked_diff_sha256": "e9b39e28d597454adf23d7ba6c13a6e4237e0be3a1b95e39fa83ee4f0e9cff3f",
+  "dirty_hashes": {
+   "evals/src/replay-finals-lesson.ts": "a0128426fac84f835524ec9674e4ebc714fd6ad6121af5f6f87d4e121b10745f",
+   "evals/src/replay-finals-main.ts": "2ca55d62688dea0dea69ef784f995972de9a9173d18a8528a3c8c123ef6ea835",
+   "evals/src/replay-finals-pin.ts": "2bd11b7ba57180d2302a8b3062da852e90f53a9315adae4f568f8c272b8771fb",
+   "evals/src/replay-finals-provenance.ts": "646a01649a559e3e0cf06f4946055908e445a54a4cf1ee4c35f43d6d5a521c4e",
+   "evals/src/replay-finals-readonly.ts": "6b7924e1cce954dfc89b41c9f80be6dd0effa7822558d0c21e6ee54ad5e0dd31",
+   "evals/src/replay-finals.ts": "b2ab8ce53a5d7670ac61a2abc6696bbf9ca6905251e47e9fbbae34aedadbc393"
+  },
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 32,
+  "effective": {
+   "pass_total": "4/47",
+   "pass_compiled": "4/44",
+   "gen_pass": 4,
+   "compiled": 44,
+   "review_pass": 3,
+   "kinds": {
+    "section_missing": [
+     3,
+     3
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     25,
+     9
+    ],
+    "code_not_allowed": [
+     3,
+     3
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.L25",
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "5/47",
+   "pass_compiled": "5/47",
+   "gen_pass": 5,
+   "compiled": 47,
+   "review_pass": 4,
+   "kinds": {
+    "section_missing": [
+     1,
+     1
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     25,
+     9
+    ],
+    "code_not_allowed": [
+     2,
+     2
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.FLEX-1a",
+    "G6.U4.FLEX-2a",
+    "G6.U4.FLEX-3a",
+    "G6.U4.L25",
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "f1-start-e8a7f27": {
+  "label": "F1 start e8a7f27",
+  "file": "f1-start-e8a7f27.json",
+  "commit": "e8a7f27acb2ff420efebfca1e2cf68f7d406f38b",
+  "dirty_files": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {},
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 29,
+  "effective": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/44",
+   "gen_pass": 1,
+   "compiled": 44,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     60,
+     26
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     25,
+     9
+    ],
+    "code_not_allowed": [
+     3,
+     3
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/47",
+   "gen_pass": 1,
+   "compiled": 47,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     64,
+     26
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     25,
+     9
+    ],
+    "code_not_allowed": [
+     2,
+     2
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "template-62f372f": {
+  "label": "template/prompt 62f372f",
+  "file": "template-62f372f.json",
+  "commit": "62f372f294bbe2b6f595b3ea93306027256b04ce",
+  "dirty_files": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {},
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 29,
+  "effective": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/44",
+   "gen_pass": 1,
+   "compiled": 44,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     50,
+     25
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     1,
+     1
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/47",
+   "gen_pass": 1,
+   "compiled": 47,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     52,
+     25
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "f2-end-8ed5e83": {
+  "label": "F2 end 8ed5e83",
+  "file": "f2-end-8ed5e83.json",
+  "commit": "8ed5e8318c886c77c1dc2f4be0c7884d0da75d3a",
+  "dirty_files": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {},
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 29,
+  "effective": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/44",
+   "gen_pass": 1,
+   "compiled": 44,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     60,
+     26
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     1,
+     1
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/47",
+   "gen_pass": 1,
+   "compiled": 47,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     64,
+     26
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "f3-47549fe": {
+  "label": "F3 47549fe",
+  "file": "f3-47549fe.json",
+  "commit": "47549fe9d5863135e19506b4625fdbaa66b869a9",
+  "dirty_files": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {},
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 29,
+  "effective": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/44",
+   "gen_pass": 1,
+   "compiled": 44,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     50,
+     25
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     1,
+     1
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/47",
+   "gen_pass": 1,
+   "compiled": 47,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     52,
+     25
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.L7"
+   ]
+  }
+ },
+ "final-3bbe94f": {
+  "label": "final 3bbe94f",
+  "file": "final-3bbe94f.json",
+  "commit": "3bbe94f8ead657ea66c77d5129fceb9844b269fc",
+  "dirty_files": 0,
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "dirty_hashes": {},
+  "input_hash": "aecf38bdc1f09ca320f668bd43690d87d0cd2978eae5826a3e7ddc31da8fba1a",
+  "calibration_agree": 29,
+  "effective": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/44",
+   "gen_pass": 1,
+   "compiled": 44,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     50,
+     25
+    ],
+    "standard_not_taught": [
+     107,
+     37
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     1,
+     1
+    ],
+    "proper_noun_unsourced": [
+     5,
+     3
+    ],
+    "page_out_of_range": [
+     1,
+     1
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {
+    "minutes_out_of_range": 5,
+    "quote_unmatched": 2
+   },
+   "passing": [
+    "G6.U4.L28",
+    "G6.U4.L31",
+    "G6.U4.L32",
+    "G6.U4.L7"
+   ]
+  },
+  "final": {
+   "pass_total": "1/47",
+   "pass_compiled": "1/47",
+   "gen_pass": 1,
+   "compiled": 47,
+   "review_pass": 1,
+   "kinds": {
+    "section_missing": [
+     52,
+     25
+    ],
+    "standard_not_taught": [
+     114,
+     40
+    ],
+    "standard_not_checked": [
+     23,
+     9
+    ],
+    "code_not_allowed": [
+     0,
+     0
+    ],
+    "proper_noun_unsourced": [
+     3,
+     2
+    ],
+    "page_out_of_range": [
+     0,
+     0
+    ],
+    "schema_invalid": [
+     0,
+     0
+    ]
+   },
+   "other_kinds": {},
+   "passing": [
+    "G6.U4.L7"
+   ]
+  }
+ }
+}

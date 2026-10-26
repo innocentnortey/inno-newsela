@@ -63,3 +63,5 @@ human-reviewed taxonomy and no measured improvement.
 ## Audit 2026-10-26 (offline)
 
 [`astra-audit-2026-10-26.json`](astra-audit-2026-10-26.json) is an offline, read-only replay of the two kept NL-112 databases (no paid calls). It corrects the run facts (attempt 3: 44/47 original drafts parse and compile, 19/47 no repair, 30/47 stored-ready; the 17 blocks replay clean with the checker fixes). It is not the protocol's human review. The `FT-N` taxonomy now exists in `taxonomy.md` (NL-120, PD-32 fallback, not reviewed by Innocent); no `XP-N` score and no seeded-error result exist. Narrative: [`docs/delivery/2026-10-26-astra-fix-handoff.md`](../../delivery/2026-10-26-astra-fix-handoff.md).
+
+Final offline replay (2026-10-26, 47 old drafts re-checked by the code at each commit, no model call, a reanalysis and not a forecast): [`replay-2026-10-26-final/`](replay-2026-10-26-final/README.md). Wrap-up: [`docs/delivery/2026-10-26-final-status.md`](../../delivery/2026-10-26-final-status.md).
