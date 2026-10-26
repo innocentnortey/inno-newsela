@@ -26,7 +26,7 @@ const BACKOFF_MS = 30_000;
 const BACKOFF_MAX_MS = 600_000;
 
 export interface JudgeWiring {
-  /** null when the judge is not enabled (real mode without a priced MODEL_JUDGE_ID). */
+  /** null when the judge is not enabled (real mode without MODEL_JUDGE_ID, or with an unpriced one). */
   claim_loop: JudgeClaimLoop | null;
   /** The same object; loops.ts calls lane.run_until(stop). */
   lane: JudgeClaimLoop | null;
@@ -38,6 +38,11 @@ export function wire_judge(d: WorkerDeps, opts: { judge?: JudgeClient } = {}): J
   const stub = d.settings.model.model_provider_mode === "stub";
   const judge_model_id = d.settings.model_judge_id ?? "stub-judge";
   const model_id = stub ? "stub-judge" : judge_model_id;
+  if (!stub && opts.judge === undefined && d.settings.model_judge_id === null) {
+    // The judge is advisory: no id means no judge lane, not a worker that refuses to start (GEN-8).
+    d.logger.warn("judge.disabled", { extra: { reason: "no_judge_model_id", hint: "set MODEL_JUDGE_ID to enable the advisory judge" } });
+    return { claim_loop: null, lane: null };
+  }
   if (!stub && opts.judge === undefined) {
     try {
       PRICE_TABLE.price_for(model_id);

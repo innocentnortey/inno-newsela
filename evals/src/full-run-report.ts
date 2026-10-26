@@ -68,6 +68,8 @@ export interface FullRunFacts {
   n: number;
   n_ready: number;
   first_pass_schema_valid: number;
+  /** Lesson jobs that reached ready or failed, i.e. actually ran. A first-pass count over zero of these means nothing. */
+  lessons_run: number;
   repairs: number;
   failures_by_reason: Record<string, number>;
   placeholders: number;
@@ -110,6 +112,7 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
   const lessons: LessonFact[] = [];
   const confirm_counts: number[] = [];
   let first_pass = 0;
+  let lessons_run = 0;
   let disclosure = 0;
   let rt_ok = 0;
   let rt_total = 0;
@@ -120,7 +123,9 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
 
   for (const j of jobs) {
     const lesson_id = j.lesson_id as string;
-    if (j.repairs === 0 && j.truncation_retries === 0 && !j.failure_reasons.some((f) => f.check === "schema_invalid")) first_pass++;
+    const ran = j.tile_state === "ready" || j.tile_state === "failed";
+    if (ran) lessons_run++;
+    if (ran && j.repairs === 0 && j.truncation_retries === 0 && !j.failure_reasons.some((f) => f.check === "schema_invalid")) first_pass++;
     for (const f of j.failure_reasons) bump(failures, f.check);
     jobs_cost = jobs_cost.plus(j.cost_usd);
     if (j.cost_usd.gt(per_lesson_max)) per_lesson_max = j.cost_usd;
@@ -166,7 +171,7 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
   const end = rows.run.finished_at ?? rows.run.created_at;
   return {
     run_id, cap_usd: rows.run.cap_usd, n: jobs.length, n_ready: jobs.filter((j) => j.tile_state === "ready").length,
-    first_pass_schema_valid: first_pass, repairs: totals.repairs, failures_by_reason: sorted_counts(failures),
+    first_pass_schema_valid: first_pass, lessons_run, repairs: totals.repairs, failures_by_reason: sorted_counts(failures),
     placeholders: rows.placeholders_left, grounding_flags_by_kind: sorted_counts(grounding), disclosure_prompts_l31_l32: disclosure,
     confirmations, round_trip_ok: rt_ok, round_trip_total: rt_total, cost_usd: totals.cost_usd, jobs_cost, per_lesson_max,
     wall_s: (end.getTime() - rows.run.created_at.getTime()) / 1000, p95_minutes, all_terminal, lessons,
@@ -179,7 +184,7 @@ export function evaluate_s9_thresholds(facts: FullRunFacts, api_summary: ApiRunS
   const sums_equal = facts.jobs_cost.eq(facts.cost_usd);
   const api_equal = api_summary === null || new Decimal(api_summary.cost_usd).eq(facts.cost_usd);
   return [
-    { id: "first_pass_schema_valid_rate_ge_0.90", passed: facts.n > 0 && rate >= 0.9, detail: `${facts.first_pass_schema_valid}/${facts.n} = ${rate.toFixed(3)} (M-31; M-5 is not computed here, the first-pass rate and repair count stand in)` },
+    { id: "first_pass_schema_valid_rate_ge_0.90", passed: facts.n > 0 && facts.lessons_run > 0 && rate >= 0.9, detail: facts.lessons_run === 0 ? `not evaluated: 0 of ${facts.n} lessons ran` : `${facts.first_pass_schema_valid}/${facts.n} = ${rate.toFixed(3)}, ${facts.lessons_run} ran (M-31; M-5 is not computed here, the first-pass rate and repair count stand in)` },
     { id: "all_terminal_with_reasons", passed: facts.all_terminal, detail: facts.all_terminal ? "every job ready or failed with a reason" : "a job is not terminal or has no failure reason" },
     { id: "round_trip_hash_all", passed: facts.round_trip_total === facts.n_ready && facts.round_trip_ok === facts.round_trip_total && facts.n_ready > 0, detail: `${facts.round_trip_ok}/${expected_n} ready lessons match their derived hash (${facts.n_ready} ready)` },
     { id: "median_confirmations_le_4", passed: facts.confirmations <= 4, detail: `median ${facts.confirmations} (M-41)` },
@@ -202,7 +207,7 @@ export interface ReportHeader {
 
 export function render_full_run_markdown(facts: FullRunFacts, thresholds: ThresholdResult[], header: ReportHeader): string {
   const kv = (o: Record<string, number>): string => (Object.keys(o).length === 0 ? "- none" : Object.entries(o).map(([k, v]) => `- ${k}: ${v}`).join("\n"));
-  const rate = facts.n === 0 ? "n/a" : (facts.first_pass_schema_valid / facts.n).toFixed(3);
+  const rate = facts.n === 0 || facts.lessons_run === 0 ? "n/a" : (facts.first_pass_schema_valid / facts.n).toFixed(3);
   return [
     `# Full-run report: ${facts.run_id}`,
     "",
@@ -217,6 +222,7 @@ export function render_full_run_markdown(facts: FullRunFacts, thresholds: Thresh
     "| field | value |",
     "|---|---|",
     `| n | ${facts.n} |`,
+    `| lessons run (ready or failed) | ${facts.lessons_run} of ${facts.n} |`,
     `| first_pass_schema_valid | ${facts.first_pass_schema_valid} (rate ${rate}) |`,
     `| repairs | ${facts.repairs} |`,
     `| placeholders | ${facts.placeholders} |`,

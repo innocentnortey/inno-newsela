@@ -13,10 +13,11 @@ export interface CallResult {
 }
 export type Call = (op: string, method: string, route: string, opts?: CallOpts) => Promise<CallResult>;
 
-export function make_http(cfg: Pick<DriverConfig, "base_url" | "fetch" | "log">): Call {
+export function make_http(cfg: Pick<DriverConfig, "base_url" | "fetch" | "log" | "origin">): Call {
   let cookie: string | null = null;
+  const origin = cfg.origin ?? new URL(cfg.base_url).origin;
   return async (op, method, route, opts = {}) => {
-    const headers: Record<string, string> = { accept: "application/json", ...(opts.headers ?? {}) };
+    const headers: Record<string, string> = { accept: "application/json", origin, ...(opts.headers ?? {}) };
     if (cookie !== null) headers["cookie"] = cookie;
     let body: string | FormData | undefined;
     if (opts.json !== undefined) {

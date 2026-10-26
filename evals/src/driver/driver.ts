@@ -22,6 +22,13 @@ export class FullRunDriver {
     const ovid = encodeURIComponent(ov.outline_version_id);
 
     const report = as_report((await call("getValidationReport", "GET", `/outline-versions/${ovid}/report`)).body);
+    // The unit-conflict finding sits on report.unit, not in a row. With no value the server confirms the stored default.
+    const unit_finding = report.unit?.finding;
+    if (unit_finding != null && report.unit?.confirmed !== true) {
+      as_choice_result((await call("confirmUnit", "POST", `/outline-versions/${ovid}/choices`, {
+        json: { target_id: unit_finding.finding_id, kind: "confirm_unit" },
+      })).body);
+    }
     for (const row of report.rows) {
       for (const f of row.findings) {
         if (f.level !== "error" || f.choice?.source === "confirmed") continue;
@@ -39,23 +46,28 @@ export class FullRunDriver {
       json: { outline_version_id: ov.outline_version_id, mode: "run", scope: { kind: "all" }, lesson_id: null, prompt_version_id, cap_usd: cfg.cap_usd },
     })).body);
 
-    let polls = 0;
-    let state: string;
-    let paused_logged = false;
-    for (;;) {
-      const p = as_progress((await call("getRunProgress", "GET", `/runs/${encodeURIComponent(run.run_id)}/progress`)).body);
-      polls++;
-      state = p.state;
-      if (TERMINAL.has(state)) break;
-      if (state === "paused" && !paused_logged) {
-        cfg.log("run paused");
-        paused_logged = true;
+    try {
+      let polls = 0;
+      let state: string;
+      for (;;) {
+        const p = as_progress((await call("getRunProgress", "GET", `/runs/${encodeURIComponent(run.run_id)}/progress`)).body);
+        polls++;
+        state = p.state;
+        if (TERMINAL.has(state)) break;
+        if (state === "paused") {
+          // A paused run does not move on its own (a check failed). Stop and report from what is stored.
+          cfg.log(`run ${run.run_id} paused: stopped polling`);
+          break;
+        }
+        if (polls * cfg.poll_ms > cfg.max_wall_ms) throw new DriverError("TIMEOUT", `run not finished after ${polls} polls`, run.run_id);
+        await cfg.sleep(cfg.poll_ms);
       }
-      if (polls * cfg.poll_ms > cfg.max_wall_ms) throw new DriverError("TIMEOUT", `run not finished after ${polls} polls`);
-      await cfg.sleep(cfg.poll_ms);
-    }
 
-    const summary = as_summary((await call("getRunSummary", "GET", `/runs/${encodeURIComponent(run.run_id)}/summary`)).body);
-    return { run_id: run.run_id, final_state: state, summary, polls };
+      const summary = as_summary((await call("getRunSummary", "GET", `/runs/${encodeURIComponent(run.run_id)}/summary`)).body);
+      return { run_id: run.run_id, final_state: state, summary, polls };
+    } catch (e) {
+      if (e instanceof DriverError && e.run_id === null) e.run_id = run.run_id; // the run exists: callers can still report from stored rows
+      throw e;
+    }
   }
 }
