@@ -180,7 +180,7 @@ class FakeTxRunner(TxRunner):  # implements TxRunner; packages/core/src/testing/
 Lesson-level OpenAPI shapes used below without redefinition: `Session`, `UnitList`, `OutlineVersion`,
 `ValidationReport`, `IntakeChoiceRequest`, `IntakeChoiceResult`, `StartRunRequest`, `Run`, `RunProgress`,
 `RunControlRequest`, `RunControlResult`, `UnitPlan`, `RunSummary`, `UnitBoard`, `UnitMetrics`, `CoverageMatrix`,
-`ExportList`, `ExportCreated`, `LessonExportFile`, `Lesson`, `IssueList`, `ResolutionRequest`,
+`ExportList`, `ExportCreated`, `ExportBundleFile`, `Lesson`, `IssueList`, `ResolutionRequest`,
 `SafetyFlagClearRequest`, `StandardDecisionRequest`, `ResolveResult`, `FillSlotRequest`, `FillSlotResult`,
 `RegenerateRequest`, `Candidate`, `AdoptRequest`, `AdoptResult`, `SuggestionRequest`, `SuggestionDecisionRequest`,
 `Suggestion`, `TransitionRequest`, `TransitionResult`, `LessonHistory`, `Heartbeat`, `PromptVersions`,
@@ -1788,7 +1788,7 @@ class ExportService:
     # review_event per lesson (actor = the caller) in the same tx as ExportRepo.insert; an unchanged payload writes nothing
     async def list(self, user: RequestUser, unit_id: UnitId) -> ExportList: ...
     async def create(self, user: RequestUser, unit_id: UnitId) -> ExportCreated: ...   # unchanged payload → the previous version, nothing written
-    async def download(self, user: RequestUser, export_id: str) -> LessonExportFile: ...
+    async def download(self, user: RequestUser, export_id: str) -> ExportBundleFile: ...
 
 class WebServices:
     sessions: SessionService
