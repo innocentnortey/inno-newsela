@@ -11,6 +11,7 @@ import {
   okRows,
   refusalCopy,
   rowsLabel,
+  unit_id_of,
   warningItems,
 } from "@/features/validation-report/report-model";
 
@@ -113,5 +114,13 @@ describe("CHG-5 unit finding in errorItems", () => {
     const f = r.rows.flatMap((x) => x.findings).find((x) => x.kind === "unit_conflict")!;
     const items = errorItems({ ...r, unit: { ...r.unit, finding: f } });
     expect(items.filter((i) => i.where === "Unit")).toHaveLength(1);
+  });
+});
+
+describe("unit_id_of", () => {
+  it("strips the version suffix; junk gives null", () => {
+    const r = issuedShapeReport();
+    expect(unit_id_of({ ...r, outline_version_id: "G6.U4.ov1" })).toBe("G6.U4");
+    expect(unit_id_of({ ...r, outline_version_id: "junk" })).toBeNull();
   });
 });

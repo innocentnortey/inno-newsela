@@ -81,6 +81,12 @@ export function UploadForm() {
   async function submit() {
     if (busy || result) return;
     if (source === "file" && !file) {
+      if (error?.code === "UNSUPPORTED_FILE") {
+        // The type banner already says what is wrong; do not add "Choose a file first." beside it (F-12).
+        zoneRef.current?.focus();
+        return;
+      }
+      setError(null);
       setFieldError("Choose a file first.");
       zoneRef.current?.focus();
       return;

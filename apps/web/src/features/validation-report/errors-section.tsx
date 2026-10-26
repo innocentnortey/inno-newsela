@@ -8,7 +8,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from "@/components/ui/table";
 import { ConfirmedLine, FailureLine } from "./confirmed-line";
 import { FixEditor } from "./fix-editor";
 import { FINDING_SENTENCE } from "./kind-labels";
-import { errorItems, headingCopy, type ErrorItem, type Report, type ReportActions, type TargetStatus } from "./report-model";
+import { errorItems, unit_id_of, headingCopy, type ErrorItem, type Report, type ReportActions, type TargetStatus } from "./report-model";
 
 interface Props {
   report: Report;
@@ -97,7 +97,7 @@ function ActionCell({ item, report, canEdit, status, actions, firstId }: Props &
     );
   }
   const req = isUnit
-    ? ({ target_id: f.finding_id, kind: "confirm_unit", value: report.unit.as_written } as const)
+    ? ({ target_id: f.finding_id, kind: "confirm_unit", ...(unit_id_of(report) ? { value: unit_id_of(report)! } : {}) } as const)
     : ({ target_id: f.finding_id, kind: "confirm_fix", value: f.proposed_fix } as const);
   return (
     <>
