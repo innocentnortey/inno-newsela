@@ -188,17 +188,35 @@ export async function run_spike(opts: SpikeOptions, deps?: SpikeDeps): Promise<P
   return record;
 }
 
+/** The Yjs half (NL-119). Dynamic import: with --socket-editors 0 nothing from yjs-mix.ts is loaded. The password is never passed on. */
+async function run_socket_half(opts: SpikeOptions, cfg: CliConfig, env: Record<string, string | undefined>): Promise<number> {
+  const { build_yjs_deps, run_yjs_probe } = await import("./yjs-mix.ts");
+  const { deps, close } = await build_yjs_deps({ ...env, DATABASE_URL: cfg.database_url } as NodeJS.ProcessEnv);
+  try {
+    return (await run_yjs_probe(opts, deps)).exit_code;
+  } finally {
+    await close();
+  }
+}
+
 export async function main(argv: string[], env: Record<string, string | undefined>): Promise<number> {
   try {
     const cfg = parse_args(argv, env);
     const deps = build_deps(cfg, env);
     deps.out = {};
     const opts: SpikeOptions = {
-      users: cfg.users, ramp_s: cfg.ramp_s, plateau_s: cfg.plateau_s, socket_editors: cfg.socket_editors, base_url: cfg.base_url, collab_url: "",
+      users: cfg.users, ramp_s: cfg.ramp_s, plateau_s: cfg.plateau_s, socket_editors: cfg.socket_editors, base_url: cfg.base_url, collab_url: cfg.collab_url,
     };
-    const record = await run_spike(opts, deps);
-    process.stdout.write(`${JSON.stringify({ probe_run_id: record.probe_run_id, report_path: deps.out.report_path, request_log: deps.out.request_log })}\n`);
-    return 0;
+    // The HTTP and Yjs halves run concurrently: the capacity doc's load is one mixed load. Two rows (kind=http, kind=yjs), never merged.
+    const socket = opts.socket_editors > 0 ? run_socket_half(opts, cfg, env) : Promise.resolve(0);
+    const [http, sock] = await Promise.allSettled([run_spike(opts, deps), socket]);
+    if (sock.status === "rejected") {
+      process.stderr.write(`load:spike yjs half failed: ${sock.reason instanceof Error ? sock.reason.message : String(sock.reason)}\n`);
+    }
+    if (http.status === "rejected") throw http.reason;
+    // the JSON summary stays the LAST stdout line
+    process.stdout.write(`${JSON.stringify({ probe_run_id: http.value.probe_run_id, report_path: deps.out.report_path, request_log: deps.out.request_log })}\n`);
+    return sock.status === "fulfilled" ? sock.value : 1;
   } catch (e) {
     if (e instanceof ProbeRefusal || e instanceof NothingToProbe) {
       process.stderr.write(`${e.message}\n`);
