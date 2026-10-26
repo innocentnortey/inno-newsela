@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CodeChip } from "@/components/ui/badge";
+import { STATUS_SPECS } from "@/components/ui/status";
 import { StatusPill } from "@/components/ui/status-pill";
 import { cn } from "@/lib/cn";
 import type { components } from "@/lib/api-types";
@@ -27,7 +28,11 @@ export function IssueCard({ issue, number, sectionLabel, selected, stale, onGo, 
       </li>
     );
   }
-  const name = `Go to issue ${number}: ${kindLabel(issue.kind)}${sectionLabel ? ` in ${sectionLabel}` : ""}`;
+  // WCAG 2.5.3: the accessible name must contain the visible text, in order, after the "Go to issue N" prefix.
+  const visible = [STATUS_SPECS[issueStatusKey(issue)].label, kindSentence(issue.kind), issue.address, issue.message]
+    .filter(Boolean)
+    .join(" ");
+  const name = `Go to issue ${number}: ${kindLabel(issue.kind)}${sectionLabel ? ` in ${sectionLabel}` : ""}. ${visible}`;
   return (
     <li className="flex flex-col gap-2" data-issue-id={issue.issue_id}>
       <button

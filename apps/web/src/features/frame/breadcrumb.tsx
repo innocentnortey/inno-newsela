@@ -33,12 +33,12 @@ export function BreadcrumbTrail() {
   const { crumbs } = useContext(BreadcrumbContext);
   if (crumbs.length === 0) return null;
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-2 text-small text-ink2">
+    <nav aria-label="Breadcrumb" className="min-w-0">
+      <ol className="flex items-center gap-2 overflow-hidden text-small text-ink2">
         {crumbs.map((c, i) => {
           const last = i === crumbs.length - 1;
           return (
-            <li key={`${i}-${c.label}`} className="flex items-center gap-2">
+            <li key={`${i}-${c.label}`} className={last ? "flex min-w-0 items-center gap-2 truncate" : "flex shrink-0 items-center gap-2"}>
               {!last && c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current={last ? "page" : undefined}>{c.label}</span>}
               {!last ? <span aria-hidden="true">/</span> : null}
             </li>

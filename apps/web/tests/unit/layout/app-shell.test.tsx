@@ -56,4 +56,13 @@ describe("AppShell", () => {
     await userEvent.click(btn);
     expect(btn).toHaveAttribute("aria-expanded", "true");
   });
+
+  it("gives spare height to the content row, not the top bar row", () => {
+    const { container } = render(
+      <AppShell navSections={sections} topBar={<span>Top</span>}>
+        <p>Body</p>
+      </AppShell>,
+    );
+    expect((container.firstElementChild as HTMLElement).className).toContain("md:grid-rows-[auto_1fr]");
+  });
 });

@@ -289,7 +289,7 @@ Percy's sarcastic word choice sets the tone" · "Read and annotate *The Lightnin
 
 **Accessibility:** landmarks: the outline is a `nav` "Lesson sections"; the page is `main`'s article; the rail is an
 `aside` "Evidence". The editor is a labelled multi-line textbox ("Lesson 4 text"); headings inside it stay in order
-(R-58). Issue cards are buttons ("Go to issue 1: quote placeholder open in Learning in Action Part A"); after the jump,
+(R-58). Issue cards are buttons ("Go to issue 1: quote placeholder open in Learning in Action Part A. Blocking Quote placeholder open G6.U4.L4.LearningInAction.PartA message..."); after the jump,
 focus is in the editor at the span. Keyboard order: top bar → stepper → outline → page → rail → footer. Optional
 shortcuts `]` / `[` for next and previous issue. Presence carets carry names (not colour alone); the presence sentence
 is real text. Save state and blocking-count changes are polite live regions, debounced. Sticky footer never hides the

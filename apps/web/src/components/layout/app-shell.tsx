@@ -32,7 +32,7 @@ export function AppShell({
 }: AppShellProps) {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="bg-ground text-ink min-h-screen md:grid md:grid-cols-[var(--layout-nav-rail)_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)]">
+    <div className="bg-ground text-ink min-h-screen md:grid md:grid-rows-[auto_1fr] md:grid-cols-[var(--layout-nav-rail)_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)]">
       <a
         href="#main-content"
         className="sr-only focus-visible:not-sr-only focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus,currentColor)]"

@@ -33,9 +33,9 @@ describe("issues rail", () => {
   it("card_name_and_order", () => {
     renderWithSession(el(ISSUES4), "reviewer");
     const names = screen.getAllByRole("button").map((b) => b.getAttribute("aria-label"));
-    expect(names[0]).toBe("Go to issue 1: quote placeholder open in Learning in Action Part A");
-    expect(names[1]).toBe("Go to issue 2: cross lesson link in Homework");
-    expect(names[2]).toBe("Go to issue 3: standard confirmation");
+    expect(names[0]).toMatch(/^Go to issue 1: quote placeholder open in Learning in Action Part A\. Blocking Quote placeholder open /);
+    expect(names[1]).toMatch(/^Go to issue 2: cross lesson link in Homework\. /);
+    expect(names[2]).toMatch(/^Go to issue 3: standard confirmation\. /);
   });
 
   it("resolved_group", () => {
