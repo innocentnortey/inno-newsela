@@ -120,6 +120,9 @@ export class SessionRecheck {
       survivors.length > 0
     ) {
       closed += await this.check_access(this.current_access, survivors);
+    } else if (survivors.length === 0) {
+      // Nothing left to protect: the failures were not consecutive sweeps over live writers (GEN-6 review).
+      this.access_failures = 0;
     }
     return closed;
   }
