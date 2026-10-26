@@ -1,6 +1,18 @@
-// Mirrors OpenAPI components ExportLesson, HeldBack, ExportVersion, ExportList, ExportCreated, LessonExportFile (export cards).
+// Mirrors OpenAPI components ExportLesson, HeldBack, ExportVersion, ExportList, ExportCreated, ExportBundleFile, ExportedLessonRecord (export cards).
 import { z } from "zod";
 import { Sha256, Timestamp } from "./common.ts";
+
+// The file schema is the service's own strict schema; the OpenAPI component names match it (CHG-6).
+export { ExportBundleFile, ExportedLessonRecord } from "../export.ts";
+// Stored-lesson components of the file: the same Zod schemas the strict bundle embeds, under the OpenAPI names.
+export {
+  StoredLesson,
+  Section as StoredSection,
+  FrontMatterRecord as StoredFrontMatter,
+  ProseMirrorDoc as StoredProseMirrorDoc,
+  ProseMirrorNode as StoredProseMirrorNode,
+} from "../lesson.ts";
+export { TextCardRecord as StoredTextCard } from "../lesson-draft.ts";
 
 export const ExportLesson = z.object({ lesson_id: z.string(), approved_hash: Sha256 });
 export type ExportLesson = z.infer<typeof ExportLesson>;
@@ -38,18 +50,3 @@ export const ExportCreated = z.object({
   download_path: z.string(),
 });
 export type ExportCreated = z.infer<typeof ExportCreated>;
-
-export const LessonExportFile = z.object({
-  export_id: z.string(),
-  version_number: z.number().int(),
-  label: z.literal("Export (no live integration)"),
-  payload_hash: Sha256,
-  lessons: z.array(
-    z.object({
-      lesson_id: z.string(),
-      content_hash: Sha256,
-      lesson: z.record(z.string(), z.unknown()),
-    }),
-  ),
-});
-export type LessonExportFile = z.infer<typeof LessonExportFile>;

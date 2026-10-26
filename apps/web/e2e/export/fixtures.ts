@@ -5,6 +5,7 @@ import { apiGlob } from "../../src/test-utils/sign-in-as";
 export type ExportList = components["schemas"]["ExportList"];
 export type ExportCreated = components["schemas"]["ExportCreated"];
 export type ExportVersion = components["schemas"]["ExportVersion"];
+export type ExportBundleFile = components["schemas"]["ExportBundleFile"];
 
 // The query keeps the page URL from matching the api glob (apiGlob also matches page navigations).
 export const EXPORT_URL = "/units/g6-u4/export?view=1";
@@ -96,21 +97,17 @@ export async function serveExports(
   });
   await page.route(apiGlob("/exports/*/download"), (route) => {
     if (route.request().method() !== "GET") return route.fallback();
-    const id =
-      /exports\/([^/]+)\/download/.exec(route.request().url())?.[1] ??
-      "exp-0001";
-    const n = Number(id.slice(-1)) || 1;
+    const file: ExportBundleFile = {
+      export_version: 1,
+      unit_id: "G6.U4",
+      generated_at: "2026-10-25T12:00:00.000Z",
+      lessons: [],
+    };
     return route.fulfill({
       status: 200,
       contentType: "application/json",
       headers: CORS,
-      body: JSON.stringify({
-        export_id: id,
-        version_number: n,
-        label: "Export (no live integration)",
-        payload_hash: hash(90 + n),
-        lessons: [],
-      }),
+      body: JSON.stringify(file),
     });
   });
   return state;

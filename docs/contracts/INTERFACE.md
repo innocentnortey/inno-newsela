@@ -1343,7 +1343,10 @@ standards, which live in the front matter)
     `waits_on`), `exports` (`export_id`, `version_number`, `created_at`, `created_by`, `lesson_count`, `payload_hash`).
   - Response (`createExport`): `export_id`, `version_number`, `same_as_previous` (yes/no), `included`, `held_back`,
     `download_path`.
-  - `downloadExport`: a JSON document in the `Lesson` export schema.
+  - `downloadExport`: a JSON document that is the `ExportBundleFile`: `export_version` (1), `unit_id`, `generated_at`, and
+    `lessons` (`lesson_id`, `version_id`, `content_hash`, `approved_by`, `approved_at`, `lesson` = the stored lesson).
+    Strict: no other keys. The `payload_hash` the list and create responses show is the sha256 of this document's
+    canonical JSON; it is not a field inside it.
 - **States:** included lessons move to `exported`, in the same transaction that writes the export version.
 - **Permissions:** `approver`. Wrong role → `ROLE_FORBIDDEN`.
 - **Named errors:** `ROLE_FORBIDDEN`, `NOT_FOUND`.
@@ -1353,18 +1356,19 @@ standards, which live in the front matter)
     snapshot stands.
   - Includes a dependent lesson only while every lesson it links to is approved (R-42 as amended, HP-5 addendum).
   - Exporting twice with no change gives identical lesson payloads; the file validates against the published JSON
-    Schema (R-42). Labelled "Export (no live integration)" (PD-22).
+    Schema (R-42). The screen is labelled "Export (no live integration)" (PD-22); the file carries no label.
   - *No-change export (System review):* when the included set and its approved hashes equal the latest export's,
     `createExport` writes nothing and returns that export (200, `same_as_previous: true`); otherwise it writes a new
     version (201). Two simultaneous calls are serialized per unit, so the second sees the first's result.
-  - The export JSON Schema will live at `docs/contracts/lesson-export.schema.json` (planned; written with the export
-    ticket, generated from the Zod `Lesson` schema).
+  - The export JSON Schema is published at `docs/contracts/lesson-export.schema.json`, generated from the Zod
+    `ExportBundleFile` by `npm run schemas:emit` (CHG-6).
 - **Timing:** `listExports` p95 < 500 ms [T]; `createExport` p95 < 2 s [A] for 47 lessons.
 - **Presentation notes:** the label is required copy; the layout is presentation.
 - **Reviews:**
   - UX review: Claude (UX session), 2026-10-25, done.
   - System review: Claude (System track, Opus), 2026-10-25 — agreed: a no-change export returns the previous version (200)
     without writing; per-unit serialization; schema path named (planned).
+  - CHG-6 reconcile, GEN-7, 2026-10-26: file description matches the emitted bundle.
 - **Open behaviour questions:** none.
 
 <a id="con-24"></a>
