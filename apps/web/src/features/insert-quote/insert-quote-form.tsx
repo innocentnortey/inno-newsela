@@ -12,7 +12,7 @@ import { api } from "@/lib/api-client";
 import { useAnnounce } from "@/lib/announce";
 import type { components } from "@/lib/api-types";
 import { useDraft } from "@/lib/draft-memory";
-import { mapFillError, type FillFailure } from "./fill-errors";
+import { mapFillError, SOURCE_REQUIRED_MSG, TEXT_REQUIRED_MSG, type FillFailure } from "./fill-errors";
 import { findSlot } from "./find-slot";
 import { RIGHTS_OPTIONS, type OfferedRights } from "./rights";
 import { SHORT_QUOTE_LIMIT, countWords } from "./word-count";
@@ -103,6 +103,15 @@ export function InsertQuoteForm({ lessonId, slotId, onClose, onFilled }: InsertQ
   async function onSubmit(ev: FormEvent) {
     ev.preventDefault();
     if (submitting || !slot || frozen) return;
+    if (text.trim() === "") {
+      setFailure({ target: "text", message: TEXT_REQUIRED_MSG });
+      return;
+    }
+    const noSource = [title, chapter, pages].every((v) => v.trim() === "") && (slot.kind !== "excerpt" || url.trim() === "");
+    if (noSource) {
+      setFailure({ target: "source", message: SOURCE_REQUIRED_MSG });
+      return;
+    }
     setFailure(null);
     const body: FillSlotRequest = {
       text,

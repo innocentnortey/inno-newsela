@@ -11,8 +11,11 @@ describe("buildNav", () => {
     expect(labels("approver")).toEqual(["Units", "Unit board"]);
   });
   it("drops Prompt guidance once cut 7 has fired", () => expect(labels("author", "/", [7])).toEqual(["Units", "Unit board"]));
-  it("marks the current entry by path prefix", () => {
-    const items = buildNav("reviewer", "/units/g6-u4/board")[0]!.items;
-    expect(items.filter((i) => i.current).map((i) => i.id)).toEqual(["units", "board"]);
+  it("marks only the longest matching entry", () => {
+    const cur = (p: string) => buildNav("reviewer", p)[0]!.items.filter((i) => i.current).map((i) => i.id);
+    expect(cur("/units/g6-u4/board")).toEqual(["board"]);
+    expect(cur("/units")).toEqual(["units"]);
+    expect(cur("/units/g6-u4/lessons/L5/approval")).toEqual(["units"]);
+    expect(cur("/elsewhere")).toEqual([]);
   });
 });

@@ -169,6 +169,21 @@ describe("BoardScreen", () => {
     expect(screen.queryByText("Reviewer minutes per approved lesson")).toBeNull();
   });
 
+  it("unit with no outline shows the empty state", async () => {
+    const { ApiError } = await import("@/lib/api-client");
+    GET.mockReset().mockRejectedValue(new ApiError({ status: 404, code: "NOT_FOUND", message: "There is no unit" }));
+    await mount("author");
+    expect(screen.getByText("No lessons generated for this unit yet.")).toBeTruthy();
+    expect(screen.getByText("Lessons appear here as a run drafts them.")).toBeTruthy();
+    expect(screen.queryByText(/There is no unit/)).toBeNull();
+    expect(screen.getByRole("link", { name: "Upload an outline" }).getAttribute("href")).toBe("/units/g6-u4/outlines/new");
+    expect(screen.queryByText("Reviewer minutes per approved lesson")).toBeNull();
+    cleanup();
+    await mount("reviewer");
+    expect(screen.queryByRole("link", { name: "Upload an outline" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "See the latest run" })).toBeNull();
+  });
+
   it("first use reviewer link", async () => {
     s.rows = [];
     s.rollup = {};

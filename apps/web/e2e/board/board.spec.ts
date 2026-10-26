@@ -255,3 +255,22 @@ for (const sc of SCENARIOS) {
     }
   }
 }
+
+test("no outline empty state", async ({ page }) => {
+  await signInAs(page, "reviewer");
+  await routeBoard(page);
+  await page.route(/\/units\/[^/]+\/board(\?.*)?$/, (route) => {
+    if (route.request().method() !== "GET" || new URL(route.request().url()).port !== "4010") return route.fallback();
+    return route.fulfill({
+      status: 404,
+      contentType: "application/json",
+      headers: { "access-control-allow-origin": "*", "x-request-id": "req-test", "access-control-expose-headers": "x-request-id" },
+      body: JSON.stringify({ error: { code: "NOT_FOUND", message: "There is no unit", details: {} } }),
+    });
+  });
+  await page.goto("/units/g6-u4/board");
+  await expect(page.getByText("No lessons generated for this unit yet.")).toBeVisible();
+  await expect(page.getByText("Lessons appear here as a run drafts them.")).toBeVisible();
+  await expect(page.getByText(/There is no unit/)).toHaveCount(0);
+  await expect(page.getByText("Reviewer minutes per approved lesson")).toHaveCount(0);
+});

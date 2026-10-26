@@ -120,3 +120,11 @@ for (const state of ["main", "error"] as const) {
     }
   }
 }
+
+test("demo accounts box lists the three roles", async ({ page }) => {
+  await unauthenticated(page);
+  await open(page);
+  const box = page.getByRole("region", { name: "Demo accounts" });
+  await expect(box).toBeVisible();
+  for (const r of ["Author", "Reviewer", "Approver"]) await expect(box.getByText(r, { exact: true })).toBeVisible();
+});

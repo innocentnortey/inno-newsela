@@ -9,7 +9,7 @@ import { api, isApiError } from "@/lib/api-client";
 import { useAnnounce } from "@/lib/announce";
 import type { components } from "@/lib/api-types";
 import { usePoll } from "@/lib/use-poll";
-import { COLLAB_DOWN, DRAFTING, REGEN_CAP, REGEN_LOCKED } from "./copy";
+import { COLLAB_DOWN, DRAFTING, REGEN_CAP, REGEN_LOCKED, REGEN_NO_RUN } from "./copy";
 
 type Candidate = components["schemas"]["Candidate"];
 
@@ -26,6 +26,7 @@ function errorText(e: unknown): string {
   if (e.code === "LESSON_LOCKED") return REGEN_LOCKED;
   if (e.code === "DAY_CAP_REACHED") return REGEN_CAP;
   if (e.code === "COLLAB_UNAVAILABLE") return COLLAB_DOWN;
+  if (e.code === "NOT_FOUND" && e.details.reason === "no_generation_run") return REGEN_NO_RUN;
   return e.message;
 }
 

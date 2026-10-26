@@ -21,11 +21,11 @@ export const NAV_ENTRIES: NavEntry[] = [
 export function buildNav(role: Role, pathname: string, fired: readonly number[] = FIRED_CUTS): NavSection[] {
   const items = NAV_ENTRIES.filter(
     (e) => (e.roles === "all" || e.roles.includes(role)) && (e.cut === undefined || !fired.includes(e.cut)),
-  ).map((e) => ({
-    id: e.id,
-    label: e.label,
-    href: e.href,
-    current: pathname === e.href || pathname.startsWith(e.href + "/"),
-  }));
-  return [{ id: "main", items }];
+  );
+  // Exactly one entry is current: the longest href that equals the path or is a path prefix of it.
+  let best: NavEntry | undefined;
+  for (const e of items) {
+    if ((pathname === e.href || pathname.startsWith(e.href + "/")) && (!best || e.href.length > best.href.length)) best = e;
+  }
+  return [{ id: "main", items: items.map((e) => ({ id: e.id, label: e.label, href: e.href, current: e === best })) }];
 }

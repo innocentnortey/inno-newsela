@@ -5,11 +5,12 @@ import { PageHeader } from "@/components/layout";
 import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/link";
-import { CantLoad, NotFound, StaleBanner } from "@/features/frame/conventions";
+import { CantLoad, StaleBanner } from "@/features/frame/conventions";
 import { useSetBreadcrumb } from "@/features/frame/breadcrumb";
 import { useSession } from "@/features/frame/session-context";
 import { isApiError } from "@/lib/api-client";
 import { usePoll } from "@/lib/use-poll";
+import { BoardEmpty } from "./board-empty";
 import { BoardSkeleton, RowsSkeleton } from "./board-skeleton";
 import { paramFromState, runIsActive, stateFromParam, stateLabel, totalLessons, type LessonState } from "./board-state";
 import { BoardTable } from "./board-table";
@@ -17,7 +18,7 @@ import { fetchBoard, fetchMetrics, fetchUnit } from "./data";
 import { LinksRow } from "./links-row";
 import { NorthStarTile } from "./north-star-tile";
 import { RollupSheet } from "./rollup-sheet";
-import { runHref, validationReportHref } from "./row-href";
+import { runHref } from "./row-href";
 import { StateFilter } from "./state-filter";
 import { parseUnitTitle } from "./unit-title";
 import { useBoardAnnouncements } from "./use-board-announcements";
@@ -59,10 +60,6 @@ export function BoardScreen({ unitKey }: { unitKey: string }) {
     board.retry();
   }
 
-  if (isApiError(board.error) && board.error.code === "NOT_FOUND" && !board.data) {
-    return <NotFound what={`unit "${unitKey}"`} where="Lesson Studio" boardHref="/units" />;
-  }
-
   const header = (
     <PageHeader
       eyebrow="Unit board"
@@ -80,8 +77,17 @@ export function BoardScreen({ unitKey }: { unitKey: string }) {
       meta={total > 0 ? <span className="bg-well rounded-sm px-2 py-0.5 text-label">{`${total} lessons`}</span> : undefined}
     />
   );
+  const noOutline = isApiError(board.error) && board.error.code === "NOT_FOUND" && !board.data;
   const stale = board.stale && board.dataAt ? <StaleBanner asOf={board.dataAt} thing="board" /> : null;
 
+  if (noOutline) {
+    return (
+      <div className="flex flex-col gap-4">
+        {header}
+        <BoardEmpty role={role} unitKey={unitKey} noOutline />
+      </div>
+    );
+  }
   if (board.error && !board.data) {
     return (
       <div className="flex flex-col gap-4">
@@ -117,15 +123,7 @@ export function BoardScreen({ unitKey }: { unitKey: string }) {
         {header}
         {stale}
         {runBanner}
-        <div className="flex flex-col gap-2">
-          <p className="text-title-sm">No lessons generated for this unit yet.</p>
-          <p className="text-small text-ink2">Lessons appear here as a run drafts them.</p>
-          {role === "author" ? (
-            latestVersion ? <Link href={validationReportHref(unitKey, latestVersion)}>Go to the validation report</Link> : null
-          ) : runId ? (
-            <Link href={runHref(unitKey, runId)}>See the latest run</Link>
-          ) : null}
-        </div>
+        <BoardEmpty role={role} unitKey={unitKey} latestVersion={latestVersion} runId={runId} />
       </div>
     );
   }

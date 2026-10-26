@@ -2,6 +2,7 @@ import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { InsertQuoteDialog } from "@/features/insert-quote/insert-quote-dialog";
+import { clearAllDrafts } from "@/lib/draft-memory";
 import { renderWithSession } from "@/test-utils/render-with-session";
 import { GET, POST, QUOTE, lessonWith } from "./helpers";
 
@@ -38,5 +39,27 @@ describe("quote text is never rendered as HTML or altered", () => {
   it("keeps leading and trailing spaces", async () => {
     await send("  spaced out  ");
     expect(POST.mock.calls[0]?.[1].body.text).toBe("  spaced out  ");
+  });
+});
+
+describe("empty fields are caught before any request", () => {
+  beforeEach(() => clearAllDrafts());
+  async function open() {
+    renderWithSession(<InsertQuoteDialog lessonId="G6.U4.L4" slotId="s1" open onClose={vi.fn()} />, "reviewer");
+    await screen.findByLabelText("Text");
+  }
+  it("empty text shows the field message", async () => {
+    await open();
+    await userEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(await screen.findByText("Add the quote text.")).toBeTruthy();
+    expect(POST).not.toHaveBeenCalled();
+    expect(screen.queryByText("The request is not valid.")).toBeNull();
+  });
+  it("missing source shows the source sentence", async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText("Text"), { target: { value: "Short quote." } });
+    await userEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(await screen.findByText("A quote needs a source: add the book and page, or the URL.")).toBeTruthy();
+    expect(POST).not.toHaveBeenCalled();
   });
 });

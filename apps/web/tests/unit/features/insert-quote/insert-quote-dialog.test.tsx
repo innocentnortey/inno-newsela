@@ -132,6 +132,7 @@ describe("InsertQuoteDialog", () => {
     const onFilled = vi.fn();
     setup(vi.fn(), onFilled);
     await type(NINE);
+    await typeSource();
     await userEvent.click(insert());
     await waitFor(() => expect(POST).toHaveBeenCalled());
     expect(onFilled).not.toHaveBeenCalled();
@@ -141,6 +142,7 @@ describe("InsertQuoteDialog", () => {
     GET.mockResolvedValue({ data: lessonWith("in_review", EXCERPT) });
     const { onClose } = setup();
     await type(NINE);
+    await typeSource();
     await userEvent.click(insert());
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(POST).toHaveBeenCalledTimes(1);
