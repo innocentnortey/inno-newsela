@@ -13,7 +13,7 @@ import { PgDatabase } from "@ls/db/pool";
 import { PgEvidenceRepo } from "@ls/db/repos/evidence";
 import * as Y from "yjs";
 import type { MixResult, SpikeOptions } from "./types.ts";
-import { count_duplicates, count_lost, error_rate, make_token, percentile } from "./yjs-stats.ts";
+import { count_duplicates, count_lost, error_rate, is_clean_sample, make_token, percentile } from "./yjs-stats.ts";
 import {
   append_token,
   connect_client,
@@ -54,6 +54,8 @@ export interface YjsMixDetail {
   socket_errors: number;
   sockets_opened: number;
   duration_s: number;
+  incomplete_reason: string | null;
+  remote_samples_total: number;
 }
 export interface YjsDeps {
   db: PgDatabase;
@@ -78,6 +80,13 @@ interface Sent {
   clock: number;
   acked: boolean;
 }
+interface Unseen {
+  t0: number;
+  sender: Editor;
+  sender_epoch: number;
+  peer_epoch: number;
+  clean_at_send: boolean;
+}
 interface Editor {
   index: number;
   id: string;
@@ -94,7 +103,8 @@ interface Editor {
   seq: number;
   timer: ReturnType<typeof setInterval> | null;
   sent: Map<string, Sent>;
-  unseen: Map<string, number>; // remote tokens not yet seen here -> sender's t0
+  epoch: number; // bumped whenever this editor's socket goes down or is dropped on purpose
+  unseen: Map<string, Unseen>; // remote tokens not yet seen here
   drop: { at: number; closed: boolean; resynced: boolean; done: boolean } | null;
 }
 
@@ -103,6 +113,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
   const empty: YjsMixDetail = {
     result: { p95_ms: {}, error_rate: 0, lost_updates: 0, n: 0 },
     incomplete: false, sent: 0, acknowledged: 0, unacknowledged: 0, duplicates: 0, socket_errors: 0, sockets_opened: 0, duration_s: 0,
+    incomplete_reason: null, remote_samples_total: 0,
   };
   if (n <= 0) return empty;
 
@@ -114,11 +125,17 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
   const reviewers = await create_reviewers(support, run_tag, n);
 
   const remote_samples: number[] = [];
+  const remote_drop_samples: number[] = [];
   const stored_samples: number[] = [];
   const reconnect_samples: number[] = [];
   let socket_errors = 0;
   let sockets_opened = 0;
   let incomplete = false;
+  let incomplete_reason: string | null = null;
+  const mark_incomplete = (reason: string) => {
+    incomplete = true;
+    incomplete_reason ??= reason;
+  };
   let stop_typing = false;
 
   const editors: Editor[] = Array.from({ length: n }, (_, i) => {
@@ -128,7 +145,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
     return {
       index: i, id: `${run_tag}-e${i}`, lesson_id: lesson_ids[lesson_index]!, peers: on_lesson, typer: i - lesson_index * per < typers,
       reviewer: reviewers[i]!, client: null, state: "connecting", connect_at: (i * opts.ramp_s * 1000) / n, connect_started: 0,
-      ever_synced: false, down_since: null, seq: 0, timer: null, sent: new Map(), unseen: new Map(), drop: null,
+      ever_synced: false, down_since: null, seq: 0, timer: null, sent: new Map(), epoch: 0, unseen: new Map(), drop: null,
     };
   });
   const by_lesson = new Map<string, Editor[]>();
@@ -142,7 +159,10 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
     const t0 = now();
     const clock = Y.decodeStateVector(Y.encodeStateVector(e.client.doc)).get(e.client.doc.clientID) ?? 0;
     e.sent.set(token, { t0, clock, acked: false });
-    for (const peer of by_lesson.get(e.lesson_id) ?? []) if (peer !== e) peer.unseen.set(token, t0);
+    for (const peer of by_lesson.get(e.lesson_id) ?? []) {
+      if (peer === e) continue;
+      peer.unseen.set(token, { t0, sender: e, sender_epoch: e.epoch, peer_epoch: peer.epoch, clean_at_send: e.state === "up" && peer.state === "up" });
+    }
   };
 
   const start = (e: Editor) => {
@@ -161,6 +181,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
       onDown: () => {
         if (e.state !== "up") return;
         e.state = "down";
+        e.epoch += 1;
         if (e.drop !== null && !e.drop.closed) e.drop.closed = true; // the planned drop, not an error
         else {
           socket_errors += 1;
@@ -192,9 +213,14 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
         if (e.unseen.size === 0) return;
         const text = client.doc.getXmlFragment("section:" + address).toString();
         const t1 = now();
-        for (const [token, t0] of e.unseen) {
+        for (const [token, u] of e.unseen) {
           if (text.includes(token)) {
-            remote_samples.push(t1 - t0);
+            // a sample taken across an outage measures the outage, not the latency: keep it apart, never drop it silently
+            const clean = u.clean_at_send && is_clean_sample(
+              { sender_up: true, peer_up: true, sender_epoch: u.sender_epoch, peer_epoch: u.peer_epoch },
+              { sender_up: u.sender.state === "up", peer_up: e.state === "up", sender_epoch: u.sender.epoch, peer_epoch: e.epoch },
+            );
+            (clean ? remote_samples : remote_drop_samples).push(t1 - u.t0);
             e.unseen.delete(token);
           }
         }
@@ -221,7 +247,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
     while (editors.some((e) => !e.ever_synced) && !incomplete) {
       if (now() - run_start > connect_deadline) {
         socket_errors += editors.filter((e) => !e.ever_synced).length;
-        incomplete = true;
+        mark_incomplete("connect_timeout");
         break;
       }
       await sleep(50);
@@ -238,6 +264,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
           const ws = e.client?.sockets.at(-1);
           if (e.state !== "up" || ws === undefined) continue;
           e.drop = { at: t, closed: false, resynced: false, done: false };
+          e.epoch += 1; // a token typed between close() and the close event is excluded too
           ws.close(4000);
         }
       }
@@ -250,10 +277,10 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
           } else if (t - d.at > tuning.reconnect_timeout_ms) {
             d.done = true;
             socket_errors += 1;
-            if (e.state === "down") incomplete = true;
+            if (e.state === "down") mark_incomplete("socket_down");
           }
         }
-        if (e.down_since !== null && t - e.down_since > tuning.reconnect_timeout_ms) incomplete = true;
+        if (e.down_since !== null && t - e.down_since > tuning.reconnect_timeout_ms) mark_incomplete("socket_down");
       }
       await sleep(50);
     }
@@ -271,10 +298,11 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
           reconnect_samples.push((now() - d.at) / 1000);
           d.done = true;
         }
-        if (e.down_since !== null && now() - e.down_since > tuning.reconnect_timeout_ms) incomplete = true;
+        if (e.down_since !== null && now() - e.down_since > tuning.reconnect_timeout_ms) mark_incomplete("socket_down");
       }
       await sleep(100);
     }
+    if (outstanding() > 0) mark_incomplete("unacknowledged_after_drain");
 
     // lost updates: acknowledged tokens against the latest stored document, read over SQL
     for (const [lesson_id, group] of by_lesson) {
@@ -297,7 +325,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
       }
     }
   } catch {
-    incomplete = true; // never throw once editors exist: the caller still writes its row
+    mark_incomplete("error"); // never throw once editors exist: the caller still writes its row
   } finally {
     for (const t of timers) clearTimeout(t);
     for (const e of editors) {
@@ -324,6 +352,9 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
     result: {
       p95_ms: {
         remote_edit: percentile(remote_samples, 95),
+        remote_edit_n: remote_samples.length,
+        remote_edit_during_drop: percentile(remote_drop_samples, 95),
+        remote_edit_during_drop_n: remote_drop_samples.length,
         stored: percentile(stored_samples, 95),
         reconnect_p95_s: percentile(reconnect_samples, 95),
         duplicate_tokens: duplicates,
@@ -332,12 +363,14 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
         editors: n,
         lessons,
         incomplete,
+        incomplete_reason,
       },
       error_rate: rate,
       lost_updates,
       n: all_sent.length,
     },
     incomplete, sent: all_sent.length, acknowledged, unacknowledged, duplicates, socket_errors, sockets_opened, duration_s,
+    incomplete_reason, remote_samples_total: remote_samples.length + remote_drop_samples.length,
   };
 }
 

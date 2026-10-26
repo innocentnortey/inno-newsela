@@ -23,11 +23,12 @@ export interface CliConfig {
   provider_mode: "stub" | "real";
   allow_remote: boolean;
   socket_editors: number;
+  collab_url: string;
 }
 
 const LOCAL = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 const INT_FLAGS = ["--users", "--ramp-s", "--plateau-s", "--ramp-down-s", "--socket-editors"];
-const STR_FLAGS = ["--base-url", "--database-url", "--password-env", "--unit", "--out-dir", "--request-log", "--provider"];
+const STR_FLAGS = ["--base-url", "--database-url", "--password-env", "--unit", "--out-dir", "--request-log", "--provider", "--collab-url"];
 
 export function parse_args(argv: string[], env: Record<string, string | undefined>): CliConfig {
   const vals = new Map<string, string>();
@@ -65,13 +66,29 @@ export function parse_args(argv: string[], env: Record<string, string | undefine
   if (!allow_remote && !LOCAL.has(host)) {
     throw new ProbeRefusal(`refusing: ${host} is not a local host (pass --allow-remote only for a stack you may load)`);
   }
+  const socket_editors = int("--socket-editors", 0, 0);
+  const collab_url = vals.get("--collab-url") ?? env["COLLAB_URL"] ?? "";
+  if (socket_editors > 0 && collab_url === "") throw new ProbeRefusal("--collab-url (or COLLAB_URL) is required with --socket-editors");
+  if (collab_url !== "") {
+    let c: URL;
+    try {
+      c = new URL(collab_url);
+    } catch {
+      throw new ProbeRefusal("--collab-url must be a ws:// or wss:// URL");
+    }
+    if (c.protocol !== "ws:" && c.protocol !== "wss:") throw new ProbeRefusal("--collab-url must be a ws:// or wss:// URL");
+    if (!allow_remote && !LOCAL.has(c.hostname)) {
+      throw new ProbeRefusal(`refusing: ${c.hostname} is not a local host (pass --allow-remote only for a stack you may load)`);
+    }
+  }
   const database_url = vals.get("--database-url") ?? env["DATABASE_URL"] ?? "";
   return {
     users: int("--users", 200, 1),
     ramp_s: int("--ramp-s", 120, 0),
     plateau_s: int("--plateau-s", 900, 1),
     ramp_down_s: int("--ramp-down-s", 120, 0),
-    socket_editors: int("--socket-editors", 0, 0),
+    socket_editors,
+    collab_url,
     base_url,
     database_url,
     password_env: vals.get("--password-env") ?? "LOAD_PROBE_PASSWORD",
