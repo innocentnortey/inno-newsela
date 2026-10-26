@@ -112,8 +112,8 @@ reviews are recorded. An agreed card changes only through the change procedure (
 - [x] Readiness record `docs/plans/foundation-wave.md`: stack and the decision it comes from, owned files, bounded scope, dependencies, one ticket spec per ticket, review requirements (code review, accessibility, visual check against the look sheet and `design.md`) — FW-1…FW-4, PE-1…PE-11 (2026-10-25)
 - [x] Scope only from the eligible list (tokens, typography, basic accessible components, layout primitives); nothing behaviour-dependent (permissions, autosave, resumability, booking or job state, data fetching, backend error recovery, real-time collaboration)
 - [x] Each FW ticket's acceptance examples are presentation examples (`PE-N`), not invented backend pairs
-- [ ] Each FW ticket passes `ticket_readiness.py` before it starts; built and reviewed like any §8 ticket (lane, plan → implement → test → review, affected tests)
-- **Gate:** ☐ FW tickets merged with their review evidence — Claude ✓ ____
+- [x] Each FW ticket passes `ticket_readiness.py` before it starts (FW-1…FW-4 READY, 147/147 READY at publish); built and reviewed like any §8 ticket (lane, plan → implement → test → review, affected tests)
+- **Gate:** ☑ FW tickets merged with their review evidence — Claude ✓ 2026-10-26: FW-1…FW-4 merged (`docs/plans/merged.txt`; merge commits b5aa505, 8ea9dfe, 0869b6c, 37d45cc), gallery axe + visual checks in FW-4; presentation only
 
 ## 5 · Spikes  (§5) — System track
 *2026-10-25: run in the Phase A VPS session (Opus orchestrator; Opus planners → Sonnet implementers per spike, in worktrees `spike/SP-N`).*
