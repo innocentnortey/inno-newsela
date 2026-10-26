@@ -87,6 +87,19 @@ describe("PgJobQueue", () => {
     expect((await q.claim("w1", 3, 1000))?.run_id).toBe(r3);
   });
 
+  it("finished_runs_never_occupy_the_claim_window: terminal-job runs in planning/running do not starve later jobs (S-36)", async () => {
+    await reset();
+    const done: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      const r = await run((tx) => seed_run(tx, { state: "planning", created_at: at(i) }));
+      await run((tx) => seed_job(tx, { run_id: r, kind: "candidate", status: "ready", lesson_id: `D.${i}` }));
+      done.push(r);
+    }
+    const later = await run((tx) => seed_run(tx, { state: "planning", created_at: at(10) }));
+    await run((tx) => seed_job(tx, { run_id: later, kind: "candidate", lesson_id: "Z.1" }));
+    expect((await q.claim("w1", 3, 1000))?.run_id).toBe(later);
+  });
+
   it("expired_lease_requeues: only running jobs with a past lease move; other tables untouched", async () => {
     await reset();
     const r = await run((tx) => seed_run(tx, { plan_stored_at: T0 }));

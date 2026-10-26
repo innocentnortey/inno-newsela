@@ -85,11 +85,8 @@ async function main(): Promise<void> {
   await exit;
   let stuck: string | null = null;
   if (kind === "candidate" && ok) {
-    // SEAM DEFECT (devlog, request R-1): a finished candidate run keeps run.state='planning' (derive_run_state: no plan_stored).
-    // claim() only looks at the first MAX_ACTIVE_RUNS (3) runs in planning|running, so after three candidates every later job starves.
-    // The worker is read-only for this ticket; the driver closes the run so the suite can go on, and prints what it found.
+    // S-36 fixed: the worker's run machine settles a finished candidate run, so the harness no longer closes runs through SQL.
     stuck = (await q<{ state: string }>("select state from run where id=$1", [run_id]))[0]?.state ?? null;
-    if (stuck === "planning") await q("update run set state='complete', finished_at=now() where id=$1 and kind='candidate' and state='planning'", [run_id]);
   }
   await db.close().catch(() => undefined);
   console.log(JSON.stringify({ run_id, kind, mode, finished: ok, run_state_after_job: stuck }));

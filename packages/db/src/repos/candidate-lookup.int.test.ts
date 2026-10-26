@@ -81,7 +81,7 @@ describe("PgCandidateLookup", () => {
     expect(await lk.latest_lesson_run("G6.U4.L9" as LessonId)).toBeNull();
   });
 
-  it("version_of_run returns the candidate version a run wrote, null for another run; next_version_number is max+1", async () => {
+  it("version_of_run returns the version a run wrote (candidate or generated v1), null for another run; next_version_number is max+1", async () => {
     const L = "G6.U4.L6" as LessonId;
     expect(await lk.next_version_number(L)).toBe(1);
     await w(async (tx) => {
@@ -101,7 +101,8 @@ describe("PgCandidateLookup", () => {
       });
     });
     expect(await lk.version_of_run(L, "run_cand" as RunId)).toBe("ver_cand");
-    expect(await lk.version_of_run(L, "run_gen" as RunId)).toBeNull(); // generated, not a candidate
+    expect(await lk.version_of_run(L, "run_gen" as RunId)).toBe("ver_gen"); // S-37: a candidate that became v1 is kind='generated'
+    expect(await lk.version_of_run("G6.U4.L7" as LessonId, "run_gen" as RunId)).toBeNull(); // another lesson's run
     expect(await lk.version_of_run(L, "run_other" as RunId)).toBeNull();
     expect(await lk.next_version_number(L)).toBe(3);
   });

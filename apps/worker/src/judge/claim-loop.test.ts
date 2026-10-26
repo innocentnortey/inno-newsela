@@ -40,6 +40,26 @@ describe("JudgeClaimLoop", () => {
     expect(written).toHaveLength(1);
   });
 
+  it("S-38: the judge runs after the claim transaction has ended", async () => {
+    const clock = new FakeClock();
+    const logger = create_logger({ service: "w", build_id: "t", write: () => undefined });
+    let open = 0;
+    let open_during_run = -1;
+    const db: TxRunner = {
+      async with_tx(fn) {
+        open += 1;
+        try {
+          return await fn({ query: async (sql: string) => ({ rows: sql.includes("FROM lesson_doc") ? [{ lesson_id: "A", content_hash: H }] : [] }) } as never);
+        } finally {
+          open -= 1;
+        }
+      },
+    };
+    const loop = new JudgeClaimLoop(db, { run: async () => ((open_during_run = open), report()) }, { append_advisory: async () => 0 }, clock, logger, { poll_ms: 10, backoff_ms: 100, backoff_max_ms: 250 });
+    expect(await loop.run_once()).toMatchObject({ lesson_id: "A" });
+    expect(open_during_run).toBe(0);
+  });
+
   it("returns null when nothing is claimable", async () => {
     const { loop } = make([], async () => report());
     expect(await loop.run_once()).toBeNull();

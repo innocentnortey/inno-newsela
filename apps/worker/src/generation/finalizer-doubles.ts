@@ -284,7 +284,7 @@ export const reference_derive_run_state: DeriveRunState = (jobs, run) => {
   if (run.cancelled) return "cancelled";
   if (run.capped) return "capped";
   if (run.paused) return "paused";
-  if (!run.plan_stored) return "planning";
+  if (!run.plan_stored && !(jobs.length > 0 && jobs.every((j) => j.kind === "candidate"))) return "planning";
   const work = jobs.filter((j) => j.kind !== "unit_plan");
   const terminal = work.every((j) => j.status === "ready" || j.status === "generation_failed" || j.status === "cancelled");
   if (!terminal) return "running";

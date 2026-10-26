@@ -32,7 +32,7 @@ export class PgAdvisoryIssueWriter implements AdvisoryIssueWriter {
   async append_advisory(lesson_id: LessonId, content_hash: Sha256, nos: readonly JudgeNo[]): Promise<number> {
     if (nos.length === 0) return 0;
     return this.db.with_tx(async (tx) => {
-      // No row lock here: the claim transaction already holds FOR UPDATE on this row. Only the latest hash gets issues; a slow judge must not make an old hash look current (finding 3).
+      // No row lock here (the claim transaction is short and has ended). Only the latest hash gets issues; a slow judge must not make an old hash look current (finding 3).
       const latest = await tx.query("SELECT content_hash FROM lesson_doc WHERE lesson_id=$1 ORDER BY seq DESC LIMIT 1", [lesson_id]);
       if ((latest.rows[0] as { content_hash?: string } | undefined)?.content_hash !== content_hash) return 0;
       let inserted = 0;

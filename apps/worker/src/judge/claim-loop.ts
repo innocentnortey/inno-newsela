@@ -54,40 +54,46 @@ export class JudgeClaimLoop {
 
   /** Claims at most one (lesson, hash), runs it, writes the advisory issues. null = nothing to do. */
   async run_once(): Promise<JudgeLoopReport | null> {
-    return this.db.with_tx(async (tx) => {
+    // S-38: claim in a short transaction (the FOR UPDATE lock lasts only for the SELECT) and run the judge outside it.
+    // A second claimant may now pick the same hash while this one is judging; verdict rows and advisory issues are
+    // written idempotently (duplicate issues are skipped), so the worst case is a repeated judge call, not a held lock.
+    const pick = await this.db.with_tx(async (tx) => {
       const rows = (await (tx as unknown as Q).query(CLAIM_SQL)).rows as { lesson_id: string; content_hash: string }[];
       const now = this.clock.now().getTime();
-      const pick = rows.find((r) => (this.#backoff.get(`${r.lesson_id}|${r.content_hash}`)?.next_at ?? 0) <= now);
-      if (pick === undefined) return null;
-      const lesson_id = pick.lesson_id as LessonId;
-      const content_hash = pick.content_hash as Sha256;
-      const key = `${lesson_id}|${content_hash}`;
-      let report: JudgeRunReport;
-      try {
-        report = await this.job.run(lesson_id, content_hash);
-      } catch (e) {
-        this.#fail(key);
-        this.logger.error("judge.failed", { lesson_id, extra: { name: e instanceof Error ? e.name : "unknown", content_hash } });
-        return null;
-      }
-      if (report.pairs > 0 && report.failed + report.skipped === report.pairs) {
-        this.#fail(key);
-        this.logger.warn("judge.unavailable", { lesson_id, extra: { content_hash, failed: report.failed, skipped: report.skipped } });
-        return { lesson_id, content_hash, pairs: report.pairs, verdicts_no: 0, issues_written: 0, skipped: report.skipped, failed: report.failed };
-      }
-      if (report.failed + report.skipped > 0) {
-        this.logger.warn("judge.partial", { lesson_id, extra: { content_hash, failed: report.failed, skipped: report.skipped } });
-      }
-      this.#backoff.delete(key);
-      const nos = (
-        await (tx as unknown as Q).query(
-          "SELECT address, code, question FROM judge_verdict WHERE lesson_id=$1 AND content_hash=$2 AND verdict='no' ORDER BY address, code",
-          [lesson_id, content_hash],
-        )
-      ).rows as { address: string; code: string; question: string }[];
-      const issues_written = await this.issues.append_advisory(lesson_id, content_hash, nos);
-      return { lesson_id, content_hash, pairs: report.pairs, verdicts_no: report.verdicts_no, issues_written, skipped: report.skipped, failed: report.failed };
+      return rows.find((r) => (this.#backoff.get(`${r.lesson_id}|${r.content_hash}`)?.next_at ?? 0) <= now);
     });
+    if (pick === undefined) return null;
+    const lesson_id = pick.lesson_id as LessonId;
+    const content_hash = pick.content_hash as Sha256;
+    const key = `${lesson_id}|${content_hash}`;
+    let report: JudgeRunReport;
+    try {
+      report = await this.job.run(lesson_id, content_hash);
+    } catch (e) {
+      this.#fail(key);
+      this.logger.error("judge.failed", { lesson_id, extra: { name: e instanceof Error ? e.name : "unknown", content_hash } });
+      return null;
+    }
+    if (report.pairs > 0 && report.failed + report.skipped === report.pairs) {
+      this.#fail(key);
+      this.logger.warn("judge.unavailable", { lesson_id, extra: { content_hash, failed: report.failed, skipped: report.skipped } });
+      return { lesson_id, content_hash, pairs: report.pairs, verdicts_no: 0, issues_written: 0, skipped: report.skipped, failed: report.failed };
+    }
+    if (report.failed + report.skipped > 0) {
+      this.logger.warn("judge.partial", { lesson_id, extra: { content_hash, failed: report.failed, skipped: report.skipped } });
+    }
+    this.#backoff.delete(key);
+    const nos = await this.db.with_tx(
+      async (tx) =>
+        (
+          await (tx as unknown as Q).query(
+            "SELECT address, code, question FROM judge_verdict WHERE lesson_id=$1 AND content_hash=$2 AND verdict='no' ORDER BY address, code",
+            [lesson_id, content_hash],
+          )
+        ).rows as { address: string; code: string; question: string }[],
+    );
+    const issues_written = await this.issues.append_advisory(lesson_id, content_hash, nos);
+    return { lesson_id, content_hash, pairs: report.pairs, verdicts_no: report.verdicts_no, issues_written, skipped: report.skipped, failed: report.failed };
   }
 
   async run_until(stop: { is_set(): boolean }): Promise<{ judged: number }> {

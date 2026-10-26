@@ -188,7 +188,8 @@ describe("PgLessonRepo", () => {
     expect((await repo.latest_snapshot(id))?.version_id).toBe(s2.version_id);
     expect(await repo.latest_snapshot("G6.U9.L2")).toBeNull();
     expect((await repo.candidate(id, c.version.version_id))?.version_id).toBe(c.version.version_id);
-    expect(await repo.candidate(id, g.version.version_id)).toBeNull();
+    expect((await repo.candidate(id, g.version.version_id))?.version_id).toBe(g.version.version_id); // S-37: a generated v1 is readable as a candidate
+    expect(await repo.candidate(id, "ver_missing")).toBeNull();
     expect(await repo.candidate("G6.U9.L2", c.version.version_id)).toBeNull();
     expect(await repo.has_generated_version("G6.U9.L2")).toBe(false);
   });

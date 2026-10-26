@@ -318,8 +318,9 @@ export class PgLessonRepo implements LessonStateRepo, LessonVersionRepo, LessonG
     );
   }
 
+  // S-37: a candidate that became the lesson's v1 is stored as kind='generated'; reads must still find it.
   candidate(lesson_id: LessonId, candidate_id: VersionId): Promise<LessonVersionRow | null> {
-    return this.one_version("SELECT * FROM lesson_version WHERE id=$2 AND lesson_id=$1 AND kind='candidate'", [lesson_id, candidate_id]);
+    return this.one_version("SELECT * FROM lesson_version WHERE id=$2 AND lesson_id=$1 AND kind IN ('candidate','generated')", [lesson_id, candidate_id]);
   }
 
   async has_generated_version(lesson_id: LessonId): Promise<boolean> {

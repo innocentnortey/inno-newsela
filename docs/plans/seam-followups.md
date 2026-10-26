@@ -52,9 +52,9 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 | S-31 | `support/users.ts` mints `usr_e2e_<hex>` ids that the web collab client (UserId in StoreAck.stored_by) refuses once such a user's edit is stored; con-17 mints ULID ids itself. Also: checks and Submit/Approve gates need a unit outline row (NL-99 `seedLesson`), else InvariantViolation | NL-116 | fix support/users.ts to mint ULIDs | open |
 
 ## W7 review findings (2026-10-25, NL-102/110/113/114/115/116 merged)
-- S-36 (NL-114, Medium): finished candidate runs stay `planning`; `CLAIM_SQL` only looks at the first 3 active runs, so later jobs starve after three regenerates. Owner A9 worker/run machine.
-- S-37 (NL-114, Medium): `PgCandidateLookup.version_of_run` matches only `kind='candidate'`, so a `generation_failed` v1 never settles (expected-fail test marks it). Fix in `packages/db/src/repos/candidate-lookup.ts`.
-- S-38 (NL-110, Medium): `claim-loop.run_once` runs the judge call inside the claim transaction holding `FOR UPDATE` on up to 5 lesson_doc rows; claim in a short tx and run outside.
+- ~~S-36~~ DONE (GEN-2, 2026-10-26) (NL-114, Medium): finished candidate runs stay `planning`; `CLAIM_SQL` only looks at the first 3 active runs, so later jobs starve after three regenerates. Owner A9 worker/run machine.
+- ~~S-37~~ DONE (GEN-2, 2026-10-26) (NL-114, Medium): `PgCandidateLookup.version_of_run` matches only `kind='candidate'`, so a `generation_failed` v1 never settles (expected-fail test marks it). Fix in `packages/db/src/repos/candidate-lookup.ts`.
+- ~~S-38~~ DONE (GEN-2, 2026-10-26) (NL-110, Medium): `claim-loop.run_once` runs the judge call inside the claim transaction holding `FOR UPDATE` on up to 5 lesson_doc rows; claim in a short tx and run outside.
 - S-39 (NL-102): CHG-6 still `open` (LessonExportFile vs ExportBundleFile drift); AC-5 idempotence assertion weak; Download clipped at 390px.
 - S-40 (NL-113): AC-2 "Submit enabled after" half not asserted in con-13 pending.spec.
 - S-41 (NL-110): AC-10 "answer yes" activity not exercised in sent_equals_logged; NL-32 frozen price test re-hashed without owner sign-off.
