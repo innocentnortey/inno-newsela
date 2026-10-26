@@ -1,0 +1,25 @@
+{
+ "ticket": "NL-121",
+ "note": "Frozen before implementation (risk::security). Tests are red because evals/src/heldout/{schema,compare,published,generated,guard,cli}.ts and evals/src/suites/s11.ts make_s11(deps) do not exist yet. Fixtures are synthetic (canary CANARY-HELDOUT-7f3a). AC-6 (real run) is blocked on NL-112 and has no test. AC-8 is docs. The shells.test.ts S11 entry removal and the eslint.config.js block are implementer edits. Worktree was checked out sparse (apps/web/e2e/__screenshots__ excluded) because the disk was full; run `git sparse-checkout disable` once space is free.",
+ "files": {
+  "evals/src/heldout/compare.test.ts": "2ee60cf8c435e4d5f4c40cff176b6794b99470b194fd79b3c2644ff04ca1feac",
+  "evals/src/heldout/generated.int.test.ts": "94bc47044fe665e7c1c63524397eef57eb68a3e2453346e0b7160f0755caf653",
+  "evals/src/heldout/heldout.test.ts": "c6223f99f097a6f26cec2846498968329e1ff1fb6a5851045b4377318ccf92a5",
+  "evals/src/heldout/lint.test.ts": "4b8b269e0ee529fedc0ab127d9697064338420086f2ef655da1b2419ff64c047",
+  "evals/src/heldout/wf-27-obligations.int.test.ts": "1606f94c4559ff45c61c96561a400fca0dcb5ea69b528e71ffd6116c92fa7300",
+  "evals/tests/fixtures/heldout-syn/g6-u4-l01.json": "7a9ab4a7f972e47eeb68422cd3fe5ac4be21dff59a27918aba9e4e0505c0e917",
+  "evals/tests/fixtures/heldout-syn/g6-u4-l02.json": "a6abbc2b6f396aba3b45543bdc8378faa8a1ffd192030b9182780fcffe820c0b",
+  "evals/tests/fixtures/heldout-syn/g6-u4-l03.json": "81810f3a33329fb902918e9f53e6dd136d8b51603b2cebe2e3b4e16f73ce037b",
+  "evals/tests/fixtures/heldout-syn/g6-u4-l04.json": "bc05fa6a59f8f9f0ebc8d31498470798c7006e52e2626d91e5936f591d1c4845",
+  "evals/tests/fixtures/heldout-syn/g6-u4-l05.json": "82a2dee155454088d5d1e74629244632dddb0728dd34596dccb726aca74df219"
+ },
+ "criteria": {
+  "AC-1": "canary_absent",
+  "AC-2": "counts_only",
+  "AC-3": "refuses_tracked_path",
+  "AC-4": "no_model_or_http_import",
+  "AC-5": "unreadable_and_missing",
+  "AC-7": "test_heldout_report_counts_only",
+  "AC-9": "GR-13, OBS-11 (wf-27-obligations.int.test.ts)"
+ }
+}
