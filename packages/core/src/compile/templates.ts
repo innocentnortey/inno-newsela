@@ -24,7 +24,9 @@ const slot = (
   ...(parts !== undefined ? { parts } : {}),
 });
 
-const five = (lesson_type: string): SectionTemplate => ({
+// Learning in Action routine headings are not required (WP-1/WP-2 table B list none). Part A/Part B are required for
+// Reading and Writing only (WP-1, WP-2); Academic Discussion, Research and Presentation have no worked pair, so no parts.
+const five = (lesson_type: string, opts: { parts: boolean }): SectionTemplate => ({
   lesson_type,
   sections: [
     slot("Launch", 5, ["routine_heading", "teacher_talk", "sample_response"]),
@@ -34,8 +36,8 @@ const five = (lesson_type: string): SectionTemplate => ({
     slot(
       "Learning in Action",
       30,
-      ["routine_heading", "teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch", "support_table"],
-      ["Part A", "Part B"],
+      ["teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch", "support_table"],
+      opts.parts ? ["Part A", "Part B"] : undefined,
     ),
     slot("Look Back", 5, ["quick_write", "sample_response"]),
     slot("Homework", 0, ["homework"]),
@@ -60,11 +62,11 @@ const flex = (lesson_type: string): SectionTemplate => ({
 
 export const SECTION_TEMPLATES: { templates: readonly SectionTemplate[] } = {
   templates: [
-    five("Reading"),
-    five("Writing"),
-    five("Academic Discussion"),
-    five("Research"),
-    five("Presentation"),
+    five("Reading", { parts: true }),
+    five("Writing", { parts: true }),
+    five("Academic Discussion", { parts: false }),
+    five("Research", { parts: false }),
+    five("Presentation", { parts: false }),
     {
       lesson_type: "Spark",
       sections: [

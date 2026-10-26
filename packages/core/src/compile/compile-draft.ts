@@ -155,7 +155,11 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
   let tip_section: string | null = null;
   const part_remaps: PartRemap[] = [];
   for (const slot of ctx.template.sections) {
-    const blocks = draft.blocks.filter((b) => b.section === slot.name);
+    // A slot whose template lists no parts has none: a part label the model wrote there is dropped (the prompt says part is
+    // null), so the compiler makes no part heading or title routine that could stand in for a required role.
+    const blocks = draft.blocks
+      .filter((b) => b.section === slot.name)
+      .map((b) => (slot.parts === undefined && b.part !== null ? { ...b, part: null } : b));
     const is_target = slot.name === target;
     const tips = {
       id: (i: number): string | null =>

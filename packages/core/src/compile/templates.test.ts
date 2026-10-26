@@ -36,14 +36,21 @@ describe("templates", () => {
     for (const t of SECTION_TEMPLATES.templates)
       for (const s of t.sections) for (const r of s.required_roles) expect(DRAFT_ROLES).toContain(r);
   });
-  it("parts_only_on_five_section_types", () => {
-    for (const n of ["Reading", "Writing", "Academic Discussion", "Research", "Presentation"]) {
-      const t = template_for(n)!;
-      for (const sec of t.sections)
+  // Oracle: WP-1 and WP-2 table B (Part A / Part B in Learning in Action); no worked pair for the other types; WP-3 has none.
+  it("parts_only_for_reading_and_writing_learning_in_action", () => {
+    for (const n of ["Reading", "Writing"])
+      for (const sec of template_for(n)!.sections)
         expect(sec.parts, `${n} ${sec.name}`).toEqual(sec.name === "Learning in Action" ? ["Part A", "Part B"] : undefined);
-    }
-    for (const n of ["Spark", "Flex Day", "Assessment"])
+    for (const n of ["Academic Discussion", "Research", "Presentation", "Spark", "Flex Day", "Assessment"])
       for (const sec of template_for(n)!.sections) expect(sec.parts, `${n} ${sec.name}`).toBeUndefined();
+  });
+  // Oracle: WP-1/WP-2 expected.json list no routine_heading for Learning in Action; WP-3 lists it for Flex Day.
+  it("routine_heading_required_in_learning_in_action_only_for_flex_and_assessment", () => {
+    for (const t of SECTION_TEMPLATES.templates) {
+      const lia = t.sections.find((s) => s.name === "Learning in Action")!.required_roles;
+      const flex = t.lesson_type === "Flex Day" || t.lesson_type === "Assessment";
+      expect(lia.includes("routine_heading"), t.lesson_type).toBe(flex);
+    }
   });
   it("flex_day_asks_for_wp3_components", () => {
     const t = template_for("Flex Day")!;

@@ -4,9 +4,9 @@ A lesson is a list of sections. Each section holds blocks, and every block carri
 
 Section names and minutes come from the template in the context block. Keep them in order and do not add or rename sections.
 
-Each section must include the roles the template requires for it. A sample_response goes right after the question it answers. A Flex Day or Assessment lesson also needs, in Learning in Action, a routine_heading that names the activity and a teacher_tip that tells the teacher what to choose or prepare.
+Each section must include the roles the template requires for it. A sample_response goes right after the question it answers. A Flex Day or Assessment lesson also needs a sample_response in Launch, and in Learning in Action a routine_heading that names the activity and a teacher_tip that tells the teacher what to choose or prepare.
 
-Parts. When a template line ends with parts (for example parts: Part A, Part B), every block in that section carries its part label in the part field, written exactly as listed: a capital P, a space and a capital letter, nothing else. Put all Part A blocks before the Part B blocks. A descriptive phrase is never the label. To give a part a title, make the first block of that part a routine_heading holding the title. In a section whose template line lists no parts, part is null.
+Parts. Only a section whose template line ends with parts uses them; never invent Part A or Part B elsewhere. When a template line ends with parts (for example parts: Part A, Part B), every block in that section carries its part label in the part field, written exactly as listed: a capital P, a space and a capital letter, nothing else. Put all Part A blocks before the Part B blocks. A descriptive phrase is never the label. To give a part a title, make the first block of that part a routine_heading holding the title. In a section whose template line lists no parts, part is null.
 
 A check for understanding uses the cfu_item role, with one question and its expected response as a single item. Every cfu_item block must also fill its cfu field: the question in stem, the answer options in options (at least two), key_index for the correct option, one entry in rationales for each option, and standard_code. A cfu_item whose cfu field is null is invalid.
 

@@ -19,10 +19,19 @@ describe("production template as the prompt renders it", () => {
     const lines = template_lines(template_for("Reading")!);
     expect(lines).toContain("section 1: Launch, 5 minutes, roles: routine_heading, teacher_talk, sample_response");
     expect(lines).toContain(
-      "section 3: Learning in Action, 30 minutes, roles: routine_heading, teacher_talk, cfu_item, callout_purpose, callout_say, callout_watch, support_table; parts: Part A, Part B",
+      "section 3: Learning in Action, 30 minutes, roles: teacher_talk, cfu_item, callout_purpose, callout_say, callout_watch, support_table; parts: Part A, Part B",
     );
     expect(lines).toContain("section 4: Look Back, 5 minutes, roles: quick_write, sample_response");
     expect(lines).toContain("section 5: Homework, 0 minutes, roles: homework");
+  });
+
+  it("academic_discussion_prints_no_parts_and_flex_keeps_its_heading", () => {
+    // hand-written from the section-missing analysis 2026-10-26: no worked pair gives Academic Discussion parts
+    const ad = template_lines(template_for("Academic Discussion")!);
+    expect(ad.filter((l) => l.includes("parts:"))).toEqual([]);
+    const flex = template_lines(template_for("Flex Day")!);
+    expect(flex.find((l) => l.includes(": Launch, "))).toContain("sample_response");
+    expect(flex.find((l) => l.includes(": Learning in Action, "))).toContain("routine_heading");
   });
 
   // Agreement check only, not an independent oracle.

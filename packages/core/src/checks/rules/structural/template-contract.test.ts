@@ -109,6 +109,40 @@ describe("template contract", () => {
     expect(run(sample.ctx).map((f) => f.message)).toContain('Section "Launch" is missing required role sample_response');
   });
 
+  // WP-1/WP-2 table B list no routine heading in Learning in Action; WP-1 requires its two parts.
+  it("learning_in_action_needs_parts_not_a_routine_heading_for_reading", () => {
+    const { ctx } = good("wp1", (d) => {
+      d.blocks = d.blocks.filter((b) => !(b.section === "Learning in Action" && b.role === "routine_heading"));
+    });
+    expect(section_findings(ctx)).toEqual([]);
+  });
+
+  it("academic_discussion_does_not_require_parts_or_a_learning_in_action_heading", () => {
+    const draft = LessonDraft.parse(strip(JSON.parse(readFileSync(new URL(GOOD.wp1.file, import.meta.url), "utf8"))));
+    for (const b of draft.blocks) if (b.section === "Learning in Action") b.part = null;
+    draft.blocks = draft.blocks.filter((b) => !(b.section === "Learning in Action" && b.role === "routine_heading"));
+    const row = build_ctx("wp1").row;
+    const compiled = compile_draft(draft, { row, template: template_for("Academic Discussion")!, unit_id: "G6.U4" as UnitId, schema_version: SCHEMA_VERSION });
+    expect(section_findings({ ...make_ctx(compiled.lesson), row })).toEqual([]);
+    const reading = compile_draft(draft, { row, template: template_for("Reading")!, unit_id: "G6.U4" as UnitId, schema_version: SCHEMA_VERSION });
+    expect(section_findings({ ...make_ctx(reading.lesson), row }).map((f) => f.message)).toEqual([
+      'Section "Learning in Action" is missing part "Part A"',
+      'Section "Learning in Action" is missing part "Part B"',
+    ]);
+  });
+
+  it("part_labels_in_a_slot_without_parts_are_dropped_and_make_no_heading", () => {
+    const { compiled } = good("wp3", (d) => {
+      for (const b of d.blocks) if (b.section === "Learning in Action") b.part = "Set up the organizer";
+    });
+    const lia = compiled.lesson.sections.find((s) => s.name === "Learning in Action")!;
+    expect((lia.content.content ?? []).filter((n) => n.type === "heading" && n.attrs?.level === 2)).toEqual([]);
+    expect(compiled.part_remaps).toEqual([]);
+    const titles = (lia.content.content ?? []).filter((n) => n.type === "routine_heading").length;
+    const model = good("wp3").compiled.lesson.sections.find((s) => s.name === "Learning in Action")!;
+    expect(titles).toBe((model.content.content ?? []).filter((n) => n.type === "routine_heading").length);
+  });
+
   it("unknown_type_is_not_a_section_problem", () => {
     expect(run(make_ctx(reading_lesson({ type: "Mystery" })))).toEqual([]);
   });

@@ -25,6 +25,10 @@ describe("lesson-shape contract text", () => {
       "either stays empty or lists the same codes",
     ]) expect(shape, phrase).toContain(phrase);
   });
+  it("requires a Flex sample_response in Launch and parts only where the template lists them", () => {
+    expect(shape).toContain("also needs a sample_response in Launch");
+    expect(shape).toContain("Only a section whose template line ends with parts uses them");
+  });
   it("no longer forbids narrowing", () => {
     expect(shape).not.toContain("Do not narrow");
   });
