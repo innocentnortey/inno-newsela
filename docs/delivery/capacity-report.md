@@ -99,3 +99,29 @@ The stored p95 is now almost entirely the 1 s debounce; the database write is ab
 - **The HTTP half missed four targets in this run** (lesson open 7.2 s, board and poll 4.0 s, error rate 4.33%, recovery), where the first run met all of them by a wide margin. 1,684 of the 38,909 requests were `SERVICE_BUSY` (the 2 s database pool wait ran out): board 716, heartbeat 551, lesson open 337, act read 62, act write 18.
 - **I did not diagnose this and did not tune anything.** The run differs from the first in three ways that are not separated here: much heavier machine contention (load average 27 against 8), a database that is a shared container with other agents' test traffic and Docker's port proxy (dockerd was at 100% CPU) rather than a dedicated one, and a native `next start` web process rather than the Compose image. PD-38 changes only the collab store debounce, so it does not obviously explain the HTTP numbers, but this run cannot rule out an effect (the lower debounce raises the store write rate against the same database). A quiet-machine re-run, ideally on the Compose stack, is needed before these HTTP numbers are read as a capacity result in either direction.
 - Qualifiers 1, 2 and 6 of the first report still apply (synthetic padded unit, no generation load, single instance not Render). Qualifier 4 (check failures) is closed by this run: 0 `check.failed`.
+
+## A/B check
+
+Run 2026-10-26 10:01 to 10:18 UTC. Question: is the HTTP slowdown in "Re-run after PD-38" (lesson open p95 7,188 ms, board 4,032 ms, 4.33% `SERVICE_BUSY`) a code regression between `1d9e78d` (first NL-127 run) and main, or contention/setup? All values are **[M] measured**; each run is one run (n = 1 per cell), 5,843 requests per run.
+
+**Setup (identical for both builds).** Native `next build` + `next start` from a git worktree per build, stub provider, no provider key, no Yjs sockets (`--socket-editors` off), random port, a throwaway migrated database in the shared test Postgres at 127.0.0.1:55440 (owner role, not the `ls_app` role of the re-run), dropped after each run. Seed: unit `G6.U1`, 40 lessons from the WP-1 fixture padded to about 24 KB of lesson JSON each (about 3,000+ words), outline rows, demo accounts; the same seed script for both builds. Command: `npm run load:spike -- --users 200 --ramp-s 30 --plateau-s 120 --ramp-down-s 30`. Build A = `1d9e78d`; build B = main `52b6902` (contains GEN-2 to GEN-6, PD-38 and NL-103/104/117, so it covers every candidate named in the question).
+
+| Run | Build | Machine state at load start (`uptime`, 1/5/15 min) | Lesson open p95 | Board p95 | Heartbeat p95 | Busy 503s | Error rate |
+|---|---|---|---|---|---|---|---|
+| A1 | `1d9e78d` | load 5.11, 11.10, 15.76 (falling) | 13 ms | 9 ms | 15 ms | 0 | 0.00% |
+| B1 | `52b6902` | load 5.60, 8.38, 13.84 | 13 ms | 8 ms | 15 ms | 0 | 0.00% |
+| B2c | `52b6902` | load 16.54, 9.17, 12.76 (20 busy-loop processes of mine added; 32.6 at the end) | 168 ms | 84 ms | 164 ms | 0 | 0.00% |
+| A2c | `1d9e78d` | load 33.04, 21.32, 16.91 (same 20 busy loops) | 168 ms | 84 ms | 154 ms | 0 | 0.00% |
+
+A first A run used an unpadded 3 KB lesson by mistake (lesson open 14 ms, board 10 ms, 0 errors); it is discarded as not comparable, not part of the table.
+
+### What was established
+
+- On the same machine state, main is **not slower** than `1d9e78d` on the HTTP half: 13 ms against 13 ms (lesson open), 8 against 9 ms (board), at load about 5; 168 ms against 168 ms and 84 ms against 84 ms with the machine pushed to load 33. The A/B/A third leg was not run because A and B did not differ. No bisect was needed.
+- Heavy CPU contention alone (load 33, more than the re-run's 27) raised latency about 13 times but **did not produce 503s or seconds-long p95s** for either build.
+
+### What was not established
+
+- The re-run's 7.2 s / 4.0 s / 4.33% was **not reproduced**, so its cause is not identified. It is not explained by code merged between `1d9e78d` and main on the lesson read, board or heartbeat path. Differences from the re-run that this check did not test: the 140 Yjs socket editors writing to the same database at the same time, the 900 s plateau (this check used 120 s), the non-owner `ls_app` role, the heavy `dockerd` and ClickHouse load that sat on the same Postgres container path, and the count of orphaned `next-server` processes. Of these, database-side slowness behind the container (the `SERVICE_BUSY` is a 2 s pool wait) is the likeliest but is a hypothesis.
+- Each cell is one run (n = 1); differences of a few milliseconds are noise. Machine load was not held equal across the quiet pair (A1 5.1 against B1 5.6 at start); in the contended pair it was 16.5 (rising to 32.6) against 33.0.
+- Not tested: the socket half, or the capacity target at the original 15-minute plateau. A quiet-machine full re-run (with sockets and the `ls_app` role) is still what settles the headline HTTP numbers.
