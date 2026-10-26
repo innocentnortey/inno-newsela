@@ -18,8 +18,11 @@ export interface GoogleSheetsExportFetcherOptions {
   max_bytes: number;
   transport?: SheetTransport;
   clock?: Clock;
+  /** Origin of the Sheets service; default Google. Config only lets it move to loopback in stub mode. */
+  base_url?: string;
 }
 
+const DEFAULT_BASE = "https://docs.google.com";
 const MAX_HOPS = 3;
 const NOT_PUBLIC = "This sheet is private; share it publicly or upload the file.";
 const UNREACHABLE = "Google Sheets did not answer in time. Try again or upload the file.";
@@ -32,7 +35,7 @@ const unreachable = (): DomainRefusal => new DomainRefusal("SHEET_UNREACHABLE", 
 const too_large = (): DomainRefusal => new DomainRefusal("UNSUPPORTED_FILE", "The sheet is larger than 5 MB.", { reason: "too_large" });
 
 /** Strict allow-list parse; the server only ever requests an address it built itself. */
-export function parse_sheet_url(sheet_url: string): { sheet_id: string; canonical_url: string; export_url: string } {
+export function parse_sheet_url(sheet_url: string, base_url: string = DEFAULT_BASE): { sheet_id: string; canonical_url: string; export_url: string } {
   if (typeof sheet_url !== "string" || sheet_url.length > 2048) throw invalid();
   let u: URL;
   try {
@@ -40,15 +43,20 @@ export function parse_sheet_url(sheet_url: string): { sheet_id: string; canonica
   } catch {
     throw invalid();
   }
-  if (u.protocol !== "https:" || u.hostname !== "docs.google.com" || u.port !== "" || u.username !== "" || u.password !== "") throw invalid();
+  const base = new URL(base_url);
+  if (u.origin !== base.origin || u.username !== "" || u.password !== "") throw invalid();
   const m = SHEET_PATH.exec(u.pathname);
   if (m === null) throw invalid();
   const sheet_id = m[1] as string;
-  const canonical_url = `https://docs.google.com/spreadsheets/d/${sheet_id}`;
+  const canonical_url = `${base.origin}/spreadsheets/d/${sheet_id}`;
   return { sheet_id, canonical_url, export_url: `${canonical_url}/export?format=xlsx` };
 }
 
-function redirect_allowed(next: URL): boolean {
+function redirect_allowed(next: URL, base_url: string = DEFAULT_BASE): boolean {
+  if (next.username !== "" || next.password !== "") return false;
+  if (base_url !== DEFAULT_BASE && next.origin === new URL(base_url).origin) {
+    return !(next.pathname.startsWith("/accounts") || next.pathname.includes("ServiceLogin"));
+  }
   if (next.protocol !== "https:" || next.port !== "" || next.username !== "" || next.password !== "") return false;
   if (next.hostname !== "docs.google.com" && !CONTENT_HOST.test(next.hostname)) return false;
   if (next.pathname.startsWith("/accounts") || next.pathname.includes("ServiceLogin")) return false;
@@ -60,16 +68,18 @@ export class GoogleSheetsExportFetcher implements SheetFetcher {
   private readonly max_bytes: number;
   private readonly transport: SheetTransport;
   private readonly clock: Clock;
+  private readonly base_url: string;
 
   constructor(opts: GoogleSheetsExportFetcherOptions) {
     this.timeout_ms = opts.timeout_ms;
     this.max_bytes = opts.max_bytes;
     this.transport = opts.transport ?? ((url, init) => globalThis.fetch(url, init) as Promise<SheetResponse>);
     this.clock = opts.clock ?? new SystemClock();
+    this.base_url = opts.base_url ?? DEFAULT_BASE;
   }
 
   async fetch_export(sheet_url: string): Promise<FetchedSheet> {
-    const { canonical_url, export_url } = parse_sheet_url(sheet_url);
+    const { canonical_url, export_url } = parse_sheet_url(sheet_url, this.base_url);
     const ac = new AbortController();
     const deadline = this.clock.sleep(this.timeout_ms).then((): never => {
       ac.abort();
@@ -108,7 +118,7 @@ export class GoogleSheetsExportFetcher implements SheetFetcher {
         } catch {
           throw not_public();
         }
-        if (!redirect_allowed(next)) throw not_public();
+        if (!redirect_allowed(next, this.base_url)) throw not_public();
         url = next.toString();
         continue;
       }
