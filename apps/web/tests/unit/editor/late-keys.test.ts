@@ -107,4 +107,23 @@ describe("late-keys", () => {
     s.press("b");
     expect(s.got).toEqual([]);
   });
+
+  it("does not capture while editable, and disarm ends capture", () => {
+    const s = setup();
+    s.press("a");
+    s.set_editable(false);
+    s.cap.arm();
+    s.press("1");
+    s.set_editable(true);
+    s.tick(100);
+    s.press("2"); // editable again: this key belongs to the editor, not the notice
+    s.set_editable(false);
+    s.tick(100);
+    s.press("3"); // armed was cleared by the editable key, and engagement was refreshed only by "2"
+    expect(s.got).toEqual(["1"]);
+    s.cap.arm();
+    s.cap.disarm();
+    s.press("4");
+    expect(s.got).toEqual(["1"]);
+  });
 });

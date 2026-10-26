@@ -126,4 +126,16 @@ describe("CollabSession", () => {
     s.add_late_text("x");
     expect(s.snapshot().refusal).toEqual({ message: "Your last edits were not saved.", text: ["x"], dropped: 0 });
   }, 20000);
+
+  it("a later refusal does not re-append keys captured for the earlier notice", async () => {
+    const m = await mock();
+    const s = session(m, "L9");
+    const h = s as unknown as { handle_refused(msg: { type: "refused"; code: "LESSON_LOCKED"; message: string; refused_from: string }): void };
+    const msg = { type: "refused" as const, code: "LESSON_LOCKED" as const, message: "m", refused_from: "" };
+    s.add_late_text("A");
+    h.handle_refused(msg);
+    expect(s.snapshot().refusal?.text).toEqual(["A"]);
+    h.handle_refused(msg);
+    expect(s.snapshot().refusal?.text.join("")).toBe("");
+  });
 });

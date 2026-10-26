@@ -30,6 +30,7 @@ export interface LateKeyCaptureOptions {
 }
 export interface LateKeyCapture {
   arm(): void;
+  disarm(): void;
   dispose(): void;
 }
 
@@ -48,7 +49,7 @@ export function create_late_key_capture(
     if (!inside && !bare) return;
     const n = now();
     if (armed) {
-      if (n - last_at > LATE_KEY_IDLE_MS) armed = false;
+      if (o.is_editable() || n - last_at > LATE_KEY_IDLE_MS) armed = false;
       else {
         last_at = n;
         o.on_text(ch);
@@ -61,6 +62,9 @@ export function create_late_key_capture(
   return {
     arm() {
       armed = now() - last_at <= ENGAGED_MS;
+    },
+    disarm() {
+      armed = false;
     },
     dispose() {
       o.doc.removeEventListener("keydown", on_keydown, true);

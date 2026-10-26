@@ -209,6 +209,7 @@ export function LessonEditor(props: LessonEditorProps) {
   const was_read_only = useRef(read_only);
   useEffect(() => {
     if (!was_read_only.current && read_only) capture.current?.arm();
+    else if (!read_only) capture.current?.disarm();
     was_read_only.current = read_only;
   }, [read_only]);
   const stored_at = snap.stored?.stored_at ?? null;

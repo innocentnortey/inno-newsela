@@ -59,6 +59,7 @@ export class CollabSession {
   private refused_text: string[] = [];
   private refused_dropped = 0;
   private late_text = "";
+  private refusal_seen = false;
   private signed_out = false;
   private mode_state: string | null = null;
   private detach_doc: (() => void) | null = null;
@@ -208,6 +209,9 @@ export class CollabSession {
       },
       msg,
     );
+    // a later refusal replaces the earlier one; keys captured for the old notice must not carry over
+    if (this.refusal_seen) this.late_text = "";
+    this.refusal_seen = true;
     this.refused_text = outcome.refused_text;
     this.refused_dropped = outcome.dropped_updates;
     this.rebuild_refusal();
