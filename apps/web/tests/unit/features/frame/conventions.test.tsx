@@ -14,7 +14,7 @@ describe("screen conventions", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
   it("NotFound names the place and links back", () => {
-    render(<NotFound what="lesson L99" />);
+    render(<NotFound what="lesson L99" where="Grade 6 · Unit 4" boardHref="/units/g6-u4/board" />);
     expect(screen.getByText("There is no lesson L99 in Grade 6 · Unit 4")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to the board" })).toHaveAttribute("href", "/units/g6-u4/board");
   });

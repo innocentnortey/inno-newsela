@@ -1,4 +1,5 @@
 "use client";
+import { placeLabel } from "@/features/workspace/state-model";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ export function ApprovalScreen({ unitKey, lessonKey, lessonId, client }: Approva
   const board = `/units/${unitKey}/board`;
   if (data.status === "error") {
     return data.error?.code === "NOT_FOUND" ? (
-      <NotFound what={`Lesson ${n}`} boardHref={board} />
+      <NotFound what={`Lesson ${n}`} where={placeLabel(unitKey)} boardHref={board} />
     ) : (
       <CantLoad thing={COPY.cantLoadThing} onRetry={() => void data.reload()} />
     );

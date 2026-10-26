@@ -84,7 +84,7 @@ test("states: contract example has quality null and reads as cut", async ({
   await mockOperation(page, "getUnitMetrics", { example: "layoutExample" });
   await page.goto(QUALITY_URL);
   await expect(
-    page.getByText(/There is no page in Grade 6 · Unit 4/),
+    page.getByText(/There is no page in this app/),
   ).toBeVisible();
 });
 

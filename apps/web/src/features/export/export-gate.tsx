@@ -10,6 +10,6 @@ export function ExportGate({
   fired?: readonly number[];
   children: ReactNode;
 }) {
-  if (fired.includes(5)) return <NotFound what="page" />;
+  if (fired.includes(5)) return <NotFound what="page" where="this app" boardHref="/units" />;
   return <>{children}</>;
 }

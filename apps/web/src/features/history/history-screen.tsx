@@ -1,4 +1,5 @@
 "use client";
+import { placeLabel } from "@/features/workspace/state-model";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { SideRail, TwoPane } from "@/components/layout/two-pane";
@@ -39,7 +40,7 @@ export function HistoryScreen({
 
   if (data.status === "error") {
     return data.error?.code === "NOT_FOUND" ? (
-      <NotFound what={`Lesson ${n}`} boardHref={board} />
+      <NotFound what={`Lesson ${n}`} where={placeLabel(unitKey)} boardHref={board} />
     ) : (
       <CantLoad thing={COPY.cantLoadThing} onRetry={() => void data.reload()} />
     );
