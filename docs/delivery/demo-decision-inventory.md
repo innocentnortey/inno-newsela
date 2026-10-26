@@ -3,8 +3,8 @@
 **Status: proposed (draft).** Built from the written record only, per
 [hiring-partner-framing -> Demo video](../../.claude/rules/hiring-partner-framing.md); ticket NL-131. Nothing here is
 narrated from memory. Draft 1 (2026-10-25, 31 rows) was renamed to this undated path and extended; the ranks changed.
-It is **not final**: the full run (NL-112), the error analysis (NL-120) and the capacity measurement (NL-127) have
-not produced results in this record, so the **Reserved** table carries no numbers. Re-walk the table after those land and
+It is **not final**: the full run (NL-112) and error analysis (NL-120) have since run (see the **Reserved** table and `real-model-results.md`), and the
+capacity measurement (NL-127) ran on the stub; the **Reserved** table's rows still carry no numbers until re-walked. Re-walk the table after those land and
 before NL-136 writes the demo script. The restricted source folder was not read for this file (GR-9).
 
 ## How to read it
@@ -82,8 +82,8 @@ joins the table above as a result row.
 
 | Reserved for | Result that will exist | Source it will cite | Status |
 |---|---|---|---|
-| NL-112 | Full 47-lesson run report (generation success, retries, time per lesson, spend against the cap, checks that fired) | the NL-112 report under `docs/testing/` (path set when written) | not run in this record |
-| NL-120 | Error analysis of that run (what the checks caught, what a reviewer would still find, seeded-error catch rate) | `docs/testing/error-analysis/README.md` (the plan; results not yet written) | not run in this record |
+| NL-112 | Full 47-lesson run report (generation success, retries, time per lesson, spend against the cap, checks that fired) | `evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, summary `docs/delivery/real-model-results.md` | **ran 2026-10-26**: 30 of 47 ready, 19 of 47 clean first pass (90% target not met), $3.597, p95 57.1 s; one run. Rows still carry no numbers until re-walked |
+| NL-120 | Error analysis of that run (what the checks caught, what a reviewer would still find, seeded-error catch rate) | `docs/delivery/error-analysis-real-run.md` (replay of the real run; no `FT-N` taxonomy signed) | ran on the real run; seeded-error catch rate not run |
 | NL-127 | Capacity measurement against the PD-33 figures (500 users per day, 200-concurrent-user spike, at most 6 generation jobs) | `docs/design/capacity-and-workload.md` (targets only) | not run in this record |
 
 ## Not decided (do not narrate as decisions)

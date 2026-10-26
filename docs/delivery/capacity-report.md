@@ -40,7 +40,7 @@ Rows read back with `psql`: `probe_run` `pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) a
 
 ## Qualifiers (these make the passes weaker than they look)
 
-1. **Synthetic unit.** NL-112 (the real-key full-unit run) has not run. The HTTP half read a padded 40-lesson unit (about
+1. **Synthetic unit, stub provider.** The real-model full run (NL-112) ran separately (p50 36.3 s, p95 57.1 s per lesson, 347 s wall, 6 at a time; `docs/delivery/real-model-results.md`), not under this load. The HTTP half read a padded 40-lesson unit (about
    3,300 words each); the Yjs half used small fixture lessons. Both make the numbers optimistic against real content.
 2. **No generation load.** The stub run's first job (`unit_plan`) failed (`error_kind: unexpected`) and the run stayed in
    `planning`, so the worker was idle and the progress poll was not exercised (the board was polled instead).
@@ -56,7 +56,7 @@ Rows read back with `psql`: `probe_run` `pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) a
 
 For the demo and the defence: lesson open, the board and polling stay far inside their budgets at 200 users on the demo
 stack with a stubbed provider, with zero lost acknowledged edits. It does **not** show the 3 s store target is met, a
-generation run under load, or real-content sizes. Re-run after NL-112 and after the store path is diagnosed.
+generation run under load, or real-content sizes. A generation run under this load, on the real model, has not been measured.
 
 ## Re-run after PD-38
 

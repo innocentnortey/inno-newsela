@@ -3,9 +3,10 @@
 **Status:** NL-139 pass of 2026-10-26. Written from the design outputs DO-1…DO-7 (NL-04); the capacity numbers are now
 filled from the NL-127 report. It is a reader's map: it links to the documents that own each fact and does not copy
 them. Where a number comes from a design target it carries `[T]` (target), `[A]` (assumption), `[C]` (calculation) or
-`[M]` (measured, with *n* and a report path). Two things are still unmeasured and keep their marker, `pending: NL-112`
-(the real-model full run) and `pending: NL-134` (experiment scoring); both need Innocent's yes to spend, and no result
-is claimed for them. Section 10 says what that means. Contracts are never restated here
+`[M]` (measured, with *n* and a report path). The real-model full run has now been measured (30 of 47 lessons ready on the issued unit after two
+prompt rounds; 17 blocked with recorded reasons; the 90% first-pass target is **not** met, 40% clean first pass; one run,
+$3.60; [`delivery/real-model-results.md`](delivery/real-model-results.md)). Experiment scoring keeps its marker,
+`pending: NL-134`, and no result is claimed for it. Section 10 says what that means. Contracts are never restated here
 ([`contracts/INTERFACE.md`](contracts/INTERFACE.md) owns them).
 
 ## 1. Why it exists
@@ -123,7 +124,9 @@ Each card, its options and its evidence are in [`design/hard-problems.md`](desig
 
 - **Evaluation** ([`design/eval-plan.md`](design/eval-plan.md), DO-5): fourteen suites S1–S14, from the intake golden
   suite (S1) to the capacity spike (S14), each with its grader, case provenance and held-out separation. Results:
-  full run and draft golden pending: NL-112; metrics scoring and reruns pending: NL-134. The capacity spike (S14) ran:
+  the full run (S9) ran once on the real model: 30 of 47 ready, 19 of 47 clean first pass, $3.597, p50 36.3 s and p95 57.1 s
+  per lesson, 347 s wall (`evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, n = 47, single run); the draft
+  golden (S3) was 0 of 9 before the prompt fix and is not re-measured; metrics scoring and reruns pending: NL-134. The capacity spike (S14) ran:
   see section 8. The stub-provider fault suite S6 passed 4 of 4 (`evals/reports/faults-05b70004372e.md`, n = 4, stub,
   cost $0).
 - **Observability** ([`design/observability.md`](design/observability.md), DO-6): every entry point that does work has a
@@ -170,7 +173,7 @@ step was taken; the next step is to separate the debounce wait from the write in
 machine. Whether to lower the debounce, relax the target or accept the miss is Innocent's open decision.
 
 **Qualifiers that make the passes weaker than they look:** a padded synthetic 40-lesson unit and small fixtures (not
-real generated content; the real-key full run, NL-112, has not run); no generation load ran (the stub run's first job
+real generated content; the real-model full run was measured separately and is not part of the load run); no generation load ran (the stub run's first job
 failed, so the worker was idle); another agent used the machine during the run; a single VPS instance, not Render
 (Starter sizes are 0.5 CPU / 512 MB, so these figures do not transfer).
 
@@ -192,14 +195,20 @@ data** or **cut**, and the cut or unbuilt ones carry PRD §6.4's "what we say in
 
 **Not measured, and why**
 
-- **Real-model full run (NL-112) has not run; `pending: NL-112`.** It spends model budget (PD-29, $75 ceiling) and needs
-  Innocent's yes. Until then, no number here comes from a generated 47-lesson unit. The spike figures in section 6 come
-  from throwaway code on a few drafts (SP-1: 3 of 3 drafts valid), not a population estimate.
-- **Experiments and the north star (NL-134) are unscored; `pending: NL-134`.** No error-analysis round (NL-120), no `FT-N`
-  failure types and no experiment has been run, so none is claimed. No review session has been measured. When it is, the
+- **Real-model full run (NL-112): measured once, target not met.** After two prompt rounds, 30 of 47 lessons were ready on
+  the issued unit and 17 were blocked with recorded reasons (15 `proper_noun_unsourced`, 2 `page_out_of_range`). Clean first
+  pass was 19 of 47 (40%), so the 90% first-pass target is not met. Spend $3.597 (cap $6.00); per lesson p50 36.3 s, p95
+  57.1 s; 347 s wall; n = 47, one run, one unit, one model (`docs/delivery/real-model-results.md`). The two
+  `page_out_of_range` cases may be a checker that is too strict (Innocent's decision). Not measured: AI assist and the judge on
+  a real model; the S3 draft golden after the fix (0 of 9 before it); quality as a teacher would judge it. The spike figures in
+  section 6 (SP-1: 3 of 3 drafts valid) are a separate, smaller sample.
+- **Experiments and the north star (NL-134) are unscored; `pending: NL-134`.** An error-analysis round on the real run was done (NL-120,
+  `docs/delivery/error-analysis-real-run.md`), but no `FT-N` taxonomy was signed and no `XP-N` experiment was scored on the
+  frozen set, so none is claimed. No review session has been measured. When it is, the
   north star is **one reviewer (Innocent), n = k sessions**, with k stated beside it, and is not a population estimate
   or a measure of Newsela's own staff (PRD §6.6: "No baseline (AQ-14); our reviewers").
-- **Capacity** is measured with the model provider stubbed, on synthetic content, on a shared VPS (section 8). The stored
+- **Capacity** is measured with the model provider stubbed, on synthetic content, on a shared VPS (section 8); the real-model
+  latency above comes from the full run, not from a load test. The stored
   p95 target (< 3 s) was **missed** (6,008 ms, n = 22,533); what that means: the demo stack does not meet its own
   store-latency target at 200 editors, and the scale path has no step for it yet.
 
@@ -214,7 +223,7 @@ data** or **cut**, and the cut or unbuilt ones carry PRD §6.4's "what we say in
 | #5 | JSON export (R-42) | **Built** (NL-51, NL-75, NL-102); "Export (no live integration)" | the export file is not a live publish to Newsela |
 | #6 | Unit quality page (R-50), seeded errors (R-52) | Page **built** (NL-74); the planting and report **tool built** (NL-92), but no errors were planted or reviewed (NL-124, NL-135) | "G-3 (seeded-error catch rate) not measured in this build" |
 | #7 | Prompt-guidance editing (R-39) | Screen **built** (NL-76); prompts are versioned and pinned per run | not exercised against a real run |
-| #8 | AI assist (R-31) | **Built** (NL-50, NL-72, NL-116); only the stub provider has been used | not run on the real model |
+| #8 | AI assist (R-31) | **Built** (NL-50, NL-72, NL-116); only the stub provider has been used; assist not measured on the real model | not run on the real model |
 
 "Built" means merged with its tests. It is not "used in the demo on the real model": the connected-app walk (NL-126)
 ran on the stub stack and marks real-model journeys NOT WALKED.

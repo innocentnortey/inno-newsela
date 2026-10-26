@@ -10,6 +10,9 @@ programs of four units with about 40 lessons each, and the bottleneck is staff r
 Lesson Studio takes an uploaded unit-outline sheet, bulk-generates standards-aligned ~50-minute lessons with an LLM,
 stores them, and gives reviewers a collaborative editor with AI assists and an approval workflow.
 All test, eval and demo data is synthetic.
+Real-model status (one run, n = 47): after two prompt rounds, 30 of 47 lessons of the issued unit are ready and 17 are blocked with
+recorded reasons; the 90% first-pass target is not met (40% clean first pass). See
+[`docs/delivery/real-model-results.md`](docs/delivery/real-model-results.md).
 
 ## Prerequisites
 
@@ -100,8 +103,9 @@ All run from the repository root. The WF-n numbers are the workflows in `docs/de
 | `npm run dev` | the Compose stack described above |
 
 `scripts/script-targets.json` lists each script's target file and owning ticket; a target whose file is missing exits 2
-with `NOT BUILT`. At the time of writing every listed target file exists, but the real-model scripts (`eval:full-run`,
-`eval:judge-calibrate`, the experiment scoring) have not been run on a real key: that needs Innocent's yes to spend.
+with `NOT BUILT`. At the time of writing every listed target file exists, and `eval:full-run` has been run on a real key (30 of 47 lessons ready on the issued unit after two prompt rounds; the 90%
+first-pass target is not met; see `docs/delivery/real-model-results.md`). `eval:judge-calibrate` and the experiment scoring
+have not been run on a real key.
 
 ## Deploy
 

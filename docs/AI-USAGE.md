@@ -40,7 +40,7 @@ rows in [`prd/newsela-prd.md`](prd/newsela-prd.md). The ones that shape the buil
 Two things this means in practice. First, many decisions after 2026-10-25 were **adopted by the AI under his standing
 authorization (PD-32)**, and the record labels them that way; they are not individual sign-offs. Second, automated
 checks never count as his walkthrough or user test. Work that needs his eyes or his money is still open at the time of
-writing: the look-sheet comparisons, the real-model full run (NL-112, needs his yes to spend), the ~30 judge labels
+writing: the look-sheet comparisons, the final sign-off on the real-model full run numbers (NL-112 ran with his spend yes), the ~30 judge labels
 (NL-122), his measured review sessions (NL-123), seeded errors (NL-124), the demo recording and submission.
 
 ## (c) What the product itself uses AI for, and where it does not
@@ -54,7 +54,7 @@ writing: the look-sheet comparisons, the real-model full run (NL-112, needs his 
 - **Not used:** intake (the sheet is normalized by plain code, no model call), the check suite (code), submit/freeze,
   and approval (a second human account approves the exact version it was shown). A model never approves a lesson.
 - **State of the stack so far:** every run in the repository's reports used the **stub provider** (no model call).
-  The reports state `provider_mode: stub` and `cost_usd: 0`. The real-model full unit run has not happened.
+  The load, integrity and fault reports state `provider_mode: stub` and `cost_usd: 0`. The real-model full unit run has since happened (final run: 30 of 47 lessons ready, $3.597, one run; `docs/delivery/real-model-results.md`).
 
 ## (d) Where the AI was wrong, and how it was caught
 
@@ -80,8 +80,8 @@ Examples from the dev logs, with the catch in each:
 6. **The PRD's issued-sheet counts were recalled, not computed.** A real-stack run (NL-94) computed 6 errors and 16 ELD
    findings over 9 distinct codes against the PRD's 5 and 7; recorded as PD-36, with tests asserting the computed numbers.
 
-**Not yet available:** the error-analysis round (NL-120), whose `FT-N` failure types would show how the real model's drafts
-fail. It needs the real-model full run first, so no `FT-N` exists and none is claimed here
+**Partly available:** the real-model full run exists, and its error analysis (`delivery/error-analysis-real-run.md`) counts
+why drafts failed. No `FT-N` failure-type taxonomy has been signed, so none is claimed here
 ([`testing/error-analysis/README.md`](testing/error-analysis/README.md) is its protocol only).
 
 ## (e) Spend
@@ -89,8 +89,8 @@ fail. It needs the real-model full run first, so no `FT-N` exists and none is cl
 - **Product model spend (the $75 ceiling, PD-29, metric M-29).** What a report shows: SP-1 recorded usage rows of
   $0.964 across 13 calls, with the record noting a $3.55 ledger figure and roughly $1.7 real spend (understated, see (d)5).
   Every later evaluation and load report is stub-mode with `cost_usd` 0, and the NL-127 load run made no real call
-  (`grep -c api.anthropic.com` = 0). The real-model full run, the draft golden and any experiment have not run, so there is
-  **no spend to report for them**; this document does not estimate it.
+  (`grep -c api.anthropic.com` = 0). The real-model full run cost $3.597 in its final attempt ($4.19 in the one before; about $9.8 of $20 authorised across this
+  session, per `docs/delivery/real-model-results.md`). The S3 draft golden cost $0.79 and no experiment has been scored, so there is nothing to report for those beyond that.
 - **Claude Code usage on the VPS.** PD-35 set dollar budgets for the build sessions (Phase A at most $150 per run and $300
   in total; Phase B at most $200 per run and $600 in total). The launcher config later records that Innocent removed the
   dollar caps on 2026-10-25 ("I'm on a subscription"); run counts and the served-model check remained, and usage is

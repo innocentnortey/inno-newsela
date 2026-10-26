@@ -178,8 +178,8 @@ reviews are recorded. An agreed card changes only through the change procedure (
 
 ## 9 · Experiment ★  (§9)
 - [ ] Kickoff page generated from code (flow, prompts with versions, approach, failure types)
-- [ ] Error-analysis round: ~20 traces, first failure each, `FT-N` taxonomy, models × failures table — Innocent ✓ ____
-- [ ] Every `XP-N` targets one `FT-N`, one change, scored on the frozen set
+- [ ] Error-analysis round: ~20 traces, first failure each, `FT-N` taxonomy, models × failures table — Innocent ✓ ____ *(evidence so far, not ticked: `docs/delivery/error-analysis-real-run.md` replays 47 real traces and counts causes; no `FT-N` taxonomy, no models × failures table, no Innocent check. Results: `docs/delivery/real-model-results.md`)*
+- [ ] Every `XP-N` targets one `FT-N`, one change, scored on the frozen set *(not done: two prompt rounds were made from the error analysis, 8/47 to 30/47 ready, but not scored as `XP-N` on a frozen set)*
 - **Gate:** ☐ no tuning change without a named failure type
 
 ## 10 · Ship & defend  (§10)

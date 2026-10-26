@@ -48,7 +48,7 @@ First-pass schema-valid 3/9, repairs 8/9: same `cfu: null` cause. `standard_not_
 is never told the part structure, so that is a prompt gap shared with this run but not fixed here (needs the golden's part names
 in the template, which is a design change). Missing Spark/Flex callouts and null minutes (`section_minutes` FC-3) are shared.
 
-## Fixes made (this change)
+## Fixes made in prompt round 1 (this change)
 
 1. `packages/core/src/compile/templates.ts` (+test): Spark and Flex "Learning in Action" now require the three callouts, matching the check rules.
 2. `packages/prompts/locked/lesson-shape.md`: cfu object required; every focus code is the exact `standard_code` of some check
@@ -64,3 +64,13 @@ Not changed: max repair rounds (1), checker rules, narrowed-leaf recording.
 Before: 0/8 ready. After: 3/8 ready (L1, L10, L29, all with 0 repairs, first pass valid). Failed: FLEX-1a, L9, L12, L36
 (`proper_noun_unsourced`) and L21 (`page_out_of_range`). No `standard_not_checked`, `section_missing` or `minutes_out_of_range` remained on the sample.
 Spend about $1.22. Next layer is now visible: names outside the card and page/chapter references.
+
+## Round 2 and the final full run (2026-10-26)
+
+Prompt round 2 (`64fe0e9`) told the model that a name from its own knowledge blocks the lesson even when correct, and that
+pages and chapters are cited only inside the range the card gives. The final full run
+(`evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, devlog `docs/devlog/2026-10-26-nl112-full-run-3.md`) then gave
+30 of 47 ready and 17 blocked: first failing check `proper_noun_unsourced` 15, `page_out_of_range` 2. `standard_not_checked`,
+`section_missing`, `minutes_out_of_range` and `quote_unmatched` did not appear. Clean first pass 19 of 47 (40%); the 90% target is
+not met. These counts are the first failing check per job; the per-lesson replay was not repeated for this run. Checker rules
+and the repair limit (1) are unchanged; the next options are in `docs/delivery/real-model-results.md`.
