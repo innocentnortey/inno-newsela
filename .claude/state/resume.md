@@ -23,3 +23,6 @@ Applied: area-map rewrite (one clause per ticket), routes under `.claude/referen
 
 ## State after the routing-audit maintenance (2026-10-25)
 Main pushed at 06f969d: NL-65, 66, 67, 69, 70 merged and their issues (#69–#74) closed. In flight: NL-71 implementer (port 3129). Next: review/merge NL-71; plan NL-87, 88, 89; S-22 mount (now NL-113's); file the pin CHG for request_changes/reopen (NL-69 review) and CON-16 Candidate.note CHG (NL-67); then W5+. checkpoint_b.py not yet re-run.
+
+## NL-127 (2026-10-26)
+Load report at `evals/reports/load-2026-10-26.md`: all HTTP targets met; stored p95 6.0 s missed (M-24); stub unit_plan failure and check.failed findings open. Next: file those findings, re-run after NL-112 on a quiet machine.
