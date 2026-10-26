@@ -11,6 +11,8 @@ export function section_slug(name: string): string {
 
 export function normalise_part_label(label: string): string {
   const t = label.trim();
+  const letter = /^(?:part\s+)?([A-Za-z])$/i.exec(t);
+  if (letter) return `Part ${(letter[1] ?? "").toUpperCase()}`;
   const m = /^part\s+(.*)$/i.exec(t);
   return m ? `Part ${m[1] ?? ""}` : `Part ${t}`;
 }

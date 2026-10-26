@@ -28,7 +28,13 @@ describe("registry", () => {
   });
 
   it("24 non-structural rules return [] on a rich context", () => {
-    const ctx = make_ctx(reading_lesson(), ["word"]);
+    const base = make_ctx(reading_lesson(), ["word"]);
+    // The lesson's Pulse Check is tagged RL.6.1, so that code must be one the row lists and the catalogue knows.
+    const ctx = {
+      ...base,
+      allowed_codes: ["RL.6.1"],
+      standards: [{ code: "RL.6.1", set: "CA_CCSS_ELA_6" as const, text: "synthetic", parent_code: null, is_leaf: true, eld_strand: null }],
+    };
     const stubs = CHECK_RULES.filter((r) => !STRUCTURAL.includes(r.kind));
     expect(stubs).toHaveLength(24);
     for (const r of stubs) expect(r.run(ctx, DEFAULT_POLICY)).toEqual([]);

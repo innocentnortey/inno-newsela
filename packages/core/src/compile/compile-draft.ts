@@ -7,6 +7,8 @@ import type { PMNode, Section, StoredLesson } from "@ls/schema/lesson";
 import type { NormalizedRow } from "@ls/schema/outline";
 import { assign_addresses, safety_note_id, section_slug, tip_address } from "./addresses.ts";
 import * as N from "./nodes.ts";
+import { plan_parts } from "./part-labels.ts";
+import type { PartPlan, PartRemap } from "./part-labels.ts";
 import { check_role } from "./roles.ts";
 import type { SectionTemplate } from "./templates.ts";
 
@@ -23,6 +25,8 @@ export interface CompiledLesson {
   teacher_word_count: number;
   placeholders: number;
   safety_tips: string[];
+  /** Descriptive or odd part labels the compiler mapped to Part A/B; diagnostics only. */
+  part_remaps: PartRemap[];
 }
 
 export type CompileErrorReason = "section_not_in_template" | "role_not_allowed" | "unknown_node";
@@ -46,17 +50,28 @@ function build_nodes(
   blocks: readonly DraftBlock[],
   next_slot: () => string,
   tips: { id: (i: number) => string | null },
+  plan: PartPlan,
 ): PMJson[] {
   const out: PMJson[] = [];
+  const part_of = (b: DraftBlock): string | null => (b.part === null ? null : plan.label_of(b.part));
+  const titled = new Set<string>();
   let prev_part: string | null = null;
   let tip_i = 0;
   for (let i = 0; i < blocks.length; ) {
     const b = blocks[i]!;
-    if (b.part !== null && b.part !== prev_part) out.push(N.part_heading(b.part));
-    prev_part = b.part;
+    const part = part_of(b);
+    if (part !== null && part !== prev_part) {
+      out.push(N.part_heading(part));
+      const title = plan.title_of(part);
+      if (title !== null && !titled.has(part)) {
+        titled.add(part);
+        out.push(...N.routine_title(title));
+      }
+    }
+    prev_part = part;
     if (CALLOUTS.has(b.role)) {
       const run: DraftBlock[] = [];
-      while (i < blocks.length && CALLOUTS.has(blocks[i]!.role) && blocks[i]!.part === b.part) {
+      while (i < blocks.length && CALLOUTS.has(blocks[i]!.role) && part_of(blocks[i]!) === part) {
         run.push(blocks[i]!);
         i += 1;
       }
@@ -131,6 +146,7 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
   };
   const draft_sections: { name: string; minutes: number; doc: PMJson[] }[] = [];
   let tip_section: string | null = null;
+  const part_remaps: PartRemap[] = [];
   for (const slot of ctx.template.sections) {
     const blocks = draft.blocks.filter((b) => b.section === slot.name);
     const is_target = slot.name === target;
@@ -138,7 +154,9 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
       id: (i: number): string | null =>
         is_target && i < notes.length ? safety_note_id(lesson_id, i + 1) : null,
     };
-    const nodes = build_nodes(blocks, next_slot, tips);
+    const plan = plan_parts(slot.name, blocks.map((b) => b.part));
+    part_remaps.push(...plan.remaps);
+    const nodes = build_nodes(blocks, next_slot, tips, plan);
     if (is_target) {
       const paired = blocks.filter((b) => b.role === "teacher_tip").length;
       notes.forEach((note, i) => {
@@ -198,5 +216,5 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
     teacher_word_count += count_words(s.content as PMNode);
     placeholders += count_placeholders(s.content as PMNode);
   }
-  return { lesson, content_hash: hash_lesson(lesson), teacher_word_count, placeholders, safety_tips };
+  return { lesson, content_hash: hash_lesson(lesson), teacher_word_count, placeholders, safety_tips, part_remaps };
 }

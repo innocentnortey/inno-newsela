@@ -18,4 +18,16 @@ describe("derive_alignment", () => {
     const msgs = run_checks(ctx, RULE_GROUPS.alignment, DEFAULT_POLICY).findings.map((f) => f.message).join();
     expect(msgs).not.toMatch(/aligned/i);
   });
+
+  it("links_are_unconfirmed_and_never_judge", () => {
+    const ctx = wp1_ctx();
+    const rows = derive_alignment(ctx);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) {
+      expect(r.asserted_by).not.toBe("judge");
+      expect(r.confirmed_by).toBeNull();
+    }
+    const msgs = run_checks(ctx, RULE_GROUPS.alignment, DEFAULT_POLICY).findings.map((f) => f.message);
+    for (const m of msgs) expect(m).not.toMatch(/aligned|verified/i);
+  });
 });

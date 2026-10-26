@@ -13,7 +13,7 @@ const lesson: StoredLesson = {
 describe("addresses", () => {
   it("slugs", () => {
     expect(section_slug("Learning in Action")).toBe("LearningInAction");
-    expect(normalise_part_label("part a")).toBe("Part a");
+    expect(normalise_part_label("part a")).toBe("Part A");
     expect(normalise_part_label("A")).toBe("Part A");
   });
   it("part, tip and note ids", () => {

@@ -1,14 +1,15 @@
 import type { AlignmentLinkRow, CheckContext } from "../../types.ts";
-import { cfu_tags, covered, focus_codes, recorded, teaching_parts } from "./standards-view.ts";
+import { MAX_CODES_PER_CHECK } from "../../../compile/standard-tags.ts";
+import { doc_tags, focus_obligations, recorded, teaching_addresses } from "./standards-view.ts";
 
+/** Links come only from tags on headings. They are the generator's or outline's claim; none is confirmed here. */
 export function derive_alignment(ctx: CheckContext): AlignmentLinkRow[] {
   const rec = recorded(ctx);
-  const rec_codes = new Set(rec.map((s) => s.code));
   const codes = [
-    ...new Set([...focus_codes(ctx), ...rec.filter((s) => s.role === "supporting").map((s) => s.code)]),
+    ...new Set([...focus_obligations(ctx).map((o) => o.code), ...rec.filter((s) => s.role === "supporting").map((s) => s.code)]),
   ];
-  const parts = teaching_parts(ctx.lesson);
-  const tags = cfu_tags(ctx);
+  const tags = doc_tags(ctx.lesson);
+  const where = teaching_addresses(ctx.lesson);
   const rows: AlignmentLinkRow[] = [];
   const seen = new Set<string>();
   const push = (row: AlignmentLinkRow): void => {
@@ -25,9 +26,18 @@ export function derive_alignment(ctx: CheckContext): AlignmentLinkRow[] {
     const confirmed_by =
       ctx.confirmations.find((c) => c.code === code && c.confirmed_by !== null)?.confirmed_by ?? null;
     const base = { lesson_id: ctx.lesson_id, content_hash: ctx.content_hash, code, origin, asserted_by, confirmed_by };
-    parts.forEach((address, i) => push({ ...base, address, role: i === 0 ? "I" : "P" }));
+    let first = true;
     for (const t of tags) {
-      if (covered(code, [t], rec_codes)) push({ ...base, address: t.address, role: "A" });
+      if (t.code !== code || t.kind !== "teach" || !where.has(t.address)) continue;
+      const key = `${code}|${t.address}`;
+      if (seen.has(`${key}|I`) || seen.has(`${key}|P`)) continue;
+      push({ ...base, address: t.address, role: first ? "I" : "P" });
+      first = false;
+    }
+    for (const t of tags) {
+      if (t.code === code && t.kind === "assess" && t.codes_in_tag <= MAX_CODES_PER_CHECK) {
+        push({ ...base, address: t.address, role: "A" });
+      }
     }
   }
   return rows;

@@ -22,7 +22,7 @@ describe("standard_confirmation", () => {
   });
 
   it("an added code (row list empty) needs one confirmation", () => {
-    const base = wp1_ctx({ lesson: lesson_with([rec("RL.6.7", { origin: "added" })], "RL.6.7"), allowed_codes: [] });
+    const base = wp1_ctx({ lesson: lesson_with([rec("RL.6.7", { origin: "added" })], "RL.6.7", "RL.6.7"), allowed_codes: [] });
     const ctx = { ...base, row: { ...base.row, focus_codes: [] } };
     expect(counts(ctx)).toEqual({ blocking: 0, confirmation: 1 });
   });

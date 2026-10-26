@@ -32,6 +32,7 @@ describe("alignment finding shape", () => {
       "standard_add_suggestion",
       "standard_confirmation",
       "standard_not_checked",
+      "standard_not_taught",
     ]);
   });
 });

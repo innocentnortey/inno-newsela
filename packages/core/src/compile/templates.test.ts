@@ -30,4 +30,19 @@ describe("templates", () => {
     for (const t of SECTION_TEMPLATES.templates)
       for (const s of t.sections) for (const r of s.required_roles) expect(DRAFT_ROLES).toContain(r);
   });
+  it("parts_only_on_five_section_types", () => {
+    for (const n of ["Reading", "Writing", "Academic Discussion", "Research", "Presentation"]) {
+      const t = template_for(n)!;
+      for (const sec of t.sections)
+        expect(sec.parts, `${n} ${sec.name}`).toEqual(sec.name === "Learning in Action" ? ["Part A", "Part B"] : undefined);
+    }
+    for (const n of ["Spark", "Flex Day", "Assessment"])
+      for (const sec of template_for(n)!.sections) expect(sec.parts, `${n} ${sec.name}`).toBeUndefined();
+  });
+  it("flex_day_asks_for_wp3_components", () => {
+    const t = template_for("Flex Day")!;
+    expect(t.sections.find((s) => s.name === "Launch")?.required_roles).toContain("sample_response");
+    const lia = t.sections.find((s) => s.name === "Learning in Action")!.required_roles;
+    for (const r of ["routine_heading", "teacher_tip", "cfu_item"] as const) expect(lia).toContain(r);
+  });
 });

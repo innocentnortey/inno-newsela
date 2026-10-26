@@ -1,5 +1,6 @@
 import type { PMNode, StoredLesson } from "@ls/schema/lesson";
 import type { CheckContext } from "../../types.ts";
+import { MAX_CODES_PER_CHECK, parse_tag } from "../../../compile/standard-tags.ts";
 import { find_cfu_items, node_text, visit_with_parts, walk } from "../structural/doc-walk.ts";
 
 type Standard = StoredLesson["front_matter"]["standards"][number];
@@ -52,15 +53,11 @@ export function covered(f: string, tags: CfuTag[], recorded_codes: Set<string>):
   );
 }
 
-/**
- * Addresses of teaching parts. Compiled lessons carry no per-code teach tag, so
- * "taught" means the lesson has at least one teaching part; this is the one seam
- * to replace if a per-code tag lands.
- */
-export function teaching_parts(lesson: StoredLesson): string[] {
+/** Addresses (part or section) with at least one teaching paragraph, in the named sections. */
+function teaching_text_addresses(lesson: StoredLesson, names: readonly string[]): string[] {
   const found: string[] = [];
   for (const section of lesson.sections) {
-    if (section.name !== "Literacy Lab" && section.name !== "Learning in Action") continue;
+    if (!names.includes(section.name)) continue;
     const excluded = new Set<PMNode>();
     for (const item of find_cfu_items(section)) {
       excluded.add(item.heading);
@@ -83,4 +80,85 @@ export function teaching_parts(lesson: StoredLesson): string[] {
     });
   }
   return found;
+}
+
+/** Addresses of teaching parts (Literacy Lab and Learning in Action); S3's observer imports this. */
+export function teaching_parts(lesson: StoredLesson): string[] {
+  return teaching_text_addresses(lesson, ["Literacy Lab", "Learning in Action"]);
+}
+
+/** Addresses with teaching text in Launch, Literacy Lab or Learning in Action. */
+export function teaching_addresses(lesson: StoredLesson): Set<string> {
+  return new Set(teaching_text_addresses(lesson, ["Launch", "Literacy Lab", "Learning in Action"]));
+}
+
+export type DocTag = {
+  kind: "teach" | "assess";
+  source: "pulse_check" | "quick_write" | "routine";
+  code: string;
+  address: string;
+  codes_in_tag: number;
+};
+
+/** Per-code evidence written on headings by the compiler (compile/standard-tags.ts). */
+export function doc_tags(lesson: StoredLesson): DocTag[] {
+  const out: DocTag[] = [];
+  for (const section of lesson.sections) {
+    if (section.name === "Homework") continue;
+    visit_with_parts(section, ({ node, address }) => {
+      if (node.type !== "routine_heading") return;
+      const t = node_text(node).trim();
+      const loose = parse_tag(t, false);
+      let kind: DocTag["kind"];
+      let source: DocTag["source"];
+      let parsed = loose;
+      if (node.attrs?.icon === "cfu" && loose?.label === "Pulse Check") {
+        kind = "assess";
+        source = "pulse_check";
+      } else if (loose?.label === "Quick Write") {
+        kind = "assess";
+        source = "quick_write";
+      } else {
+        parsed = parse_tag(t, true);
+        kind = "teach";
+        source = "routine";
+      }
+      if (parsed === null) return;
+      for (const code of parsed.codes) {
+        out.push({ kind, source, code, address, codes_in_tag: parsed.codes.length });
+      }
+    });
+  }
+  return out;
+}
+
+export function tagged_codes(lesson: StoredLesson): string[] {
+  return [...new Set(doc_tags(lesson).map((t) => t.code))];
+}
+
+export type Obligation = { code: string; parent: string | null };
+
+/** Each listed focus code, replaced by its recorded focus leaves when the lesson narrowed it, plus added focus codes. */
+export function focus_obligations(ctx: CheckContext): Obligation[] {
+  const rec = recorded(ctx).filter((s) => s.role === "focus");
+  const out: Obligation[] = [];
+  for (const f of ctx.row.focus_codes) {
+    const leaves = rec.filter((s) => s.code.startsWith(`${f}.`));
+    if (leaves.length > 0) for (const l of leaves) out.push({ code: l.code, parent: f });
+    else out.push({ code: f, parent: null });
+  }
+  for (const s of rec) {
+    const under = ctx.row.focus_codes.some((f) => s.code === f || s.code.startsWith(`${f}.`));
+    if (!under) out.push({ code: s.code, parent: null });
+  }
+  return out.filter((o, i) => out.findIndex((x) => x.code === o.code) === i);
+}
+
+/** Codes an assessment tag covers; an item naming more than MAX_CODES_PER_CHECK codes covers none. */
+export function assessment_codes(ctx: CheckContext, sources: readonly DocTag["source"][]): Set<string> {
+  return new Set(
+    doc_tags(ctx.lesson)
+      .filter((t) => t.kind === "assess" && sources.includes(t.source) && t.codes_in_tag <= MAX_CODES_PER_CHECK)
+      .map((t) => t.code),
+  );
 }

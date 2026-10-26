@@ -5,6 +5,7 @@ import {
   TEACHER_LABELS, rationale_label, routine_icon,
 } from "./labels.ts";
 import { normalise_part_label } from "./addresses.ts";
+import { format_tag } from "./standard-tags.ts";
 
 type MarkName = "strong" | "em" | "teacher_talk" | "sample_response";
 
@@ -24,7 +25,7 @@ export function paras(s: string, marks: readonly MarkName[] = []): PMJson[] {
 }
 
 export function routine_heading(block: DraftBlock): PMJson[] {
-  return [{ type: "routine_heading", attrs: { icon: routine_icon(block.text) }, content: [text(block.text.trim())] }];
+  return [{ type: "routine_heading", attrs: { icon: routine_icon(block.text) }, content: [text(format_tag(block.text, block.standard_codes))] }];
 }
 
 export function teacher_talk(block: DraftBlock): PMJson[] {
@@ -116,7 +117,7 @@ export function cfu_item(block: DraftBlock): PMJson[] {
 
 export function quick_write(block: DraftBlock): PMJson[] {
   return [
-    { type: "routine_heading", attrs: { icon: "writing" }, content: [text(QUICK_WRITE)] },
+    { type: "routine_heading", attrs: { icon: "writing" }, content: [text(format_tag(QUICK_WRITE, block.standard_codes))] },
     ...paras(block.text),
   ];
 }
@@ -138,4 +139,8 @@ export function teacher_tip(text_value: string, safety_note_id: string | null): 
 
 export function part_heading(label: string): PMJson {
   return { type: "heading", attrs: { level: 2 }, content: [text(normalise_part_label(label))] };
+}
+
+export function routine_title(title: string): PMJson[] {
+  return [{ type: "routine_heading", attrs: { icon: routine_icon(title) }, content: [text(title.trim())] }];
 }

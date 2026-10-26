@@ -234,3 +234,49 @@ describe("hash_and_determinism", () => {
     }
   });
 });
+
+describe("part labels and code tags", () => {
+  const relabel = (d: LessonDraft, map: Record<string, string>): LessonDraft => ({
+    ...d,
+    blocks: d.blocks.map((b) => (b.part !== null && map[b.part] !== undefined ? { ...b, part: map[b.part]! } : b)),
+  });
+  const block = (over: Partial<LessonDraft["blocks"][number]>): LessonDraft["blocks"][number] => ({
+    role: "paragraph", section: "Learning in Action", part: "Part A", text: "x", standard_codes: [], code_origins: [],
+    cfu: null, minutes: null, ...over,
+  });
+
+  it("part_remaps_reported", () => {
+    const d = relabel(draft("wp1"), { "Part A": "Gather evidence", "Part B": "Plan and write" });
+    const c = compile_draft(d, ctx(row("wp1"), "Reading"));
+    const lia = sec(c, "Learning in Action");
+    const heads = find(lia.content as PMNode, "heading").map((h) => texts(h).join(""));
+    expect(heads).toEqual(["Part A", "Part B"]);
+    const content = (lia.content as PMNode).content ?? [];
+    const i = content.findIndex((n) => n.type === "heading");
+    expect(texts(content[i + 1]!).join("")).toBe("Gather evidence");
+    expect(part_address(lia.address, "Part B")).toBe("G6.U4.L4.LearningInAction.PartB");
+    expect(c.part_remaps).toHaveLength(2);
+  });
+
+  it("canonical_labels_unchanged", () => {
+    expect(wp1().part_remaps).toEqual([]);
+  });
+
+  it("codes_survive_as_tags", () => {
+    const d = draft("wp1");
+    const extra = [
+      block({ role: "routine_heading", text: "Percy's Voice", standard_codes: ["RL.6.1"], code_origins: ["outline"] }),
+      block({ role: "routine_heading", text: "Already (RL.6.1)", standard_codes: ["RL.6.1"], code_origins: ["outline"] }),
+      block({ role: "routine_heading", text: "Plain title" }),
+      block({ role: "quick_write", section: "Look Back", part: null, text: "Write.", standard_codes: ["RL.6.1"], code_origins: ["outline"] }),
+    ];
+    const c = compile_draft({ ...d, blocks: [...d.blocks, ...extra] }, ctx(row("wp1"), "Reading"));
+    const heads = c.lesson.sections.flatMap((s) => find(s.content as PMNode, "routine_heading").map((h) => texts(h).join("")));
+    expect(heads).toContain("Percy's Voice (RL.6.1)");
+    expect(heads).toContain("Already (RL.6.1)");
+    expect(heads).not.toContain("Already (RL.6.1) (RL.6.1)");
+    expect(heads).toContain("Plain title");
+    expect(heads).toContain("Quick Write (RL.6.1)");
+    expect(heads.some((h) => /^Pulse Check \(.+\)$/.test(h))).toBe(true);
+  });
+});

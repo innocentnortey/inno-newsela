@@ -9,7 +9,7 @@ describe("standard_not_taught / standard_not_checked", () => {
     const ctx = wp1_ctx({ lesson: lesson_with([rec("L.6.4.b")], null) });
     const f = standard_not_checked_rule.run(ctx, DEFAULT_POLICY);
     expect(f).toHaveLength(1);
-    expect(f[0]?.code).toBe("L.6.4");
+    expect(f[0]?.code).toBe("L.6.4.b");
     expect(f[0]?.address).toContain("LiteracyLab");
     expect(standard_not_taught_rule.run(ctx, DEFAULT_POLICY)).toEqual([]);
   });
@@ -34,12 +34,13 @@ describe("standard_not_taught / standard_not_checked", () => {
     };
     const f = standard_not_taught_rule.run(wp1_ctx({ lesson }), DEFAULT_POLICY);
     expect(f).toHaveLength(1);
-    expect(f[0]?.code).toBe("L.6.4");
+    expect(f[0]?.code).toBe("L.6.4.b");
   });
 
-  it("a parent is covered by a recorded leaf tag only", () => {
+  it("with no leaf recorded the listed parent is the obligation and a leaf tag does not cover it", () => {
     const unrecorded = wp1_ctx({ lesson: lesson_with([], "L.6.4.b"), standards: std_rows() });
-    expect(standard_not_checked_rule.run(unrecorded, DEFAULT_POLICY)).toHaveLength(1);
+    const f = standard_not_checked_rule.run(unrecorded, DEFAULT_POLICY);
+    expect(f.map((x) => x.code)).toEqual(["L.6.4"]);
     expect(standard_not_checked_rule.run(wp1_ctx(), DEFAULT_POLICY)).toEqual([]);
   });
 });
