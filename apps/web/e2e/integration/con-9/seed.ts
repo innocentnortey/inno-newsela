@@ -155,7 +155,7 @@ export async function linkLessons(unit_id: string, from: number, to: number, slo
     [`${unit_id}.ov1`, `${unit_id}.L${from}`, `${unit_id}.L${to}`, slot_id],
   );
   if (opts.filled) {
-    const derived = { sections: [{ content: { type: "doc", content: [{ type: "excerpt_slot", attrs: { slot_id, source_ref: "synthetic-source" } }] } }] };
+    const derived = { sections: [{ content: { type: "doc", content: [{ type: "excerpt_slot", attrs: { slot_id, source_ref: "synthetic-source", rights: "free" } }] } }] };
     await db().query(
       `insert into lesson_doc (lesson_id, seq, store_id, ydoc_bytes, derived_json, content_hash, state_vector, schema_version)
        values ($1,1,'e2e','\\x00',$2::jsonb,$3,'\\x00',1) on conflict do nothing`,

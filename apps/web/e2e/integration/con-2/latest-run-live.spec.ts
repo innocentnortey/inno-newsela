@@ -36,7 +36,8 @@ test("latest-run: SCR-2 shows Running then Complete with the real worker's count
   const link = page.getByRole("link", { name: "View run progress" });
   await expect(link).toHaveAttribute("href", new RegExp(`${progressUrl(run).replace(/[.]/g, "\\.")}$`));
   await page.waitForLoadState("networkidle");
-  expect(urls.filter((u) => u === "/api/units")).toHaveLength(1);
+  // The page reads the list once; since GEN-5 the nav frame reads it once more to point "Unit board" at the latest unit. No polling beyond that.
+  expect(urls.filter((u) => u === "/api/units").length).toBeLessThanOrEqual(2);
   expect(urls.filter((u) => /\/api\/runs\/.*\/progress/.test(u))).toHaveLength(1);
 
   worker.release(L4, 1);

@@ -48,7 +48,10 @@ test.beforeAll(async ({ browser }) => {
     a.page.waitForResponse((r) => r.url().includes("/decision")),
     panel(a.page).getByRole("button", { name: /reject/i }).click(),
   ]);
-  const l = await (await apiAs(a.context, a.page, "GET", `/lessons/${lesson.lessonId}`)).text();
+  // Since NL-126 G3 (F-6) the lesson read carries reviewer and last_editor as display names; that is the approval screen's data, not
+  // review minutes next to a name. Those two fields are removed before the scan; any other place a name appears still fails.
+  const lessonBody = (await (await apiAs(a.context, a.page, "GET", `/lessons/${lesson.lessonId}`)).json()) as Record<string, unknown>;
+  const l = JSON.stringify({ ...lessonBody, reviewer: null, last_editor: null });
   const sg = await (await apiAs(a.context, a.page, "GET", `/lessons/${lesson.lessonId}/suggestions`)).text();
   get_bodies = l + sg;
 });

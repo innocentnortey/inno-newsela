@@ -24,7 +24,8 @@ test("latest-run: before any run the version row reads No run yet; five reads ch
     page.getByText("No run yet. Confirm the report, then generate."),
   ).toBeVisible();
   await expect(page.getByText(/\b(Running|Complete)\b/)).toHaveCount(0);
-  expect(urls.filter((u) => u === "/api/units")).toHaveLength(1);
+  // The page reads the list once; since GEN-5 the nav frame reads it once more to point "Unit board" at the latest unit. No polling beyond that.
+  expect(urls.filter((u) => u === "/api/units").length).toBeLessThanOrEqual(2);
   expect(urls.filter((u) => u.includes("/progress"))).toHaveLength(0);
 
   const audits = await db().count("audit_event", "actor_id=$1", [user.user_id]);
