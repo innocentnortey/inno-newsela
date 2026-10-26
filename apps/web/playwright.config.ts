@@ -41,9 +41,13 @@ export default defineConfig({
   projects: [
     { name: "chromium", testMatch: "gallery/**/*.spec.ts", use: { browserName: "chromium" } },
 <<<<<<< HEAD
+<<<<<<< HEAD
     { name: "mock", testMatch: "{frame,sign-in,units-home,upload-outline,validation-report,start-run,progress,board,workspace-read,workspace-actions,workspace-editor,approval,unit-plan,history,resolve,insert-quote,candidate,send-back,run-summary,assist,export,coverage}/**/*.spec.ts", use: { browserName: "chromium" } },
 =======
     { name: "mock", testMatch: "{frame,sign-in,units-home,upload-outline,validation-report,start-run,progress,board,workspace-read,workspace-actions,workspace-editor,approval,unit-plan,history,resolve,insert-quote,candidate,send-back,run-summary,assist,export,quality}/**/*.spec.ts", use: { browserName: "chromium" } },
 >>>>>>> ticket/NL-74
+=======
+    { name: "mock", testMatch: "{frame,sign-in,units-home,upload-outline,validation-report,start-run,progress,board,workspace-read,workspace-actions,workspace-editor,approval,unit-plan,history,resolve,insert-quote,candidate,send-back,run-summary,assist,export,prompt-guidance}/**/*.spec.ts", use: { browserName: "chromium" } },
+>>>>>>> ticket/NL-76
   ],
 });
