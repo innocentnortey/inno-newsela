@@ -279,12 +279,8 @@ test("failed_and_v1: a failed candidate leaves the live lesson alone; a generati
   console.log("v1 stored for", L5, v1Candidate);
 });
 
-// SEAM DEFECT proven by this join (devlog, request R-2): when the candidate becomes the lesson's v1 its lesson_version.kind is
-// 'generated', but PgCandidateLookup.version_of_run only finds kind='candidate', so getCandidate keeps answering `drafting` for a
-// job that finished and SCR-9's 2 s poll never settles. test.fail() turns this into a flag: when the lookup is fixed this test
-// passes unexpectedly and Playwright reports it, which is the cue to drop the marker.
-test("failed_and_v1: the API reports the candidate that became v1 as ready (KNOWN DEFECT, expected to fail)", async ({ browser }) => {
-  test.fail(true, "version_of_run ignores kind='generated' (packages/db/src/repos/candidate-lookup.ts)");
+// S-37 regression: when the candidate becomes the lesson's v1 its lesson_version.kind is 'generated'; the lookup must still find it.
+test("failed_and_v1: the API reports the candidate that became v1 as ready", async ({ browser }) => {
   expect(v1Candidate, "the previous failed_and_v1 test must have run").not.toBe("");
   const r1 = await session(browser, "reviewer");
   const g = await getCandidate(r1, v1Candidate, L5);

@@ -34,7 +34,10 @@ const JOB_COLUMNS = `id, run_id, kind, lesson_id, status, tile_state, attempt, q
 
 const CLAIM_SQL = `
 WITH active AS (
-  SELECT id, created_at FROM run WHERE state IN ('planning','running') ORDER BY created_at, id LIMIT $1
+  SELECT id, created_at FROM run
+   WHERE state IN ('planning','running')
+     AND EXISTS (SELECT 1 FROM lesson_job q WHERE q.run_id = run.id AND q.status IN ('queued','running'))
+   ORDER BY created_at, id LIMIT $1
 ), load AS (
   SELECT run_id, count(*) AS n FROM lesson_job WHERE status='running' AND run_id IN (SELECT id FROM active) GROUP BY run_id
 ), pick AS (

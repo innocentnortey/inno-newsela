@@ -50,7 +50,9 @@ export function derive_run_state(jobs: readonly JobStatusView[], run: RunStateIn
   if (run.cancelled) return "cancelled";
   if (run.capped) return "capped";
   if (run.paused) return "paused";
-  if (!run.plan_stored) return "planning";
+  // S-36: a candidate (regenerate) run has no unit_plan job and never stores a plan; its jobs alone decide the state.
+  const plan_less = jobs.length > 0 && jobs.every((j) => j.kind === "candidate");
+  if (!run.plan_stored && !plan_less) return "planning";
   const work = jobs.filter((j) => j.kind !== "unit_plan");
   if (work.length === 0) return "running";
   if (work.some((j) => j.status === "queued" || j.status === "running")) return "running";

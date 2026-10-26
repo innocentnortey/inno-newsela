@@ -36,13 +36,13 @@ export class PgCandidateLookup {
     return (r[0]?.["run_id"] as RunId | undefined) ?? null;
   }
 
-  // Candidate version written by that run.
+  // Version written by that run: a candidate, or the lesson's v1 (kind='generated') when the candidate became v1.
   async version_of_run(
     lesson_id: LessonId,
     run_id: RunId,
   ): Promise<VersionId | null> {
     const r = await this.rows(
-      "SELECT id FROM lesson_version WHERE lesson_id = $1 AND run_id = $2 AND kind = 'candidate' ORDER BY number DESC LIMIT 1",
+      "SELECT id FROM lesson_version WHERE lesson_id = $1 AND run_id = $2 AND kind IN ('candidate','generated') ORDER BY number DESC LIMIT 1",
       [lesson_id, run_id],
     );
     return (r[0]?.["id"] as VersionId | undefined) ?? null;
