@@ -3,6 +3,7 @@ import { InvariantViolation, ProviderError } from "@ls/core/errors";
 import type { ProviderErrorKind } from "@ls/core/errors";
 import type { ModelClient, ModelResponse, StructuredCallRequest } from "@ls/core/ports/model-client";
 import type { SecretStr } from "@ls/config/secret";
+import { sanitize_schema_for_anthropic } from "./schema-sanitize.ts";
 
 export interface AnthropicMessagesAdapterInit {
   api_key: SecretStr;
@@ -14,7 +15,24 @@ export interface AnthropicMessagesAdapterInit {
 
 const STOP_REASONS = ["end_turn", "max_tokens", "stop_sequence", "refusal", "tool_use"] as const;
 
-function error_of(kind: ProviderErrorKind, status: number | null, retry_after_s: number | null, id: string | null) {
+const DETAIL_MAX = 300;
+// Provider 400/422 text is kept only when it names one of our request parameters ("output_config.format.schema: ...").
+// Those describe our schema or settings. Anything else could echo user content, so it is dropped.
+const REQUEST_PARAM_MESSAGE = /^(output_config|messages|system|model|max_tokens|temperature|thinking|tools|metadata)[\w.[\]-]*:/;
+const KEY_LIKE = /(sk-[A-Za-z0-9_-]{8,}|[A-Za-z0-9_-]{32,}|Bearer\s+\S+)/g;
+
+/** Safe diagnostic text from a provider 400/422 body, or null. Max 300 chars, key-like strings removed. */
+export function safe_provider_detail(e: unknown): string | null {
+  const body = (e as { error?: unknown } | null)?.error as { error?: { message?: unknown } } | undefined;
+  const msg = body?.error?.message;
+  if (typeof msg !== "string") return null;
+  const flat = msg.replace(/\s+/g, " ").trim();
+  if (!REQUEST_PARAM_MESSAGE.test(flat)) return null;
+  const cleaned = flat.replace(KEY_LIKE, "[removed]");
+  return cleaned.length > DETAIL_MAX ? cleaned.slice(0, DETAIL_MAX - 3) + "..." : cleaned;
+}
+
+function error_of(kind: ProviderErrorKind, status: number | null, retry_after_s: number | null, id: string | null, safe_detail: string | null = null) {
   // Fixed message only: SDK messages can echo the response body or request.
   return new ProviderError({
     kind,
@@ -22,6 +40,7 @@ function error_of(kind: ProviderErrorKind, status: number | null, retry_after_s:
     http_status: status,
     retry_after_s,
     provider_request_id: id,
+    safe_detail,
   });
 }
 
@@ -42,7 +61,7 @@ export function map_error(e: unknown): ProviderError {
     if (status === 529) return error_of("overloaded", status, null, id);
     if (status === 401 || status === 403) return error_of("auth", status, null, id);
     if (status >= 500) return error_of("server_error", status, null, id);
-    return error_of("bad_request", status, null, id);
+    return error_of("bad_request", status, null, id, status === 400 || status === 422 ? safe_provider_detail(e) : null);
   }
   return error_of("connection", null, null, null);
 }
@@ -82,7 +101,7 @@ export class AnthropicMessagesAdapter implements ModelClient {
         ? {
             ...(req.effort !== null ? { effort: req.effort } : {}),
             ...(enforced
-              ? { format: { type: "json_schema" as const, schema: req.output_json_schema as Record<string, unknown> } }
+              ? { format: { type: "json_schema" as const, schema: sanitize_schema_for_anthropic(req.output_json_schema) } }
               : {}),
           }
         : undefined;

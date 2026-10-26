@@ -29,12 +29,15 @@ export class ProviderError extends Error {
   readonly http_status: number | null;
   readonly retry_after_s: number | null;
   readonly provider_request_id: string | null;
+  /** Truncated, key-stripped provider text that describes our request (HTTP 400/422 only); logged, never stored in the database. */
+  readonly safe_detail: string | null;
   constructor(init: {
     kind: ProviderErrorKind;
     message?: string;
     http_status?: number | null;
     retry_after_s?: number | null;
     provider_request_id?: string | null;
+    safe_detail?: string | null;
   }) {
     super(init.message ?? `provider error: ${init.kind}`);
     this.name = "ProviderError";
@@ -43,6 +46,7 @@ export class ProviderError extends Error {
     this.http_status = init.http_status ?? null;
     this.retry_after_s = init.retry_after_s ?? null;
     this.provider_request_id = init.provider_request_id ?? null;
+    this.safe_detail = init.safe_detail ?? null;
   }
 }
 

@@ -115,9 +115,9 @@ export class ModelCallRecorder {
           await this.clock.sleep(delay_ms);
           continue;
         }
-        // The message is the kind name only: no provider text is stored.
+        // The stored message is the kind name only: no provider text is stored. A safe_detail (400/422 schema complaints) goes to the log line only.
         await this.safe_fail(id, { kind: e.kind, http_status: e.http_status, message: e.kind, retry_after_s: e.retry_after_s });
-        this.emit_failed(ctx, req, id, retries, e.kind, e.http_status);
+        this.emit_failed(ctx, req, id, retries, e.kind, e.http_status, e.safe_detail ?? undefined);
         throw e;
       }
 

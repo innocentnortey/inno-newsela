@@ -26,7 +26,7 @@ function lazy_deps(opts: EvalOptions): S9Deps {
   const cap_usd = resolve_cap({ provider_mode: opts.provider_mode, cap_arg: null, env }); // refuses before any request
   const d = build_default_deps(env, opts.provider_mode);
   const cfg: DriverConfig = {
-    base_url: env["DRIVER_BASE_URL"] ?? "http://127.0.0.1:3000/api", email: env["DRIVER_EMAIL"] ?? "", password: env["DRIVER_PASSWORD"] ?? "",
+    base_url: env["DRIVER_BASE_URL"] ?? "http://127.0.0.1:3000/api", ...(env["DRIVER_ORIGIN"] ? { origin: env["DRIVER_ORIGIN"] } : {}), email: env["DRIVER_EMAIL"] ?? "", password: env["DRIVER_PASSWORD"] ?? "",
     unit: opts.unit ?? "G6.U4", outline_path: env["DRIVER_OUTLINE_PATH"] ?? "", provider_mode: opts.provider_mode, cap_usd,
     prompt_version_id: null, poll_ms: 2000, max_wall_ms: 7_200_000, fetch: globalThis.fetch,
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)), log: (l) => process.stderr.write(`${l}\n`),
@@ -43,7 +43,11 @@ export function make_s9(provider_mode: ProviderMode, deps?: S9Deps): EvalSuite {
         const result = await d.driver_factory(opts).run();
         return await build_full_run_report_detailed(result.run_id as RunId, d.ctx, result.summary, d.expected_n ?? 47);
       } catch (e) {
-        if (e instanceof DriverError) throw new InvariantViolation("full run refused or failed", { code: e.code });
+        if (e instanceof DriverError) {
+          // A run that started but did not finish still gets its report, built from the stored rows.
+          if (e.run_id !== null) return await build_full_run_report_detailed(e.run_id as RunId, d.ctx, null, d.expected_n ?? 47);
+          throw new InvariantViolation("full run refused or failed", { code: e.code });
+        }
         throw e;
       } finally {
         await d.close?.();

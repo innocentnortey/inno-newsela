@@ -71,4 +71,19 @@ describe("full-run report", () => {
     expect(d.thresholds.map((t) => t.id)).toContain("n_is_47");
     expect(d.eval_run_id).toMatch(/^ev_mem_/);
   });
+
+  it("GEN-8: with zero lessons run the first-pass line is not a pass and the report says so", async () => {
+    const world = make_stub_world({ n: 47, seed: 86 });
+    for (const l of world.lessons) (l as { tile_state: string }).tile_state = "queued";
+    const { c } = ctx(world);
+    const d = await build_full_run_report_detailed(world.run_id as never, c);
+    expect(d.facts.lessons_run).toBe(0);
+    expect(d.facts.first_pass_schema_valid).toBe(0);
+    const t = d.thresholds.find((x) => x.id === "first_pass_schema_valid_rate_ge_0.90")!;
+    expect(t.passed).toBe(false);
+    expect(t.detail).toContain("0 of 47 lessons ran");
+    const text = fs.readFileSync(path.join(root, d.report.report_path), "utf8");
+    expect(text).not.toContain("47/47");
+    expect(text).toContain("lessons run (ready or failed) | 0 of 47");
+  });
 });

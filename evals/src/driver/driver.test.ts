@@ -18,15 +18,17 @@ const counts = { teaching_days: 0 };
 
 function fake(opts: { states?: string[] } = {}) {
   const calls: string[] = [];
+  const seen: Array<{ key: string; origin: string | null; body: unknown }> = [];
   const states = [...(opts.states ?? ["running", "complete"])];
   const f: typeof fetch = async (input, init) => {
     const p = new URL(String(input)).pathname;
     const key = `${init?.method ?? "GET"} ${p}`;
     calls.push(key);
+    seen.push({ key, origin: new Headers(init?.headers).get("origin"), body: typeof init?.body === "string" ? JSON.parse(init.body) : null });
     if (key === "POST /api/session") return json({ user: {}, expires_at: "t" }, 200, { "set-cookie": `ls_session=${COOKIE}; Path=/; HttpOnly` });
     if (key === "POST /api/outline-versions") return json({ outline_version_id: "ov_1", unit_id: "G6.U4", version_number: 1, row_counts: {} }, 201);
     if (key.endsWith("/report")) {
-      return json({ outline_version_id: "ov_1", counts, generate_allowed: false, rows: [{ row_number: 1, level: "error", findings: [
+      return json({ outline_version_id: "ov_1", counts, generate_allowed: false, unit: { as_written: "G6.U4", filenames_say: "G6.U3", confirmed: false, confirmed_by: null, finding: { finding_id: "fu", level: "error", kind: "unit_conflict" } }, rows: [{ row_number: 1, level: "error", findings: [
         { finding_id: "f1", level: "error", kind: "malformed_code", proposed_fix: "RL.6.1", choice: null },
         { finding_id: "f2", level: "error", kind: "malformed_code", proposed_fix: "RL.6.2", choice: { source: "confirmed" } },
         { finding_id: "f3", level: "warning", kind: "bad_filename", proposed_fix: null, choice: null },
@@ -44,7 +46,7 @@ function fake(opts: { states?: string[] } = {}) {
     }
     return json({ error: { code: "NOT_FOUND" } }, 404);
   };
-  return { f, calls };
+  return { f, calls, seen };
 }
 
 function cfg(over: Partial<DriverConfig> = {}): DriverConfig {
@@ -93,7 +95,7 @@ describe("driver", () => {
     const spy = fake();
     const code = await main(["--unit", "G6-U4", "--outline", OUTLINE], { DRIVER_EMAIL: "a@b.test", DRIVER_PASSWORD: PASSWORD }, { fetch: spy.f, sleep: async () => {}, log: () => {} });
     expect(code).toBe(0);
-    expect(spy.calls.filter((c) => c.endsWith("/choices"))).toHaveLength(1); // f1 only: f2 is confirmed, f3 is a warning
+    expect(spy.calls.filter((c) => c.endsWith("/choices"))).toHaveLength(2); // f1 only: f2 is confirmed, f3 is a warning
   });
 
   it("refuses without credentials before any request", async () => {
@@ -104,10 +106,47 @@ describe("driver", () => {
 
   it("poll_every_two_seconds", async () => {
     const sleeps: number[] = [];
-    const spy = fake({ states: ["running", "running", "paused", "complete"] });
+    const spy = fake({ states: ["running", "running", "complete"] });
     const r = await new FullRunDriver(cfg({ fetch: spy.f, sleep: async (ms) => { sleeps.push(ms); } })).run();
-    expect(sleeps).toEqual([2000, 2000, 2000]);
-    expect(r.polls).toBe(4);
+    expect(sleeps).toEqual([2000, 2000]);
+    expect(r.polls).toBe(3);
+  });
+
+  it("GEN-8: sends an Origin header on every call (the web app's CSRF check), from base_url or the override", async () => {
+    const spy = fake();
+    await new FullRunDriver(cfg({ fetch: spy.f, base_url: "http://127.0.0.1:3000/api" })).run();
+    expect(spy.seen.length).toBeGreaterThan(5);
+    for (const c of spy.seen) expect(c.origin, c.key).toBe("http://127.0.0.1:3000");
+    const o = fake();
+    await new FullRunDriver(cfg({ fetch: o.f, origin: "https://app.example.test" })).run();
+    for (const c of o.seen) expect(c.origin).toBe("https://app.example.test");
+  });
+
+  it("GEN-8: confirms the unit-conflict finding (confirm_unit, no value) before starting the run", async () => {
+    const spy = fake();
+    await new FullRunDriver(cfg({ fetch: spy.f })).run();
+    const choices = spy.seen.filter((c) => c.key.endsWith("/choices")).map((c) => c.body);
+    expect(choices[0]).toEqual({ target_id: "fu", kind: "confirm_unit" });
+    expect(choices).toHaveLength(2); // the unit conflict, then the one unconfirmed row error
+    expect(spy.calls.indexOf("POST /api/runs")).toBeGreaterThan(spy.calls.lastIndexOf("POST /api/outline-versions/ov_1/choices"));
+  });
+
+  it("GEN-8: a paused run stops the polling at once and returns state paused with the run id", async () => {
+    const lines: string[] = [];
+    const spy = fake({ states: ["running", "paused", "running", "complete"] });
+    const r = await new FullRunDriver(cfg({ fetch: spy.f, log: (l) => lines.push(l) })).run();
+    expect(r.final_state).toBe("paused");
+    expect(r.polls).toBe(2);
+    expect(r.run_id).toBe("run_1");
+    expect(lines.some((l) => l.includes("paused"))).toBe(true);
+  });
+
+  it("GEN-8: a failure after the run started carries the run id for the report", async () => {
+    const spy = fake({ states: Array<string>(50).fill("running") });
+    const err = (await new FullRunDriver(cfg({ fetch: spy.f, max_wall_ms: 10_000 })).run().catch((e: unknown) => e)) as DriverError;
+    expect(err.run_id).toBe("run_1");
+    const early = (await new FullRunDriver(cfg({ fetch: async () => json({ user: {} }) })).run().catch((e: unknown) => e)) as DriverError;
+    expect(early.run_id).toBeNull();
   });
 
   it("times out on the injected clock, not the wall clock", async () => {
@@ -134,7 +173,7 @@ describe("driver", () => {
     for (const l of lines) {
       expect(l).not.toContain(PASSWORD);
       expect(l).not.toContain(COOKIE);
-      expect(l).toMatch(/^\w+ \d{3} \d+ms$|^run paused$/);
+      expect(l).toMatch(/^\w+ \d{3} \d+ms$|^run run_1 paused: stopped polling$/);
     }
   });
 });
