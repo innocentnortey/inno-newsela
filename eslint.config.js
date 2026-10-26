@@ -120,6 +120,27 @@ export default [
     },
   },
   {
+    // NL-121: the held-out comparison reads published content; it may import no model client and no HTTP client.
+    files: ["evals/src/heldout/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: ["node:http", "node:https", "http", "https", "undici", "node-fetch", "axios", "@anthropic-ai/sdk", "openai"],
+          patterns: [
+            { group: ["@ls/llm", "@ls/llm/**", "**/llm/src/**"], message: "NL-121: the held-out comparison imports no model client." },
+            {
+              group: ["@ls/llm/recorder", "@ls/llm/anthropic", "**/llm/src/recorder", "**/llm/src/recorder.ts", "**/llm/src/anthropic", "**/llm/src/anthropic.ts"],
+              message: "NL-33: paid model calls go through PaidCaller; only packages/llm and wiring files may import the recorder or provider client.",
+            },
+          ],
+        },
+      ],
+      "no-restricted-globals": ["error", "fetch"],
+    },
+  },
+  {
     files: ["packages/db/src/testing/**", "packages/**/*.test.ts", "packages/**/*.int.test.ts", "packages/**/test-support/**", "apps/**/*.test.ts", "apps/**/testing/**", "apps/**/harness.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },

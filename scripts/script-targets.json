@@ -8,7 +8,7 @@
   "eval:faults":          { "target": "ops/faults/run-faults.ts", "owner": "NL-107", "run": ["npx", "tsx", "ops/faults/run-faults.ts"] },
   "eval:full-run":        { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "full-run"] },
   "eval:seed":            { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "seed"] },
-  "eval:heldout":         { "target": "evals/src/cli.ts", "owner": "NL-49", "run": ["npx", "tsx", "evals/src/cli.ts", "heldout"] },
+  "eval:heldout":         { "target": "evals/src/heldout/cli.ts", "owner": "NL-121", "run": ["npx", "tsx", "evals/src/heldout/cli.ts"] },
   "eval:judge-calibrate": { "target": "evals/src/judge-calibrate/main.ts", "owner": "NL-111", "run": ["npx", "tsx", "evals/src/judge-calibrate/main.ts"] },
   "load:spike":           { "target": "load/spike.ts",    "owner": "NL-49", "run": ["npx", "tsx", "load/spike.ts"] },
   "ops:backup":           { "target": "ops/backup.sh",    "owner": "NL-83", "run": ["bash", "ops/backup.sh"] },

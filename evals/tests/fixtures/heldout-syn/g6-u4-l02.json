@@ -1,0 +1,61 @@
+{
+ "type": "Core",
+ "standard_lists": [
+  {
+   "id": 0,
+   "title": "California CCSS: Focus Standards",
+   "standards": [
+    {
+     "id": 1,
+     "code": "RL.6.1",
+     "description": "Invented description CANARY-HELDOUT-7f3a"
+    }
+   ]
+  },
+  {
+   "id": 0,
+   "title": "California CCSS: Supporting Standards",
+   "standards": [
+    {
+     "id": 1,
+     "code": "SL.6.1",
+     "description": "Invented description SL.6.1."
+    }
+   ]
+  },
+  {
+   "id": 0,
+   "title": "California ELD Standards",
+   "standards": [
+    {
+     "id": 1,
+     "code": "ELD.PI.6.1",
+     "description": "Invented description ELD.PI.6.1."
+    }
+   ]
+  }
+ ],
+ "sections": {
+  "teacher": [
+   {
+    "title": "Launch",
+    "sequence": 1,
+    "estimated_time_in_minutes": 10,
+    "body": "Invented teacher text."
+   },
+   {
+    "title": "Research: Invented subtitle",
+    "sequence": 2,
+    "estimated_time_in_minutes": 10,
+    "body": "Invented text."
+   },
+   {
+    "title": "Homework",
+    "sequence": 3,
+    "estimated_time_in_minutes": 10,
+    "body": "Invented text."
+   }
+  ],
+  "student": []
+ }
+}
