@@ -27,8 +27,8 @@ Prism mock**. The real backend is an integration ticket's job ([integration rout
 | SCR-16 history | NL-70 | `getLessonHistory` |
 | SCR-17 run summary | NL-71 | `getRunSummary` |
 | SCR-18 coverage | NL-73 | `getCoverageMatrix` |
-| SCR-19 unit quality | NL-74 | `getUnitMetrics` |
-| SCR-19 quality | NL-74 | `getUnitMetrics` |
+| SCR-19 unit quality | NL-74; NL-104 real stack | `getUnitMetrics` |
+| SCR-19 quality | NL-74; NL-104 real stack | `getUnitMetrics` |
 | SCR-20 export | NL-75 | `listExports`, `createExport`, `downloadExport` |
 | SCR-21 prompt guidance | NL-76 | `listPromptVersions`, `saveGuidance` (trial: `startRun`) |
 

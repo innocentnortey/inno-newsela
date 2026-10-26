@@ -10,6 +10,7 @@ import type { LessonGraphRepo } from "@ls/core/ports/lesson-graph";
 import type { MetricsRepo } from "@ls/core/ports/metrics";
 import { LessonState, SendBackTag, type BoardRow, type DependencyFlag, type UnitBoard } from "@ls/schema/api/board";
 import type { UnitMetrics } from "@ls/schema/api/metrics";
+import type { UnitQualityProvider } from "../read-models/unit-quality.ts";
 import { unit_key } from "./outline-service.ts";
 
 export interface SendBackRecord { lesson_id: LessonId; tag: string | null; note: string; by: string; at: Date }
@@ -76,6 +77,7 @@ export class BoardService {
     private readonly extras: BoardExtrasRead,
     private readonly graph: GraphLookup,
     private readonly clock: Clock,
+    private readonly quality: UnitQualityProvider | null = null, // NL-104: null while cut #6 fires
   ) {}
 
   async board(user: RequestUser, unit_id: UnitId, state: LessonState | null): Promise<UnitBoard> {
@@ -173,7 +175,7 @@ export class BoardService {
         caption: CAPTION,
         segment_label,
       },
-      quality: null,
+      quality: this.quality === null ? null : await this.quality.read(unit_id),
     };
   }
 }
