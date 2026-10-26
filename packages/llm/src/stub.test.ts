@@ -4,7 +4,7 @@ import { FakeClock } from "@ls/core/ports/clock";
 import type { StructuredCallRequest } from "@ls/core/ports/model-client";
 import type { JudgeRequest } from "@ls/core/ports/judge-client";
 import { LessonDraft } from "@ls/schema/lesson-draft";
-import { StubJudgeClient, StubModelClient, wp1_lesson_draft_text, wp2_lesson_draft_text, wp1_repaired_draft_text } from "./stub.ts";
+import { StubJudgeClient, StubModelClient, UnscriptedStubCall, wp1_lesson_draft_text, wp2_lesson_draft_text, wp1_repaired_draft_text } from "./stub.ts";
 
 function req(over: Partial<StructuredCallRequest> = {}): StructuredCallRequest {
   return {
@@ -98,5 +98,12 @@ describe("wp2_lesson_draft_text", () => {
 
   it("wp1_repaired_draft_text parses as the L4 lesson draft", () => {
     expect((JSON.parse(wp1_repaired_draft_text()) as { lesson_id: string }).lesson_id).toBe("G6.U4.L4");
+  });
+
+  it("an unscripted call throws UnscriptedStubCall with a safe reason", async () => {
+    const stub = new StubModelClient();
+    const err = await stub.complete(req()).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(UnscriptedStubCall);
+    expect((err as UnscriptedStubCall).safe_reason).toMatch(/^unscripted stub call: GENERATION\//);
   });
 });

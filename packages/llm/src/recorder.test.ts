@@ -5,6 +5,7 @@ import { FakeClock } from "@ls/core/ports/clock";
 import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
 import { ModelCallRecorder } from "./recorder.ts";
+import { UnscriptedStubCall } from "./stub.ts";
 import { cost_math, ctx, KEY_MARKER, prices, rendered, request, settings } from "./test-support/fixtures.ts";
 import { MemoryModelCallLog } from "./test-support/memory-log.ts";
 import { response, ScriptedClient } from "./test-support/scripted-client.ts";
@@ -185,5 +186,28 @@ describe("ModelCallRecorder", () => {
     }
     const failure = model_call_lines.find((o) => (o["extra"] as Record<string, unknown>)["status"] === "failed")!;
     expect(failure).toBeDefined();
+  });
+
+  it("unexpected_client_error_reason [negative]: a plain Error stores its class name only; an UnscriptedStubCall stores its safe reason", async () => {
+    const lines: string[] = [];
+    const logger = create_logger({ service: "worker", build_id: "t", write: (l) => lines.push(l) });
+    const stored: string[] = [];
+    const a = setup({ logger });
+    const fail_a = a.log.fail.bind(a.log);
+    a.log.fail = async (id, e) => { stored.push(e.message); await fail_a(id, e); };
+    a.client.script(new Error("secret sk-ant-abc") as never);
+    await expect(a.recorder.call(ctx(), request(), rendered())).rejects.toThrow("secret");
+    expect(stored).toEqual(["unexpected client error: Error"]);
+    expect(stored.join()).not.toContain("sk-ant");
+    expect(lines.join("\n")).not.toContain("sk-ant");
+
+    const b = setup({ logger });
+    const fail_b = b.log.fail.bind(b.log);
+    b.log.fail = async (id, e) => { stored.push(e.message); await fail_b(id, e); };
+    b.client.script(new UnscriptedStubCall("GENERATION", "unit_plan") as never);
+    await expect(b.recorder.call(ctx(), request(), rendered())).rejects.toBeInstanceOf(UnscriptedStubCall);
+    expect(stored[1]).toBe("unexpected client error: unscripted stub call: GENERATION/unit_plan");
+    const failed = lines.map((l) => JSON.parse(l) as { extra?: Record<string, unknown> }).filter((o) => o.extra?.["status"] === "failed");
+    expect(failed.map((o) => o.extra?.["reason"])).toEqual(["Error", "unscripted stub call: GENERATION/unit_plan"]);
   });
 });

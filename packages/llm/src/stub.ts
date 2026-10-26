@@ -22,6 +22,16 @@ const PURPOSE_OF: Readonly<Record<string, CallPurpose>> = {
   JudgeVerdict: "judge",
 };
 
+/** Thrown when no script matches; `safe_reason` is built from fixed enums only, so it may be logged and stored. */
+export class UnscriptedStubCall extends Error {
+  readonly safe_reason: string;
+  constructor(alias: ModelAlias, purpose: CallPurpose | "*") {
+    super("unscripted stub call: " + alias);
+    this.name = "UnscriptedStubCall";
+    this.safe_reason = `unscripted stub call: ${alias}/${purpose}`;
+  }
+}
+
 const quarter = (n: number): number => Math.ceil(n / 4);
 
 export class StubModelClient implements ModelClient {
@@ -49,7 +59,7 @@ export class StubModelClient implements ModelClient {
       const item = s.shift();
       if (item !== undefined) return item;
     }
-    throw new Error("unscripted stub call: " + req.alias);
+    throw new UnscriptedStubCall(req.alias, purpose);
   }
 
   async complete(req: StructuredCallRequest): Promise<ModelResponse> {

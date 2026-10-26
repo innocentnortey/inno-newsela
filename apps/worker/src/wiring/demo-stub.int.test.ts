@@ -29,4 +29,33 @@ describe("demo stub", () => {
     expect(new Decimal(spent[0]!.s).gt(0)).toBe(true);
     expect(new Decimal(spent[0]!.s).lte(5)).toBe(true);
   }, 90_000);
+
+  it("a stub-mode run over the issued sheet leaves planning: the unit_plan job completes and no job is stuck running", async () => {
+    const w = await make_world();
+    worlds.push(w);
+    script_demo_stub(w.stub);
+    const wiring = wire_generation(w.deps); // default stub-mode path: no per-test prices
+    const run_id = await w.start_run([8, 9, 25], 5);
+    expect(await w.drive_until(async () => (await w.query<{ state: string }>("select state from run where id=$1", [run_id]))[0]!.state !== "planning", 60_000, wiring.claim_loop)).toBe(true);
+    const state = await w.query<{ state: string }>("select state from run where id=$1", [run_id]);
+    expect(state[0]!.state).not.toBe("planning");
+    const running = await w.query("select 1 from lesson_job where run_id=$1 and status='running'", [run_id]);
+    expect(running).toHaveLength(0);
+    expect(w.stub.calls.length).toBeGreaterThan(0);
+  }, 90_000);
+
+  it("an unscripted stub call fails the unit_plan job with a reason that names the cause", async () => {
+    const w = await make_world();
+    worlds.push(w);
+    const wiring = wire_generation(w.deps); // no script_demo_stub: the F-2 shape
+    const run_id = await w.start_run([8, 9, 25], 5);
+    const logged = (event: string) => w.lines.map((l) => JSON.parse(l) as { event: string; extra?: Record<string, unknown> }).filter((o) => o.event === event);
+    expect(await w.drive_until(async () => logged("claim_loop.job_failed").length > 0, 30_000, wiring.claim_loop)).toBe(true);
+    const failed_calls = await w.query<{ status: string; stop_reason: string }>("select status, stop_reason from model_call where run_id=$1 and status='failed'", [run_id]);
+    expect(failed_calls.length).toBeGreaterThan(0);
+    // The database stores the kind only (no message text); the reason is in the two log lines.
+    const reason = "unscripted stub call: GENERATION/unit_plan";
+    expect(logged("model_call").some((o) => o.extra?.["status"] === "failed" && o.extra["reason"] === reason)).toBe(true);
+    expect(logged("claim_loop.job_failed")[0]!.extra?.["reason"]).toBe(reason);
+  }, 60_000);
 });

@@ -33,6 +33,7 @@ export function lesson_id_of(document_name: string): LessonId {
 }
 
 export class LessonPersistence {
+  readonly #first_change = new Map<LessonId, number>();
   readonly #last = new Map<LessonId, { sv: StateVector; hash: string }>();
 
   constructor(
@@ -75,10 +76,14 @@ export class LessonPersistence {
     const lesson_id = lesson_id_of(document_name);
     const sv = state_vector_of(ydoc_bytes);
     const started = performance.now();
+    const first_change = this.#first_change.get(lesson_id);
+    this.#first_change.delete(lesson_id);
+    const store_wait_ms = first_change === undefined ? null : Math.max(0, Math.round(started - first_change));
     const derived = ydoc_to_lesson(ydoc_bytes, SCHEMA_VERSION);
     const hash = content_hash(derived);
     const last = this.#last.get(lesson_id);
     if (last !== undefined && last.sv === sv && last.hash === hash) return null;
+    const db_started = performance.now();
     const ack = await this.store_port.store({
       lesson_id,
       ydoc_bytes,
@@ -89,18 +94,25 @@ export class LessonPersistence {
       request_id,
       tag: null,
     });
+    const db_write_ms = Math.round(performance.now() - db_started);
     this.#last.set(lesson_id, { sv, hash });
     this.acks.stored(lesson_id, ack);
     this.logger.info("collab.stored", {
       lesson_id,
       store_id: ack.store_id,
       duration_ms: Math.round(performance.now() - started),
-      extra: { seq: ack.seq },
+      extra: { seq: ack.seq, store_wait_ms, db_write_ms },
     });
     return ack;
   }
 
+  /** Marks the first unsaved change of a lesson (kept until the next store) so the debounce wait can be logged. */
+  note_change(lesson_id: LessonId, at_ms: number = performance.now()): void {
+    if (!this.#first_change.has(lesson_id)) this.#first_change.set(lesson_id, at_ms);
+  }
+
   forget(lesson_id: LessonId): void {
     this.#last.delete(lesson_id);
+    this.#first_change.delete(lesson_id);
   }
 }

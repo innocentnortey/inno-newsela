@@ -154,4 +154,18 @@ describe("ClaimLoop", () => {
     expect(w.lines.some((l) => l.level === "error" && l.event === "claim_loop.fatal")).toBe(true);
     expect(w.queue.log.filter((x) => x === "claim").length).toBeLessThan(40);
   });
+
+  it("job_failed_logs_safe_reason: a plain Error logs its class name, never its message", async () => {
+    const w = world(1);
+    w.runner.throw_on_start = new Error("secret sk-ant-abc");
+    const exit = w.loop.run_until(w.stop);
+    await flush();
+    w.stop.set();
+    w.clock.advance(1000);
+    await flush();
+    await exit;
+    const line = w.lines.find((l) => l.event === "claim_loop.job_failed");
+    expect(line?.fields.extra).toMatchObject({ name: "Error", reason: "Error" });
+    expect(JSON.stringify(w.lines)).not.toContain("sk-ant");
+  });
 });

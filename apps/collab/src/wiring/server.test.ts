@@ -6,7 +6,7 @@ import { load_collab_settings } from "@ls/config/settings";
 import { build_collab_runtime } from "../main.ts";
 import type { PgDatabase } from "@ls/db/pool";
 import { wire_collab_server } from "./server.ts";
-import { FakeDocStore, FakeReader, FakeSessions, FakeStates, capture_logger, clock, settings } from "../nl-80.fixtures.ts";
+import { DOC_NAME, FakeDocStore, FakeDocument, FakeReader, FakeSessions, FakeStates, capture_logger, clock, edited, settings, stored_doc, user } from "../nl-80.fixtures.ts";
 
 // NL-83 made /healthz ping the database; this test has no database, so it injects a pinging fake (same as main.test.ts).
 const FAKE_DB = { ping: async () => true, with_tx: async () => { throw new Error("unused"); } } as unknown as PgDatabase;
@@ -34,6 +34,26 @@ describe("wire_server_builds_all_parts [invariant, AC-12]", () => {
     expect(hocus.configuration.extensions[0]).toBe(w.extension);
     expect(hocus.configuration.debounce).toBe(2000);
     expect(hocus.configuration.maxDebounce).toBe(4000);
+  });
+
+  it("the extension exposes onChange, and onChange then onStoreDocument logs collab.stored with a store_wait_ms [GEN-4]", async () => {
+    const hocus = { configuration: { extensions: [] as unknown[], debounce: 0, maxDebounce: 0 }, documents: new Map() };
+    const cap = capture_logger();
+    const w = wire_collab_server(
+      { settings: settings(), logger: cap.logger, db: {} as never, ids: {} as never, clock: clock() },
+      { hocuspocus: hocus },
+      { sessions: new FakeSessions(), states: new FakeStates(), doc_store: new FakeDocStore(), doc_reader: new FakeReader(stored_doc()) },
+    );
+    const hooks = w.extension as unknown as Record<string, (p: unknown) => Promise<unknown>>;
+    expect(typeof hooks["onChange"]).toBe("function");
+    const doc = new FakeDocument([]);
+    await hooks["onLoadDocument"]!({ document: doc, documentName: DOC_NAME });
+    doc.getMap("front_matter").set("title", edited(3).title);
+    await hooks["onChange"]!({ document: doc, documentName: DOC_NAME });
+    await hooks["onStoreDocument"]!({ document: doc, documentName: DOC_NAME, lastContext: { ctx: { user: user("reviewer", "u-rev-9") } } });
+    const stored = cap.lines.map((l) => JSON.parse(l) as { event: string; extra: Record<string, unknown> }).filter((o) => o.event === "collab.stored");
+    expect(stored).toHaveLength(1);
+    expect(typeof stored[0]!.extra["store_wait_ms"]).toBe("number");
   });
 
   it("[boundary] with no server to mount on (hocuspocus null) it still builds and mounts nothing", () => {
