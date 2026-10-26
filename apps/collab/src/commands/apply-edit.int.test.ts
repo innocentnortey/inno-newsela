@@ -232,6 +232,7 @@ describe("slot_fill_and_adopt_scopes [invariant, AC-5]", () => {
       const q = lab.find((x: any) => x.type === "quote");
       expect(q).toBeDefined();
       expect(q.attrs).toMatchObject({ slot_id: SLOT, rights: "public-domain" });
+      expect(["excerpt_slot", "quote_placeholder"]).toContain(q.attrs.origin);
       expect(JSON.parse(q.attrs.source_ref)).toEqual(source_ref);
       expect(text_of(q)).toBe("The hare boasted.");
       expect(lab.some((x: any) => x.type === "quote_placeholder")).toBe(false);

@@ -491,7 +491,8 @@
       "attrs": {
         "slot_id": "x-2",
         "source_ref": "{\"title\":\"Synthetic Book\",\"chapter\":\"1\"}",
-        "rights": "public-domain"
+        "rights": "public-domain",
+        "origin": null
       },
       "content": [
         {

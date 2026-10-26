@@ -279,7 +279,7 @@ describe("PgLessonRepo", () => {
     await put(2, "public-domain");
     expect((await repo.dependencies(l4))[0]!.slot_filled).toBe(true);
     // after a real fill the node is a `quote` that keeps the slot id
-    const filled = { sections: [{ content: { type: "doc", content: [{ type: "quote", attrs: { slot_id: "hare-lion", rights: "public-domain", source_ref: '{"title":"Synthetic Reader"}' } }] } }] };
+    const filled = { sections: [{ content: { type: "doc", content: [{ type: "quote", attrs: { slot_id: "hare-lion", origin: "excerpt_slot", rights: "public-domain", source_ref: '{"title":"Synthetic Reader"}' } }] } }] };
     await t.db.with_tx(async (tx) => {
       await insert_row(tx, "lesson_doc", { lesson_id: l5, seq: 3, derived_json: JSON.stringify(filled) });
     });

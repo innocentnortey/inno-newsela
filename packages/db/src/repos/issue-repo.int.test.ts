@@ -95,6 +95,22 @@ describe("PgIssueRepo", () => {
     expect(back.issues.map((i) => i.kind).sort()).toEqual(["arc_repeat", "safety_flag_open"]);
   });
 
+  it("same_hash_recheck_keeps_judge_no: an externally written kind is not cleared by the rule engine", async () => {
+    const l = next_lesson();
+    const A = F({ kind: "safety_flag_open", address: null });
+    await replace(l, H1, [A]);
+    await t.db.with_tx(async (tx) => {
+      await insert_row(tx, "issue", {
+        id: ids.new_id("iss"), lesson_id: l, content_hash: H1, level: "advisory", kind: "judge_no",
+        message: "Provisional.", address: "lesson.blocks[1]", code: "RL.6.1", created_at: clock.now().toISOString(),
+      });
+    });
+    const r = await replace(l, H1, [A]);
+    expect(r.issues.map((i) => i.kind).sort()).toEqual(["judge_no", "safety_flag_open"]);
+    const rows = await t.db.with_tx(async (tx) => (await tx.query<{ cleared_by: string | null }>("SELECT cleared_by FROM issue WHERE lesson_id=$1 AND kind='judge_no'", [l])).rows);
+    expect(rows.map((x) => x.cleared_by)).toEqual([null]);
+  });
+
   it("same_hash_recheck_adds_new_finding", async () => {
     const l = next_lesson();
     const B = F({ kind: "arc_repeat", level: "advisory", address: null });

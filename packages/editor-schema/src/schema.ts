@@ -246,6 +246,8 @@ const nodes: Record<string, NodeSpec> = {
       slot_id: { validate: "string" },
       source_ref: { default: "", validate: "string" },
       rights: { default: "unset", validate: one_of("quote rights", RIGHTS) },
+      // The slot node type this quote replaced (GEN-3 review): lets the `.excerpt-N` ordinal count only excerpt slots.
+      origin: { default: null, validate: nullable_string("origin") },
     },
     toDOM: block_dom("quote"),
   },

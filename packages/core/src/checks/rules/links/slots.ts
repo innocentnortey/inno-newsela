@@ -34,7 +34,9 @@ export function find_slot_node(sections: Sections, slot_id: string): PMNode | un
   if (exact !== undefined) return exact;
   // lesson-links names slots `<lesson>.excerpt-N`, compile names them `<lesson>.slot<n>`; ordinal fallback until NL-46 reconciles.
   const m = /\.excerpt-(\d+)$/.exec(slot_id);
-  return m === null ? undefined : slots.filter((n) => n.type !== "quote_placeholder")[Number(m[1]) - 1];
+  // Only excerpt_slot nodes, or quotes that replaced one (attrs.origin), are counted: filling a quote placeholder must not shift N.
+  const excerpts = slots.filter((n) => n.type === "excerpt_slot" || (n.type === "quote" && n.attrs?.origin === "excerpt_slot"));
+  return m === null ? undefined : excerpts[Number(m[1]) - 1];
 }
 
 export function slot_state_of(sections: Sections, slot_id: string): SlotState {

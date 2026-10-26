@@ -30,13 +30,21 @@ describe("slot_state_of", () => {
     expect(slot_state_of(s, "G6.U4.L5.excerpt-3")).toBe("absent");
   });
   it("a slot already filled in the editor is a quote node that keeps its slot id", () => {
-    const quote = { type: "quote", attrs: { slot_id: "hare-lion", rights: "public-domain", source_ref: '{"title":"x"}' } } as PMNode;
+    const quote = { type: "quote", attrs: { slot_id: "hare-lion", origin: "excerpt_slot", rights: "public-domain", source_ref: '{"title":"x"}' } } as PMNode;
     const s = sec(quote, slot({ slot_id: "next", rights: "unset" }));
     expect(slot_state_of(s, "hare-lion")).toBe("filled");
     expect(slot_state_of(s, "G6.U4.L5.excerpt-1")).toBe("filled");
     expect(slot_state_of(s, "G6.U4.L5.excerpt-2")).toBe("open");
     const plain = { type: "quote", attrs: { slot_id: null } } as PMNode;
     expect(slot_state_of(sec(plain), "G6.U4.L5.excerpt-1")).toBe("absent");
+  });
+  it("filling a quote placeholder before an excerpt does not shift .excerpt-N", () => {
+    const filled_placeholder = { type: "quote", attrs: { slot_id: "q1", origin: "quote_placeholder", rights: "cleared", source_ref: "r" } } as PMNode;
+    const s = sec(filled_placeholder, slot({ slot_id: "first-excerpt", rights: "unset" }));
+    expect(find_slot_node(s, "G6.U4.L5.excerpt-1")?.attrs?.slot_id).toBe("first-excerpt");
+    expect(slot_state_of(s, "G6.U4.L5.excerpt-1")).toBe("open");
+    expect(slot_state_of(s, "G6.U4.L5.excerpt-2")).toBe("absent");
+    expect(slot_state_of(s, "q1")).toBe("filled");
   });
   it("treats a quote_placeholder as open and a missing slot as absent", () => {
     expect(slot_state_of(sec({ type: "quote_placeholder", attrs: { slot_id: "q" } } as PMNode), "q")).toBe("open");

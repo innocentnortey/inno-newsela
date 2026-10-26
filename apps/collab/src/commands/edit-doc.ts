@@ -86,8 +86,13 @@ function prepare_slot_fill(doc: Y.Doc, edit: SlotFillEdit): () => void {
   }
   if (hit === null) throw not_found("Slot");
   const { parent, index } = hit;
+  const replaced = parent.get(index);
+  const prior = replaced instanceof Y.XmlElement ? replaced : null;
+  // Remember which slot node this became a quote from, so the `.excerpt-N` ordinal still counts only excerpt slots.
+  const origin = prior === null ? null : prior.nodeName === "quote" ? (prior.getAttribute("origin") ?? null) : prior.nodeName;
   return () => {
     const el = new Y.XmlElement("quote");
+    if (origin !== null) el.setAttribute("origin", origin);
     el.setAttribute("slot_id", edit.slot_id);
     el.setAttribute("source_ref", JSON.stringify(edit.source_ref)); // "" would mean unsourced; a SourceRef is never "{}"-empty (title is required)
     el.setAttribute("rights", edit.rights_status);

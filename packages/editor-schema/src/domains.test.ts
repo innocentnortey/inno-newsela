@@ -121,6 +121,7 @@ describe("quote node (NL-46)", () => {
         slot_id: "slot-a",
         source_ref: '{"title":"Synthetic"}',
         rights: "to-clear",
+        origin: null,
       },
       content: [{ type: "text", text: "<b>kept verbatim</b>" }],
     });
@@ -129,6 +130,6 @@ describe("quote node (NL-46)", () => {
   });
   it("defaults source_ref to a blank string and rights to unset", () => {
     const n = EDITOR_SCHEMA.nodes["quote"]!.create({ slot_id: "s" });
-    expect(n.attrs).toEqual({ slot_id: "s", source_ref: "", rights: "unset" });
+    expect(n.attrs).toEqual({ slot_id: "s", source_ref: "", rights: "unset", origin: null });
   });
 });

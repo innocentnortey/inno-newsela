@@ -38,7 +38,7 @@ export class PgAdvisoryIssueWriter implements AdvisoryIssueWriter {
       let inserted = 0;
       for (const no of nos) {
         const dup = await tx.query(
-          "SELECT 1 FROM issue WHERE lesson_id=$1 AND content_hash=$2 AND kind='judge_no' AND address=$3 AND code=$4 LIMIT 1",
+          "SELECT 1 FROM issue WHERE lesson_id=$1 AND content_hash=$2 AND kind='judge_no' AND cleared_by IS DISTINCT FROM 'fix' AND address=$3 AND code=$4 LIMIT 1",
           [lesson_id, content_hash, no.address, no.code],
         );
         if (dup.rows.length > 0) continue;

@@ -40,6 +40,13 @@ export const CHECK_KINDS = [
 ] as const;
 export type CheckKind = (typeof CHECK_KINDS)[number];
 
+// Kinds written outside the rule engine (the worker's judge): their rule's run() returns nothing, so a re-check
+// must never treat an absent finding of these kinds as "fixed".
+export const EXTERNAL_KINDS = ["judge_no"] as const satisfies readonly CheckKind[];
+export const RULE_ENGINE_KINDS: readonly string[] = CHECK_KINDS.filter(
+  (k) => !(EXTERNAL_KINDS as readonly string[]).includes(k),
+);
+
 export type IssueLevelName = "blocking" | "confirmation" | "advisory";
 
 export type CheckPolicy = {

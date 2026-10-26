@@ -6,6 +6,7 @@ import type {
 } from "@ls/core/ports/issues";
 import type { Tx } from "@ls/core/ports/tx";
 import { DomainRefusal, InvariantViolation } from "@ls/core/errors";
+import { RULE_ENGINE_KINDS } from "@ls/core/checks/types";
 import type { PgDatabase } from "../pool.ts";
 import { Tx as DbTx } from "../tx.ts";
 import type { PgRepoDeps } from "./audit.ts";
@@ -81,7 +82,7 @@ export class PgIssueRepo implements IssueRepo {
         [lesson_id, content_hash, iso],
       );
       const here = existing.filter((r) => r.content_hash === content_hash);
-      const gone = here.filter((r) => r.resolved_at === null && !fresh.has(key(r))).map((r) => r.id);
+      const gone = here.filter((r) => r.resolved_at === null && RULE_ENGINE_KINDS.includes(r.kind) && !fresh.has(key(r))).map((r) => r.id);
       if (gone.length > 0) await q.query(`UPDATE issue SET cleared_by='fix' WHERE id = ANY($1)`, [gone]);
       const have = new Set(here.map(key));
       await this.#insert_findings(q, lesson_id, content_hash, findings.filter((f) => !have.has(key(f))), existing, iso);
