@@ -710,7 +710,9 @@ Targets hold at the **200-concurrent-user spike** with ≤ 6 generation jobs in 
 - **Fields:**
   - Response:
     - `lesson_id` (e.g. `G6.U4.L4`), `lesson_key` (`L4`), `unit_id`, `number`, `title`, `type`, `state`,
-      `version_number`, `content_hash`, `state_vector` (text, base64), `schema_version`, `last_editor` (name or empty).
+      `version_number`, `version_id` (the id of the version shown: the snapshot's id for submitted and later, else the
+      current working version's id; `null` only when the lesson has no version yet; the review heartbeat of CON-20 sends
+      it; CHG-7), `content_hash`, `state_vector` (text, base64), `schema_version`, `last_editor` (name or empty).
     - For `submitted` and later: `snapshot` (`version_id`, `content_hash`, `state_vector`) — the values Approve must
       send back (CON-18).
     - `front_matter`: objectives, `standards` (each `code`, `role` = focus / supporting / ELD, `origin` = `outline`,
@@ -755,6 +757,8 @@ Targets hold at the **200-concurrent-user spike** with ≤ 6 generation jobs in 
   - System review: Claude (System track, Opus), 2026-10-25 — agreed: `content` returned here, editor waits for socket sync;
     fixed the checklist keys; set `SCHEMA_UNKNOWN` to 500; added `lesson_key`/`unit_id` and the dual-form path (UXQ-2);
     UXQ-11 stated.
+  - Change CHG-7, 2026-10-26 (orchestrator under PD-32): `version_id` added to the response so the review heartbeat can
+    name the real version (S-18); additive, no promise removed. See [`CHANGES.md`](CHANGES.md).
 - **Behaviour questions:** [UXP-1](#uxp-1), [UXP-6](#uxp-6), UXQ-2, UXQ-11 — decided 2026-10-25 (recommendation adopted under PD-31).
 
 <a id="con-12"></a>
@@ -1235,7 +1239,7 @@ standards, which live in the front matter)
 - **Operation(s):** `sendHeartbeat` — one heartbeat → stored. Nothing comes back to show.
 - **Fields:**
   - Request: `tab_id` (text), `focused` (yes/no), `visible` (yes/no), `last_input_at` (date-time), `sent_at`
-    (date-time), `version_id` (text).
+    (date-time), `version_id` (text; the `version_id` that CON-11 returns for the lesson, never made up by the client).
   - Response: none (204).
 - **States:** none on the lesson. The server merges intervals per user across tabs. At the first approval CON-18 writes the
   frozen metrics row once.

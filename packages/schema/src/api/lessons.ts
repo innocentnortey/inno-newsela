@@ -91,6 +91,7 @@ export const Lesson = z.object({
   type: z.string(),
   state: LessonState,
   version_number: z.number().int(),
+  version_id: z.string().nullable(),
   content_hash: Sha256,
   state_vector: StateVector,
   schema_version: z.number().int(),

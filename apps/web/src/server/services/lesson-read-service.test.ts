@@ -7,6 +7,12 @@ import {
 } from "./lesson-read-fixtures.ts";
 
 describe("LessonReadService", () => {
+  it("version_id_null: a lesson with no version yet returns version_id null (CHG-7)", async () => {
+    const w = make_world({ row: lesson_row({ current_version_id: null }) });
+    const { lesson } = await make_service(w).get_lesson_traced(user("reviewer"), LID);
+    expect(lesson.version_id).toBeNull();
+  });
+
   it("get_wp1_in_review: derived row for an in_review lesson", async () => {
     const w = make_world();
     const { lesson, version_id } = await make_service(w).get_lesson_traced(user("reviewer"), LID);
@@ -21,6 +27,7 @@ describe("LessonReadService", () => {
     expect(lesson.content_hash).toBe(H1);
     expect(lesson.version_number).toBe(1);
     expect(version_id).toBe(V_GEN);
+    expect(lesson.version_id).toBe(V_GEN);
     expect(lesson.checklist).toEqual([]);
     expect(w.writes).toBe(0);
   });
@@ -38,6 +45,7 @@ describe("LessonReadService", () => {
     const { lesson } = await make_service(w).get_lesson_traced(user("approver"), LID);
     expect(lesson.content_hash).toBe(H2);
     expect(lesson.snapshot).toEqual({ version_id: V_SUB, content_hash: H2, state_vector: SV });
+    expect(lesson.version_id).toBe(V_SUB);
     expect(lesson.version_number).toBe(3);
     expect(lesson.allowed_actions).toEqual(["approve", "request_changes"]);
   });

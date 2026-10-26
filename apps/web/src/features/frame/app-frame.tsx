@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout";
 import { AnnounceProvider } from "@/lib/announce";
 import { BreadcrumbProvider } from "./breadcrumb";
 import { buildNav } from "./nav";
+import { useNavUnitKey } from "./use-nav-unit";
 import { SessionGate } from "./session-gate";
 import { useSession } from "./session-context";
 import { TopBar } from "./top-bar";
@@ -13,9 +14,10 @@ import { TopBar } from "./top-bar";
 function Shell({ children }: { children: ReactNode }) {
   const { role } = useSession();
   const pathname = usePathname() ?? "/";
+  const unitKey = useNavUnitKey(pathname);
   return (
     <BreadcrumbProvider>
-      <AppShell navSections={buildNav(role, pathname)} topBar={<TopBar />}>
+      <AppShell navSections={buildNav(role, pathname, undefined, unitKey)} topBar={<TopBar />}>
         {children}
       </AppShell>
     </BreadcrumbProvider>
