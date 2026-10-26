@@ -1,0 +1,13 @@
+== G6.U4.FLEX-1a
+quote_unmatched: Quoted passage of 12 words is not in this lesson's outline row, arc header or standards @ G6.U4.FLEX-1a.Launch
+== G6.U4.L36
+
+blocks.19.standard_codes
+blocks.20.standard_codes
+blocks.21.standard_codes
+== G6.U4.L41
+proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L41.LearningInAction.PartB | matched: "Length"
+proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L41.LearningInAction.PartB | matched: "Decoration"
+== G6.U4.L40
+minutes_out_of_range: "Learning in Action" is 33 minutes; the template expects 30 (allowed difference 1) @ G6.U4.L40.LearningInAction
+proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L40.LearningInAction.PartB | matched: "Skip"
