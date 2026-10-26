@@ -16,6 +16,13 @@ describe("templates", () => {
   it("Flex Day is 5/40/5", () => {
     expect(template_for("Flex Day")?.sections.map((s) => s.minutes)).toEqual([5, 40, 5]);
   });
+  it("every Learning in Action asks for the ELD callouts and a Pulse Check the check rules require", () => {
+    for (const t of SECTION_TEMPLATES.templates) {
+      const lia = t.sections.find((s) => s.name === "Learning in Action");
+      for (const r of ["cfu_item", "callout_purpose", "callout_say", "callout_watch"] as const)
+        expect(lia?.required_roles, `${t.lesson_type} ${r}`).toContain(r);
+    }
+  });
   it("unknown type is undefined", () => {
     expect(template_for("Nope")).toBeUndefined();
   });

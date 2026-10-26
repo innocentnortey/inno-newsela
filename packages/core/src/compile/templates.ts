@@ -31,11 +31,15 @@ const five = (lesson_type: string): SectionTemplate => ({
   ],
 });
 
+// The check rules (checks/rules/structural/expected.ts) require the three ELD callouts and a Pulse Check in every
+// "Learning in Action", whatever the lesson type; a template that asks for less made every Spark and Flex draft fail.
+const LIA_ROLES = ["teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch"] as const;
+
 const flex = (lesson_type: string): SectionTemplate => ({
   lesson_type,
   sections: [
     slot("Launch", 5, ["routine_heading", "teacher_talk"]),
-    slot("Learning in Action", 40, ["teacher_talk", "cfu_item"]),
+    slot("Learning in Action", 40, LIA_ROLES),
     slot("Look Back", 5, ["quick_write"]),
   ],
 });
@@ -51,7 +55,7 @@ export const SECTION_TEMPLATES: { templates: readonly SectionTemplate[] } = {
       lesson_type: "Spark",
       sections: [
         slot("Launch", 15, ["routine_heading", "teacher_talk", "sample_response"]),
-        slot("Learning in Action", 30, ["teacher_talk", "cfu_item"]),
+        slot("Learning in Action", 30, LIA_ROLES),
         slot("Look Back", 5, ["quick_write"]),
         slot("Homework", 0, ["homework"]),
       ],
