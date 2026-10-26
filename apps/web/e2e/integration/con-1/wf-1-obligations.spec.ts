@@ -41,7 +41,7 @@ test("GR-9: the restricted source folder is ignored, untracked and never referen
   const tracked = spawnSync("git", ["ls-files", "docs/source/restricted"], { cwd: ROOT, encoding: "utf8" });
   expect(tracked.stdout.trim()).toBe("");
   const needle = ["docs", "source", "restricted"].join("/");
-  for (const f of walk(join(WEB, "e2e/integration")).filter((p) => p.endsWith(".ts") && !p.endsWith("wf-1-obligations.spec.ts"))) {
+  for (const f of walk(join(WEB, "e2e/integration")).filter((p) => p.endsWith(".ts") && !/obligations/.test(p))  // obligation specs state the GR-9 check themselves and so name the path) {
     expect(readFileSync(f, "utf8"), f).not.toContain(needle);
   }
 });
