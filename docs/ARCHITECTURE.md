@@ -1,9 +1,11 @@
 # Architecture — Newsela Lesson Studio
 
-**Status:** draft (NL-04), written from the design outputs DO-1…DO-7 before any code exists. It is a reader's map: it
-links to the documents that own each fact and does not copy them. Where a number comes from a design target it carries
-`[T]` (target), `[A]` (assumption) or `[C]` (calculation) and a link; where it will come from a run it reads
-`pending: NL-n`. NL-139 fills the measured numbers and the final limits. Contracts are never restated here
+**Status:** NL-139 pass of 2026-10-26. Written from the design outputs DO-1…DO-7 (NL-04); the capacity numbers are now
+filled from the NL-127 report. It is a reader's map: it links to the documents that own each fact and does not copy
+them. Where a number comes from a design target it carries `[T]` (target), `[A]` (assumption), `[C]` (calculation) or
+`[M]` (measured, with *n* and a report path). Two things are still unmeasured and keep their marker, `pending: NL-112`
+(the real-model full run) and `pending: NL-134` (experiment scoring); both need Innocent's yes to spend, and no result
+is claimed for them. Section 10 says what that means. Contracts are never restated here
 ([`contracts/INTERFACE.md`](contracts/INTERFACE.md) owns them).
 
 ## 1. Why it exists
@@ -47,8 +49,10 @@ frozen at Submit, approved by another on the pinned version, exported as an appr
 
 ## 3. Processes and data
 
-Three Node processes share one code base and one Postgres database, run locally under Docker Compose (PD-15 option D:
-local Compose, the `render.yaml` is committed but nothing is provisioned on Render). Component duties, trust
+Three Node processes share one code base and one Postgres database, run locally under Docker Compose (PD-15 option D: local Compose
+at $0). Hosting on Render from the GitHub mirror was decided later (PD-37, 2026-10-26) and its setup is written in
+[`delivery/render-deploy-prompt.md`](delivery/render-deploy-prompt.md); this document does not claim it is live (see
+section 10). Component duties, trust
 boundaries and record ownership are in [`design/architecture.md`](design/architecture.md) (DO-2); the sizing and
 decision sentences are in [`design/system-design.md`](design/system-design.md) (DO-1).
 
@@ -119,20 +123,56 @@ Each card, its options and its evidence are in [`design/hard-problems.md`](desig
 
 - **Evaluation** ([`design/eval-plan.md`](design/eval-plan.md), DO-5): fourteen suites S1–S14, from the intake golden
   suite (S1) to the capacity spike (S14), each with its grader, case provenance and held-out separation. Results:
-  full run and draft golden pending: NL-112; metrics scoring and reruns pending: NL-134; capacity spike pending: NL-127.
+  full run and draft golden pending: NL-112; metrics scoring and reruns pending: NL-134. The capacity spike (S14) ran:
+  see section 8. The stub-provider fault suite S6 passed 4 of 4 (`evals/reports/faults-05b70004372e.md`, n = 4, stub,
+  cost $0).
 - **Observability** ([`design/observability.md`](design/observability.md), DO-6): every entry point that does work has a
   stable workflow id (WF-n), a correlation key, required records and a **capture check** that proves the records are
   written when the real entry point is driven. A workflow is not done until its capture check passes.
 - **Metrics** ([`design/metrics-registry.md`](design/metrics-registry.md), DO-7): the registry M-1 onward, each with
-  definition, source records, owner, action and target. Measured values: pending: NL-134 (outcome metrics) and
-  pending: NL-127 (performance metrics).
+  definition, source records, owner, action and target. Measured values: outcome metrics pending: NL-134
+  (no review sessions have been measured). Performance metrics M-18…M-27 are in section 8 [M], from
+  [`evals/reports/load-2026-10-26.md`](../evals/reports/load-2026-10-26.md).
 
 ## 8. Capacity
 
 The decision is Innocent's (PD-33): 500 users a day with a 200-user concurrent spike. Generation load is a separate
 quantity, limited by the provider and spend caps and not by user count. Workload mix, burst shape and the performance
 targets `[T]` are in [`design/capacity-and-workload.md`](design/capacity-and-workload.md). Measured results against the
-targets: pending: NL-127.
+targets are below. Full detail, qualifiers and the run command are in
+[`delivery/capacity-report.md`](delivery/capacity-report.md); the raw report is
+[`evals/reports/load-2026-10-26.md`](../evals/reports/load-2026-10-26.md).
+
+**What was run [M]:** 200 virtual HTTP users plus 140 Yjs socket editors, 2 min ramp, 15 min plateau, 2 min ramp down,
+on the VPS (8 cores, 31 GB), the committed Compose stack, **model provider stubbed**. Probe rows
+`pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) and `pr_01M5VE7XWE796CFYZ7S22YE9GF` (yjs).
+
+| Metric | Target `[T]` | Measured `[M]` (n) | Result |
+|---|---|---|---|
+| Lesson open p95 | < 1.5 s | 23 ms (n = 4,902) | met |
+| Unit board p95 | < 1 s | 20 ms (n = 20,402) | met |
+| Board poll p95 | < 300 ms | 20 ms (n = 20,402; the progress poll was not exercised) | met on the board only |
+| HTTP error rate | < 0.5% | 0.00% of 38,909; 0 socket errors in 22,533 samples | met |
+| Recovery after the plateau | <= 120 s | 100 s (computed over windows that overlap the ramp down) | met, weakly |
+| Remote-edit p95 | < 500 ms | 6.7 ms (n = 44,612) | met |
+| Lost acknowledged updates | 0 | 0 (n = 22,533) | met |
+| Reconnect p95 | <= 10 s | 9.95 s | met by 0.05 s |
+| **Stored p95** | **< 3 s** | **6,008 ms (n = 22,533)** | **MISSED** |
+
+**The stored-latency target was missed and stays missed.** It was not tuned. The share of the 6,008 ms that is the
+collaboration server's store debounce (2.0 s, with a 4.0 s ceiling) rather than the database write is **unproven
+`[A]`**: the run did not log them separately. The follow-up analysis
+([devlog](../docs/devlog/2026-10-26-nl127-followup.md)) reasons that the shipped ceiling alone puts p95 near 3.8 s plus
+store time, with the remainder unmeasured; that is analysis, not a measurement. The report's label "M-24" for this figure
+is wrong (M-24 is reconnect time); the stored figure belongs to US-36 / M-19. The scale path in
+[`design/capacity-and-workload.md`](design/capacity-and-workload.md) has no step keyed to store latency, so no scale
+step was taken; the next step is to separate the debounce wait from the write in the logs and re-run on a quiet
+machine. Whether to lower the debounce, relax the target or accept the miss is Innocent's open decision.
+
+**Qualifiers that make the passes weaker than they look:** a padded synthetic 40-lesson unit and small fixtures (not
+real generated content; the real-key full run, NL-112, has not run); no generation load ran (the stub run's first job
+failed, so the worker was idle); another agent used the machine during the run; a single VPS instance, not Render
+(Starter sizes are 0.5 CPU / 512 MB, so these figures do not transfer).
 
 ## 9. Data handling and safety
 
@@ -147,14 +187,49 @@ targets: pending: NL-127.
 
 ## 10. Limits
 
-This section follows GR-14 (demo honesty) and is a draft until NL-139.
+This section follows GR-14 (demo honesty). Status at 2026-10-26; an item is **built**, **built, not run on real
+data** or **cut**, and the cut or unbuilt ones carry PRD §6.4's "what we say instead".
 
-- Nothing is built yet; every behaviour above is a design, and spike results come from throwaway code.
-- Spike numbers were taken on a few drafts; the full-unit run is pending: NL-112.
-- The north star will be measured on one reviewer (Innocent), so it is labelled as such with its sample size and is
-  not a population estimate; pending: NL-134.
-- Capacity is validated by a load script with the model provider stubbed; pending: NL-127. The collaboration
-  load script is a cuttable item (PD-17); if cut, collaboration latency under load was not measured.
-- Judge, AI assist, prompt saving, export, coverage matrix and the quality page are cuttable (PD-17); final status is
-  recorded by NL-139.
-- Hosting is local Docker Compose; the Render configuration is committed but not provisioned (PD-15 option D).
+**Not measured, and why**
+
+- **Real-model full run (NL-112) has not run; `pending: NL-112`.** It spends model budget (PD-29, $75 ceiling) and needs
+  Innocent's yes. Until then, no number here comes from a generated 47-lesson unit. The spike figures in section 6 come
+  from throwaway code on a few drafts (SP-1: 3 of 3 drafts valid), not a population estimate.
+- **Experiments and the north star (NL-134) are unscored; `pending: NL-134`.** No error-analysis round (NL-120), no `FT-N`
+  failure types and no experiment has been run, so none is claimed. No review session has been measured. When it is, the
+  north star is **one reviewer (Innocent), n = k sessions**, with k stated beside it, and is not a population estimate
+  or a measure of Newsela's own staff (PRD §6.6: "No baseline (AQ-14); our reviewers").
+- **Capacity** is measured with the model provider stubbed, on synthetic content, on a shared VPS (section 8). The stored
+  p95 target (< 3 s) was **missed** (6,008 ms, n = 22,533); what that means: the demo stack does not meet its own
+  store-latency target at 200 editors, and the scale path has no step for it yet.
+
+**Built or cut (PRD §6.4 order)**
+
+| Cut | Item | State | What we say |
+|---|---|---|---|
+| #1 | Yjs load script (R-56) | **Built and run once** (NL-119, 140 editors, section 8); the stored target was missed | as section 8 |
+| #2 | Alignment judge (R-23) and held-out comparison (R-53) | **Code built** (judge worker NL-110, calibration script NL-111, held-out script NL-121); **not run on real labels or the real model**: Innocent's ~30 labels (NL-122) and the calibration record (NL-132) do not exist | "Alignment is checked by code and confirmed by a named reviewer; no calibrated model judge in this build"; any judge verdict is advisory and provisional, not expert |
+| #3 | Arc checks (R-9) | **Cut**: no arc-check code found in the checks | "Arc coherence comes from the unit plan; cross-lesson checks are next" |
+| #4 | Coverage matrix (R-41) | **Built** (NL-91 query, NL-73 screen, NL-117 end to end) | none needed; its data comes from stored alignment links |
+| #5 | JSON export (R-42) | **Built** (NL-51, NL-75, NL-102); "Export (no live integration)" | the export file is not a live publish to Newsela |
+| #6 | Unit quality page (R-50), seeded errors (R-52) | Page **built** (NL-74); the planting and report **tool built** (NL-92), but no errors were planted or reviewed (NL-124, NL-135) | "G-3 (seeded-error catch rate) not measured in this build" |
+| #7 | Prompt-guidance editing (R-39) | Screen **built** (NL-76); prompts are versioned and pinned per run | not exercised against a real run |
+| #8 | AI assist (R-31) | **Built** (NL-50, NL-72, NL-116); only the stub provider has been used | not run on the real model |
+
+"Built" means merged with its tests. It is not "used in the demo on the real model": the connected-app walk (NL-126)
+ran on the stub stack and marks real-model journeys NOT WALKED.
+
+**Hosting**
+
+- The demo ran under local Docker Compose (PD-15 option D, $0). Innocent then decided to host on Render from the GitHub
+  mirror (PD-37, 2026-10-26); the setup steps are written in
+  [`delivery/render-deploy-prompt.md`](delivery/render-deploy-prompt.md) and the Render service is **not claimed to be
+  live here**: no verification of a live URL is on record in this repository. The Render configuration uses one owner
+  database role (accepted risk AR-1), so append-only audit tables rest on database triggers, not on grants, there.
+- The VPS is the build and rehearsal machine. **It is not production hosting.**
+
+**Other limits**
+
+- All data is synthetic (GR-13). The collab and judge paths, and the collaboration-under-load figures, are as stated above.
+- Bounded code claims: the design sections of this document describe the design; where a claim was checked against code
+  it is cited with its path in the owning design document, and this pass did not re-verify the design sections line by line.

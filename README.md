@@ -1,6 +1,11 @@
 # Newsela Lesson Studio
 
-A hiring-partner project for Newsela, via Gauntlet AI. Newsela is entering California Core ELA/ELD instruction: 40-week
+A hiring-partner project for Newsela, via Gauntlet AI.
+
+| Release SHA | Demo video | Licence |
+|---|---|---|
+| pending: NL-137 (set when the release check runs) | pending: NL-138 (recording not made) | pending: NL-137 (no `LICENSE` file yet; GR-17 asks for "All rights reserved; evaluation use permitted") |
+ Newsela is entering California Core ELA/ELD instruction: 40-week
 programs of four units with about 40 lessons each, and the bottleneck is staff review, not first drafts.
 Lesson Studio takes an uploaded unit-outline sheet, bulk-generates standards-aligned ~50-minute lessons with an LLM,
 stores them, and gives reviewers a collaborative editor with AI assists and an approval workflow.
@@ -22,7 +27,10 @@ cp .env.example .env     # project settings only: safe local values, no provider
 `npm run dev` is `docker compose up --build` (project name `ls`). Provider keys (`ANTHROPIC_API_KEY`,
 `OPENROUTER_API_KEY`) come from the shared env file through the launcher and are passed to the containers by name; never
 paste them into `.env`. `with-provider-env --check` shows their status without values. With `MODEL_PROVIDER_MODE=stub`
-(the `.env.example` default) the stack runs on stub model output.
+(the `.env.example` default) the stack runs on stub model output; stub output is not a generated lesson.
+The `web` image copies the files the app reads at run time (locked prompts, the standards table and the model
+fixtures) into the standalone build in `Dockerfile.web`; a missing copy there made the container fail at start, and
+the fix is in the committed file.
 
 Services (see `docker-compose.yml`):
 
@@ -52,8 +60,9 @@ After `up --wait`, run once (safe to repeat; it only adds what is missing):
 
 The `seed` service sets `SEED_ALLOW_DEMO_ACCOUNTS=1` for this one-shot step only, which creates
 `author.demo@example.test`, `reviewer.demo@example.test` and `approver.demo@example.test` with the password the
-sign-in page's "Demo accounts" box shows (`demo-password-synthetic`; one shared constant in
-`packages/core/src/auth/demo-accounts.ts`). Without the flag the seed generates random passwords into `.demo/`
+sign-in page's "Demo accounts" box shows (one shared constant in `packages/core/src/auth/demo-accounts.ts`; see
+[`docs/devlog/2026-10-26-demo-accounts.md`](docs/devlog/2026-10-26-demo-accounts.md)). The accounts are one author,
+one reviewer and one approver. Without the flag the seed generates random passwords into `.demo/`
 (unchanged). `render.yaml` sets neither `SEED_ALLOW_DEMO_ACCOUNTS` nor `DEMO_ACCOUNTS`.
 
 ### Dev notes
@@ -90,12 +99,15 @@ All run from the repository root. The WF-n numbers are the workflows in `docs/de
 | `npm run eval:kickoff` | write the experiment kickoff page from the code (WF-46) |
 | `npm run dev` | the Compose stack described above |
 
-Some targets are placeholders until their owning ticket lands; `scripts/script-targets.json` lists each target and owner.
+`scripts/script-targets.json` lists each script's target file and owning ticket; a target whose file is missing exits 2
+with `NOT BUILT`. At the time of writing every listed target file exists, but the real-model scripts (`eval:full-run`,
+`eval:judge-calibrate`, the experiment scoring) have not been run on a real key: that needs Innocent's yes to spend.
 
 ## Deploy
 
 The demo runs locally under Docker Compose (PD-15, option D: no new hosting spend). `render.yaml` is committed for
-Render, the Gauntlet default host, and is not provisioned until Innocent approves the spend.
+Render, the Gauntlet default host. Whether the Render service is live is not recorded in this README: no verified live URL
+exists in the repository.
 
 Render note (PD-37, 2026-10-26): Innocent has since approved hosting on Render, built from the GitHub mirror of this
 repository's `main`. The step-by-step setup (blueprint gaps to check, the `ls-secrets` environment group, provisioning
@@ -105,6 +117,8 @@ only in the Render environment group, never in `render.yaml` or this repository.
 ## Docs map
 
 - Architecture write-up: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- How AI was used to build and inside the product: [`docs/AI-USAGE.md`](docs/AI-USAGE.md)
+- Capacity results: [`docs/delivery/capacity-report.md`](docs/delivery/capacity-report.md)
 - Requirements: [`docs/prd/newsela-prd.md`](docs/prd/newsela-prd.md)
 - Shared interface contracts: [`docs/contracts/INTERFACE.md`](docs/contracts/INTERFACE.md)
 - Submission deliverables: [`SUBMISSION.md`](SUBMISSION.md)
@@ -113,4 +127,4 @@ only in the Render environment group, never in `render.yaml` or this repository.
 
 ## Licence
 
-Pending: NL-139 (no `LICENSE` file yet).
+Pending: NL-137 (no `LICENSE` file yet; the pointer is added when the file exists).
