@@ -34,5 +34,4 @@ Columns: **Built** · **Tested on mock** (Playwright + axe against Prism) · **R
 | Capacity at 200 users | NL-118/119/127 | yes | – | – | **partly**: reads met their targets; stored p95 **missed** (6.0 s vs 3 s) — `docs/delivery/capacity-report.md` |
 
 Known open gaps (full list: `docs/plans/seam-followups.md`, `docs/plans/seam-audit-2026-10-26.md`): nav board link hard-coded
-(GEN-5), S-29 collab role at connect, Render co-edit needs a collab URL build arg, `no_silent_loss` integrity assertion red
-(a keystroke typed as the editor locks is lost, S-125 notes), QA_REPORT findings fixed but not re-walked.
+(GEN-5), S-29 collab role at connect, Render co-edit needs a collab URL build arg, the lock-boundary keystroke loss is fixed (S-125-3: single printable characters only, not Enter/Backspace/paste/IME; `no_silent_loss` 20/20 and `zero_edits_after_lock` 20/20), QA_REPORT findings fixed but not re-walked.
