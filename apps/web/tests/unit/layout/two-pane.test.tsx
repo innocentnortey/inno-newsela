@@ -33,4 +33,15 @@ describe("TwoPane", () => {
     );
     expect(container.firstElementChild).toHaveAttribute("data-rail-width", "rail-narrow");
   });
+
+  it("mobile grid has a single shrinkable column", () => {
+    const { container } = render(
+      <TwoPane rail={<span>r</span>}>
+        <p>c</p>
+      </TwoPane>,
+    );
+    expect((container.firstElementChild as HTMLElement).className).toMatch(/(^|\s)grid-cols-1(\s|$)/);
+    expect(container.querySelector('[data-slot="content"]')).toHaveClass("min-w-0");
+    expect(container.querySelector('[data-slot="rail"]')).toHaveClass("min-w-0");
+  });
 });

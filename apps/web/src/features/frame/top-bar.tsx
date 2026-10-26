@@ -36,8 +36,8 @@ export function TopBar() {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-4">
         <BreadcrumbTrail />
-        <div className="ml-auto flex items-center gap-3 text-small text-ink">
-          <span>{user.name}</span>
+        <div className="ml-auto flex shrink-0 items-center gap-3 text-small text-ink">
+          <span className="max-sm:sr-only">{user.name}</span>
           <span className="text-ink2">{ROLE_LABEL[role]}</span>
           <Button variant="ghost" size="sm" loading={busy} onClick={signOut}>
             Sign out

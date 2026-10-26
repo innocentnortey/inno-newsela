@@ -12,7 +12,7 @@ export function PageSheet({ children, toolbar, className }: PageSheetProps) {
     <article
       data-slot="page-sheet"
       className={cn(
-        "bg-panel border-hair rounded-xl border shadow-[var(--shadow-e2)]",
+        "bg-panel border-hair max-w-full min-w-0 rounded-xl border shadow-[var(--shadow-e2)]",
         className,
       )}
     >

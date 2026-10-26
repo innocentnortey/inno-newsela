@@ -22,4 +22,11 @@ describe("PageSheet", () => {
     const { container } = render(<PageSheet>x</PageSheet>);
     expect(container.querySelector('[data-slot="toolbar"]')).toBeNull();
   });
+
+  it("sheet can shrink inside a grid", () => {
+    const { container } = render(<PageSheet>x</PageSheet>);
+    const sheet = container.querySelector('[data-slot="page-sheet"]') as HTMLElement;
+    expect(sheet.className).toContain("min-w-0");
+    expect(sheet.className).toContain("max-w-full");
+  });
 });
