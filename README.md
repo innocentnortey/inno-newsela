@@ -42,6 +42,20 @@ The web image bakes the browser's collab URL at build time (`NEXT_PUBLIC_COLLAB_
 service already applies migrations when the stack starts, and Postgres is not published, so point `DATABASE_URL` and
 `MIGRATE_DATABASE_URL` at a reachable database (for example the test one below) before running them on the host.
 
+#### Seeding the local demo (standards, prompt v1, demo accounts)
+
+After `up --wait`, run once (safe to repeat; it only adds what is missing):
+
+```
+/home/linuxuser/workspaces/bin/with-provider-env --project-env .env -- docker compose --profile seed run --rm seed
+```
+
+The `seed` service sets `SEED_ALLOW_DEMO_ACCOUNTS=1` for this one-shot step only, which creates
+`author.demo@example.test`, `reviewer.demo@example.test` and `approver.demo@example.test` with the password the
+sign-in page's "Demo accounts" box shows (`demo-password-synthetic`; one shared constant in
+`packages/core/src/auth/demo-accounts.ts`). Without the flag the seed generates random passwords into `.demo/`
+(unchanged). `render.yaml` sets neither `SEED_ALLOW_DEMO_ACCOUNTS` nor `DEMO_ACCOUNTS`.
+
 ### Dev notes
 
 - `scripts/test-db.sh up|down` starts or stops a test Postgres on `127.0.0.1:55440` (project `newsela-test`, via

@@ -19,6 +19,8 @@ ARG BUILD_ID=dev
 ENV NODE_ENV=production BUILD_ID=$BUILD_ID RENDER_GIT_COMMIT=$BUILD_ID
 WORKDIR /app
 COPY --from=build --chown=node:node /app /app
+# /app itself is root-owned (WORKDIR), so the seed could not create .demo/ (credentials file for random passwords).
+RUN mkdir -p /app/.demo && chown node:node /app/.demo
 USER node
 ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 CMD ["node_modules/.bin/tsx", "apps/worker/src/main.ts"]

@@ -83,3 +83,6 @@ Fixed 2026-10-26, option A (Innocent): `apps/web/src/editor/late-keys.ts`, `coll
 
 ## S-103 (open, from NL-103): seam defects found on the real stack
 (1) An author needs a `usr_<ULID>` display name or the unit-plan job fails with a ZodError. (2) `audit_event.version_hash` is null on a guidance save. (3) A candidate's `derived_from_version_id` is null. (4) No `check_job` rows exist for a candidate hash, so M-5 is not computable yet. Owner: integrator / NL-113 follow-ups.
+
+## S-G1-1 (open, Low, from the G1 Docker acceptance run): first editor load after sign-in once showed read-only
+Observed once, unreproduced. The first lesson-editor load straight after sign-in rendered read-only; a reload was editable. Suspects: session or role not yet resolved when the editor mounts, or the collab auth handshake racing the cookie. Owner: NL-63 editor. Next step: reproduce with a fresh Compose stack and the seeded demo accounts; capture the editor state and `/api/session` response on first load.

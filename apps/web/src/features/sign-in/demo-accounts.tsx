@@ -1,10 +1,8 @@
-// Same values as src/test-utils/fixtures.ts (not importable from app code). Synthetic demo data only.
-const ROWS = [
-  { role: "Author", email: "author.demo@example.org" },
-  { role: "Reviewer", email: "reviewer.demo@example.org" },
-  { role: "Approver", email: "approver.demo@example.org" },
-];
-const PASSWORD = "demo-password-synthetic";
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from "@ls/core/auth/demo-accounts";
+
+// Same list the seed creates (SEED_ALLOW_DEMO_ACCOUNTS=1), so the shown credentials sign in.
+const ROWS = DEMO_ACCOUNTS.map((a) => ({ role: a.role.charAt(0).toUpperCase() + a.role.slice(1), email: a.email }));
+const PASSWORD = DEMO_PASSWORD;
 
 export function DemoAccounts() {
   return (

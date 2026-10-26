@@ -5,6 +5,7 @@ import { randomInt } from "node:crypto";
 import { chmodSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from "@ls/core/auth/demo-accounts";
 import { hash_password } from "@ls/core/auth/passwords";
 import { PrefixedIdGenerator } from "@ls/core/ports/ids";
 import { SystemClock } from "@ls/core/ports/clock";
@@ -42,11 +43,6 @@ export class SeedInputError extends Error {
   }
 }
 
-const DEMO_ACCOUNTS = [
-  { role: "author", email: "author.demo@example.test", name: "Demo author" },
-  { role: "reviewer", email: "reviewer.demo@example.test", name: "Demo reviewer" },
-  { role: "approver", email: "approver.demo@example.test", name: "Demo approver" },
-] as const;
 const SET_FILE: Record<StandardSet, string> = {
   CA_CCSS_ELA_6: "ccss-ela-6.json",
   CA_ELD_6: "eld-6.json",
@@ -98,7 +94,10 @@ export async function seed_reference_data(db: PgDatabase, opts: SeedOptions = {}
   );
   const missing = DEMO_ACCOUNTS.filter((a) => !existing.includes(a.email));
 
-  const supplied = read_optional_string(env, "SEED_DEMO_PASSWORD");
+  // SEED_ALLOW_DEMO_ACCOUNTS=1 (local Compose demo only) uses the documented password the SCR-1 box shows;
+  // otherwise SEED_DEMO_PASSWORD, otherwise a random one written to the credentials file.
+  const documented = env["SEED_ALLOW_DEMO_ACCOUNTS"] === "1";
+  const supplied = documented ? DEMO_PASSWORD : read_optional_string(env, "SEED_DEMO_PASSWORD");
   const generated = supplied === null && missing.length > 0;
   const password = supplied ?? (missing.length > 0 ? generate_password() : "");
   const hashes = new Map(missing.map((a) => [a.email, hash_password(password)]));
@@ -191,7 +190,7 @@ if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.a
   main().then(
     (report) => {
       console.log(JSON.stringify({ event: "seed", ...report }));
-      if (read_optional_string(process.env, "SEED_DEMO_PASSWORD") === null && report.users > 0) {
+      if (process.env["SEED_ALLOW_DEMO_ACCOUNTS"] !== "1" && read_optional_string(process.env, "SEED_DEMO_PASSWORD") === null && report.users > 0) {
         console.log("credentials written to .demo/seed-credentials.txt");
       }
       process.exit(0);
