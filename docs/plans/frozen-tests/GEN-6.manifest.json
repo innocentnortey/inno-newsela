@@ -1,0 +1,33 @@
+{
+  "ticket": "GEN-6",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/access-recheck.test.ts": "569d5e54c1e33699afb24f4f0f413e9c05baf1e4f20306be2f147f5212328985",
+    "apps/collab/src/access-recheck.int.test.ts": "0b90b688980b8473436bd41b3321d353d22b8810b3c2828a23a73fd55a7d296c",
+    "apps/collab/src/gen6-lows.test.ts": "f3ee0fa72b42ed1578cbacb1ae3fca98f04e845fffa71ad151022cfd6238ff56"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/access-recheck.test.ts",
+      "apps/collab/src/access-recheck.int.test.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/access-recheck.test.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/access-recheck.int.test.ts"
+    ],
+    "AC-4": [
+      "apps/collab/src/gen6-lows.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/collab/src/session-recheck.ts",
+    "apps/collab/src/wiring/**",
+    "apps/collab/src/main.ts",
+    "apps/collab/src/deps.ts",
+    "apps/collab/src/deps-types.ts",
+    "packages/db/src/repos/sessions.ts",
+    "packages/db/src/repos/lessons.ts"
+  ]
+}
