@@ -13,6 +13,7 @@ import { save_state_text } from "@/features/workspace/live/save-state";
 import type { EditorClientState, StoredAck } from "./client-state";
 import { CollabSession, type SessionSnapshot } from "./collab-session";
 import { collab_url } from "./collab-url";
+import { create_late_key_capture, type LateKeyCapture } from "./late-keys";
 import { initials_of, presence_entries, slot_of, type PresenceEntry } from "./presence";
 import type { AssistSelection } from "@/features/assist/use-suggestions";
 import { selectionAnchor } from "./selection-anchor";
@@ -185,6 +186,32 @@ export function LessonEditor(props: LessonEditorProps) {
 
   const state = snap.state;
   const read_only = prop_read_only || snap.read_only;
+  const root_ref = useRef<HTMLDivElement>(null);
+  const read_only_ref = useRef(false);
+  const capture = useRef<LateKeyCapture | null>(null);
+  useEffect(() => {
+    read_only_ref.current = read_only;
+  });
+  useEffect(() => {
+    if (!session || !root_ref.current) return;
+    const c = create_late_key_capture({
+      root: root_ref.current,
+      doc: document,
+      is_editable: () => !read_only_ref.current,
+      on_text: (s) => session.add_late_text(s),
+    });
+    capture.current = c;
+    return () => {
+      c.dispose();
+      capture.current = null;
+    };
+  }, [session]);
+  const was_read_only = useRef(read_only);
+  useEffect(() => {
+    if (!was_read_only.current && read_only) capture.current?.arm();
+    else if (!read_only) capture.current?.disarm();
+    was_read_only.current = read_only;
+  }, [read_only]);
   const stored_at = snap.stored?.stored_at ?? null;
   const text = save_state_text(state, stored_at, connecting_ms);
 
@@ -210,7 +237,7 @@ export function LessonEditor(props: LessonEditorProps) {
     `/sign-in?next=${encodeURIComponent(typeof window === "undefined" ? "/" : window.location.pathname + window.location.search)}`;
 
   return (
-    <div data-testid="lesson-editor" data-lesson-id={lessonId} data-client-state={state} className="flex flex-col gap-3">
+    <div ref={root_ref} data-testid="lesson-editor" data-lesson-id={lessonId} data-client-state={state} className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <PresenceSentence entries={entries} />
         <span data-testid="save-state" data-state={state} data-stored-at={stored_at ?? ""} className="text-small text-ink2">

@@ -56,6 +56,10 @@ export class CollabSession {
   private scope_read_only = false;
   private refused = false;
   private refusal: SessionSnapshot["refusal"] = null;
+  private refused_text: string[] = [];
+  private refused_dropped = 0;
+  private late_text = "";
+  private refusal_seen = false;
   private signed_out = false;
   private mode_state: string | null = null;
   private detach_doc: (() => void) | null = null;
@@ -205,11 +209,29 @@ export class CollabSession {
       },
       msg,
     );
+    // a later refusal replaces the earlier one; keys captured for the old notice must not carry over
+    if (this.refusal_seen) this.late_text = "";
+    this.refusal_seen = true;
+    this.refused_text = outcome.refused_text;
+    this.refused_dropped = outcome.dropped_updates;
+    this.rebuild_refusal();
+  }
+
+  private rebuild_refusal(): void {
+    if (this.refused_text.length === 0 && this.late_text === "" && this.refusal === null) return;
     this.refusal = {
       message: "Your last edits were not saved.",
-      text: outcome.refused_text,
-      dropped: outcome.dropped_updates,
+      text: this.late_text === "" ? this.refused_text : [...this.refused_text, this.late_text],
+      dropped: this.refused_dropped,
     };
+  }
+
+  /** Keys typed after the editor turned read-only. They never enter the doc and are never sent; they only make the notice honest. */
+  add_late_text(s: string): void {
+    if (this.destroyed || s === "") return;
+    this.late_text += s;
+    this.rebuild_refusal();
+    this.emit();
   }
 
   /** The refused operations live only in the destroyed doc; the fresh one only receives server state. */
