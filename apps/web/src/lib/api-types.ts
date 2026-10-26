@@ -1581,20 +1581,75 @@ export interface components {
             held_back: components["schemas"]["HeldBack"][];
             download_path: string;
         };
-        /** @description The export file. Each lesson validates against the published Lesson export JSON Schema (planned at docs/contracts/lesson-export.schema.json). */
-        LessonExportFile: {
-            export_id: string;
-            version_number: number;
+        /** @description The export file. Strict (no other keys). Validates against the published docs/contracts/lesson-export.schema.json, generated from the Zod ExportBundleFile (CHG-6). The payload_hash on the list and create responses is the sha256 of this document, not a field in it. */
+        ExportBundleFile: {
             /** @constant */
-            label: "Export (no live integration)";
-            payload_hash: components["schemas"]["Sha256"];
-            lessons: {
-                lesson_id: string;
-                content_hash: components["schemas"]["Sha256"];
-                lesson: {
+            export_version: 1;
+            unit_id: string;
+            generated_at: components["schemas"]["Timestamp"];
+            lessons: components["schemas"]["ExportedLessonRecord"][];
+        };
+        ExportedLessonRecord: {
+            lesson_id: string;
+            version_id: string;
+            content_hash: components["schemas"]["Sha256"];
+            approved_by: string;
+            approved_at: components["schemas"]["Timestamp"];
+            lesson: components["schemas"]["StoredLesson"];
+        };
+        /** @description The lesson as stored (not the API Lesson). */
+        StoredLesson: {
+            lesson_id: string;
+            schema_version: number;
+            title: string;
+            type: string;
+            front_matter: components["schemas"]["StoredFrontMatter"];
+            sections: components["schemas"]["StoredSection"][];
+            text_cards: components["schemas"]["StoredTextCard"][];
+        };
+        /** @description A section as stored, with its node tree typed (the API Section keeps the looser ProseMirrorDoc). */
+        StoredSection: {
+            address: string;
+            name: string;
+            minutes: number;
+            content: components["schemas"]["StoredProseMirrorDoc"];
+        };
+        StoredProseMirrorDoc: {
+            /** @constant */
+            type: "doc";
+            attrs?: {
+                [key: string]: unknown;
+            };
+            content?: components["schemas"]["StoredProseMirrorNode"][];
+        };
+        StoredProseMirrorNode: {
+            type: string;
+            attrs?: {
+                [key: string]: unknown;
+            };
+            content?: components["schemas"]["StoredProseMirrorNode"][];
+            marks?: {
+                type: string;
+                attrs?: {
                     [key: string]: unknown;
                 };
             }[];
+            text?: string;
+        };
+        StoredFrontMatter: {
+            standards: components["schemas"]["Standard"][];
+            minutes_total: number;
+            vocabulary: string[];
+        };
+        StoredTextCard: {
+            title: string;
+            author: components["schemas"]["NullableText"];
+            edition: components["schemas"]["NullableText"];
+            chapter: components["schemas"]["NullableText"];
+            pages: components["schemas"]["NullableText"];
+            /** @enum {string} */
+            kind: "off-platform-text" | "newsela-article" | "public-domain";
+            content_available: boolean;
         };
         GuidanceVersion: {
             version_id: string;
@@ -2258,13 +2313,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The export file. The Lesson export JSON Schema will be published at docs/contracts/lesson-export.schema.json (planned, with the export ticket). */
+            /** @description The export file, the bundle stored when the version was written, byte for byte. It validates against docs/contracts/lesson-export.schema.json (published; generated from the Zod ExportBundleFile). */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LessonExportFile"];
+                    "application/json": components["schemas"]["ExportBundleFile"];
                 };
             };
             400: components["responses"]["BadRequest"];

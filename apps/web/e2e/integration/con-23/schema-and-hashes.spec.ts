@@ -17,7 +17,12 @@ test("schema-and-hashes: Ajv accepts the file and payload_hash is the same every
   await seedApproved({ unit, number: 2, approver_id: approver.user_id });
   await as(page, approver);
   const c = (await (await createExport(page, unit.unit_key)).json()) as Created;
+  const rowsBefore = (await exportRows(unit.unit_id)).length;
   const file = await download(page, c.export_id);
+  expect(Object.keys(file.body).sort()).toEqual(["export_version", "generated_at", "lessons", "unit_id"]);
+  for (const l of file.body.lessons) {
+    expect(Object.keys(l).sort()).toEqual(["approved_at", "approved_by", "content_hash", "lesson", "lesson_id", "version_id"]);
+  }
 
   const { default: Ajv } = (await import("ajv/dist/2020.js")) as unknown as { default: new (o: object) => { compile: (s: object) => ((d: unknown) => boolean) & { errors?: unknown[] | null } } };
   const validate = new Ajv({ strict: false, validateFormats: false }).compile(JSON.parse(readFileSync(SCHEMA, "utf8")) as object);
@@ -39,6 +44,14 @@ test("schema-and-hashes: Ajv accepts the file and payload_hash is the same every
 
   const again = await createExport(page, unit.unit_key);
   expect(again.status()).toBe(200);
-  const file2 = await download(page, ((await again.json()) as Created).export_id);
-  expect(file2.body.lessons).toEqual(file.body.lessons);
+  const againBody = (await again.json()) as Created;
+  expect(againBody.same_as_previous).toBe(true);
+  expect(againBody.export_id).toBe(c.export_id);
+  expect(againBody.version_number).toBe(c.version_number);
+  // AC-5 witnesses that are independent of the stored object: no second row, same bytes, same hash.
+  expect((await exportRows(unit.unit_id)).length).toBe(rowsBefore);
+  expect(rowsBefore).toBe(1);
+  const file2 = await download(page, againBody.export_id);
+  expect(file2.text).toBe(file.text);
+  expect(bundleHash(file2.body)).toBe(computed);
 });

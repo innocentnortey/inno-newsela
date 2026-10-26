@@ -11,8 +11,8 @@ describe("component names", () => {
     .sort();
   const expected = [...components, ...EXTRAS].sort();
 
-  it("spec has 102 components", () => {
-    expect(components).toHaveLength(102);
+  it("spec has 109 components", () => {
+    expect(components).toHaveLength(109);
   });
   it("no component is missing a mirror", () => {
     expect(expected.filter((n) => !exported.includes(n))).toEqual([]);
@@ -20,7 +20,7 @@ describe("component names", () => {
   it("no mirror lacks a component or extra", () => {
     expect(exported.filter((n) => !expected.includes(n))).toEqual([]);
   });
-  it("106 mirrors are counted", () => {
-    expect(exported).toHaveLength(106);
+  it("113 mirrors are counted", () => {
+    expect(exported).toHaveLength(113);
   });
 });
