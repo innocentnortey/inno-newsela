@@ -116,6 +116,8 @@ services:
       COLLAB_INTERNAL_URL: ${COLLAB_INTERNAL_URL:-http://collab:1234/internal}
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
       MODEL_PROVIDER_MODE: ${MODEL_PROVIDER_MODE:-stub}
+      # Shows the three demo accounts on the sign-in page (Compose demo only, not Render).
+      DEMO_ACCOUNTS: "1"
       BUILD_ID: ${BUILD_ID:-dev}
       ANTHROPIC_API_KEY:
       OPENROUTER_API_KEY:
