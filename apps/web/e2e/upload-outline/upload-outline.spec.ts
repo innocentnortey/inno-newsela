@@ -95,6 +95,14 @@ test("error UNSUPPORTED_FILE", async ({ page }) => {
   await expect(page.getByTestId("chosen-file")).toHaveText("Chosen: g6-u4-outline.xlsx");
 });
 
+test("unsupported file: the type banner shows alone after Upload, without Choose a file first", async ({ page }) => {
+  await open(page);
+  await page.locator("input[type=file]").setInputFiles({ name: "bad.txt", mimeType: "text/plain", buffer: Buffer.from("x") });
+  await page.getByRole("button", { name: "Upload" }).click();
+  await expect(alertBox(page)).toContainText("This file type isn't supported. Upload a CSV or XLSX file.");
+  await expect(page.getByText("Choose a file first.")).toHaveCount(0);
+});
+
 test("error HEADER_NOT_FOUND", async ({ page }) => {
   await respondWithError(page, "uploadOutline", "HEADER_NOT_FOUND", { columns_looked_for: ["Lesson #", "Focus", "Standards"] });
   await open(page);

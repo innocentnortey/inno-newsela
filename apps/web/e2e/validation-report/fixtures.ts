@@ -95,12 +95,12 @@ export function issuedShapeReport(): Report {
       segments: [{ segment_id: "s-task-9", column: "K", kind: "writer_task", text: "Writer to draft a short excerpt", action: null, source: "default", by: null }],
     }),
     row(12, 8, { level: "warning", findings: [finding("f-vocab", "vocabulary_over_cap", "warning", "H", "nine words listed", null)] }),
-    row(30, 20, { level: "error", findings: [finding("f-30", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.9")] }),
-    row(34, 24, { level: "error", findings: [finding("f-34", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.9")] }),
+    row(30, 20, { level: "error", findings: [finding("f-30", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.1, RL.6.2, RL.6.9, L.6.4")] }),
+    row(34, 24, { level: "error", findings: [finding("f-34", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.1, RL.6.2, RL.6.9, L.6.4")] }),
     row(39, 29, {
       level: "error",
       findings: [
-        finding("f-39", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.9"),
+        finding("f-39", "nonexistent_code", "error", "J", "RL.6.9.a", "RL.6.1, RL.6.2, RL.6.9, L.6.4"),
         finding("f-safety-39", "safety_note_proposed", "warning", "N", "Check allergy list", null),
       ],
     }),

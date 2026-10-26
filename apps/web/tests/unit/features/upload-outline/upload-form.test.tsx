@@ -88,6 +88,22 @@ describe("UploadForm", () => {
     expect(screen.getByRole("button", { name: "Choose file" })).toHaveFocus();
   });
 
+  it("unsupported file then upload: the type banner stays alone", async () => {
+    const { container } = setup();
+    pick(container, "bad.txt");
+    await userEvent.click(screen.getByRole("button", { name: "Upload" }));
+    expect(POST).not.toHaveBeenCalled();
+    expect(screen.getByText("This file type isn't supported. Upload a CSV or XLSX file.")).toBeInTheDocument();
+    expect(screen.queryByText("Choose a file first.")).not.toBeInTheDocument();
+  });
+
+  it("no file chosen: field message, no banner", async () => {
+    setup();
+    await userEvent.click(screen.getByRole("button", { name: "Upload" }));
+    expect(screen.getByText("Choose a file first.")).toBeInTheDocument();
+    expect(screen.queryByText(/isn't supported/)).not.toBeInTheDocument();
+  });
+
   it("extension_check_only", () => {
     const { container } = setup();
     pick(container, "a.pdf");

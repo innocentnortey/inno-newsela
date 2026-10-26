@@ -9,6 +9,7 @@ import {
 import { standards_double } from "../../tests/fixtures/outline/standards-double.ts";
 import { IntakeError } from "./errors.ts";
 import { normalize_outline } from "./normalize.ts";
+import { check_standards_cell } from "./normalize-codes.ts";
 import type { CellGrid } from "./parse-grid.ts";
 
 const run = (g: CellGrid) => normalize_outline(g, standards_double, 200);
@@ -205,5 +206,24 @@ describe("normalize_outline", () => {
   it("slice_rows: grid_from_rows keeps title, header and only the named rows", () => {
     const out = run(grid_from_rows([8]));
     expect(out.counts.lessons).toBe(1);
+  });
+
+  it("nonexistent code proposes the cell minus the bad code", () => {
+    const one = (cell: string) => check_standards_cell(cell, standards_double).findings.filter((f) => f.kind === "nonexistent_code");
+    const a = one("RL.6.1, RL.6.2, RL.6.9, RL.6.9.a, L.6.4");
+    expect(a).toEqual([
+      { kind: "nonexistent_code", original_text: "RL.6.9.a", proposed_fix: "RL.6.1, RL.6.2, RL.6.9, L.6.4", default_choice: null },
+    ]);
+    // suggestion not yet listed is appended
+    expect(one("L.6.1, L.6.4.z")[0]?.proposed_fix).toBe("L.6.1, L.6.4");
+    expect(one("L.6.1, W.6.9.z")[0]?.proposed_fix).toBe("L.6.1, W.6.9");
+    // only the bad code: its suggestion, or null when there is none
+    expect(one("W.6.9.z")[0]?.proposed_fix).toBe("W.6.9");
+    expect(one("RL.6.9.z, RL.6.9.y").map((f) => f.proposed_fix)).toEqual(["RL.6.9", "RL.6.9"]);
+    // issued sheet: every flagged cell keeps its valid codes
+    for (const f of kinds(run(load_issued_grid()).findings, "nonexistent_code")) {
+      expect(f.proposed_fix!.split(", ").length).toBeGreaterThan(1);
+      expect(f.proposed_fix).not.toContain(f.original_text);
+    }
   });
 });

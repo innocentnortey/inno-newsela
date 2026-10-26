@@ -77,6 +77,14 @@ test("confirm: all five confirmed turns the banner to success and Generate opens
   await expect(page.getByRole("dialog", { name: "Start a run" })).toBeVisible();
 });
 
+test("confirm unit: the request carries the full unit id and the real route's U4 rejection never fires", async ({ page }) => {
+  const ctrl = await open(page);
+  await ready(page);
+  await page.getByRole("button", { name: "Confirm U4 for the unit" }).click();
+  await expect(page.getByRole("button", { name: "Confirm U4 for the unit" })).toHaveCount(0);
+  expect(ctrl.choiceCalls.find((c) => c.kind === "confirm_unit")?.value).toBe("G6.U4");
+});
+
 test("eld: 7 of 12 codes are flagged with the sheet label beside the strand", async ({ page }) => {
   await open(page);
   await ready(page);

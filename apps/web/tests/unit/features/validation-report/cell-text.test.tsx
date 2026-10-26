@@ -40,3 +40,10 @@ describe("cell text is text (R-58)", () => {
     expect(container.innerHTML).toContain("&lt;script&gt;");
   });
 });
+
+describe("nonexistent code proposal", () => {
+  it("nonexistent: chips show the corrected list, not one code", () => {
+    view();
+    for (const code of ["RL.6.1", "RL.6.2", "L.6.4"]) expect(screen.getAllByText(code).length).toBeGreaterThan(0);
+  });
+});

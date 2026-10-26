@@ -12,6 +12,12 @@ export type UnitRule = components["schemas"]["UnitRule"];
 export type ChoiceRequest = components["schemas"]["IntakeChoiceRequest"];
 export type ChoiceResult = components["schemas"]["IntakeChoiceResult"];
 
+/** The full unit id ("G6.U4") behind a report's version id ("G6.U4.ov1"); null when it does not look like one (F-1). */
+export function unit_id_of(report: Report): string | null {
+  const id = report.outline_version_id.replace(/\.ov\d+$/, "");
+  return /^G\d{1,2}\.U\d{1,2}$/.test(id) ? id : null;
+}
+
 export interface TargetStatus {
   request: ChoiceRequest;
   phase: "saving" | "failed";

@@ -30,6 +30,9 @@ function apply(r: Report, req: ChoiceRequest): Row | { error: string } | null {
       if (req.kind === "edit_fix" && String(req.value).includes(".a")) {
         return { error: `"${String(req.value)}" is not a California standard. Use a code from the standards list, e.g. RL.6.9.` };
       }
+      if (req.kind === "confirm_unit" && req.value != null && !/^G\d{1,2}\.U\d{1,2}$/.test(String(req.value))) {
+        return { error: "That is not a unit id such as G6.U4." };
+      }
       f.choice = revert ? { value: null, source: "default", by: null, at: null } : { value: (req.value as string | null) ?? null, source: "confirmed", by: CHEN, at: CONFIRMED_AT };
       return row;
     }

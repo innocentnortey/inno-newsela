@@ -41,6 +41,8 @@ export function check_standards_cell(cell: string, standards: StandardsLookup): 
   const codes: string[] = [];
   const seen_nonexistent = new Set<string>();
   const seen_parent = new Set<string>();
+  // Filled in after the token loop, when the full code list is known (F-8). Findings keep their position.
+  const unknowns: { finding: RawFinding; code: string; suggestion: string | null }[] = [];
   let last_prefix: string | null = null;
 
   const consider = (code: string): void => {
@@ -48,7 +50,9 @@ export function check_standards_cell(cell: string, standards: StandardsLookup): 
     const res = standards.resolve(code);
     if (res.status === "unknown" && !seen_nonexistent.has(code)) {
       seen_nonexistent.add(code);
-      findings.push({ kind: "nonexistent_code", original_text: cell, proposed_fix: res.suggestion, default_choice: null });
+      const finding: RawFinding = { kind: "nonexistent_code", original_text: code, proposed_fix: null, default_choice: null };
+      findings.push(finding);
+      unknowns.push({ finding, code, suggestion: res.suggestion });
     } else if (res.status === "parent" && !seen_parent.has(code)) {
       seen_parent.add(code);
       findings.push({
@@ -92,6 +96,14 @@ export function check_standards_cell(cell: string, standards: StandardsLookup): 
         default_choice: null,
       });
     }
+  }
+  // Propose the cell's other codes in order of first appearance, with the invalid ones dropped and each suggestion
+  // appended only when it is not already listed.
+  const bad = new Set(unknowns.map((u) => u.code));
+  for (const u of unknowns) {
+    const fix = codes.filter((c) => !bad.has(c));
+    if (u.suggestion && !fix.includes(u.suggestion)) fix.push(u.suggestion);
+    u.finding.proposed_fix = fix.length > 0 ? fix.join(", ") : null;
   }
   return { codes, findings };
 }
