@@ -1,0 +1,336 @@
+{
+  "lesson_id": "G6.U4.L5",
+  "title": "Lesson 5: Comparing Percy and Soongoora",
+  "text_cards": [
+    {
+      "title": "The Lightning Thief",
+      "author": "Rick Riordan",
+      "edition": null,
+      "chapter": null,
+      "pages": null,
+      "kind": "off-platform-text",
+      "content_available": false
+    },
+    {
+      "title": "The Hare and the Lion",
+      "author": "George W. Bateman (translator)",
+      "edition": "Zanzibar Tales: Told by Natives of the East Coast of Africa",
+      "chapter": null,
+      "pages": null,
+      "kind": "off-platform-text",
+      "content_available": false
+    }
+  ],
+  "blocks": [
+    {
+      "role": "routine_heading",
+      "section": "Launch",
+      "part": null,
+      "text": "Think-Pair-Share",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Ask: Where were you told Percy is trouble in last night's pages?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "sample_response",
+      "section": "Launch",
+      "part": null,
+      "text": "Adults call Percy trouble and do not believe what he says.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Say: Today we read how Percy tells his own story.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "routine_heading",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Model an Explanatory Paragraph",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 10
+    },
+    {
+      "role": "cfu_item",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "",
+      "standard_codes": [
+        "W.6.2.a"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "Which is the strongest topic sentence for a paragraph comparing two characters?",
+        "options": [
+          "Percy and Soongoora both respond bravely when stronger figures try to control them.",
+          "Percy is a boy.",
+          "Soongoora is a hare.",
+          "Stories have characters."
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Correct: It names both characters and the comparison.",
+          "Incorrect: It names one character and no comparison.",
+          "Incorrect: It names one character and no comparison.",
+          "Incorrect: It names no character."
+        ],
+        "standard_code": "W.6.2.a"
+      },
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Watch for students who need the idea restated.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Purpose: students practise the skill.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "support_table",
+      "section": "Literacy Lab",
+      "part": null,
+      "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Say: Listen as I read pages 9-15 and think aloud.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 15
+    },
+    {
+      "role": "excerpt_slot",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Reviewer to insert: the passage of 'The Hare and the Lion' (Bateman translation) covering Soongoora's lie about the honey, Simba's challenge and the hare's escape plan",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Watch for students who need the idea restated.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Purpose: students practise the skill.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "support_table",
+      "section": "Learning in Action",
+      "part": "Part A",
+      "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "cfu_item",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "",
+      "standard_codes": [
+        "W.6.2.b"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "Which checklist item shows a concluding statement?",
+        "options": [
+          "A sentence that restates the comparison",
+          "A list of page numbers",
+          "A new topic",
+          "A drawing"
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Correct: It closes the paragraph by restating the comparison.",
+          "Incorrect: Page numbers are not a conclusion.",
+          "Incorrect: A new topic is not a conclusion.",
+          "Incorrect: A drawing is not a statement."
+        ],
+        "standard_code": "W.6.2.b"
+      },
+      "minutes": 15
+    },
+    {
+      "role": "cfu_item",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "",
+      "standard_codes": [
+        "W.6.2"
+      ],
+      "code_origins": [
+        "outline"
+      ],
+      "cfu": {
+        "stem": "Which sentence is a concluding statement that follows from the explanation?",
+        "options": [
+          "A sentence that restates the comparison",
+          "A list of page numbers",
+          "A new topic",
+          "A drawing"
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Correct: It closes the paragraph by restating the comparison.",
+          "Incorrect: Page numbers are not a conclusion.",
+          "Incorrect: A new topic is not a conclusion.",
+          "Incorrect: A drawing is not a statement."
+        ],
+        "standard_code": "W.6.2"
+      },
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "Watch for students who need the idea restated.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "Purpose: students practise the skill.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "support_table",
+      "section": "Learning in Action",
+      "part": "Part B",
+      "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "quick_write",
+      "section": "Look Back",
+      "part": null,
+      "text": "What similar fears and values do both stories reveal?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "sample_response",
+      "section": "Look Back",
+      "part": null,
+      "text": "Both stories show characters pushed by stronger figures who stay brave.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "homework",
+      "section": "Homework",
+      "part": null,
+      "text": "Read and annotate the next chapter of The Lightning Thief.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    }
+  ]
+}

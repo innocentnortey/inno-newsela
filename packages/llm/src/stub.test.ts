@@ -4,7 +4,7 @@ import { FakeClock } from "@ls/core/ports/clock";
 import type { StructuredCallRequest } from "@ls/core/ports/model-client";
 import type { JudgeRequest } from "@ls/core/ports/judge-client";
 import { LessonDraft } from "@ls/schema/lesson-draft";
-import { StubJudgeClient, StubModelClient, wp1_lesson_draft_text } from "./stub.ts";
+import { StubJudgeClient, StubModelClient, wp1_lesson_draft_text, wp2_lesson_draft_text, wp1_repaired_draft_text } from "./stub.ts";
 
 function req(over: Partial<StructuredCallRequest> = {}): StructuredCallRequest {
   return {
@@ -86,5 +86,17 @@ describe("judge_stub", () => {
     await expect(j.verdict(jr)).rejects.toBeInstanceOf(ProviderError);
     await expect(j.verdict(jr)).rejects.toThrow();
     expect(j.calls).toHaveLength(4);
+  });
+});
+
+describe("wp2_lesson_draft_text", () => {
+  it("wp2_lesson_draft_text parses as JSON with lesson G6.U4.L5", () => {
+    const parsed = JSON.parse(wp2_lesson_draft_text()) as { lesson_id: string };
+    expect(parsed.lesson_id).toBe("G6.U4.L5");
+    expect(LessonDraft.safeParse(parsed).success).toBe(true);
+  });
+
+  it("wp1_repaired_draft_text parses as the L4 lesson draft", () => {
+    expect((JSON.parse(wp1_repaired_draft_text()) as { lesson_id: string }).lesson_id).toBe("G6.U4.L4");
   });
 });

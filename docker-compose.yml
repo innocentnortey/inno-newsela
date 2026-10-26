@@ -99,6 +99,8 @@ services:
       dockerfile: Dockerfile.web
       args:
         BUILD_ID: ${BUILD_ID:-dev}
+        # Public URL, baked into the browser bundle at build time (changing COLLAB_PORT needs --build).
+        NEXT_PUBLIC_COLLAB_URL: ${NEXT_PUBLIC_COLLAB_URL:-ws://localhost:${COLLAB_PORT:-1234}}
     image: ls-web
     networks: [ls_net]
     ports:
@@ -111,7 +113,7 @@ services:
       ? COLLAB_INTERNAL_TOKEN
       : "${COLLAB_INTERNAL_TOKEN\
           :?set COLLAB_INTERNAL_TOKEN}"
-      COLLAB_INTERNAL_URL: http://collab:1234
+      COLLAB_INTERNAL_URL: ${COLLAB_INTERNAL_URL:-http://collab:1234/internal}
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
       MODEL_PROVIDER_MODE: ${MODEL_PROVIDER_MODE:-stub}
       BUILD_ID: ${BUILD_ID:-dev}

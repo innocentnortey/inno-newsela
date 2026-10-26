@@ -25,6 +25,7 @@ import { LOCKED_DIR } from "@ls/prompts/locked";
 import { PromptRenderer } from "@ls/prompts/render";
 import { SchemaRegistry } from "@ls/prompts/schemas";
 import type { WorkerDeps } from "../deps-types.ts";
+import { demo_stub_prices, is_demo_stub } from "./demo-stub.ts";
 import { CompileCheckNode } from "../generation/nodes/compile-check-node.ts";
 import { DraftNode } from "../generation/nodes/draft-node.ts";
 import { FailNode } from "../generation/nodes/fail-node.ts";
@@ -77,7 +78,7 @@ export function wire_generation(d: WorkerDeps, opts: GenerationOptions = {}): Ge
 
   const queue = new PgJobQueue(deps);
   const calls = new PgModelCallLog(deps);
-  const prices = opts.prices ?? PRICE_TABLE;
+  const prices = opts.prices ?? (is_demo_stub(d) ? demo_stub_prices() : PRICE_TABLE);
   const cost: CostMath = { settle_cost, max_call_cost };
   const recorder = new ModelCallRecorder(d.model_client, calls, d.clock, prices, d.settings.model, cost, { logger: d.logger });
   const spend = new PgSpendLedger({ ...deps, settings: d.settings.spend, logger: d.logger });

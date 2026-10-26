@@ -14,4 +14,23 @@ describe("build_worker_deps", () => {
     expect(deps.model_client).toBeInstanceOf(StubModelClient);
     await (deps.db as PgDatabase).close();
   });
+
+  it("stub mode client is scripted for unit_plan", async () => {
+    const settings = load_worker_settings({ DATABASE_URL: "postgres://u:p@localhost:5432/d", AUDIT_HASH_SALT: "s", COLLAB_INTERNAL_TOKEN: "t" });
+    const deps = build_worker_deps(settings, create_logger({ service: "worker", build_id: "t", level: "info", write: () => undefined }));
+    const r = await deps.model_client.complete({
+      alias: "GENERATION",
+      system_blocks: [],
+      user_blocks: [{ text: "<<<OUTLINE_DATA kind=row row=8>>>\n{}\n<<<END_OUTLINE_DATA>>>", cacheable: false, label: "data" }],
+      output_schema_name: "UnitPlanDraft",
+      output_json_schema: {},
+      output_mode: "prompt_embedded",
+      max_output_tokens: 100,
+      timeout_ms: 1000,
+      effort: null,
+      temperature: null,
+    });
+    expect(JSON.parse(r.raw_text).entries[0].lesson_id).toBe("G6.U4.L4");
+    await (deps.db as PgDatabase).close();
+  });
 });

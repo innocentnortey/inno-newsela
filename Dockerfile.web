@@ -13,6 +13,9 @@ RUN npm ci --ignore-scripts
 
 FROM deps AS build
 ARG BUILD_ID=dev
+# Public URL (not a secret): the browser editor's collab endpoint, inlined into the bundle at build time.
+ARG NEXT_PUBLIC_COLLAB_URL
+ENV NEXT_PUBLIC_COLLAB_URL=$NEXT_PUBLIC_COLLAB_URL
 COPY apps/web apps/web
 RUN npm run build -w @ls/web
 
