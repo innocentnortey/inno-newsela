@@ -4,7 +4,7 @@
 ([`demo-decision-inventory.md`](demo-decision-inventory.md), draft 2), the NL-126 QA report
 ([`QA_REPORT.md`](../ux/05-verify/QA_REPORT.md)), the NL-127 load report
 ([`load-2026-10-26.md`](../../evals/reports/load-2026-10-26.md)), the eval reports, the spikes SP-1 to SP-3. The matching
-video order is in [`2026-10-26-demo-script.md`](2026-10-26-demo-script.md). Per
+video order is in [`demo-script.md`](demo-script.md). Per
 [hiring-partner-framing](../../.claude/rules/hiring-partner-framing.md) (*Interview-preparation route*): say the business
 problem in one sentence, then spend most of the answer on the architecture, the decision, the rejected alternative,
 the verification and the limit. The tool is expert-driven (GR-16): it drafts, named reviewers decide.
