@@ -26,6 +26,10 @@ export interface PromptSection {
   required_roles: readonly string[];
   /** Exact part labels the section's blocks carry (for example Part A, Part B). */
   parts?: readonly string[];
+  /** Roles each part must hold, keyed by part label. */
+  part_roles?: Readonly<Record<string, readonly string[]>>;
+  /** The placeholder role a part is expected to hold, keyed by part label. */
+  part_placeholder?: Readonly<Record<string, string>>;
 }
 export interface PromptSectionTemplate {
   sections: readonly PromptSection[];

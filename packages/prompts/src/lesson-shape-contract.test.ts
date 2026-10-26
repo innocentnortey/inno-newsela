@@ -27,7 +27,14 @@ describe("lesson-shape contract text", () => {
   });
   it("requires a Flex sample_response in Launch and parts only where the template lists them", () => {
     expect(shape).toContain("also needs a sample_response in Launch");
-    expect(shape).toContain("Only a section whose template line ends with parts uses them");
+    expect(shape).toContain("Only a section whose template line lists parts uses them");
+  });
+  it("states the placeholder policy and the part roles (WP-1, WP-2, WP-4)", () => {
+    for (const phrase of [
+      "Part roles.", "Placeholders.", "exactly one in Learning in Action Part A", "never more than two blocks",
+      "only when the card's homework asks students to read a separate named text",
+      "A Writing lesson never gets a second placeholder",
+    ]) expect(shape, phrase).toContain(phrase);
   });
   it("no longer forbids narrowing", () => {
     expect(shape).not.toContain("Do not narrow");

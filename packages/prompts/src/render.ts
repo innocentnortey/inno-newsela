@@ -41,11 +41,19 @@ function context_block(lines: string[]): PromptBlock {
 function instruction_block(text: string): PromptBlock {
   return { label: "instruction", cacheable: false, text };
 }
+/** "; Part A roles: a, b, c" -- the part's required roles, then its expected placeholder role. */
+function part_line(s: PromptSectionTemplate["sections"][number], part: string): string {
+  const roles = [...(s.part_roles?.[part] ?? [])];
+  const placeholder = s.part_placeholder?.[part];
+  if (placeholder !== undefined && !roles.includes(placeholder)) roles.push(placeholder);
+  return roles.length === 0 ? "" : `; ${part} roles: ${roles.join(", ")}`;
+}
 function template_block(t: PromptSectionTemplate): PromptBlock {
   const lines = t.sections.map(
     (s, i) =>
       `section ${i + 1}: ${s.name}, ${s.minutes} minutes, roles: ${s.required_roles.join(", ")}` +
-      (s.parts !== undefined && s.parts.length > 0 ? `; parts: ${s.parts.join(", ")}` : ""),
+      (s.parts !== undefined && s.parts.length > 0 ? `; parts: ${s.parts.join(", ")}` : "") +
+      (s.parts ?? []).map((p) => part_line(s, p)).join(""),
   );
   return data_block({ kind: "template" }, lines.join("\n"));
 }

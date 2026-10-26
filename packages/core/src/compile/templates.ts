@@ -6,6 +6,18 @@ export interface SectionSlot {
   required_roles: readonly DraftRole[];
   /** Exact part labels every block of this section carries (WP-1/WP-2: Part A, Part B). */
   parts?: readonly string[];
+  /**
+   * Roles each part must hold (WP-1/WP-2 table B, Learning in Action Part A and Part B). Keys are labels from `parts`.
+   * The prompt prints them (render.ts template_block) so the model is told the worked-pair list. The structural check
+   * still enforces only the section-level `required_roles` (a per-part check would block lessons that pass today).
+   */
+  part_roles?: Readonly<Record<string, readonly DraftRole[]>>;
+  /**
+   * Placeholder role a part is expected to hold (the lesson-shape placeholder policy: WP-1 Part A text_evidence_needed,
+   * WP-2 and WP-4 Part A excerpt_slot). Printed for the model; not enforced per part, because whether a lesson needs a
+   * quotation is a property of the row (the excerpt-slot obligation check owns the Writing case).
+   */
+  part_placeholder?: Readonly<Record<string, DraftRole>>;
 }
 export interface SectionTemplate {
   lesson_type: string;
@@ -17,15 +29,31 @@ const slot = (
   minutes: number,
   required_roles: readonly DraftRole[],
   parts?: readonly string[],
+  extra?: Pick<SectionSlot, "part_roles" | "part_placeholder">,
 ): SectionSlot => ({
   name,
   minutes,
   required_roles,
   ...(parts !== undefined ? { parts } : {}),
+  ...(extra ?? {}),
 });
 
 // Learning in Action routine headings are not required (WP-1/WP-2 table B list none). Part A/Part B are required for
 // Reading and Writing only (WP-1, WP-2); Academic Discussion, Research and Presentation have no worked pair, so no parts.
+// Part A / Part B roles per lesson kind, oracle WP-1 (Reading) and WP-2 (Writing) "Required output B" tables and the S3
+// expected.json files that restate them. Reading Part A: teacher_talk + support_table, and the lesson's one
+// text_evidence_needed; Writing Part A: support_table, and the one excerpt_slot; Part B: cfu_item + support_table.
+const PART_ROLES = {
+  Reading: {
+    part_roles: { "Part A": ["teacher_talk", "support_table"], "Part B": ["cfu_item", "support_table"] },
+    part_placeholder: { "Part A": "text_evidence_needed" },
+  },
+  Writing: {
+    part_roles: { "Part A": ["support_table"], "Part B": ["cfu_item", "support_table"] },
+    part_placeholder: { "Part A": "excerpt_slot" },
+  },
+} as const satisfies Record<string, Pick<SectionSlot, "part_roles" | "part_placeholder">>;
+
 const five = (lesson_type: string, opts: { parts: boolean }): SectionTemplate => ({
   lesson_type,
   sections: [
@@ -38,6 +66,7 @@ const five = (lesson_type: string, opts: { parts: boolean }): SectionTemplate =>
       30,
       ["teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch", "support_table"],
       opts.parts ? ["Part A", "Part B"] : undefined,
+      opts.parts ? (lesson_type === "Reading" ? PART_ROLES.Reading : PART_ROLES.Writing) : undefined,
     ),
     slot("Look Back", 5, ["quick_write", "sample_response"]),
     slot("Homework", 0, ["homework"]),

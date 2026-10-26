@@ -60,6 +60,28 @@ describe("templates", () => {
   });
 });
 
+// Oracle: docs/data/worked-pairs.md WP-1 and WP-2 "Required output B" Learning in Action rows, restated by
+// evals/cases/drafts/wp-1 and wp-2 expected.json (Part A / Part B role lists).
+describe("templates: part roles", () => {
+  const lia = (t: string) => template_for(t)!.sections.find((s) => s.name === "Learning in Action")!;
+  it("Reading: Part A teacher_talk + support_table + one text_evidence_needed; Part B cfu_item + support_table (WP-1)", () => {
+    expect(lia("Reading").part_roles).toEqual({ "Part A": ["teacher_talk", "support_table"], "Part B": ["cfu_item", "support_table"] });
+    expect(lia("Reading").part_placeholder).toEqual({ "Part A": "text_evidence_needed" });
+  });
+  it("Writing: Part A support_table + the excerpt_slot; Part B cfu_item + support_table (WP-2)", () => {
+    expect(lia("Writing").part_roles).toEqual({ "Part A": ["support_table"], "Part B": ["cfu_item", "support_table"] });
+    expect(lia("Writing").part_placeholder).toEqual({ "Part A": "excerpt_slot" });
+  });
+  it("only Reading and Writing carry part roles, and every key is one of the section's parts", () => {
+    for (const t of SECTION_TEMPLATES.templates)
+      for (const sec of t.sections) {
+        const keys = [...Object.keys(sec.part_roles ?? {}), ...Object.keys(sec.part_placeholder ?? {})];
+        if (!["Reading", "Writing"].includes(t.lesson_type)) expect(keys, `${t.lesson_type} ${sec.name}`).toEqual([]);
+        for (const k of keys) expect(sec.parts, `${t.lesson_type} ${sec.name}`).toContain(k);
+      }
+  });
+});
+
 describe("templates: named tolerances and obligations", () => {
   it("minutes_tolerances_are_named", () => {
     expect(SECTION_MINUTES_PROMPT_TOLERANCE).toBe(0);

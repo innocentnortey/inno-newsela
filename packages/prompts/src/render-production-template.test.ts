@@ -19,10 +19,16 @@ describe("production template as the prompt renders it", () => {
     const lines = template_lines(template_for("Reading")!);
     expect(lines).toContain("section 1: Launch, 5 minutes, roles: routine_heading, teacher_talk, sample_response");
     expect(lines).toContain(
-      "section 3: Learning in Action, 30 minutes, roles: teacher_talk, cfu_item, callout_purpose, callout_say, callout_watch, support_table; parts: Part A, Part B",
+      "section 3: Learning in Action, 30 minutes, roles: teacher_talk, cfu_item, callout_purpose, callout_say, callout_watch, support_table; parts: Part A, Part B; Part A roles: teacher_talk, support_table, text_evidence_needed; Part B roles: cfu_item, support_table",
     );
     expect(lines).toContain("section 4: Look Back, 5 minutes, roles: quick_write, sample_response");
     expect(lines).toContain("section 5: Homework, 0 minutes, roles: homework");
+  });
+
+  it("writing_template_names_the_excerpt_slot_in_part_a", () => {
+    // hand-written from WP-2 "Required output B": Part A is the excerpt slot + support table, Part B the checklist cfu_item + support table
+    const lia = template_lines(template_for("Writing")!).find((l) => l.includes(": Learning in Action, "))!;
+    expect(lia).toContain("; Part A roles: support_table, excerpt_slot; Part B roles: cfu_item, support_table");
   });
 
   it("academic_discussion_prints_no_parts_and_flex_keeps_its_heading", () => {

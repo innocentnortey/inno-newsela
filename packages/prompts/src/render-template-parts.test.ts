@@ -22,4 +22,14 @@ describe("template block parts", () => {
   it("leaves a section without parts exactly as before", () => {
     expect(template_text(TEMPLATE)).not.toContain("parts:");
   });
+  it("prints each part's roles and its placeholder role after the parts", () => {
+    const template = {
+      sections: TEMPLATE.sections.map((s) =>
+        s.name === "Practice"
+          ? { ...s, parts: ["Part A", "Part B"], part_roles: { "Part A": ["teacher_talk", "support_table"], "Part B": ["cfu_item"] }, part_placeholder: { "Part A": "text_evidence_needed" } }
+          : s),
+    };
+    const lia = template_text(template).split("\n").find((l) => l.includes("Practice"))!;
+    expect(lia).toContain("; Part A roles: teacher_talk, support_table, text_evidence_needed; Part B roles: cfu_item");
+  });
 });
