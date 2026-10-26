@@ -1,0 +1,11 @@
+kind,level,count,count
+proper_noun_unsourced,advisory,67,29
+arc_repeat,advisory,54,26
+quote_placeholder_open,blocking,25,21
+vocabulary_over_cap,advisory,21,21
+excerpt_slot_open,blocking,15,14
+cross_lesson_link,blocking,5,5
+standard_confirmation,confirmation,4,4
+safety_flag_open,blocking,1,1
+safety_note_without_tip,blocking,1,1
+(9 rows)

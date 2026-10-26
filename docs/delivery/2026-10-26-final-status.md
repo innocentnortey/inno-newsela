@@ -75,3 +75,26 @@ NL-02, NL-03, NL-122, NL-123, NL-124, NL-133 (UX-5b), NL-138 video, NL-143 porta
 | NL-120 | Facts reconciled; treat as pending review | The PD-32 fallback line was recorded early; it needs Innocent's review or a genuine fallback event |
 | NL-128..130, NL-134 | No experiment evidence | NL-128's proposal duplicated an instruction already in the prompt |
 | NL-135 | Open | Needs the blind human review |
+
+## Addendum: measurement of the final candidate `ed7a073` (one pass, 2026-10-26 evening)
+
+Artefacts: [`docs/testing/error-analysis/paid-final-ed7a073/`](../testing/error-analysis/paid-final-ed7a073/), devlog [`2026-10-26-final-candidate-measure.md`](../devlog/2026-10-26-final-candidate-measure.md). New prompt version `pr_01M5WTKTZ18CGJWEAYYNWQSY5S` (locked hash `f1d29f98868a…`), so the NL-134 rerun rule applies and these numbers are **not like-for-like** with run 3 (code and checks also changed).
+
+| Measure | Run 3 (`64fe0e9`) | Final candidate run `run_01M5WV0E6SPZ1SZE244Q8YR95S` |
+|---|---|---|
+| Initial parse + compile | 44/47 | 37/47 (37/38 of those drafted) |
+| Ready with no repair | 19/47 | 28/47 (28/38 drafted) |
+| Stored ready | 30/47 | 37/47 (37/38 drafted) |
+| Repairs attempted / recovered | 28 / 11 | 10 / 9 |
+| Not ready | 17 | 10: 9 `capped` (never drafted), 1 content failure (L19) |
+| Cost (stored `model_call` sum) | $3.597 | $3.385 |
+
+The whole-unit run ended **`capped`**: the driver flag is `--cap-usd` (not `--max-usd`), each draft reserves about $0.34 and six run at once, so the $5 cap was reached by reservations at $3.385 settled; FLEX-2b, FLEX-3a, FLEX-3b and L36-L41 were never drafted. The improvement over run 3 is therefore partly a denominator effect; it is not a 47-lesson result. The report's 90% first-pass threshold shows FAIL on the 47 denominator (0.787), 0.974 on the 38 drafted.
+
+S3 drafts x3 (real model, $0.7457): **3/9 pass** (wp-3 3/3; wp-1 0/3, FC-7 placeholder count and FC-3 missing Part A role; wp-2 0/3, placeholder count 2 vs expected 1 and one FC-3). M-31 initial parse and compile 9/9. The S3 floor is 1.0, so the suite does not pass.
+
+New checks on the 10 repairs: teaching tag and standards evidence (L22) and Part A/B roles (L2, L30) were true positives and were repaired; 5 of the 10 repairs were the known capitalised-word residual ("Length", "Opinions"), i.e. checker false positives; 4 lessons failed minutes. Flex roles: only 3 of 6 Flex lessons were drafted, none failed. The stored issue rows keep only the check kind, so L19's final name finding cannot be classed.
+
+**Not done.** The isolated real-stack run (`ops/e2e-real-stack.sh`) was started twice and **produced no valid record**: the first run exposed the folder-filter bug (fixed in `05ff31f`); the second (on `ed7a073`) was invalidated when another session began editing the working tree (`apps/web/app/layout.tsx` theme bootstrap, `docs/design/design.md`, screenshots) and its first two folders had already timed out under load; it was stopped. con-6's first-poll gap remains unresolved. No real-stack evidence exists for the final commit.
+
+**Spend.** About $14.5 of the $20 session authorisation (about $10.1 before this pass plus $4.38; at most about $0.10 more for one hung call that recorded no cost). About $5.5 remains.

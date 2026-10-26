@@ -1,0 +1,10 @@
+G6.U4.L1|minutes_out_of_range: "Learning in Action" is 32 minutes; the template expects 30 (allowed difference 1) @ G6.U4.L1.LearningInAction  ||  proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L1.LearningInAction | matched: "Opinions"
+G6.U4.L2|section_missing: Lesson is missing a required excerpt slot (outline writer task) @ G6.U4.L2.LearningInAction  ||  proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L2.LearningInAction | matched: "Length"
+G6.U4.L12|proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L12.LearningInAction.PartA | matched: "Length"
+G6.U4.FLEX-1b|proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.FLEX-1b.LearningInAction | matched: "Length"
+G6.U4.L19|
+G6.U4.L22|standard_not_taught: Standard RL.6.9.a has no teaching routine tagged with it at G6.U4.L22.FrontMatter (standard_not_taught) @ G6.U4.L22.FrontMatter | code: RL.6.9.a  ||  standard_not_checked: Standard RL.6.9.a has no Pulse Check or Quick Write tagged with it at G6.U4.L22.LearningInAction.PartA (standard_not_checked) @ G6.U4.L22.LearningInAction.PartA | code: RL.6.9.a
+G6.U4.L28|minutes_out_of_range: "Learning in Action" is 34 minutes; the template expects 30 (allowed difference 1) @ G6.U4.L28.LearningInAction
+G6.U4.L30|section_missing: Section "Learning in Action" is missing required role support_table @ G6.U4.L30.LearningInAction
+G6.U4.FLEX-2a|minutes_out_of_range: "Learning in Action" is 42 minutes; the template expects 40 (allowed difference 1) @ G6.U4.FLEX-2a.LearningInAction
+G6.U4.L35|minutes_out_of_range: "Learning in Action" is 33 minutes; the template expects 30 (allowed difference 1) @ G6.U4.L35.LearningInAction  ||  proper_noun_unsourced: Proper name is not in this lesson's outline row, arc header or standards @ G6.U4.L35.LearningInAction | matched: "Length"

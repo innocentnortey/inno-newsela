@@ -1,0 +1,4 @@
+spend before step A (this task, stored rows): $0.00 (fresh DB); prior session ~$10.1
+first S3 attempt with --max-usd 3 refused by cost guard (estimate 3.17 > 3.00), no call made, spend 0; rerun with --max-usd 3.2 (guard only; actual expected ~0.8)
+S3 attempt 2 (--max-usd 3.2) was killed at 15 min by my tool timeout (exit 137, no report); stored rows in ls_paid_s3_10261858: 2 case results, $0.236 (+ maybe one unrecorded in-flight call). Restarting once as background job on fresh DB ls_paid_s3b_10261921 (infrastructure interruption, not a result).
+S3 attempt 3 finished: stored report cost $0.7457 (19 calls); task total so far = 0.7457 + 0.236 (killed attempt, stored) = ~$0.98 (+ possible unrecorded in-flight call of the killed attempt, <= ~0.13)
