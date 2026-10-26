@@ -31,7 +31,7 @@ export const RequestChanges = z
   .object({
     action: z.literal("request_changes"),
     tag: SendBackTag,
-    note: z.string(),
+    note: z.string().max(2000),
     // CHG-3: optional pin; both or neither (the service answers INVALID_REQUEST for one alone).
     snapshot_hash: Sha256.optional(),
     snapshot_state_vector: StateVector.optional(),
@@ -42,7 +42,7 @@ export type RequestChanges = z.infer<typeof RequestChanges>;
 export const Reopen = z
   .object({
     action: z.literal("reopen"),
-    reason: z.string(),
+    reason: z.string().max(2000),
     snapshot_hash: Sha256.optional(),
     snapshot_state_vector: StateVector.optional(),
   })

@@ -59,3 +59,5 @@ Owner: orchestrator. Each row is work for a `lane::build-loop` fix ticket (cut a
 - S-40 (NL-113): AC-2 "Submit enabled after" half not asserted in con-13 pending.spec.
 - S-41 (NL-110): AC-10 "answer yes" activity not exercised in sent_equals_logged; NL-32 frozen price test re-hashed without owner sign-off.
 - S-42 (NL-115/116/102): risk::security freeze-first folded into the implementer run; security-privacy-agent wave read still due (NL-116 stub seam `wiring/assist.ts` 1-15).
+- S-43 (security read, Medium): web service in `docker-compose.yml` receives `OPENROUTER_API_KEY` but only the worker judge uses it. Removing it conflicts with frozen test `tests/platform/images-static.test.ts` (NL-23 `test_provider_keys_by_name_only` expects both keys on web and worker); needs a deliberate refreeze with a note, not done silently.
+- S-44 (security read, Low): `note`/`reason` capped at 2000 in `packages/schema/src/api/transition.ts` (done); confirm a request body-size limit at proxy/Next; compose default `POSTGRES_PASSWORD=ls_dev_only` must be set for any deployed demo; expose provider mode in /healthz; download is not audited.
