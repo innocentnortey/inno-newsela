@@ -104,4 +104,26 @@ describe("CollabSession", () => {
     expect(s.snapshot().mode_state).toBe("submitted");
     expect(s.snapshot().state).toBe("read_only");
   });
+
+  it("late text after read-only lands after the refused text", async () => {
+    const m = await mock();
+    const s = session(m, "L7");
+    await until(() => s.snapshot().state === "synced");
+    await post(m, "/__mock/lock");
+    await until(() => s.snapshot().read_only);
+    s.add_late_text("06 ");
+    s.doc.getText("t").insert(0, "b");
+    await until(() => (s.snapshot().refusal?.text.length ?? 0) > 1, 5000);
+    expect(s.snapshot().refusal?.text.join("")).toBe("b06 ");
+  }, 20000);
+
+  it("late text with no refusal still shows a notice", async () => {
+    const m = await mock();
+    const s = session(m, "L8");
+    await until(() => s.snapshot().state === "synced");
+    await post(m, "/__mock/lock");
+    await until(() => s.snapshot().read_only);
+    s.add_late_text("x");
+    expect(s.snapshot().refusal).toEqual({ message: "Your last edits were not saved.", text: ["x"], dropped: 0 });
+  }, 20000);
 });
