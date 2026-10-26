@@ -11,9 +11,9 @@ import { lesson_of, load_fixture, text } from "./s6-world.ts";
 type Block = { role: string; section: string; part: string | null; text: string; standard_codes: string[]; code_origins: string[]; cfu: unknown; minutes: number | null };
 const base = load_fixture("wp-2.json").draft as { lesson_id: string; title: string; text_cards: unknown[]; blocks: Block[] };
 
-function cfu_block(code: string | null): Block {
+function cfu_block(code: string | null, section = "Learning in Action", part: string | null = "Part B"): Block {
   return {
-    role: "cfu_item", section: "Learning in Action", part: "Part B", standard_codes: code === null ? [] : [code], code_origins: code === null ? [] : ["outline"], minutes: null,
+    role: "cfu_item", section, part, standard_codes: code === null ? [] : [code], code_origins: code === null ? [] : ["outline"], minutes: null,
     text: "Check for understanding.",
     cfu: {
       stem: code === null ? "Which choice best shows the skill practised today?" : `Which choice best shows the skill named by ${code}?`,
@@ -52,7 +52,15 @@ export function draft_for(row: NormalizedRow): unknown {
   }
   // A flex day names no focus code but the template still needs a CFU item: it carries no code.
   const codes: (string | null)[] = row.focus_codes.length > 0 ? row.focus_codes : [null];
-  return { lesson_id: row.lesson_id, title: `${row.title}`.slice(0, 120) || "Lesson", text_cards: base.text_cards, blocks: [...kept, ...codes.map(cfu_block)] };
+  // Contract correction: stub drafts meet the production template (F1). A template with a Literacy Lab needs a check there
+  // (no code: it makes no standard claim), and a flex day needs a teacher tip in Learning in Action.
+  const lab: Block[] = names.has("Literacy Lab") ? [cfu_block(null, "Literacy Lab", null)] : [];
+  const tip: Block[] = (template?.sections ?? []).some((s) => s.name === "Learning in Action" && s.required_roles.includes("teacher_tip"))
+    ? [{ role: "teacher_tip", section: "Learning in Action", part: null, text: "Let pairs rehearse aloud first.", standard_codes: [], code_origins: [], cfu: null, minutes: null }]
+    : [];
+  const at = kept.findLastIndex((b) => b.section === "Literacy Lab") + 1;
+  kept.splice(at, 0, ...lab);
+  return { lesson_id: row.lesson_id, title: `${row.title}`.slice(0, 120) || "Lesson", text_cards: base.text_cards, blocks: [...kept, ...tip, ...codes.map((c) => cfu_block(c))] };
 }
 
 /** Script function for the draft and repair purposes: a healthy draft for the lesson the request names. */
