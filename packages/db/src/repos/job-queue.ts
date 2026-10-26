@@ -36,6 +36,7 @@ const CLAIM_SQL = `
 WITH active AS (
   SELECT id, created_at FROM run
    WHERE state IN ('planning','running')
+     AND ($5::text IS NULL OR EXISTS (SELECT 1 FROM prompt_version pv WHERE pv.id = run.prompt_version_id AND pv.locked_hash = $5::text))
      AND EXISTS (SELECT 1 FROM lesson_job q WHERE q.run_id = run.id AND q.status IN ('queued','running'))
    ORDER BY created_at, id LIMIT $1
 ), load AS (
@@ -58,12 +59,39 @@ FROM pick, run r WHERE j.id = pick.id AND r.id = j.run_id
 RETURNING j.id, j.run_id, j.kind, j.lesson_id, j.attempt, j.lease_until, j.idempotency_key, j.reviewer_note,
   r.unit_id, r.prompt_version_id, r.outline_version_id, r.started_by, r.choices_json->>'schema_version' AS schema_version`;
 
+// Pin-aware claim (R-F3-2): a worker only claims jobs of runs whose pinned prompt_version.locked_hash equals the locked hash
+// of the files it renders with. The filter sits in `active` so other-pin runs cannot occupy the active-run window and starve
+// matching ones. Other-pin jobs are left exactly as they are (not failed, cancelled or repinned).
+export type ClaimPin = { mode: "locked_hash"; locked_hash: string } | { mode: "any_pin" };
+
+/** Explicit opt-out for tests and tools that never render: claims jobs of every pin, as before R-F3-2. Never for production wiring. */
+export const ANY_PIN: ClaimPin = { mode: "any_pin" };
+
+export interface OtherPinReport {
+  /** queued jobs whose run pins a different locked hash (any run state; paused/capped runs are latent) */
+  queued_other_pin: number;
+  /** queued jobs whose run names a prompt version with no row */
+  queued_pin_missing: number;
+  /** of queued_other_pin: jobs in planning/running runs, i.e. live right now */
+  queued_other_pin_live: number;
+  /** distinct locked hashes (first 12 hex chars) of the other-pin jobs */
+  other_hashes: string[];
+}
+
+const OTHER_PIN_SQL = `SELECT p.locked_hash AS h, (p.id IS NULL) AS missing, r.state AS run_state, count(*)::int AS n
+  FROM lesson_job j JOIN run r ON r.id = j.run_id LEFT JOIN prompt_version p ON p.id = r.prompt_version_id
+ WHERE j.status = 'queued' AND (p.id IS NULL OR p.locked_hash <> $1::text)
+ GROUP BY 1, 2, 3`;
+
 export class PgJobQueue implements JobQueue {
   private readonly db: PgDatabase;
   private readonly ids: IdGenerator;
   private readonly clock: Clock;
 
-  constructor(deps: PgRepoDeps) {
+  /** `claim_pin` is required to claim: leaving it out makes claim() refuse, so production wiring can never silently claim every pin. */
+  constructor(deps: PgRepoDeps, private readonly claim_pin?: ClaimPin) {
+    if (claim_pin?.mode === "locked_hash" && !/^[0-9a-f]{64}$/.test(claim_pin.locked_hash))
+      throw new InvariantViolation("claim pin is not a sha256 hex");
     this.db = deps.db;
     this.ids = deps.ids;
     this.clock = deps.clock;
@@ -114,9 +142,32 @@ export class PgJobQueue implements JobQueue {
     }
   }
 
-  async claim(worker_id: string, max_active_runs: number, lease_ms: number): Promise<ClaimedJob | null> {
+  /** Queued jobs this worker's pin will never claim. Read-only; the operator sees them in one log line at worker start. */
+  async other_pin_report(): Promise<OtherPinReport> {
+    const pin = this.claim_pin;
+    if (pin === undefined || pin.mode !== "locked_hash")
+      return { queued_other_pin: 0, queued_pin_missing: 0, queued_other_pin_live: 0, other_hashes: [] };
     return this.db.with_tx(async (tx) => {
-      const r = await tx.query(CLAIM_SQL, [max_active_runs, worker_id, this.now(), lease_ms]);
+      const rows = (await tx.query(OTHER_PIN_SQL, [pin.locked_hash])).rows;
+      const rep: OtherPinReport = { queued_other_pin: 0, queued_pin_missing: 0, queued_other_pin_live: 0, other_hashes: [] };
+      for (const r of rows) {
+        const n = Number(r["n"]);
+        if (r["missing"] === true) { rep.queued_pin_missing += n; continue; }
+        rep.queued_other_pin += n;
+        if (r["run_state"] === "planning" || r["run_state"] === "running") rep.queued_other_pin_live += n;
+        const h = String(r["h"]).slice(0, 12);
+        if (!rep.other_hashes.includes(h)) rep.other_hashes.push(h);
+      }
+      rep.other_hashes.sort();
+      return rep;
+    });
+  }
+
+  async claim(worker_id: string, max_active_runs: number, lease_ms: number): Promise<ClaimedJob | null> {
+    const pin = this.claim_pin;
+    if (pin === undefined) throw new InvariantViolation("job queue has no claim pin: pass a locked hash (or ANY_PIN in a test)");
+    return this.db.with_tx(async (tx) => {
+      const r = await tx.query(CLAIM_SQL, [max_active_runs, worker_id, this.now(), lease_ms, pin.mode === "locked_hash" ? pin.locked_hash : null]);
       const c = r.rows[0];
       if (c === undefined) return null;
       const sv = c["schema_version"] === null ? NaN : Number(c["schema_version"]);

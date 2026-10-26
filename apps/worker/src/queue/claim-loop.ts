@@ -50,6 +50,11 @@ export interface UnitPlanJobPort {
   run(job: ClaimedJob, signal?: AbortSignal): Promise<UnitPlanOutcomeView>;
 }
 
+/** Reads the queued jobs this worker's pin will not claim (PgJobQueue.other_pin_report). Optional: a loop without one logs no count. */
+export interface OtherPinPort {
+  other_pin_report(): Promise<{ queued_other_pin: number; queued_pin_missing: number; queued_other_pin_live: number; other_hashes: string[] }>;
+}
+
 type LoopSettings = Pick<
   WorkerSettings,
   "worker_id" | "generation_concurrency" | "max_active_runs" | "job_lease_ms" | "job_poll_ms"
@@ -84,6 +89,8 @@ export class ClaimLoop {
     private readonly logger: Logger,
     private readonly settings: LoopSettings,
     private readonly tx: TxRunner,
+    private readonly other_pins?: OtherPinPort,
+    private readonly own_pin?: string,
   ) {}
 
   // The unit-plan call (and its one repair) bill to the run, not a lesson; roll them onto the plan job's own row.
@@ -108,6 +115,7 @@ export class ClaimLoop {
     this.logger.info("claim_loop.start", {
       extra: { requeued: rep.requeued, lost_calls_marked: lost, reservations_released: released },
     });
+    await this.log_other_pins();
     return {
       claimed: 0,
       in_flight: 0,
@@ -115,6 +123,25 @@ export class ClaimLoop {
       lost_calls_marked: lost,
       reservations_released: released,
     };
+  }
+
+  // One line per worker start: queued jobs left for a worker with a matching locked layer. Never fails the start.
+  private async log_other_pins(): Promise<void> {
+    if (this.other_pins === undefined) return;
+    try {
+      const o = await this.other_pins.other_pin_report();
+      const left = o.queued_other_pin + o.queued_pin_missing;
+      this.logger.info("claim_loop.other_pin_jobs_left", {
+        extra: {
+          message: left === 0 ? "no queued jobs pinned to another locked layer" : "queued jobs pinned to another locked layer are left untouched; finish them with a matching-artifact worker or see the runbook",
+          own_locked_hash: this.own_pin === undefined ? null : this.own_pin.slice(0, 12),
+          queued_other_pin: o.queued_other_pin, queued_other_pin_live: o.queued_other_pin_live,
+          queued_pin_missing: o.queued_pin_missing, other_locked_hashes: o.other_hashes.join(","),
+        },
+      });
+    } catch (e) {
+      this.logger.warn("claim_loop.other_pin_report_failed", { extra: { name: e instanceof Error ? e.name : "unknown" } });
+    }
   }
 
   async run_until(stop: StopSignal): Promise<LoopExit> {

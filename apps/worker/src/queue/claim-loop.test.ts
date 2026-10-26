@@ -24,7 +24,7 @@ function world(n_jobs = 0, kind: "lesson" | "unit_plan" = "lesson") {
   const { logger, lines } = make_logger();
   const jobs = Array.from({ length: n_jobs }, (_, i) => queue.add(make_job_row({ run_id: "run_a", kind, lesson_id: kind === "lesson" ? `G6.U1.L${i + 1}` : null })));
   const loop = new ClaimLoop(queue, calls as ModelCallLog, spend.as_ledger(), runner, plans, clock, logger, settings, tx);
-  return { clock, call_log, queue, calls, spend, runner, plans, tx, lines, jobs, loop, stop: new StopFlag() };
+  return { clock, call_log, queue, calls, spend, runner, plans, tx, lines, logger, jobs, loop, stop: new StopFlag() };
 }
 
 describe("ClaimLoop", () => {
@@ -194,5 +194,26 @@ describe("ClaimLoop", () => {
     const line = w.lines.find((l) => l.event === "claim_loop.job_failed");
     expect(line?.fields.extra).toMatchObject({ name: "Error", reason: "Error" });
     expect(JSON.stringify(w.lines)).not.toContain("sk-ant");
+  });
+
+  it("start_logs_one_other_pin_line_with_counts", async () => {
+    const w = world(0);
+    const loop = new ClaimLoop(w.queue, w.calls as ModelCallLog, w.spend.as_ledger(), w.runner, w.plans, w.clock, w.logger, settings, w.tx,
+      { other_pin_report: async () => ({ queued_other_pin: 4, queued_pin_missing: 1, queued_other_pin_live: 3, other_hashes: ["aaaaaaaaaaaa"] }) }, "b".repeat(64));
+    await loop.start();
+    const l = w.lines.filter((x) => x.event === "claim_loop.other_pin_jobs_left");
+    expect(l).toHaveLength(1);
+    expect(l[0]!.fields.extra).toMatchObject({ queued_other_pin: 4, queued_other_pin_live: 3, queued_pin_missing: 1, other_locked_hashes: "aaaaaaaaaaaa", own_locked_hash: "bbbbbbbbbbbb" });
+  });
+
+  it("start_survives_a_failing_other_pin_report_and_logs_nothing_without_one", async () => {
+    const w = world(0);
+    const bad = new ClaimLoop(w.queue, w.calls as ModelCallLog, w.spend.as_ledger(), w.runner, w.plans, w.clock, w.logger, settings, w.tx,
+      { other_pin_report: async () => { throw new Error("db down"); } });
+    await expect(bad.start()).resolves.toMatchObject({ claimed: 0 });
+    expect(w.lines.some((x) => x.event === "claim_loop.other_pin_report_failed")).toBe(true);
+    const none = world(0);
+    await none.loop.start();
+    expect(none.lines.some((x) => x.event.startsWith("claim_loop.other_pin"))).toBe(false);
   });
 });

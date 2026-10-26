@@ -2,6 +2,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { insert_row } from "../packages/db/src/testing/insert-row.ts";
 import { create_test_db, type TestDb } from "../packages/db/src/testing/test-db.ts";
+import { FakeClock } from "../packages/core/src/ports/clock.ts";
+import { PrefixedIdGenerator } from "../packages/core/src/ports/ids.ts";
+import { PgJobQueue } from "../packages/db/src/repos/job-queue.ts";
 import { main, read_inventory } from "./queue-compat.ts";
 
 const A = "a".repeat(64);
@@ -109,5 +112,21 @@ describe("queue-compat inventory query", () => {
     const io = { out: () => undefined, err: () => undefined };
     expect(await main(["--fail-on-old", "--artifact-hash", B], { DATABASE_URL: t.url }, io)).toBe(3);
     expect(await main(["--artifact-hash", B], { DATABASE_URL: t.url }, io)).toBe(0);
+  });
+
+  // Last: it claims j7/j8, which only moves them from queued to running inside the "match" group.
+  it("pin_aware_worker_leaves_the_stranded_jobs_and_the_inventory_still_reports_them", async () => {
+    const w = new PgJobQueue({ db: t.db, ids: new PrefixedIdGenerator(), clock: new FakeClock(NOW) }, { mode: "locked_hash", locked_hash: B });
+    const claimed: string[] = [];
+    for (let c = await w.claim("w", 10, 1000); c !== null; c = await w.claim("w", 10, 1000)) claimed.push(c.job_id);
+    expect(claimed.sort()).toEqual(["j7", "j8"]); // only the matching-pin runnable jobs; j1, j3 (old pin) and j6 (no row) stay
+    const rep = await w.other_pin_report();
+    expect(rep).toMatchObject({ queued_other_pin: 2, queued_other_pin_live: 1, queued_pin_missing: 1, other_hashes: [A.slice(0, 12)] });
+    const inv = await read_inventory(t.db, B, { now: NOW, include_failed: false });
+    const stranded = inv.jobs.filter((j) => j.status === "queued" && j.compat !== "match").map((j) => j.job_id).sort();
+    expect(stranded).toEqual(["j1", "j3", "j6"]); // same jobs the worker reports: queued_other_pin + queued_pin_missing = 3
+    expect(rep.queued_other_pin + rep.queued_pin_missing).toBe(stranded.length);
+    const rows = await t.db.with_tx(async (tx) => (await tx.query("select id, status, attempt from lesson_job where id in ('j1','j3','j6') order by id")).rows);
+    expect(rows).toEqual([{ id: "j1", status: "queued", attempt: 0 }, { id: "j3", status: "queued", attempt: 0 }, { id: "j6", status: "queued", attempt: 0 }]);
   });
 });

@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { insert_row } from "../testing/insert-row.ts";
 import { seed_job, seed_lost_calls, seed_run } from "../testing/seed-run.ts";
 import { create_test_db, type TestDb } from "../testing/test-db.ts";
-import { PgJobQueue, SCHEMA_VERSION_DEFAULT } from "./job-queue.ts";
+import { ANY_PIN, PgJobQueue, SCHEMA_VERSION_DEFAULT } from "./job-queue.ts";
 
 let t: TestDb;
 let clock: FakeClock;
@@ -32,13 +32,13 @@ const outcome = (job_id: string, over: Partial<JobOutcome> = {}): JobOutcome => 
 const reset = async (): Promise<void> => {
   await run((tx) => tx.query("TRUNCATE lesson_job, run, model_call, spend_reservation"));
   clock = new FakeClock(T0);
-  q = new PgJobQueue({ db: t.db, ids, clock });
+  q = new PgJobQueue({ db: t.db, ids, clock }, ANY_PIN);
 };
 
 beforeAll(async () => {
   t = await create_test_db({ pool_max: 4 });
   clock = new FakeClock(T0);
-  q = new PgJobQueue({ db: t.db, ids, clock });
+  q = new PgJobQueue({ db: t.db, ids, clock }, ANY_PIN);
 });
 afterAll(async () => {
   await t.drop();
@@ -271,6 +271,117 @@ describe("PgJobQueue", () => {
     await run((tx) => q.create_run_jobs([new_job(r, { lesson_id: "N.2" })], tx));
     const l = await q.claim("w1", 3, 1000);
     expect(l?.reviewer_note).toBeNull();
+  });
+
+  describe("pin-aware claim (R-F3-2)", () => {
+    const A = "a".repeat(64);
+    const B = "b".repeat(64);
+    let pins_seeded = false;
+    const pinned = async (state: string, pv: string, created: number): Promise<string> => {
+      const r = await run((tx) => seed_run(tx, { state, plan_stored_at: T0, created_at: at(created) }));
+      await run((tx) => tx.query("UPDATE run SET prompt_version_id=$1 WHERE id=$2", [pv, r]));
+      return r;
+    };
+    const seed_pins = async (): Promise<void> => {
+      await reset();
+      if (pins_seeded) return; // prompt_version is append-only: seed once per database
+      pins_seeded = true;
+      await run(async (tx) => {
+        await insert_row(tx, "prompt_version", { id: "pv_a", locked_hash: A, number: 1 });
+        await insert_row(tx, "prompt_version", { id: "pv_b", locked_hash: B, number: 2 });
+        await insert_row(tx, "prompt_version", { id: "pv_b2", locked_hash: B, number: 3 }); // same locked layer, new guidance
+      });
+    };
+    const pq = (hash: string): PgJobQueue => new PgJobQueue({ db: t.db, ids, clock }, { mode: "locked_hash", locked_hash: hash });
+    const snapshot = async (): Promise<string> =>
+      run(async (tx) => JSON.stringify((await tx.query("SELECT id, status, attempt, worker_id, lease_until, failure_reasons_json FROM lesson_job ORDER BY id")).rows));
+
+    it("claim_ignores_other_pin_jobs_and_leaves_them_untouched", async () => {
+      await seed_pins();
+      const old = await pinned("running", "pv_a", 1);
+      await run((tx) => seed_job(tx, { run_id: old, lesson_id: "P.1" }));
+      const before = await snapshot();
+      expect(await pq(B).claim("w", 3, 1000)).toBeNull();
+      expect(await snapshot()).toBe(before);
+    });
+
+    it("claim_takes_matching_jobs_across_guidance_versions_but_not_other_pin", async () => {
+      await seed_pins();
+      const old = await pinned("running", "pv_a", 1);
+      const m1 = await pinned("running", "pv_b", 2);
+      const m2 = await pinned("running", "pv_b2", 3);
+      await run(async (tx) => {
+        await seed_job(tx, { run_id: old, lesson_id: "O.1" });
+        await seed_job(tx, { run_id: m1, lesson_id: "M.1" });
+        await seed_job(tx, { run_id: m2, lesson_id: "M.2" });
+      });
+      const w = pq(B);
+      const got = [(await w.claim("w", 3, 1000))!.run_id, (await w.claim("w", 3, 1000))!.run_id];
+      expect(got.sort()).toEqual([m1, m2].sort());
+      expect(await w.claim("w", 3, 1000)).toBeNull();
+      expect((await pq(A).claim("w", 3, 1000))?.run_id).toBe(old); // the old-pin worker still gets its own job
+    });
+
+    it("other_pin_runs_do_not_occupy_the_active_run_window", async () => {
+      await seed_pins();
+      for (let i = 0; i < 3; i++) {
+        const o = await pinned("running", "pv_a", i);
+        await run((tx) => seed_job(tx, { run_id: o, lesson_id: `O.${i}` }));
+      }
+      const m = await pinned("running", "pv_b", 10);
+      await run((tx) => seed_job(tx, { run_id: m, lesson_id: "M.1" }));
+      expect((await pq(B).claim("w", 1, 1000))?.run_id).toBe(m); // cap 1: older other-pin runs must not take the slot
+    });
+
+    it("fair_share_lease_and_requeue_unchanged_under_a_pin", async () => {
+      await seed_pins();
+      const r1 = await pinned("running", "pv_b", 1);
+      const r2 = await pinned("running", "pv_b", 2);
+      await run(async (tx) => {
+        await seed_job(tx, { run_id: r1, status: "running", lease_until: at(60), lesson_id: "F.0" });
+        await seed_job(tx, { run_id: r1, queued_at: at(1), lesson_id: "F.1" });
+        await seed_job(tx, { run_id: r2, queued_at: at(2), lesson_id: "F.2" });
+      });
+      const w = pq(B);
+      const c = (await w.claim("w1", 3, 5000))!;
+      expect(c.run_id).toBe(r2);
+      expect(c.attempt).toBe(1);
+      expect(c.lease_until.getTime()).toBe(clock.now().getTime() + 5000);
+      clock.advance(10_000);
+      expect((await w.requeue_expired(clock.now())).job_ids).toContain(c.job_id);
+      expect((await w.claim("w2", 3, 5000))?.attempt).toBe(2);
+    });
+
+    it("pin_missing_run_is_not_claimed_by_a_pinned_worker", async () => {
+      await seed_pins();
+      const gone = await pinned("running", "pv_gone", 1);
+      await run((tx) => seed_job(tx, { run_id: gone, lesson_id: "G.1" }));
+      expect(await pq(B).claim("w", 3, 1000)).toBeNull();
+      expect((await q.claim("w", 3, 1000))?.run_id).toBe(gone); // explicit any_pin keeps the old behaviour
+    });
+
+    it("claim_without_a_pin_refuses_and_a_bad_hash_is_rejected", async () => {
+      await seed_pins();
+      await expect(new PgJobQueue({ db: t.db, ids, clock }).claim("w", 1, 1000)).rejects.toThrow(InvariantViolation);
+      expect(() => pq("nothex")).toThrow(InvariantViolation);
+    });
+
+    it("other_pin_report_counts_queued_other_pin_and_missing_only", async () => {
+      await seed_pins();
+      const live = await pinned("running", "pv_a", 1);
+      const paused = await pinned("paused", "pv_a", 2);
+      const gone = await pinned("running", "pv_gone", 3);
+      const mine = await pinned("running", "pv_b", 4);
+      await run(async (tx) => {
+        await seed_job(tx, { run_id: live, lesson_id: "R.1" });
+        await seed_job(tx, { run_id: live, status: "running", lease_until: at(60), lesson_id: "R.2" });
+        await seed_job(tx, { run_id: paused, lesson_id: "R.3" });
+        await seed_job(tx, { run_id: gone, lesson_id: "R.4" });
+        await seed_job(tx, { run_id: mine, lesson_id: "R.5" });
+      });
+      expect(await pq(B).other_pin_report()).toEqual({ queued_other_pin: 2, queued_other_pin_live: 1, queued_pin_missing: 1, other_hashes: [A.slice(0, 12)] });
+      expect(await pq(A).other_pin_report()).toMatchObject({ queued_other_pin: 1, queued_pin_missing: 1 });
+    });
   });
 });
 

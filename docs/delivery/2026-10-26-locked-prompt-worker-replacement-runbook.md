@@ -12,13 +12,26 @@ of the locked files the run was started under. Every job of the run carries that
 Example: run R1 pinned `pv_old` (hash `aaaa...`). The new release has locked files hashing to `bbbb...`. R1's queued jobs are
 **old pins** for the new worker and **matches** for the old one.
 
-## 2. The hazard, from the code
+## 2. What the worker does with a job from another pin (pin-aware claim, request R-F3-2)
 
-The claim SQL (`packages/db/src/repos/job-queue.ts`, `CLAIM_SQL`) picks the next queued job of any `planning` or `running` run and has
-no filter on the pin. The renderer then compares the job's pinned hash with the hash of the files on disk
-(`packages/prompts/src/render.ts`, `assert_locked`) and throws `LockedLayerMismatch` when they differ. So a worker with new locked
-files that claims an old-pin job fails it. `LockedLayerMismatch` here is the **expected symptom** of a swap done in the wrong order, not
-a bug in the job. Nothing in the code skips such jobs first (request R-F3-2: a pin-aware claim).
+The claim SQL (`packages/db/src/repos/job-queue.ts`, `CLAIM_SQL`) now only considers runs whose pinned `prompt_version.locked_hash` equals
+the locked hash the worker computed at boot from the same `packages/prompts/locked` files it renders with
+(`apps/worker/src/wiring/generation.ts`). A run that pins another hash, or a prompt version with no row, is skipped **before** the
+active-run cap, so it cannot take a slot from a matching run.
+
+Consequences an operator must know:
+
+- A new worker **no longer claims and fails** old-pin jobs. Nothing is cancelled, repinned or failed: the jobs stay `queued`, unchanged, and
+  the runs stay `running` (they just make no progress) until a worker with a matching artifact takes them or you use section 5.
+- `LockedLayerMismatch` is no longer the symptom of a wrong-order swap. The symptom is a run that stops moving. Read the log line below.
+- A job that was **already running** on an old worker when you stop it keeps its lease; once the lease expires it is requeued at the next
+  worker start (by any worker) and then waits like any other old-pin job. Nothing is lost.
+- A worker built without a pin refuses to claim (`InvariantViolation`). Only code that passes `ANY_PIN` by name (tests, tools) claims every pin.
+
+Each worker start logs one line, `claim_loop.other_pin_jobs_left`, with `own_locked_hash`, `queued_other_pin` (queued jobs on another hash),
+`queued_other_pin_live` (of those, in `planning`/`running` runs), `queued_pin_missing` and `other_locked_hashes` (first 12 hex). If the
+counts are not 0, run the inventory (section 3) and decide per group. The counts are the queued jobs `ops/queue-compat.ts` reports as
+`old_pin` + `pin_missing` (the inventory also lists running jobs, and `paused`/`capped` runs count in both).
 
 ## 3. Before a swap: read the inventory
 
@@ -42,7 +55,7 @@ Read it like this: `queued` jobs of `planning`/`running` runs are live; `latent`
 resume or retry, so they count. `running` jobs hold a lease; the old worker must finish or lose them. `pin_missing` means the run names a
 prompt version that has no row: nothing can render it; treat it as a defect to repair by hand with the owner, not to skip.
 
-## 4. Order of a safe swap
+## 4. Order of a safe swap (still the recommended order: it keeps old-pin work moving)
 
 1. Do **not** start the new web artifact first. Its start syncs a new `prompt_version` (`apps/web/src/server/wiring/prompts.ts`), after
    which authors could start runs the old worker cannot render.
@@ -57,7 +70,10 @@ prompt version that has no row: nothing can render it; treat it as a defect to r
 - (a) Run control `cancel` on the old run (`RunService.control`: recorded and audited), then start a **new** run with
   `scope: { kind: "unfinished_of_run", run_id: <old run> }` and the new `prompt_version_id`. The new run carries `parent_run_id`, so the
   repin is visible in the data and the audit log and is never silent. The scope takes every lesson of the old run whose job is not `ready`.
-- (b) `retry_failed` on a `partial` run requeues failed jobs **on their old pin** and therefore needs the old artifact (the inventory lists
+- (b) Drain with a matching artifact: run a worker built from the old locked files (its boot hash equals the old pin) next to or before the new
+  one. It claims only the old-pin jobs, the new worker only the new ones, so both can run at once. Stop the old one when the inventory's
+  `old_pin` group reaches 0.
+- (c) `retry_failed` on a `partial` run requeues failed jobs **on their old pin** and therefore needs the old artifact (the inventory lists
   them under `--include-failed`).
 
 Never edit `run.prompt_version_id`, `lesson_job.status` or `prompt_version` by SQL, and never delete a job to make the count zero.
@@ -67,7 +83,7 @@ Never edit `run.prompt_version_id`, `lesson_job.status` or `prompt_version` by S
 Date, the inventory output (and its SHA-256), the artifact hashes before and after, and the decision for each group (waited, cancelled and
 restarted as run `<id>`, or left on the old worker). Keep it with the release note.
 
-## 7. Known gap
+## 7. Status of the old gap
 
-A pin-aware claim (claim only jobs whose `locked_hash` equals the worker's) would remove the hazard. It is a production change in
-`packages/db/src/repos/job-queue.ts` and is not made here (F3 report, request R-F3-2).
+The pin-aware claim (R-F3-2) is in. What is still not automatic: nothing moves an old-pin job to the new pin. That stays an explicit
+decision (section 5), never a silent repin.

@@ -7,7 +7,7 @@ import { derive_run_state } from "@ls/core/lifecycle/run-machine";
 import { max_call_cost, settle_cost } from "@ls/core/spend/reservation";
 import { PgAuditLog } from "@ls/db/repos/audit";
 import { PgCheckQueue } from "@ls/db/repos/check-queue";
-import { PgJobQueue } from "@ls/db/repos/job-queue";
+import { PgJobQueue, type ClaimPin } from "@ls/db/repos/job-queue";
 import { PgLessonDocReader } from "@ls/db/repos/lesson-doc-reads";
 import { PgLessonDocStore } from "@ls/db/repos/lesson-docs";
 import { PgLessonRepo } from "@ls/db/repos/lessons";
@@ -21,7 +21,7 @@ import type { PgDatabase } from "@ls/db/pool";
 import { PaidCaller, type CostMath } from "@ls/llm/paid-call";
 import { PRICE_TABLE } from "@ls/llm/prices";
 import { ModelCallRecorder, type PriceLookup } from "@ls/llm/recorder";
-import { LOCKED_DIR } from "@ls/prompts/locked";
+import { LOCKED_DIR, locked_hash } from "@ls/prompts/locked";
 import { PromptRenderer } from "@ls/prompts/render";
 import { SchemaRegistry } from "@ls/prompts/schemas";
 import type { WorkerDeps } from "../deps-types.ts";
@@ -55,6 +55,8 @@ export interface GenerationOptions {
   prices?: PriceLookup;
   /** Test seam; main.ts passes none. Default: the registered check rules. */
   rules?: readonly CheckRule[];
+  /** Test seam; main.ts passes none. Default: claim only jobs pinned to the hash of LOCKED_DIR, the files this worker renders with. Pass ANY_PIN to claim every pin. */
+  claim_pin?: ClaimPin;
 }
 export interface GenerationWiring {
   claim_loop: ClaimLoop;
@@ -66,7 +68,9 @@ export function wire_generation(d: WorkerDeps, opts: GenerationOptions = {}): Ge
   const db = d.db as unknown as PgDatabase;
   const deps = { db, ids: d.ids, clock: d.clock };
 
-  const queue = new PgJobQueue(deps);
+  // Computed once at boot from the same files the renderer reads (PromptRenderer(LOCKED_DIR)), so claim and render agree.
+  const claim_pin: ClaimPin = opts.claim_pin ?? { mode: "locked_hash", locked_hash: locked_hash(LOCKED_DIR) };
+  const queue = new PgJobQueue(deps, claim_pin);
   const calls = new PgModelCallLog(deps);
   const prices = opts.prices ?? (is_demo_stub(d) ? demo_stub_prices() : PRICE_TABLE);
   const cost: CostMath = { settle_cost, max_call_cost };
@@ -99,6 +103,6 @@ export function wire_generation(d: WorkerDeps, opts: GenerationOptions = {}): Ge
   const finalizer = new RunFinalizer(runs, queue, calls, spend, d.db, d.settings, derive_run_state, d.logger);
   const runner = new LessonJobRunner(draft, compile_check, repair, store, fail, queue, finalizer, d.clock, d.settings);
   const plan_job = new UnitPlanJob(paid, renderer, runs, outlines, prompts, d.settings, queue, calls, d.db);
-  const claim_loop = new ClaimLoop(queue, calls, spend, runner, plan_job, d.clock, d.logger, d.settings, d.db);
+  const claim_loop = new ClaimLoop(queue, calls, spend, runner, plan_job, d.clock, d.logger, d.settings, d.db, queue, claim_pin.mode === "locked_hash" ? claim_pin.locked_hash : undefined);
   return { claim_loop, paid };
 }
