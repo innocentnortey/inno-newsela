@@ -132,11 +132,10 @@ describe("reviewer edits are held to the same contract as generation", () => {
     await assert_parity(s, id, edited.content_hash, ["submit", "approve"]);
   }, T);
 
-  // KNOWN DEFECT (report R-F3-8): the arc_repeat advisory is evaluated by the background lane before the lesson's own alignment rows for
-  // the hash exist, and by submit/approve after, so the stages disagree on it for one hash. Advisory only. `it.fails` flips red when fixed.
-  it.fails("E2.advisory_findings_equal_across_stages", async () => {
+  // R-F3-8 (fixed): the background check writes the lesson's own alignment rows before it loads the unit coverage arc_repeat reads.
+  it("E2.advisory_findings_equal_across_stages", async () => {
     const st = await stored(s, L4);
-    await assert_parity(s, L4, st.content_hash, ["submit", "approve"], { exact_advisories: true });
+    await assert_parity(s, L4, st.content_hash, ["submit", "approve"]);
   }, T);
 
   it("E3.reviewer_added_valid_code_is_a_confirmation", async () => {

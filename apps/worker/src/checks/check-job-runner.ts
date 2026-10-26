@@ -7,6 +7,7 @@ import type { LessonGraphRepo } from "@ls/core/ports/lesson-graph";
 import type { TxRunner } from "@ls/core/ports/tx";
 import type { LessonId, Sha256 } from "@ls/core/ports/common";
 import type { CheckContextLoader } from "@ls/core/checks/context-loader";
+import { derive_alignment } from "@ls/core/checks/rules/alignment/derive";
 import { run_checks } from "@ls/core/checks/registry";
 import type { CheckPolicy, CheckResult, CheckRuleList } from "@ls/core/checks/types";
 import type { Logger } from "@ls/obs/logger";
@@ -70,6 +71,10 @@ export class CheckJobRunner {
     let prev: Sha256 | null;
     try {
       prev = (await this.issues.current(lesson_id)).checked_hash;
+      // The unit coverage a rule reads (arc_repeat) includes this lesson's own alignment rows for the hash. Submit and approve see
+      // them already stored, so write them first and load the context after: both lanes then evaluate the same input (R-F3-8).
+      const first = await this.loader.load(lesson_id, derived.lesson, hash);
+      await this.tx.with_tx((t) => this.alignment.replace_for_hash(lesson_id, hash, derive_alignment(first), t));
       const ctx = await this.loader.load(lesson_id, derived.lesson, hash);
       result = run_checks(ctx, this.guarded(), this.policy);
       await this.tx.with_tx(async (t) => {

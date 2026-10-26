@@ -240,13 +240,12 @@ describe("valid supported content through the real lifecycle", () => {
     expect(waiting.map((w) => w.message).join(" ")).toMatch(new RegExp(`Waiting for ${L5}`, "i"));
   }, T);
 
-  // KNOWN DEFECT (report R-F3-7). gates.ts documents the waiting phase of a cross-lesson link (slot filled, source not yet
-  // approved) as "Submit passes, Approve refuses DEPENDENCY_UNAPPROVED". The collab submit path (submit-gate.ts) builds its GateState
-  // with `dependencies: []`, so blocks_submit never sees the filled dependency and the finding blocks Submit as BLOCKED. `it.fails`
-  // keeps the suite green while the defect stands and turns red the day it is fixed (then remove `.fails` and re-read V3c).
-  it.fails("V3.waiting_phase_submit_passes_per_gates_contract", async () => {
+  // R-F3-7 (fixed): the waiting phase (slot filled, source not yet approved) passes Submit; Approve refuses DEPENDENCY_UNAPPROVED.
+  let submitted_l4: { content_hash: string; state_vector: string } | null = null;
+  it("V3.waiting_phase_submit_passes_per_gates_contract", async () => {
     const sub4 = await submit(s, "G6.U4.L4", "strict");
     expect(sub4.ok, JSON.stringify(sub4)).toBe(true);
+    if (sub4.ok) submitted_l4 = sub4.result.version;
   }, T);
 
   it("V3.dependency_order_to_export", async () => {
@@ -255,17 +254,9 @@ describe("valid supported content through the real lifecycle", () => {
     const d4 = wp1_draft();
     const g4b = await stored(s, L4);
     const g5d = await stored(s, L5);
-    // Today's strict gate refuses the waiting phase with only that finding (labelled as waiting, not as an empty slot).
-    const blocked = await submit(s, L4, "strict");
-    expect(blocked.ok).toBe(false);
-    if (blocked.ok) return;
-    expect(blocked.code).toBe("BLOCKED");
-    expect((blocked.details.issues as Array<{ kind: string; message: string }>).map((i) => i.kind)).toEqual(["cross_lesson_link"]);
-    // An older submit gate (no rules) lets L4 through, which is how approval's own dependency gate is reached.
-    const sub4 = await submit(s, L4, "legacy");
-    expect(sub4.ok, JSON.stringify(sub4)).toBe(true);
-    if (!sub4.ok) return;
-    const early = await approve(s, L4, sub4.result.version);
+    // The strict gate lets the waiting phase through (R-F3-7); approval's own dependency gate then refuses it.
+    expect(submitted_l4, "V3.waiting_phase_submit... ran first and submitted L4").not.toBeNull();
+    const early = await approve(s, L4, submitted_l4!);
     expect(early.ok).toBe(false);
     if (early.ok) return;
     expect(early.code).toBe("DEPENDENCY_UNAPPROVED");
@@ -276,7 +267,7 @@ describe("valid supported content through the real lifecycle", () => {
     expect(sub5.ok, JSON.stringify(sub5)).toBe(true);
     if (!sub5.ok) return;
     expect((await approve(s, L5, sub5.result.version)).ok).toBe(true);
-    const late = await approve(s, L4, sub4.result.version);
+    const late = await approve(s, L4, submitted_l4!);
     expect(late.ok, JSON.stringify(late)).toBe(true);
     expect((await state_report(s, L4)).lesson_state).toBe("approved");
     await settle(s);
@@ -291,19 +282,15 @@ describe("valid supported content through the real lifecycle", () => {
     }
   }, T);
 
-  // KNOWN DEFECT (report R-F3-9). alignment_link's key is (lesson, hash, code, address) but derive_alignment returns one row per
-  // (code, address, ROLE): a code that is taught and checked at the same address (the flex day with RL.6.7, WP-3 U7(b), or
-  // W.6.2 / W.6.2.b in WP-2) makes the real CheckJobRunner fail on a duplicate key, so the background check never completes for it.
-  // Every other test in this directory uses a runner with the one-row-per-key filter that world.ts run_checks_for also applies.
-  // `it.fails` flips red when the runner is fixed; then drop `.fails` and the filter in stack.ts.
-  it.fails("V2.real_check_runner_completes_taught_and_checked_code", async () => {
+  // R-F3-9 (fixed): alignment_link is keyed on the role too (migration 0016), so a code taught and checked at one address completes.
+  it("V2.real_check_runner_completes_taught_and_checked_code", async () => {
     const id = FLEX_A;
     const doc = await stored(s, id);
     const [d] = await s.world.query<{ store_id: string }>("select store_id from lesson_doc where lesson_id=$1 order by seq desc limit 1", [id]);
     const rd = { db: s.world.db, ids: s.world.deps.ids, clock: s.world.deps.clock };
     await s.world.db.with_tx((tx) => new PgCheckQueue(rd).enqueue(id as never, doc.content_hash as never, d!.store_id as never, tx));
     try {
-      expect(await s.real_check_runner.run_once()).not.toBeNull();
+      expect(await s.check_runner.run_once()).not.toBeNull();
     } finally {
       await s.world.query("delete from check_job where lesson_id=$1", [id]);
     }

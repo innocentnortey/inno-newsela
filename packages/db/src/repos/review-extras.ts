@@ -154,7 +154,7 @@ export class PgAlignmentRepo implements AlignmentRepo {
   async for_lesson(lesson_id: LessonId): Promise<AlignmentLinkRow[]> {
     const rows = await this.db.with_tx(
       async (tx) =>
-        (await tx.query<Row>(`SELECT * FROM alignment_link WHERE lesson_id=$1 AND content_hash = ${LATEST_HASH} ORDER BY code, address`, [lesson_id])).rows,
+        (await tx.query<Row>(`SELECT * FROM alignment_link WHERE lesson_id=$1 AND content_hash = ${LATEST_HASH} ORDER BY code, address, role`, [lesson_id])).rows,
     );
     return rows.map(link_row);
   }
@@ -168,7 +168,7 @@ export class PgAlignmentRepo implements AlignmentRepo {
     if (decision === "add") {
       // The port carries no address or role: the lesson itself is the address, role "P" (NL-43 decision).
       const res = await t.query<Row>(
-        `${INSERT_LINK} ON CONFLICT (lesson_id, content_hash, code, address)
+        `${INSERT_LINK} ON CONFLICT (lesson_id, content_hash, code, address, role)
          DO UPDATE SET origin='added', asserted_by='reviewer', confirmed_by=NULL RETURNING *`,
         [lesson_id, hash, code, lesson_id, "P", "added", "reviewer", null],
       );

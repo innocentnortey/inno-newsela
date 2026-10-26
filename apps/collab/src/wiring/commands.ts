@@ -54,6 +54,7 @@ export function wire_collab_commands(
     rules: CHECK_RULES,
     policy: CHECK_POLICY,
     issues: new PgIssueRepo(deps),
+    graph: states,
   };
   const handler = new CollabCommandHandler({ ...built, ...given });
   install_command_handler(handler);

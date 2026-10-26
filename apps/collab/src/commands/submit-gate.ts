@@ -6,7 +6,7 @@ import type { StoredLesson } from "@ls/schema/lesson";
 import type { CollabCommandHandlerDeps } from "./types.ts";
 
 export async function evaluate_submit_gate(
-  deps: Pick<CollabCommandHandlerDeps, "loader" | "rules" | "policy" | "issues">,
+  deps: Pick<CollabCommandHandlerDeps, "loader" | "rules" | "policy" | "issues" | "graph">,
   lesson_id: string,
   stored: { lesson: StoredLesson; content_hash: string },
 ): Promise<void> {
@@ -23,7 +23,8 @@ export async function evaluate_submit_gate(
     last_editor_id: null,
     approver_id: null,
     four_eyes_enabled: false,
-    dependencies: [],
+    // The same source approve uses (graph.dependencies): the waiting phase of a cross_lesson_link passes Submit, Approve refuses it.
+    dependencies: await deps.graph.dependencies(lesson_id as never),
   };
   const g = submit_gate(state);
   if (!g.allowed) throw new DomainRefusal(g.refusals[0] ?? "BLOCKED", "This lesson cannot be submitted yet", g.details);

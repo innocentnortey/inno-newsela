@@ -60,24 +60,6 @@ export function recording(rules: CheckRuleList, stage: RuleCall["stage"], sink: 
   })) as CheckRuleList;
 }
 
-/**
- * HARNESS WORKAROUND for a production defect (see generation-defects D5): alignment_link's primary key is (lesson, hash, code,
- * address) but derive_alignment returns one row per (code, address, ROLE), so a code that is taught and checked at the same
- * address makes the real CheckJobRunner fail on a duplicate key. apps/worker/test/support/world.ts run_checks_for keeps the first
- * row per key for the same reason. This runner is the real CheckJobRunner with that one filter in front of the alignment repo;
- * `real_check_runner` is the unmodified wire_checks runner.
- */
-function harness_runner(world: World, rd: { db: World["db"]; ids: World["deps"]["ids"]; clock: World["deps"]["clock"] }, loader: CheckContextLoader): CheckJobRunner {
-  const alignment = new PgAlignmentRepo(rd);
-  const dedup = Object.create(alignment) as PgAlignmentRepo;
-  dedup.replace_for_hash = (lesson_id, hash, links, tx) =>
-    alignment.replace_for_hash(lesson_id, hash, links.filter((l, i) => links.findIndex((x) => x.code === l.code && x.address === l.address) === i), tx);
-  return new CheckJobRunner(
-    new PgCheckQueue(rd), new PgLessonDocReader({ db: world.db }), new PgIssueRepo(rd), dedup, new PgLessonRepo(rd), loader, CHECK_RULES, CHECK_POLICY,
-    world.deps.db as never, world.deps.clock, world.deps.logger,
-  );
-}
-
 let seq = 0;
 export class LifecycleStack {
   private constructor(
@@ -94,7 +76,6 @@ export class LifecycleStack {
     readonly issues: IssueService,
     readonly exports: ExportService,
     readonly check_runner: CheckJobRunner,
-    readonly real_check_runner: CheckJobRunner,
     readonly loader: CheckContextLoader,
     private readonly stop_collab: () => Promise<void>,
   ) {}
@@ -140,7 +121,6 @@ export class LifecycleStack {
       new SlotService(lessons, handler as never, CHECK_POLICY, lessons),
       new IssueService(issues_repo, new PgCheckQueue(rd), flags, alignment, lessons, handler as never, audit, world.db, world.deps.clock, web, lessons, reader),
       new ExportService(lessons, new PgExportRepo(rd), audit, world.db, world.deps.ids, world.deps.clock, lessons, lessons, outlines),
-      harness_runner(world, rd, loader),
       wire_checks(world.deps).check_runner,
       loader,
       async () => {

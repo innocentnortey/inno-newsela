@@ -71,7 +71,7 @@ describe("migrations (AC-1..3)", () => {
     t = await fresh(true);
   });
 
-  it("[invariant] applies_all: 16 files, exactly the 35 tables and the view audit_log_v", async () => {
+  it("[invariant] applies_all: 17 files, exactly the 35 tables and the view audit_log_v", async () => {
     const tables = await rows(
       t,
       "select table_name from information_schema.tables where table_schema='public' and table_type='BASE TABLE' order by 1",
@@ -85,10 +85,10 @@ describe("migrations (AC-1..3)", () => {
     expect(views.map((r) => r["table_name"])).toEqual(["audit_log_v"]);
     const m = await rows(t, "select id from schema_migrations order by id");
     expect(m.map((r) => r["id"])).toEqual(readdirSync(MIGRATIONS).sort());
-    expect(m).toHaveLength(16);
+    expect(m).toHaveLength(17);
   });
 
-  it("[capture] test_migrations_recorded: ops/migrate.ts writes 16 migrations + 16 ops events; rerun applies none", async () => {
+  it("[capture] test_migrations_recorded: ops/migrate.ts writes 17 migrations + 17 ops events; rerun applies none", async () => {
     const u = await fresh(false);
     const run = () =>
       execFileSync("npx", ["tsx", "ops/migrate.ts"], {
@@ -97,13 +97,13 @@ describe("migrations (AC-1..3)", () => {
         encoding: "utf8",
       });
     const first = JSON.parse(run().trim().split("\n").pop()!);
-    expect(first.applied).toHaveLength(16);
-    expect(await rows(u, "select 1 from schema_migrations")).toHaveLength(16);
+    expect(first.applied).toHaveLength(17);
+    expect(await rows(u, "select 1 from schema_migrations")).toHaveLength(17);
     const ev = await rows(
       u,
       "select kind, service, build_id, details_json from ops_event",
     );
-    expect(ev).toHaveLength(16);
+    expect(ev).toHaveLength(17);
     for (const e of ev) {
       expect(e["kind"]).toBe("migration_applied");
       expect(e["service"]).toBe("migrate");
@@ -114,8 +114,8 @@ describe("migrations (AC-1..3)", () => {
       .sort();
     expect(ids).toEqual(readdirSync(MIGRATIONS).sort());
     const second = JSON.parse(run().trim().split("\n").pop()!);
-    expect(second).toMatchObject({ applied: [], already_applied: 16 });
-    expect(await rows(u, "select 1 from ops_event")).toHaveLength(16);
+    expect(second).toMatchObject({ applied: [], already_applied: 17 });
+    expect(await rows(u, "select 1 from ops_event")).toHaveLength(17);
   }, 60_000);
 
   it("[failure] checksum_mismatch_refused: a changed applied file throws MigrationError and applies nothing", async () => {
@@ -125,13 +125,13 @@ describe("migrations (AC-1..3)", () => {
     await run_migrations(u.db, { dir });
     appendFileSync(join(dir, "0003_prompts.sql"), "\n-- tampered\n");
     writeFileSync(
-      join(dir, "0016_extra.sql"),
+      join(dir, "0099_extra.sql"),
       "create table extra_t (id text);",
     );
     const err = await run_migrations(u.db, { dir }).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(MigrationError);
     expect((err as MigrationError).migration_id).toBe("0003_prompts.sql");
-    expect(await rows(u, "select 1 from schema_migrations")).toHaveLength(16);
+    expect(await rows(u, "select 1 from schema_migrations")).toHaveLength(17);
     expect(await rows(u, "select to_regclass('extra_t')::text as r")).toEqual([
       { r: null },
     ]);

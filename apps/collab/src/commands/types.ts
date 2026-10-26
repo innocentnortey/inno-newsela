@@ -5,6 +5,7 @@ import type { CheckPolicy, CheckRuleList } from "@ls/core/checks/types";
 import type { Clock } from "@ls/core/ports/clock";
 import type { IssueRepo } from "@ls/core/ports/issues";
 import type { LessonDocReader, LessonDocStore } from "@ls/core/ports/lesson-docs";
+import type { LessonGraphRepo } from "@ls/core/ports/lesson-graph";
 import type { LessonStateRepo } from "@ls/core/ports/lesson-state";
 import type { LessonVersionRepo } from "@ls/core/ports/lesson-versions";
 import type { StandardRepo } from "@ls/core/ports/standards";
@@ -35,4 +36,6 @@ export interface CollabCommandHandlerDeps {
   rules: CheckRuleList;
   policy: CheckPolicy;
   issues: IssueRepo;
+  /** Cross-lesson dependency state: the Submit gate needs it to tell a waiting cross_lesson_link from a real blocker. */
+  graph: Pick<LessonGraphRepo, "dependencies">;
 }

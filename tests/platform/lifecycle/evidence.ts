@@ -88,7 +88,15 @@ export type Key = string;
 export const key_of = (f: { kind: string; level: string; address: string | null; code?: string | null }): Key =>
   `${f.kind}|${f.level}|${f.address ?? ""}|${f.code ?? ""}`;
 export const kind_of = (k: Key): string => k.split("|")[0]!;
-export const core = (keys: Key[]): Key[] => keys.filter((k) => !HUMAN_WORK.has(kind_of(k))).sort();
+/**
+ * Unit-coverage advisory: arc_repeat's skill_unpractised ("assessed here but no lesson practises it") counts only role P, while derive_alignment
+ * gives a code taught at one address role I. Since R-F3-8 the background check sees the lesson's own rows (as submit always did), so this
+ * advisory is now reported consistently at every stage (assert_parity compares it exactly). It is advisory and about unit coverage, not about
+ * the lesson's content, so the content oracles leave it out. Whether I should count as practice is a rule question, reported separately.
+ */
+const UNIT_COVERAGE_ADVISORY = "arc_repeat|advisory|";
+export const core = (keys: Key[]): Key[] =>
+  keys.filter((k) => !HUMAN_WORK.has(kind_of(k)) && !(k.startsWith(UNIT_COVERAGE_ADVISORY) && k.endsWith("|skill_unpractised"))).sort();
 
 /** Every routine heading of the stored lesson: its icon and full text (tag included). */
 export function headings_of(l: StoredLesson): Array<{ section: string; icon: string | null; text: string }> {

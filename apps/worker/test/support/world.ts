@@ -158,9 +158,7 @@ export class World {
       if (doc === null) throw new Error("no stored lesson " + lesson_id);
       const ctx = await loader.load(lesson_id, doc.lesson, claimed.content_hash);
       const result = run_checks(ctx, CHECK_RULES, CHECK_POLICY);
-      // derive_alignment dedupes on (code, address, role) but alignment_link's key is (lesson, hash, code, address): a CFU in a
-      // teaching part yields two rows for one key (follow-up for NL-22/NL-37). Keep the first row per key.
-      const links = result.alignment.filter((l, i) => result.alignment.findIndex((x) => x.code === l.code && x.address === l.address) === i);
+      const links = result.alignment; // alignment_link is keyed on the role too (migration 0016)
       await this.db.with_tx(async (tx) => {
         await new PgIssueRepo(base).replace_for_hash(lesson_id, claimed.content_hash, result.findings, tx);
         await new PgAlignmentRepo(base).replace_for_hash(lesson_id, claimed.content_hash, links, tx);

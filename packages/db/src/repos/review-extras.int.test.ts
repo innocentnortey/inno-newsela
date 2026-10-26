@@ -111,6 +111,18 @@ describe("review extras", () => {
     expect(other).toHaveLength(1);
   });
 
+  it("alignment_same_code_and_address_in_two_roles (R-F3-9)", async () => {
+    const lesson = "G6.U4.L41";
+    await w((tx) => insert_row(tx, "lesson", { id: lesson, unit_id: "G6.U9" }));
+    await doc(lesson, 1, A);
+    const mk = (role: "I" | "P" | "A") => link({ lesson_id: lesson, address: "s1", role });
+    expect(await w((tx) => align.replace_for_hash(lesson, A, [mk("I"), mk("A")], tx))).toBe(2);
+    expect((await align.for_lesson(lesson)).map((r) => r.role)).toEqual(["A", "I"]);
+    // reviewer "add" is idempotent on the (code, address, role) key
+    await w((tx) => align.confirm(lesson, CODE, USER, "add", tx));
+    await w((tx) => align.confirm(lesson, CODE, USER, "add", tx));
+  });
+
   it("alignment_confirm_remove_add", async () => {
     const lesson = "G6.U4.L40";
     await w((tx) => insert_row(tx, "lesson", { id: lesson, unit_id: "G6.U9" }));

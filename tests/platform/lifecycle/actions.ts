@@ -158,22 +158,15 @@ const call_keys = (s: LifecycleStack, stage: "generation" | "submit" | "approve"
 export const rule_keys = call_keys;
 
 /** Same input, same core finding at every stage. `expect_stages` must each have run for this hash (no vacuous pass). */
-/**
- * arc_repeat is a unit-wide advisory computed from every lesson's alignment rows, including this lesson's own rows for the hash being
- * checked. The background lane evaluates it BEFORE it writes those rows and submit/approve AFTER, so the two can differ for one hash
- * (finding R-F3-8, advisory only). Parity is exact for every other kind; pass `exact_advisories` to include this one.
- */
-export const UNIT_CONTEXT_ADVISORIES: readonly string[] = ["arc_repeat"];
-
 export async function assert_parity(
-  s: LifecycleStack, id: string, hash: string, expect_stages: Array<"generation" | "submit" | "approve">, opts: { exact_advisories?: boolean } = {},
+  s: LifecycleStack, id: string, hash: string, expect_stages: Array<"generation" | "submit" | "approve">,
 ) {
-  const keep = (k: Key): boolean => opts.exact_advisories === true || !UNIT_CONTEXT_ADVISORIES.includes(kind_of(k));
-  const trim = (r: { seen: boolean; keys: Key[] }) => ({ seen: r.seen, keys: r.keys.filter(keep) });
+  const trim = (r: { seen: boolean; keys: Key[] }) => r;
   const gen = trim(call_keys(s, "generation", id, hash));
   const sub = trim(call_keys(s, "submit", id, hash));
   const app = trim(call_keys(s, "approve", id, hash));
-  const bg = (await issue_keys(s, id, hash)).filter(keep);
+  // call_keys is a set of keys; compare like with like (several findings of one kind can share a key, e.g. skill_unpractised per code).
+  const bg = [...new Set(await issue_keys(s, id, hash))].sort();
   const seen = { generation: gen.seen, submit: sub.seen, approve: app.seen };
   for (const st of expect_stages) expect(seen[st], `stage ${st} ran no rule for ${id}@${hash.slice(0, 8)}`).toBe(true);
   const show = JSON.stringify({ gen: gen.keys, bg, sub: sub.keys, app: app.keys }, null, 1);
@@ -182,7 +175,8 @@ export async function assert_parity(
   if (app.seen) expect(app.keys, show).toEqual(bg);
   if (gen.seen) {
     const extra = bg.filter((k) => !gen.keys.includes(k));
-    expect(extra.every((k) => (GENERATION_SUPPRESSED as readonly string[]).includes(kind_of(k))), show).toBe(true);
+    // Generation runs before any alignment row of the hash exists, so the unit-coverage advisory (arc_repeat) is the one other kind it cannot see.
+    expect(extra.every((k) => (GENERATION_SUPPRESSED as readonly string[]).includes(kind_of(k)) || kind_of(k) === "arc_repeat"), show).toBe(true);
     expect(core(gen.keys), show).toEqual(core(bg));
   }
 }
