@@ -42,7 +42,7 @@ const SOURCES: Array<[string, string]> = [
   ["M-29 build spend against the ceiling", "select sum(cost_usd)/75 as value, count(*) as n from model_call"],
   ["M-31 schema-valid first-pass rate", `select avg((repairs=0)::int) as value, count(*) as n from ${lesson_jobs}`],
   ["M-38 safety flags open", "select count(*) filter (where status='open') as value, count(*) as n from safety_flag"],
-  ["M-41 confirmations per lesson", `select percentile_cont(0.5) within group (order by c) as value, count(*) as n from (select v.lesson_id, (select count(*) from alignment_link a where a.lesson_id=v.lesson_id and a.content_hash=v.content_hash and a.origin in ('narrowed','added')) c from ${first_versions} v) t`],
+  ["M-41 confirmations per lesson", `select percentile_cont(0.5) within group (order by c) as value, count(*) as n from (select v.lesson_id, (select count(distinct a.code) from alignment_link a where a.lesson_id=v.lesson_id and a.content_hash=v.content_hash and a.origin in ('narrowed','added')) c from ${first_versions} v) t`],
 ];
 
 // Exact values the WP-1 (first draft invalid, one repair) + WP-2 (valid first pass) stub run implies; null = only "a number, n > 0".
@@ -51,7 +51,11 @@ const EXPECTED: Record<string, number> = {
   "M-7": 1.5,
   "M-15": 1, // both lesson jobs end ready
   "M-31": 0.5, // WP-1 needed one repair, WP-2 none
-  "M-41": 0, // no narrowed or added standards in these two lessons; n counts the 2 lessons
+  // WP-2 (docs/data/worked-pairs.md, "Leaves of W.6.2 asserted by the generator (narrowed): blocking confirmation") allows narrowed
+  // leaves with a confirmation. The stub WP-2 draft tags W.6.2.a and W.6.2.b, so L5 carries 2 confirmations (a reviewer confirms a CODE,
+  // not each place it is linked; W.6.2.b is linked at Part A and Part B) and L4 (no narrowing) 0: median of [0, 2] = 1. The previous 0
+  // predated the narrowed-leaf tags (WP-2 stub draft); 1.5 would have double-counted W.6.2.b's second link.
+  "M-41": 1,
 };
 // M-38 reads safety_flag: only the WP-4 script writes one, and this run has no WP-4 lesson, so n = 0 is legitimate here.
 const LEGITIMATELY_EMPTY = new Set(["M-38"]);
