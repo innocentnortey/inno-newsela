@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { StoredLesson } from "@ls/schema/lesson";
 import type { UnitId } from "@ls/schema/ids";
-import { assign_addresses, normalise_part_label, part_address, safety_note_id, section_slug, tip_address } from "./addresses.ts";
+import { assign_addresses, normalise_part_label, part_address, safety_note_id, section_address, section_slug, tip_address } from "./addresses.ts";
 
 const lesson: StoredLesson = {
   lesson_id: "G6.U4.L4", schema_version: 1, title: "t", type: "Reading",
@@ -29,5 +29,14 @@ describe("addresses", () => {
   });
   it("throws RangeError for a foreign unit", () => {
     expect(() => assign_addresses(lesson, "G6.U5" as UnitId)).toThrow(RangeError);
+  });
+});
+
+describe("section_address", () => {
+  it("section_address_matches_the_pattern", () => {
+    // oracle: PRD R-21 and CON-11 line 721 (G6.U4.L4.LearningInAction.PartA)
+    expect(section_address("G6.U4.L5", "Learning in Action")).toBe("G6.U4.L5.LearningInAction");
+    expect(section_address("G6.U4.L5", "Look Back")).toBe("G6.U4.L5.LookBack");
+    expect(part_address(section_address("G6.U4.L5", "Learning in Action"), "Part A")).toBe("G6.U4.L5.LearningInAction.PartA");
   });
 });

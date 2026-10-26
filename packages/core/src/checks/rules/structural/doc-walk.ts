@@ -1,4 +1,6 @@
 import type { PMNode, Section } from "@ls/schema/lesson";
+import { parse_rationale_label } from "../../../compile/labels.ts";
+import type { RationaleLabel } from "../../../compile/labels.ts";
 
 export function walk(node: PMNode, fn: (n: PMNode) => void): void {
   fn(node);
@@ -77,4 +79,30 @@ export function find_cfu_items(section: Section): CfuItem[] {
     items.push({ address, heading: node, blocks });
   });
   return items;
+}
+
+export type CfuParts = {
+  /** Blocks before the lettered list (all blocks when there is no lettered list). */
+  stem: PMNode[];
+  /** First ordered_list with attrs.type === "A". */
+  list: PMNode | undefined;
+  /** Paragraphs after the list that parse_rationale_label accepts. */
+  rationales: { node: PMNode; label: RationaleLabel }[];
+  /** Every other block after the list. */
+  extra: PMNode[];
+};
+
+/** The one reading of a CFU item's layout; schema_invalid (teacher view) and student-blocks (student view) share it. */
+export function cfu_parts(item: CfuItem): CfuParts {
+  const list = item.blocks.find((b) => b.type === "ordered_list" && b.attrs?.type === "A");
+  if (list === undefined) return { stem: item.blocks, list: undefined, rationales: [], extra: [] };
+  const at = item.blocks.indexOf(list);
+  const rationales: CfuParts["rationales"] = [];
+  const extra: PMNode[] = [];
+  for (const b of item.blocks.slice(at + 1)) {
+    const label = b.type === "paragraph" ? parse_rationale_label(node_text(b)) : null;
+    if (label !== null) rationales.push({ node: b, label });
+    else extra.push(b);
+  }
+  return { stem: item.blocks.slice(0, at), list, rationales, extra };
 }

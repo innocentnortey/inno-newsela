@@ -42,8 +42,8 @@ const five = (lesson_type: string): SectionTemplate => ({
   ],
 });
 
-// The check rules (checks/rules/structural/expected.ts) require the three ELD callouts and a Pulse Check in every
-// "Learning in Action", whatever the lesson type; a template that asks for less made every Spark and Flex draft fail.
+// Every "Learning in Action" needs the three ELD callouts and a Pulse Check, whatever the lesson type; the structural
+// checks read this template (checks/rules/structural/section_missing.ts).
 const LIA_ROLES = ["teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch"] as const;
 
 // WP-3: the Flex Day Launch has a sample response; Learning in Action has a routine heading and a teacher tip.
@@ -82,3 +82,12 @@ export const SECTION_TEMPLATES: { templates: readonly SectionTemplate[] } = {
 export function template_for(lesson_type: string): SectionTemplate | undefined {
   return SECTION_TEMPLATES.templates.find((t) => t.lesson_type === lesson_type);
 }
+
+// Tolerances. The lesson total (50 plus or minus 5) is `CHECK_POLICY.minutes_target` / `minutes_tolerance` in
+// checks/policy.ts. S3's section tolerance of 5 (evals/src/suites/s3-assertions.ts) measures a coarser first-output
+// shape on the compiled lesson and is NOT equivalent to the blocking check below.
+
+/** The draft prompt asks for block minutes that add up exactly to the section's minutes (locked lesson-shape.md). */
+export const SECTION_MINUTES_PROMPT_TOLERANCE = 0;
+/** Blocking `minutes_out_of_range` check, per stored section: |stored - template| above this blocks. A 3-minute Look Back (template 5) must flag. */
+export const SECTION_MINUTES_CHECK_TOLERANCE = 1;

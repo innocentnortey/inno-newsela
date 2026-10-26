@@ -9,6 +9,11 @@ export function section_slug(name: string): string {
     .join("");
 }
 
+/** The one address of a section: `<lesson_id>.<section_slug(name)>`. Every writer and every finding for a section that may not exist uses this. */
+export function section_address(lesson_id: string, name: string): string {
+  return `${lesson_id}.${section_slug(name)}`;
+}
+
 export function normalise_part_label(label: string): string {
   const t = label.trim();
   const letter = /^(?:part\s+)?([A-Za-z])$/i.exec(t);
@@ -39,7 +44,7 @@ export function assign_addresses(lesson: StoredLesson, unit_id: UnitId): StoredL
     ...lesson,
     sections: lesson.sections.map((s) => ({
       ...s,
-      address: `${lesson.lesson_id}.${section_slug(s.name)}`,
+      address: section_address(lesson.lesson_id, s.name),
     })),
   };
 }

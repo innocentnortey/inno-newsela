@@ -5,9 +5,10 @@ import { describe, expect, it } from "vitest";
 import { SCHEMA_VERSION } from "@ls/editor-schema/schema";
 import type { UnitId } from "@ls/schema/ids";
 import type { PMNode } from "@ls/schema/lesson";
-import { LessonDraft } from "@ls/schema/lesson-draft";
+import { LessonDraft, type DraftRole } from "@ls/schema/lesson-draft";
 import { build_ctx } from "../checks/rules/grounding/fixtures/build.ts";
 import { compile_draft } from "./compile-draft.ts";
+import { role_present } from "./role-nodes.ts";
 import { template_for } from "./templates.ts";
 
 type Expected = {
@@ -26,27 +27,6 @@ const CASES = [
 ];
 
 const text_of = (n: PMNode): string => (n.type === "text" ? n.text ?? "" : (n.content ?? []).map(text_of).join(""));
-const all = (n: PMNode): PMNode[] => [n, ...(n.content ?? []).flatMap(all)];
-const has_mark = (n: PMNode, mark: string): boolean => (n.marks ?? []).some((m) => m.type === mark);
-
-function present(nodes: PMNode[], role: string): boolean {
-  const flat = nodes.flatMap(all);
-  const routine = (icon?: string) =>
-    flat.some((n) => n.type === "routine_heading" && (icon === undefined ? n.attrs?.icon !== "cfu" : n.attrs?.icon === icon));
-  switch (role) {
-    case "routine_heading": return routine();
-    case "teacher_talk": return flat.some((n) => n.type === "text" && has_mark(n, "teacher_talk"));
-    case "sample_response": return flat.some((n) => n.type === "text" && has_mark(n, "sample_response"));
-    case "support_table": return flat.some((n) => n.type === "collapsible" && n.attrs?.label === "Additional Student Support");
-    case "cfu_item": return routine("cfu");
-    case "quick_write": return routine("writing");
-    case "text_evidence_needed": return flat.some((n) => n.type === "quote_placeholder");
-    case "excerpt_slot": return flat.some((n) => n.type === "excerpt_slot");
-    case "teacher_tip": return flat.some((n) => n.type === "teacher_tip");
-    case "homework": return flat.some((n) => n.type === "paragraph");
-    default: throw new Error(`no node mapping for ${role}`);
-  }
-}
 
 /** Nodes of a section, or of one Part region of it. */
 function region(content: PMNode[], part: string | null): PMNode[] {
@@ -74,7 +54,7 @@ describe("compile contract against the worked pairs", () => {
         for (const req of s.required_roles) {
           for (const role of req.roles) {
             const nodes = region(sec?.content.content ?? [], req.part);
-            expect(present(nodes, role), `${c.wp} ${s.name} ${req.part ?? ""} ${role}`).toBe(true);
+            expect(role_present(nodes, role as DraftRole), `${c.wp} ${s.name} ${req.part ?? ""} ${role}`).toBe(true);
           }
         }
       }

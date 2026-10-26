@@ -23,7 +23,8 @@
             "content": [
               {
                 "type": "text",
-                "text": "What do you notice about how the character reacts?"
+                "text": "What do you notice about how the character reacts?",
+                "marks": [{ "type": "teacher_talk" }]
               }
             ]
           },
@@ -99,6 +100,16 @@
             "type": "routine_heading",
             "attrs": { "icon": "graphic_organizer" },
             "content": [{ "type": "text", "text": "Tone Tracker" }]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Say: pairs name the tone before they write.",
+                "marks": [{ "type": "teacher_talk" }]
+              }
+            ]
           },
           {
             "type": "table",

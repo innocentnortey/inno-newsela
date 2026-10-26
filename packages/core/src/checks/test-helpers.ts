@@ -8,7 +8,6 @@ import type {
   GateState,
 } from "./types.ts";
 import { CHECK_POLICY } from "./policy.ts";
-import { section_name_to_address } from "./rules/structural/expected.ts";
 
 export const DEFAULT_POLICY = CHECK_POLICY;
 export const LESSON_ID = "G6.U4.L4";
@@ -63,8 +62,26 @@ export const table = (header: boolean): PMNode => ({
   ],
 });
 
+/** A paragraph carrying the teacher_talk mark (what the compiler writes for a `teacher_talk` block). */
+export const talk = (t: string): PMNode => ({
+  type: "paragraph",
+  content: [{ type: "text", text: t, marks: [{ type: "teacher_talk" }] }],
+});
+/** A paragraph carrying the sample_response mark. */
+export const sample = (t: string): PMNode => ({
+  type: "paragraph",
+  content: [{ type: "text", text: t, marks: [{ type: "sample_response" }] }],
+});
+export const support_table_node = (): PMNode => ({
+  type: "collapsible",
+  attrs: { label: "Additional Student Support" },
+  content: [table(true)],
+});
+
 export function cfu_item(o: {
   code?: string;
+  /** A bare "Pulse Check" heading with no standard tag (a code-less check). */
+  untagged?: boolean;
   options?: number;
   correct?: number[];
   omit_rationale?: boolean;
@@ -75,7 +92,7 @@ export function cfu_item(o: {
     p(`${correct.includes(i) ? "Correct" : "Incorrect"}: reason ${i + 1}`),
   );
   return [
-    routine("cfu", `Pulse Check (${o.code ?? "RL.6.1"})`),
+    routine("cfu", o.untagged === true ? "Pulse Check" : `Pulse Check (${o.code ?? "RL.6.1"})`),
     p("Which statement is best supported?"),
     {
       type: "ordered_list",
@@ -89,6 +106,10 @@ export function cfu_item(o: {
   ];
 }
 
+// Legacy slug kept so frozen S2 rules.json (lines 188, 348) and S7 keep their addresses; production uses
+// `section_address` (compile/addresses.ts). Remove when the evals owner corrects those expectations (request R-F1-2).
+const fixture_section_address = (lesson_id: string, name: string): string => `${lesson_id}.${name.replace(/\s+/g, "")}`;
+
 export function section(
   name: string,
   lesson_id: string,
@@ -96,7 +117,7 @@ export function section(
   nodes: PMNode[],
 ): StoredLesson["sections"][number] {
   return {
-    address: section_name_to_address(lesson_id, name),
+    address: fixture_section_address(lesson_id, name),
     name,
     minutes,
     content: { type: "doc", content: nodes },
@@ -119,18 +140,31 @@ export function reading_lesson(
       section("Launch", id, m("Launch", 5), [
         routine("notes_section", "Notes"),
         p("Warm up."),
+        talk("Say: begin the warm up."),
+        sample("Model answer for the warm up."),
       ]),
       section("Literacy Lab", id, m("Literacy Lab", 10), [
+        routine("notes_section", "Language Study"),
         p("Lab."),
         eld_block(),
+        support_table_node(),
+        // untagged: the Literacy Lab check carries no standard claim, so the alignment tests that rebuild
+        // Learning in Action keep controlling every tagged code (deviation D8, slice F1).
+        ...cfu_item({ untagged: true }),
       ]),
       section("Learning in Action", id, m("Learning in Action", 30), [
+        h(2, "Part A"),
+        routine("notes_section", "Close reading"),
+        talk("Say: model the thinking."),
         eld_block(),
+        support_table_node(),
+        h(2, "Part B"),
         ...cfu_item({}),
       ]),
       section("Look Back", id, m("Look Back", 5), [
         routine("writing", "Quick Write"),
         p("Write."),
+        sample("Model answer for the quick write."),
       ]),
       section("Homework", id, m("Homework", 0), [p("None.")]),
     ],

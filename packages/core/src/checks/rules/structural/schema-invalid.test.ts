@@ -15,6 +15,10 @@ import { proper_noun_unsourced_rule } from "../grounding/proper_noun_unsourced.t
 import type { CheckContext } from "../../types.ts";
 import { schema_invalid_rule } from "./schema_invalid.ts";
 
+/** The Learning in Action Pulse Check block of the wp1 draft (found by role, not by position). */
+const lia_cfu = (d: { blocks: { section: string; role: string; cfu: unknown }[] }) =>
+  d.blocks.find((b) => b.section === "Learning in Action" && b.role === "cfu_item") as unknown as { cfu: { options: string[]; rationales: string[] } };
+
 function with_lia(nodes: PMNode[]) {
   const l = reading_lesson();
   const i = l.sections.findIndex((s) => s.name === "Learning in Action");
@@ -98,7 +102,7 @@ describe("compiled rationales", () => {
     }
   });
   it("compiled_missing_rationale_text_is_flagged", () => {
-    const ctx = build_ctx("wp1", { mutate: (d) => { d.blocks[16]!.cfu!.rationales[2] = ""; } });
+    const ctx = build_ctx("wp1", { mutate: (d) => { lia_cfu(d).cfu!.rationales[2] = ""; } });
     expect(run(ctx)).toEqual([MISSING]);
   });
   it("compiled_deleted_rationale_paragraph_is_flagged", () => {
@@ -136,8 +140,8 @@ describe("compiled rationales", () => {
   it("more_than_four_options_pass", () => {
     const ctx = build_ctx("wp1", {
       mutate: (d) => {
-        d.blocks[16]!.cfu!.options.push("E option");
-        d.blocks[16]!.cfu!.rationales.push("fifth reason");
+        lia_cfu(d).cfu!.options.push("E option");
+        lia_cfu(d).cfu!.rationales.push("fifth reason");
       },
     });
     expect(run(ctx)).toEqual([]);
@@ -147,7 +151,7 @@ describe("compiled rationales", () => {
       ["Grover would not follow this.", "Grover"],
       ["The story never mentions Medusa here.", "Medusa"],
     ] as const) {
-      const ctx = build_ctx("wp1", { mutate: (d) => { d.blocks[16]!.cfu!.rationales[3] = text; } });
+      const ctx = build_ctx("wp1", { mutate: (d) => { lia_cfu(d).cfu!.rationales[3] = text; } });
       const f = proper_noun_unsourced_rule.run(ctx, DEFAULT_POLICY);
       expect(f.some((x) => x.level === "blocking" && x.matched === name)).toBe(true);
     }

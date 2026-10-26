@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { StoredLesson } from "@ls/schema/lesson";
 import {
   DEFAULT_POLICY,
+  LESSON_ID,
   make_ctx,
   reading_lesson,
 } from "../../test-helpers.ts";
@@ -54,7 +55,7 @@ describe("structural minutes and sections", () => {
     l.sections = l.sections.filter((s) => s.name !== "Learning in Action");
     const f = section_missing_rule.run(make_ctx(l), DEFAULT_POLICY);
     expect(f).toHaveLength(1);
-    expect(f[0]?.address).toBe("G6.U4.L4.LearninginAction");
+    expect(f[0]?.address).toBe("G6.U4.L4.LearningInAction");
     expect(f[0]?.message).toContain("Learning in Action");
   });
 
@@ -75,6 +76,20 @@ describe("structural minutes and sections", () => {
     l.sections[3]!.minutes = 0;
     expect(l.sections.reduce((s, x) => s + x.minutes, 0)).toBe(44);
     expect(total_findings(l)).toHaveLength(1);
+  });
+
+  it("section_tolerance_boundary", () => {
+    // oracle: WP-1 stored Look Back 3 against 5 must flag (S2 s2-rule-minutes_out_of_range); 4 and 6 clean is the declared tolerance of 1
+    for (const ok of [4, 6]) expect(minutes(reading_lesson({}, { "Look Back": ok })).filter((f) => f.address !== LESSON_ID), String(ok)).toEqual([]);
+    for (const bad of [3, 7]) {
+      const f = minutes(reading_lesson({}, { "Look Back": bad })).filter((x) => x.address === "G6.U4.L4.LookBack");
+      expect(f, String(bad)).toHaveLength(1);
+    }
+  });
+
+  it("minutes_message_names_the_tolerance", () => {
+    const f = minutes(reading_lesson({}, { "Look Back": 3 }));
+    expect(f[0]?.message).toContain("allowed difference 1");
   });
 
   it("flags a total of 56", () => {

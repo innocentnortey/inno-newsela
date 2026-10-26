@@ -12,22 +12,31 @@ describe("section_missing required roles", () => {
   it("flags a Literacy Lab missing the watch callout, naming role and section", () => {
     const l = reading_lesson();
     const lab = l.sections.find((s) => s.name === "Literacy Lab")!;
-    lab.content = { type: "doc", content: [p("Lab."), eld_block(["watch"])] };
+    // same Literacy Lab, with the ELD group missing its watch callout
+    lab.content = {
+      type: "doc",
+      content: (lab.content.content ?? []).map((n) =>
+        n.type === "collapsible" && n.attrs?.label === "Integrated ELD Instructions" ? eld_block(["watch"]) : n,
+      ),
+    };
     const f = section_missing_rule.run(make_ctx(l), DEFAULT_POLICY);
     expect(f).toHaveLength(1);
-    expect(f[0]?.message).toContain("eld_callout_watch");
+    expect(f[0]?.message).toContain("required role callout_watch");
     expect(f[0]?.message).toContain("Literacy Lab");
-    expect(f[0]?.address).toBe("G6.U4.L4.LiteracyLab");
+    expect(f[0]?.address).toBe(lab.address);
   });
 
   it("flags a Learning in Action with no cfu heading", () => {
     const l = reading_lesson();
     const lia = l.sections.find((s) => s.name === "Learning in Action")!;
-    lia.content = { type: "doc", content: [eld_block(), p("No check.")] };
+    // same Learning in Action, minus the Pulse Check
+    const kept = lia.content.content ?? [];
+    const at = kept.findIndex((n) => n.type === "routine_heading" && n.attrs?.icon === "cfu");
+    lia.content = { type: "doc", content: [...kept.slice(0, at), p("No check.")] };
     const f = section_missing_rule.run(make_ctx(l), DEFAULT_POLICY);
     expect(f).toHaveLength(1);
-    expect(f[0]?.message).toContain("cfu");
-    expect(f[0]?.address).toBe("G6.U4.L4.LearninginAction");
+    expect(f[0]?.message).toContain("required role cfu_item");
+    expect(f[0]?.address).toBe(lia.address);
   });
 
   it("missing_required_slot_names_the_section_address", () => {

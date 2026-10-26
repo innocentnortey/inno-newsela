@@ -26,7 +26,19 @@ const read = (n: string): unknown => JSON.parse(readFileSync(`${FIXTURES}${n}.js
 
 export type Wp = "wp1" | "wp4";
 export const load_row = (wp: Wp): NormalizedRow => NormalizedRow.parse(read(`row-${wp}`));
-export const load_draft = (wp: Wp): LessonDraft => LessonDraft.parse(read(`draft-${wp}`));
+const base_draft = (wp: Wp): LessonDraft => LessonDraft.parse(read(`draft-${wp}`));
+/**
+ * The stored WP-1 test draft opens Learning in Action without the routine heading the Reading template requires
+ * (WP-1 B table: "Percy's Voice"). The JSON stays as it is, because grounding tests address its blocks by position;
+ * the routine is added here, copied from packages/llm/src/fixtures/draft-wp1.json.
+ */
+export function load_draft(wp: Wp): LessonDraft {
+  const d = base_draft(wp);
+  if (wp !== "wp1") return d;
+  const at = d.blocks.findIndex((b) => b.section === "Learning in Action" && b.part === "Part A");
+  const routine: LessonDraft["blocks"][number] = { role: "routine_heading", section: "Learning in Action", part: "Part A", text: "Percy's Voice", standard_codes: [], code_origins: [], cfu: null, minutes: null };
+  return { ...d, blocks: [...d.blocks.slice(0, at), routine, ...d.blocks.slice(at)] };
+}
 
 /** WP-1 as stored: Look Back is 3 minutes (template 5, tolerance 1), so minutes_out_of_range fires. */
 export const bad_wp1_draft = (): LessonDraft => load_draft("wp1");

@@ -1,12 +1,12 @@
 import type { CheckFinding, CheckRule } from "../../types.ts";
-import { EXPECTED_SECTIONS, SECTION_MINUTES_TOLERANCE } from "./expected.ts";
+import { SECTION_MINUTES_CHECK_TOLERANCE, template_for } from "../../../compile/templates.ts";
 
 export const minutes_out_of_range_rule: CheckRule = {
   kind: "minutes_out_of_range",
   level: "blocking",
   run: (ctx, policy) => {
-    const tmpl = EXPECTED_SECTIONS(ctx.lesson.type);
-    if (tmpl === null) return [];
+    const template = template_for(ctx.lesson.type);
+    if (template === undefined) return [];
     const out: CheckFinding[] = [];
     const finding = (message: string, address: string): CheckFinding => ({
       kind: "minutes_out_of_range",
@@ -18,14 +18,14 @@ export const minutes_out_of_range_rule: CheckRule = {
       code: null,
     });
     for (const section of ctx.lesson.sections) {
-      const expected = tmpl.find((t) => t.name === section.name);
+      const expected = template.sections.find((t) => t.name === section.name);
       if (expected === undefined) continue;
       if (
-        Math.abs(section.minutes - expected.minutes) > SECTION_MINUTES_TOLERANCE
+        Math.abs(section.minutes - expected.minutes) > SECTION_MINUTES_CHECK_TOLERANCE
       ) {
         out.push(
           finding(
-            `"${section.name}" is ${section.minutes} minutes; the template expects ${expected.minutes}`,
+            `"${section.name}" is ${section.minutes} minutes; the template expects ${expected.minutes} (allowed difference ${SECTION_MINUTES_CHECK_TOLERANCE})`,
             section.address,
           ),
         );

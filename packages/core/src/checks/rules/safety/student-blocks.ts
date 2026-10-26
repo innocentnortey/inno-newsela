@@ -1,5 +1,5 @@
 import type { StoredLesson } from "@ls/schema/lesson";
-import { find_cfu_items, node_text, section_nodes, visit_with_parts } from "../structural/doc-walk.ts";
+import { cfu_parts, find_cfu_items, node_text, section_nodes, visit_with_parts } from "../structural/doc-walk.ts";
 
 export type StudentBlock = { address: string; text: string };
 
@@ -8,12 +8,10 @@ export function student_blocks(lesson: StoredLesson): StudentBlock[] {
   const out: StudentBlock[] = [];
   for (const section of lesson.sections) {
     for (const item of find_cfu_items(section)) {
-      const text = item.blocks
-        .filter(
-          (b) =>
-            b.type === "ordered_list" ||
-            (b.type === "paragraph" && !/^[A-Z]\.\s*(Correct|Incorrect)/.test(node_text(b))),
-        )
+      // Positional: a stem such as "Correct the sentence below" sits before the list and stays student text.
+      const parts = cfu_parts(item);
+      const text = [...parts.stem, ...(parts.list ? [parts.list] : []), ...parts.extra]
+        .filter((b) => b.type === "ordered_list" || b.type === "paragraph")
         .map(node_text)
         .join(" ");
       out.push({ address: item.address, text });

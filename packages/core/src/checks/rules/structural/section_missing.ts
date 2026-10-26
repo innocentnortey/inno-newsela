@@ -1,36 +1,17 @@
-import type { PMNode } from "@ls/schema/lesson";
 import type { CheckFinding, CheckRule } from "../../types.ts";
-import { EXPECTED_SECTIONS, section_name_to_address } from "./expected.ts";
-import { section_nodes, walk } from "./doc-walk.ts";
+import { section_address } from "../../../compile/addresses.ts";
+import { parts_present, role_present } from "../../../compile/role-nodes.ts";
+import { template_for } from "../../../compile/templates.ts";
+import { section_nodes } from "./doc-walk.ts";
 import { excerpt_obligation } from "../links/slot-obligations.ts";
 import { count_excerpt_slots } from "../links/slots.ts";
-
-function has_role(nodes: PMNode[], role: string): boolean {
-  let found = false;
-  for (const top of nodes) {
-    walk(top, (n) => {
-      if (role === "cfu") {
-        if (n.type === "routine_heading" && n.attrs?.icon === "cfu")
-          found = true;
-      } else if (role.startsWith("eld_callout_")) {
-        if (
-          n.type === "callout" &&
-          n.attrs?.variant === role.slice("eld_callout_".length)
-        ) {
-          found = true;
-        }
-      }
-    });
-  }
-  return found;
-}
 
 export const section_missing_rule: CheckRule = {
   kind: "section_missing",
   level: "blocking",
   run: (ctx) => {
-    const tmpl = EXPECTED_SECTIONS(ctx.lesson.type);
-    if (tmpl === null) return [];
+    const template = template_for(ctx.lesson.type);
+    if (template === undefined) return [];
     const out: CheckFinding[] = [];
     const finding = (message: string, address: string): CheckFinding => ({
       kind: "section_missing",
@@ -41,26 +22,23 @@ export const section_missing_rule: CheckRule = {
       related_lesson_id: null,
       code: null,
     });
-    for (const expected of tmpl) {
-      const stored = ctx.lesson.sections.find((s) => s.name === expected.name);
+    for (const slot of template.sections) {
+      const stored = ctx.lesson.sections.find((s) => s.name === slot.name);
       if (stored === undefined) {
-        out.push(
-          finding(
-            `Section "${expected.name}" is missing`,
-            section_name_to_address(ctx.lesson.lesson_id, expected.name),
-          ),
-        );
+        // The address the compiler assigns, so a recorded resolution and the editor agree.
+        out.push(finding(`Section "${slot.name}" is missing`, section_address(ctx.lesson.lesson_id, slot.name)));
         continue;
       }
       const nodes = section_nodes(stored);
-      for (const role of expected.required_roles) {
-        if (!has_role(nodes, role)) {
-          out.push(
-            finding(
-              `Section "${expected.name}" is missing required role ${role}`,
-              stored.address,
-            ),
-          );
+      for (const role of slot.required_roles) {
+        if (!role_present(nodes, role)) {
+          out.push(finding(`Section "${slot.name}" is missing required role ${role}`, stored.address));
+        }
+      }
+      const parts = parts_present(nodes);
+      for (const label of slot.parts ?? []) {
+        if (!parts.includes(label)) {
+          out.push(finding(`Section "${slot.name}" is missing part "${label}"`, stored.address));
         }
       }
     }

@@ -1,7 +1,6 @@
 import type { CheckFinding, CheckRule } from "../../types.ts";
-import { parse_rationale_label } from "../../../compile/labels.ts";
-import { EXPECTED_SECTIONS } from "./expected.ts";
-import { find_cfu_items, node_text, visit_with_parts } from "./doc-walk.ts";
+import { template_for } from "../../../compile/templates.ts";
+import { cfu_parts, find_cfu_items, visit_with_parts } from "./doc-walk.ts";
 
 export const schema_invalid_rule: CheckRule = {
   kind: "schema_invalid",
@@ -17,7 +16,7 @@ export const schema_invalid_rule: CheckRule = {
       related_lesson_id: null,
       code: null,
     });
-    if (EXPECTED_SECTIONS(ctx.lesson.type) === null) {
+    if (template_for(ctx.lesson.type) === undefined) {
       out.push(
         finding(
           `Unknown lesson type "${ctx.lesson.type}"`,
@@ -54,21 +53,13 @@ export const schema_invalid_rule: CheckRule = {
         }
       });
       for (const item of find_cfu_items(section)) {
-        const list = item.blocks.find(
-          (b) => b.type === "ordered_list" && b.attrs?.type === "A",
-        );
+        const { list, rationales: parsed } = cfu_parts(item);
         if (list === undefined) {
           out.push(finding("CFU item has no lettered options", item.address));
           continue;
         }
-        const n = (list.content ?? []).filter(
-          (c) => c.type === "list_item",
-        ).length;
-        const after = item.blocks.slice(item.blocks.indexOf(list) + 1);
-        const rationales = after
-          .filter((b) => b.type === "paragraph")
-          .map((b) => parse_rationale_label(node_text(b)))
-          .filter((r): r is NonNullable<typeof r> => r !== null);
+        const n = (list.content ?? []).filter((c) => c.type === "list_item").length;
+        const rationales = parsed.map((r) => r.label);
         const correct = rationales.filter((r) => r.correct).length;
         if (correct !== 1) {
           out.push(

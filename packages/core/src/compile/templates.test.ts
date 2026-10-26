@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { DRAFT_ROLES } from "@ls/schema/lesson-draft";
-import { SECTION_TEMPLATES, template_for } from "./templates.ts";
+import { CHECK_POLICY } from "../checks/policy.ts";
+import {
+  SECTION_MINUTES_CHECK_TOLERANCE,
+  SECTION_MINUTES_PROMPT_TOLERANCE,
+  SECTION_TEMPLATES,
+  template_for,
+} from "./templates.ts";
 
 describe("templates", () => {
   it("minutes sum to 50 for every type", () => {
@@ -44,5 +50,22 @@ describe("templates", () => {
     expect(t.sections.find((s) => s.name === "Launch")?.required_roles).toContain("sample_response");
     const lia = t.sections.find((s) => s.name === "Learning in Action")!.required_roles;
     for (const r of ["routine_heading", "teacher_tip", "cfu_item"] as const) expect(lia).toContain(r);
+  });
+});
+
+describe("templates: named tolerances and obligations", () => {
+  it("minutes_tolerances_are_named", () => {
+    expect(SECTION_MINUTES_PROMPT_TOLERANCE).toBe(0);
+    expect(SECTION_MINUTES_CHECK_TOLERANCE).toBe(1);
+  });
+  it("template_totals_equal_the_policy_target", () => {
+    for (const t of SECTION_TEMPLATES.templates) {
+      expect(t.sections.reduce((s, x) => s + x.minutes, 0), t.lesson_type).toBe(CHECK_POLICY.minutes_target);
+    }
+  });
+  it("parts_are_exact_labels", () => {
+    for (const t of SECTION_TEMPLATES.templates)
+      for (const sec of t.sections)
+        for (const label of sec.parts ?? []) expect(label).toMatch(/^Part [A-Z]$/);
   });
 });
