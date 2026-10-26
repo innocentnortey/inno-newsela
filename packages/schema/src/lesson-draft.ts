@@ -28,6 +28,10 @@ export const CfuItemDraft = z
   });
 export type CfuItemDraft = z.infer<typeof CfuItemDraft>;
 
+// Same split as core's split_code_list (comma and semicolon); the schema must not import core.
+const code_set = (raw: string | null): string[] =>
+  [...new Set((raw ?? "").split(/[,;]/).map((t) => t.trim()).filter((t) => t !== ""))].sort();
+
 export const DraftBlock = z
   .object({
     role: DraftRole,
@@ -48,6 +52,13 @@ export const DraftBlock = z
     }
     if (b.code_origins.length !== b.standard_codes.length) {
       ctx.addIssue({ code: "custom", path: ["code_origins"], message: "code_origins must match standard_codes" });
+    }
+    if (b.role === "cfu_item" && b.cfu !== null && b.standard_codes.length > 0) {
+      const from_cfu = code_set(b.cfu.standard_code);
+      const from_block = code_set(b.standard_codes.join(","));
+      if (from_cfu.length > 0 && from_cfu.join("|") !== from_block.join("|")) {
+        ctx.addIssue({ code: "custom", path: ["standard_codes"], message: "cfu_item standard_codes must match cfu.standard_code" });
+      }
     }
   });
 export type DraftBlock = z.infer<typeof DraftBlock>;

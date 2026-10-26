@@ -1,4 +1,5 @@
 import type { CheckContext } from "../../types.ts";
+import { section_address } from "../../../compile/addresses.ts";
 
 export type SlotObligation = { needed: boolean; reasons: string[] };
 
@@ -17,4 +18,10 @@ export function excerpt_obligation(ctx: CheckContext): SlotObligation {
     }
   }
   return { needed: reasons.length > 0, reasons };
+}
+
+/** Where the "missing required excerpt slot" finding sits: the stored Learning in Action section, else the address the compiler would give it. */
+export function obligation_address(ctx: CheckContext): string {
+  return ctx.lesson.sections.find((s) => s.name === "Learning in Action")?.address
+    ?? section_address(ctx.lesson_id, "Learning in Action");
 }

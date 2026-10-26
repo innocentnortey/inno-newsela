@@ -5,6 +5,9 @@ import { DEFAULT_POLICY, gate_state, make_ctx, p, reading_lesson, section } from
 import type { CheckContext } from "../../types.ts";
 import { excerpt_slot_open_rule } from "../grounding/excerpt_slot_open.ts";
 import { section_missing_rule } from "../structural/section_missing.ts";
+import type { UnitId } from "@ls/schema/ids";
+import { assign_addresses } from "../../../compile/addresses.ts";
+import { obligation_address } from "./slot-obligations.ts";
 import { count_excerpt_slots } from "./slots.ts";
 import { link } from "./test-support.ts";
 
@@ -89,4 +92,21 @@ describe("slot obligations", () => {
     const plain_quote = { type: "quote", attrs: { slot_id: "c" } } as PMNode;
     expect(count_excerpt_slots(sec(quote, placeholder, plain_quote))).toBe(1);
   });
+
+  it("absent_learning_in_action_locates_the_slot_finding_at_the_canonical_address", () => {
+    const c = ctx_for({ segments: [writer_task("apply")] });
+    const no_lia = { ...c, lesson: { ...c.lesson, sections: c.lesson.sections.filter((x) => x.name !== "Learning in Action") } };
+    const f = missing(no_lia);
+    expect(f).toHaveLength(1);
+    expect(f[0]?.address).toBe("G6.U4.L4.LearningInAction");
+    expect(f[0]?.address).toBe(assign_addresses(c.lesson, "G6.U4" as UnitId).sections.find((x) => x.name === "Learning in Action")?.address);
+    const [issue] = merge_resolutions(f, [{ kind: "section_missing", address: "G6.U4.L4.LearningInAction", code: null }]);
+    expect(issue?.resolved).toBe(true);
+  });
+
+  it("stored_learning_in_action_address_wins", () => {
+    const c = ctx_for({ segments: [writer_task("apply")] });
+    expect(obligation_address(c)).toBe("G6.U4.L4.LearninginAction");
+  });
 });
+

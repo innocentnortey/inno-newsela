@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StandardRow } from "@ls/core/ports/standards";
+import { standards_for_lesson } from "@ls/core/compile/standard-identity";
 import { build_front_matter_standards } from "./front-matter-standards.ts";
 import { load_row, standard_rows } from "./testing/fixtures.ts";
 
@@ -59,5 +60,13 @@ describe("build_front_matter_standards", () => {
     const row = { ...load_row("wp1"), focus_codes: ["L.6.4.b"], msls_codes: [], eld_codes: [] };
     const out = build_front_matter_standards(row, [leaf("L.6.4.b", "L.6.4")], ["L.6.4.b"]);
     expect(out[0]).toMatchObject({ origin: "outline", asserted_by: "outline", confirmation: null });
+  });
+
+  it("delegates_to_the_core_mapping", () => {
+    const row = { ...load_row("wp1"), focus_codes: ["L.6.4"], msls_codes: [], eld_codes: [] };
+    const cat = [parent("L.6.4"), leaf("L.6.4.b", "L.6.4"), std("RL.6.7")];
+    for (const tagged of [["L.6.4.b"], ["RL.6.7"], ["ZZ.9.9"], ["L.6.4.b", "RL.6.7", "ZZ.9.9"]]) {
+      expect(build_front_matter_standards(row, cat, tagged)).toEqual(standards_for_lesson(row, cat, tagged));
+    }
   });
 });

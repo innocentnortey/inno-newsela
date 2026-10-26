@@ -115,6 +115,12 @@ function merge_and_dedupe(text: string, cands: Cand[]): string[] {
  * by the word's class when written in lower case: a function or inflected word (pronoun, determiner, gerund,
  * adverb...) or a common word the tagger's own lexicon knows is not a name; anything else stays a candidate and is
  * checked against the sources and the lesson's own text like every other candidate. No word list is added.
+ *
+ * Known residual (2026-10-26, see docs/testing/error-analysis/name-scan-residual-2026-10-26.md): a capitalised plain
+ * noun that is the first word after a label, is in no source, and appears in lower case nowhere in the lesson (Length,
+ * Preference, Describes) cannot be told from an invented name by the tagger and is flagged. It stays blocking in CFU
+ * text: Medusa, Brindle and Quillon fall in the same class and must stay caught. Policy: repair is told the exact
+ * word; a reviewer can resolve it; no word list.
  */
 const OPTION_LABEL = /(^|\n)(\s*(?:[A-Za-z][.)]\s+)?(?:Correct|Incorrect)\s*[:.\-–—]\s*)/g;
 export function blank_option_labels(text: string): string {

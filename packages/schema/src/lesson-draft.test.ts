@@ -72,3 +72,15 @@ describe("issue_paths_only", () => {
     if (!r.success) expect(zod_issue_paths(r.error)).toEqual(["$"]);
   });
 });
+
+describe("cfu_codes_agree", () => {
+  const item = (codes: string[], code: string | null) =>
+    draft([block({ role: "cfu_item", standard_codes: codes, code_origins: codes.map(() => "outline"), cfu: cfu({ standard_code: code }) })]);
+  it("cfu_codes_must_agree_when_both_given", () => {
+    expect(paths(item(["RL.6.1"], "RL.6.2"))).toContain("blocks[0].standard_codes");
+    expect(LessonDraft.safeParse(item(["RL.6.1", "RL.6.2"], "RL.6.2, RL.6.1")).success).toBe(true);
+    expect(LessonDraft.safeParse(item([], "RL.6.1")).success).toBe(true);
+    expect(LessonDraft.safeParse(item(["RL.6.1"], null)).success).toBe(true);
+  });
+});
+

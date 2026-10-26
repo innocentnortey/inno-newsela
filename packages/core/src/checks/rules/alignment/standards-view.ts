@@ -1,7 +1,8 @@
 import type { PMNode, StoredLesson } from "@ls/schema/lesson";
 import type { CheckContext } from "../../types.ts";
-import { ELD_LABEL } from "../../../compile/labels.ts";
-import { MAX_CODES_PER_CHECK, parse_tag } from "../../../compile/standard-tags.ts";
+import { MAX_CODES_PER_CHECK } from "../../../compile/standard-tags.ts";
+import { read_evidence } from "./evidence.ts";
+import type { EvidenceActivity, EvidenceItem } from "./evidence.ts";
 import { find_cfu_items, node_text, visit_with_parts, walk } from "../structural/doc-walk.ts";
 
 type Standard = StoredLesson["front_matter"]["standards"][number];
@@ -33,18 +34,11 @@ export function focus_codes(ctx: CheckContext): string[] {
 
 export type CfuTag = { code: string; address: string };
 
+/** Pulse Check items by code (S3's observer imports this); unsubstantiated items are included. */
 export function cfu_tags(ctx: CheckContext): CfuTag[] {
-  const out: CfuTag[] = [];
-  for (const section of ctx.lesson.sections) {
-    for (const item of find_cfu_items(section)) {
-      const m = /^Pulse Check \((.+)\)$/.exec(node_text(item.heading).trim());
-      for (const raw of (m?.[1] ?? "").split(",")) {
-        const code = raw.trim();
-        if (code !== "") out.push({ code, address: item.address });
-      }
-    }
-  }
-  return out;
+  return read_evidence(ctx.lesson)
+    .filter((e) => e.activity === "pulse_check")
+    .map((e) => ({ code: e.code, address: e.address }));
 }
 
 /** A parent code is covered by a tag naming it, or a recorded leaf below it. */
@@ -55,7 +49,7 @@ export function covered(f: string, tags: CfuTag[], recorded_codes: Set<string>):
 }
 
 /** Addresses (part or section) with at least one teaching paragraph, in the named sections. */
-function teaching_text_addresses(lesson: StoredLesson, names: readonly string[], say_callouts = false): string[] {
+function teaching_text_addresses(lesson: StoredLesson, names: readonly string[]): string[] {
   const found: string[] = [];
   for (const section of lesson.sections) {
     if (!names.includes(section.name)) continue;
@@ -66,13 +60,7 @@ function teaching_text_addresses(lesson: StoredLesson, names: readonly string[],
     }
     visit_with_parts(section, ({ node }) => {
       if (node.type === "teacher_tip") walk(node, (n) => excluded.add(n));
-      else if (node.type === "collapsible") {
-        // A "Say:" callout is what the teacher says aloud, so it is teaching text; purpose and watch notes and the
-        // support table are not.
-        if (say_callouts && node.attrs?.label === ELD_LABEL) {
-          for (const k of node.content ?? []) if (k.attrs?.variant !== "say") walk(k, (n) => excluded.add(n));
-        } else walk(node, (n) => excluded.add(n));
-      }
+      else if (node.type === "collapsible") walk(node, (n) => excluded.add(n));
     });
     visit_with_parts(section, ({ node, address }) => {
       if (
@@ -88,60 +76,17 @@ function teaching_text_addresses(lesson: StoredLesson, names: readonly string[],
   return found;
 }
 
-/** Addresses of teaching parts (Literacy Lab and Learning in Action); S3's observer imports this. */
+/**
+ * S3's "any teaching part" observation and the judge seed: paragraphs only, Literacy Lab and Learning in Action.
+ * Production evidence (evidence.ts) also counts Launch and Say callouts and is per routine. The difference is
+ * intentional; S3 is the stricter observer here.
+ */
 export function teaching_parts(lesson: StoredLesson): string[] {
   return teaching_text_addresses(lesson, ["Literacy Lab", "Learning in Action"]);
 }
 
-/** Addresses with teaching text (paragraphs and Say callouts) in Launch, Literacy Lab or Learning in Action. */
-export function teaching_addresses(lesson: StoredLesson): Set<string> {
-  return new Set(teaching_text_addresses(lesson, ["Launch", "Literacy Lab", "Learning in Action"], true));
-}
-
-export type DocTag = {
-  kind: "teach" | "assess";
-  source: "pulse_check" | "quick_write" | "routine";
-  code: string;
-  address: string;
-  codes_in_tag: number;
-  /** Every code the same heading names (this one included). */
-  tag_codes: readonly string[];
-};
-
-/** Per-code evidence written on headings by the compiler (compile/standard-tags.ts). */
-export function doc_tags(lesson: StoredLesson): DocTag[] {
-  const out: DocTag[] = [];
-  for (const section of lesson.sections) {
-    if (section.name === "Homework") continue;
-    visit_with_parts(section, ({ node, address }) => {
-      if (node.type !== "routine_heading") return;
-      const t = node_text(node).trim();
-      const loose = parse_tag(t, false);
-      let kind: DocTag["kind"];
-      let source: DocTag["source"];
-      let parsed = loose;
-      if (node.attrs?.icon === "cfu" && loose?.label === "Pulse Check") {
-        kind = "assess";
-        source = "pulse_check";
-      } else if (loose?.label === "Quick Write") {
-        kind = "assess";
-        source = "quick_write";
-      } else {
-        parsed = parse_tag(t, true);
-        kind = "teach";
-        source = "routine";
-      }
-      if (parsed === null) return;
-      for (const code of parsed.codes) {
-        out.push({ kind, source, code, address, codes_in_tag: parsed.codes.length, tag_codes: parsed.codes });
-      }
-    });
-  }
-  return out;
-}
-
 export function tagged_codes(lesson: StoredLesson): string[] {
-  return [...new Set(doc_tags(lesson).map((t) => t.code))];
+  return [...new Set(read_evidence(lesson).map((e) => e.code))];
 }
 
 export type Obligation = { code: string; parent: string | null };
@@ -162,25 +107,25 @@ export function focus_obligations(ctx: CheckContext): Obligation[] {
   return out.filter((o, i) => out.findIndex((x) => x.code === o.code) === i);
 }
 
+/** ELD is decided by the official catalogue only: a forged "ELD."-looking string or an unloaded code is content. */
 function is_eld(ctx: CheckContext, code: string): boolean {
+  return ctx.standards.some((s) => s.code === code && s.set === "CA_ELD_6");
+}
+
+/** An assessment item covers its codes when it is really there and names at most MAX_CODES_PER_CHECK content standards. */
+export function tag_covers(ctx: CheckContext, item: EvidenceItem): boolean {
   return (
-    code.startsWith("ELD.") ||
-    ctx.row.eld_codes.includes(code) ||
-    recorded(ctx).some((s) => s.code === code && s.role === "eld") ||
-    ctx.standards.some((s) => s.code === code && s.set === "CA_ELD_6")
+    item.kind === "assess" &&
+    item.substantiated &&
+    item.tag_codes.filter((c) => !is_eld(ctx, c)).length <= MAX_CODES_PER_CHECK
   );
 }
 
-/** An assessment tag covers its codes unless it names more than MAX_CODES_PER_CHECK content standards; ELD codes do not count. */
-export function tag_covers(ctx: CheckContext, tag: DocTag): boolean {
-  return tag.kind === "assess" && tag.tag_codes.filter((c) => !is_eld(ctx, c)).length <= MAX_CODES_PER_CHECK;
-}
-
-/** Codes an assessment tag covers; an item naming more than MAX_CODES_PER_CHECK content codes covers none. */
-export function assessment_codes(ctx: CheckContext, sources: readonly DocTag["source"][]): Set<string> {
+/** Codes covered by an assessment item of the given activities. */
+export function assessment_codes(ctx: CheckContext, activities: readonly EvidenceActivity[]): Set<string> {
   return new Set(
-    doc_tags(ctx.lesson)
-      .filter((t) => sources.includes(t.source) && tag_covers(ctx, t))
-      .map((t) => t.code),
+    read_evidence(ctx.lesson)
+      .filter((e) => activities.includes(e.activity) && tag_covers(ctx, e))
+      .map((e) => e.code),
   );
 }

@@ -5,6 +5,7 @@ import {
   TEACHER_LABELS, rationale_label, routine_icon,
 } from "./labels.ts";
 import { normalise_part_label } from "./addresses.ts";
+import { clean_codes } from "./standard-identity.ts";
 import { format_tag } from "./standard-tags.ts";
 
 type MarkName = "strong" | "em" | "teacher_talk" | "sample_response";
@@ -24,8 +25,9 @@ export function paras(s: string, marks: readonly MarkName[] = []): PMJson[] {
   return lines.length === 0 ? [{ type: "paragraph" }] : lines.map((l) => para(l, marks));
 }
 
-export function routine_heading(block: DraftBlock): PMJson[] {
-  return [{ type: "routine_heading", attrs: { icon: routine_icon(block.text) }, content: [text(format_tag(block.text, block.standard_codes))] }];
+export function routine_heading(block: DraftBlock, lesson_id: string = ""): PMJson[] {
+  const { codes } = clean_codes(block.standard_codes, lesson_id);
+  return [{ type: "routine_heading", attrs: { icon: routine_icon(block.text) }, content: [text(format_tag(block.text.trim(), codes))] }];
 }
 
 export function teacher_talk(block: DraftBlock): PMJson[] {
@@ -94,11 +96,12 @@ export function support_table(block: DraftBlock): PMJson[] {
   ];
 }
 
-export function cfu_item(block: DraftBlock): PMJson[] {
+export function cfu_item(block: DraftBlock, lesson_id: string = ""): PMJson[] {
   const c = block.cfu;
   if (c === null) return [];
+  const { codes } = clean_codes(c.standard_code, lesson_id);
   const out: PMJson[] = [
-    { type: "routine_heading", attrs: { icon: "cfu" }, content: [text(c.standard_code === null || c.standard_code.trim() === "" ? PULSE_CHECK : `${PULSE_CHECK} (${c.standard_code.trim()})`)] },
+    { type: "routine_heading", attrs: { icon: "cfu" }, content: [text(format_tag(PULSE_CHECK, codes))] },
     para(c.stem),
     {
       type: "ordered_list",
@@ -115,9 +118,10 @@ export function cfu_item(block: DraftBlock): PMJson[] {
   return out;
 }
 
-export function quick_write(block: DraftBlock): PMJson[] {
+export function quick_write(block: DraftBlock, lesson_id: string = ""): PMJson[] {
+  const { codes } = clean_codes(block.standard_codes, lesson_id);
   return [
-    { type: "routine_heading", attrs: { icon: "writing" }, content: [text(format_tag(QUICK_WRITE, block.standard_codes))] },
+    { type: "routine_heading", attrs: { icon: "writing" }, content: [text(format_tag(QUICK_WRITE, codes))] },
     ...paras(block.text),
   ];
 }

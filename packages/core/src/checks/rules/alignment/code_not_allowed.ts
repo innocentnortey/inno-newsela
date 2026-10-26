@@ -1,6 +1,7 @@
 import type { CheckContext, CheckRule } from "../../types.ts";
 import { make_finding } from "./finding.ts";
-import { FRONT, listed_codes, recorded, tagged_codes } from "./standards-view.ts";
+import { read_evidence } from "./evidence.ts";
+import { FRONT, listed_codes, recorded } from "./standards-view.ts";
 
 function row_list_empty(ctx: CheckContext, set: string): boolean {
   if (set === "CA_CCSS_ELA_6") return ctx.row.focus_codes.length === 0;
@@ -39,22 +40,34 @@ export const code_not_allowed_rule: CheckRule = {
         );
       }
     }
-    // With no catalogue rows loaded there is nothing to judge a tagged code against.
-    for (const code of ctx.standards.length === 0 ? [] : tagged_codes(ctx.lesson)) {
+    // Every tagged code is judged against the official standards. A missing lookup never means valid: only a code the
+    // pinned row itself lists may lack a catalogue row (the row is validated at intake).
+    const first_address = new Map<string, string>();
+    for (const e of read_evidence(ctx.lesson)) if (!first_address.has(e.code)) first_address.set(e.code, e.address);
+    for (const [code, where] of first_address) {
       if (recorded_codes.has(code)) continue;
-      // A code the row itself lists is valid even when the catalogue slice loaded for the check omits it
-      // (a narrowed parent is replaced in the front matter, so its text is not loaded).
-      if (row_listed.has(code)) continue;
       const std = ctx.standards.find((x) => x.code === code);
-      if (std !== undefined && listed.has(code)) continue;
+      if (std === undefined) {
+        if (row_listed.has(code)) continue;
+        out.push(
+          make_finding(
+            "code_not_allowed",
+            "blocking",
+            `Code ${code} is used in a heading but is not in the official standards list; correct or remove the tag at ${where} (code_not_allowed)`,
+            { address: where, code },
+          ),
+        );
+        continue;
+      }
+      if (listed.has(code)) continue;
       // An unrecorded leaf of a listed parent is the advisory standard_add_suggestion case, not a block.
-      if (std !== undefined && std.is_leaf && std.parent_code !== null && listed.has(std.parent_code)) continue;
+      if (std.is_leaf && std.parent_code !== null && listed.has(std.parent_code)) continue;
       out.push(
         make_finding(
           "code_not_allowed",
           "blocking",
-          `Code ${code} is used in a heading but is not one of this lesson's standards at ${address} (code_not_allowed)`,
-          { address, code },
+          `Code ${code} is used in a heading but is not one of this lesson's standards; remove the tag at ${where} (code_not_allowed)`,
+          { address: where, code },
         ),
       );
     }

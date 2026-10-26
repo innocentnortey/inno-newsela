@@ -3,7 +3,7 @@ import { section_address } from "../../../compile/addresses.ts";
 import { parts_present, role_present } from "../../../compile/role-nodes.ts";
 import { template_for } from "../../../compile/templates.ts";
 import { section_nodes } from "./doc-walk.ts";
-import { excerpt_obligation } from "../links/slot-obligations.ts";
+import { excerpt_obligation, obligation_address } from "../links/slot-obligations.ts";
 import { count_excerpt_slots } from "../links/slots.ts";
 
 export const section_missing_rule: CheckRule = {
@@ -45,10 +45,7 @@ export const section_missing_rule: CheckRule = {
     // A required excerpt slot that was never created is blocking; an open slot is a different rule's work.
     const ob = excerpt_obligation(ctx);
     if (ob.needed && count_excerpt_slots(ctx.lesson.sections) === 0) {
-      const where =
-        ctx.lesson.sections.find((s) => s.name === "Learning in Action")?.address ??
-        ctx.lesson.sections[0]?.address ??
-        ctx.lesson.lesson_id;
+      const where = obligation_address(ctx);
       out.push(finding(`Lesson is missing a required excerpt slot (${ob.reasons.join("; ")})`, where));
     }
     return out;

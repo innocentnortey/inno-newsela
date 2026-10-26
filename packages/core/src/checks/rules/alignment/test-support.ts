@@ -28,7 +28,13 @@ export function std_rows(): StandardRow[] {
     r("L.6.4.c", "L.6.4", true, "synthetic language four c"),
     r("RL.6.7", null, true, "synthetic reading seven"),
     r("W.6.2", null, false, "synthetic writing two"),
+    r("W.6.2.a", "W.6.2", true, "synthetic writing two a"),
+    r("W.6.2.b", "W.6.2", true, "synthetic writing two b"),
+    r("W.6.2.f", "W.6.2", true, "synthetic writing two f"),
     eld("ELD.PI.6.6b", "PI", "synthetic strand one label"),
+    eld("ELD.PI.6.6b.Em", "PI", "synthetic strand one emerging"),
+    eld("ELD.PI.6.10", "PI", "synthetic strand ten label"),
+    eld("ELD.PI.6.7", "PI", "synthetic strand seven label"),
     eld("ELD.PII.6.2b", "PII", "synthetic strand two label"),
   ];
 }
@@ -80,4 +86,30 @@ export function wp1_ctx(over: Partial<CheckContext> = {}): CheckContext {
     standards: std_rows(),
     ...over,
   };
+}
+
+/**
+ * The clean Reading lesson of S2's `clean_reading` recipe with everything the standards rules need: a listed, recorded
+ * focus code (RL.6.1) that is taught in Learning in Action and checked by that section's Pulse Check, and the catalogue.
+ * Setup only (F2-D7): the earlier recipe tagged a Pulse Check with no listed code, nothing recorded and no catalogue.
+ */
+export function clean_reading_ctx(): CheckContext {
+  const base = make_ctx(reading_lesson());
+  const lesson: StoredLesson = {
+    ...base.lesson,
+    front_matter: { ...base.lesson.front_matter, standards: [rec("RL.6.1")] },
+    sections: base.lesson.sections.map((s) => ({
+      ...s,
+      content: {
+        ...s.content,
+        content: (s.content.content ?? []).map((n) => {
+          const t = n.content?.[0]?.text;
+          return s.name === "Learning in Action" && n.type === "routine_heading" && t === "Close reading"
+            ? { ...n, content: [{ type: "text", text: "Close reading (RL.6.1)" }] }
+            : n;
+        }),
+      },
+    })),
+  };
+  return { ...base, lesson, row: { ...base.row, focus_codes: ["RL.6.1"] }, standards: std_rows() };
 }

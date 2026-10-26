@@ -10,6 +10,7 @@ import type { AlignmentRepo } from "../ports/alignment.ts";
 import type { Clock } from "../ports/clock.ts";
 import type { CheckContext, DerivedRow } from "./types.ts";
 import { InvariantViolation } from "../errors.ts";
+import { tagged_codes } from "./rules/alignment/standards-view.ts";
 
 // Builds the one CheckContext the check worker, the Submit freeze and Approve all read.
 // Holds ports only: no state, no cache. The lesson under check is the argument, never re-read.
@@ -67,7 +68,7 @@ export class CheckContextLoader {
       ),
     ];
     const standards = await this.standards.texts([
-      ...new Set([...allowed_codes, ...lesson.front_matter.standards.map((s) => s.code)]),
+      ...new Set([...allowed_codes, ...lesson.front_matter.standards.map((s) => s.code), ...tagged_codes(lesson)]),
     ]);
 
     const deps = await this.graph.dependencies(lesson_id);

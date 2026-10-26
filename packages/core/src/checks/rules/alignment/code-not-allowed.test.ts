@@ -65,4 +65,27 @@ describe("code_not_allowed", () => {
     const ctx = { ...base, row: { ...base.row, focus_codes: [] } };
     expect(code_not_allowed_rule.run(ctx, DEFAULT_POLICY)).toEqual([]);
   });
+
+  it("empty_catalogue_never_means_valid", () => {
+    const base = wp1_ctx({ lesson: lesson_with([], "RL.9.9", null), allowed_codes: [], standards: [] });
+    const ctx = { ...base, row: { ...base.row, focus_codes: [] } };
+    const f = code_not_allowed_rule.run(ctx, DEFAULT_POLICY);
+    expect(f).toHaveLength(1);
+    expect(f[0]).toMatchObject({ level: "blocking", code: "RL.9.9" });
+    expect(f[0]?.message).toContain("official standards list");
+  });
+
+  it("real_but_unlisted_code_on_a_code_less_row_is_blocked", () => {
+    const base = wp1_ctx({ lesson: lesson_with([], "RL.6.7", null), allowed_codes: [] });
+    const ctx = { ...base, row: { ...base.row, focus_codes: [] } };
+    const f = code_not_allowed_rule.run(ctx, DEFAULT_POLICY);
+    expect(f).toHaveLength(1);
+    expect(f[0]?.message).toContain("not one of this lesson's standards");
+  });
+
+  it("row_listed_code_without_a_loaded_row_is_valid", () => {
+    const base = wp1_ctx({ lesson: lesson_with([], "L.6.4", null), allowed_codes: [], standards: [] });
+    const ctx = { ...base, row: { ...base.row, focus_codes: ["L.6.4"] } };
+    expect(code_not_allowed_rule.run(ctx, DEFAULT_POLICY)).toEqual([]);
+  });
 });

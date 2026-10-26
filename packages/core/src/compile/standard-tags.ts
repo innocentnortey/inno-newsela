@@ -3,6 +3,11 @@ export const MAX_CODES_PER_CHECK = 2;
 
 const CODE = /^[A-Z]{1,5}(?:\.[A-Za-z0-9]+)+$/; // RL.6.1  L.6.4.b  W.6.2.f  ELD.PI.6.6b
 
+/** True when a token has the shape of a standard code. Placeholders are filtered by identity first, never by shape. */
+export function is_code_shaped(token: string): boolean {
+  return CODE.test(token);
+}
+
 export type ParsedTag = { label: string; codes: string[] };
 
 /** "Label (A, B)" -> {label, codes}. strict: every token must look like a standard code; loose: any non-empty token. */

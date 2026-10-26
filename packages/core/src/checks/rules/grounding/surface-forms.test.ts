@@ -97,8 +97,8 @@ describe("names_after_labels", () => {
     expect(scan_names("B. Incorrect: Length does not matter.", index)).toEqual([]);
     expect(scan_names("B. Incorrect: Brindle would wait.", index)).toEqual(["Brindle"]);
   });
-  it("flags a plain noun the tagger cannot tell from a name when nothing in the lesson uses it", () => {
-    // Known residual: "Length" is not in the tagger's lexicon and is tagged a plain noun like "Medusa".
+  it("documents the residual: flags a plain noun the tagger cannot tell from a name when nothing in the lesson uses it", () => {
+    // Known residual, see name-scan.ts: a limitation, not a correct classification.
     expect(scan_names("B. Incorrect: Length does not matter.", idx())).toEqual(["Length"]);
   });
   it("lets a name in the sources clear", () => {

@@ -10,6 +10,8 @@ import * as N from "./nodes.ts";
 import { plan_parts } from "./part-labels.ts";
 import type { PartPlan, PartRemap } from "./part-labels.ts";
 import { check_role } from "./roles.ts";
+import { identity_notes } from "./standard-identity.ts";
+import type { IdentityNote } from "./standard-identity.ts";
 import type { SectionTemplate } from "./templates.ts";
 
 export interface CompileContext {
@@ -27,6 +29,8 @@ export interface CompiledLesson {
   safety_tips: string[];
   /** Descriptive or odd part labels the compiler mapped to Part A/B; diagnostics only. */
   part_remaps: PartRemap[];
+  /** The draft's own code claims that disagree with the pinned row or that compile ignored; diagnostics only. */
+  identity_notes: IdentityNote[];
 }
 
 export type CompileErrorReason = "section_not_in_template" | "role_not_allowed" | "unknown_node";
@@ -51,6 +55,7 @@ function build_nodes(
   next_slot: () => string,
   tips: { id: (i: number) => string | null },
   plan: PartPlan,
+  lesson_id: string,
 ): PMJson[] {
   const out: PMJson[] = [];
   const part_of = (b: DraftBlock): string | null => (b.part === null ? null : plan.label_of(b.part));
@@ -80,12 +85,12 @@ function build_nodes(
     }
     i += 1;
     switch (b.role) {
-      case "routine_heading": out.push(...N.routine_heading(b)); break;
+      case "routine_heading": out.push(...N.routine_heading(b, lesson_id)); break;
       case "teacher_talk": out.push(...N.teacher_talk(b)); break;
       case "sample_response": out.push(...N.sample_response(b)); break;
       case "support_table": out.push(...N.support_table(b)); break;
-      case "cfu_item": out.push(...N.cfu_item(b)); break;
-      case "quick_write": out.push(...N.quick_write(b)); break;
+      case "cfu_item": out.push(...N.cfu_item(b, lesson_id)); break;
+      case "quick_write": out.push(...N.quick_write(b, lesson_id)); break;
       case "text_evidence_needed": out.push(...N.text_evidence_needed(b, next_slot())); break;
       case "excerpt_slot": out.push(...N.excerpt_slot(b, next_slot())); break;
       case "teacher_tip": out.push(N.teacher_tip(b.text, tips.id(tip_i))); tip_i += 1; break;
@@ -132,6 +137,8 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
     }
   }
 
+  const notes_identity = identity_notes(draft, ctx.row);
+
   // 2. Safety plan.
   const notes = ctx.row.segments.filter((s) => s.kind === "safety_note");
   const last = ctx.template.sections[ctx.template.sections.length - 1];
@@ -156,7 +163,7 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
     };
     const plan = plan_parts(slot.name, blocks.map((b) => b.part));
     part_remaps.push(...plan.remaps);
-    const nodes = build_nodes(blocks, next_slot, tips, plan);
+    const nodes = build_nodes(blocks, next_slot, tips, plan, lesson_id);
     if (is_target) {
       const paired = blocks.filter((b) => b.role === "teacher_tip").length;
       notes.forEach((note, i) => {
@@ -216,5 +223,5 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
     teacher_word_count += count_words(s.content as PMNode);
     placeholders += count_placeholders(s.content as PMNode);
   }
-  return { lesson, content_hash: hash_lesson(lesson), teacher_word_count, placeholders, safety_tips, part_remaps };
+  return { lesson, content_hash: hash_lesson(lesson), teacher_word_count, placeholders, safety_tips, part_remaps, identity_notes: notes_identity };
 }

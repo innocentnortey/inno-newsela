@@ -289,3 +289,55 @@ describe("part labels and code tags", () => {
     expect(heads.some((h) => /^Pulse Check \(/.test(h))).toBe(false);
   });
 });
+
+describe("standard identity in compile", () => {
+  const heads_of = (c: ReturnType<typeof wp1>): string[] =>
+    c.lesson.sections.flatMap((s) => find(s.content as PMNode, "routine_heading").map((h) => texts(h).join("")));
+  const blk = (o: Record<string, unknown>) => ({
+    role: "routine_heading", section: "Launch", part: null, text: "t", standard_codes: [], code_origins: [], cfu: null, minutes: null, ...o,
+  }) as unknown as LessonDraft["blocks"][number];
+  const cfu_block = (code: string | null, codes: string[] = []) => {
+    const d = draft("wp1");
+    const b = d.blocks.find((x) => x.role === "cfu_item" && x.section === "Learning in Action")!;
+    return { ...b, standard_codes: codes, code_origins: codes.map(() => "outline" as const), cfu: { ...b.cfu!, standard_code: code } };
+  };
+
+  it("cfu_codes_split_and_formatted", () => {
+    const d = draft("wp1");
+    const blocks = d.blocks.map((b) => (b.role === "cfu_item" && b.section === "Learning in Action" ? cfu_block("RL.6.1; RL.6.2") : b));
+    const c = compile_draft({ ...d, blocks }, ctx(row("wp1"), "Reading"));
+    expect(heads_of(c)).toContain("Pulse Check (RL.6.1, RL.6.2)");
+  });
+
+  it("placeholder_codes_never_reach_a_heading", () => {
+    const d = draft("wp1");
+    const blocks = [
+      ...d.blocks.map((b) => (b.role === "cfu_item" && b.section === "Learning in Action" ? cfu_block("N/A") : b)),
+      blk({ text: "Percy's Voice", standard_codes: ["G6.U4.L4"], code_origins: ["outline"] }),
+      blk({ role: "quick_write", section: "Look Back", text: "Write.", standard_codes: ["none"], code_origins: ["outline"] }),
+    ];
+    const heads = heads_of(compile_draft({ ...d, blocks }, ctx(row("wp1"), "Reading")));
+    expect(heads).toContain("Percy's Voice");
+    expect(heads).toContain("Quick Write");
+    expect(heads.filter((h) => h.startsWith("Pulse Check") && h.includes("N/A"))).toEqual([]);
+    expect(heads.some((h) => /G6\.U4|none|N\/A/.test(h))).toBe(false);
+  });
+
+  it("identity_notes_report_a_wrong_origin_claim", () => {
+    const d = draft("wp1");
+    const blocks = [...d.blocks, blk({ text: "Voice", standard_codes: ["RL.6.1"], code_origins: ["added"] })];
+    const c = compile_draft({ ...d, blocks }, ctx(row("wp1"), "Reading"));
+    expect(c.identity_notes.filter((n) => n.kind === "origin_claim_contradicts_row")).toHaveLength(1);
+    expect(wp1().identity_notes).toEqual([]);
+  });
+
+  it("plain_drafts_compile_to_the_same_hash", () => {
+    // Hashes computed from the compiler on commit e8a7f27/a554848 (before the identity mapping).
+    expect(wp1().content_hash).toBe("b10c46828e3a2f02f6716612c98a88de016f6a465c785e64f9d36b277fa02ada");
+    expect(wp4().content_hash).toBe("e6e07b27ec9b8b46b196d2f6b31efb128015468dd4cd556945d408a725c393a8");
+    expect(compile_draft(draft("wp3"), ctx(row("wp3"), "Flex Day")).content_hash).toBe(
+      "91aefd0d364504695d34572420f9fda48f85cc8a11c3c65e41c9e4f30946bc9b",
+    );
+  });
+});
+

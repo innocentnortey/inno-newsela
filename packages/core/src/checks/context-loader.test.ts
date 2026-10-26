@@ -13,7 +13,8 @@ import type { DerivedRow } from "../ports/lesson-docs.ts";
 import { CheckContextLoader } from "./context-loader.ts";
 import { run_checks, CHECK_RULES } from "./registry.ts";
 import { CHECK_POLICY } from "./policy.ts";
-import { reading_lesson } from "./test-helpers.ts";
+import { approve_gate, merge_resolutions, submit_gate } from "./gates.ts";
+import { cfu_item, gate_state, p, reading_lesson, routine } from "./test-helpers.ts";
 
 const L4 = "G6.U4.L4" as LessonId;
 const L5 = "G6.U4.L5" as LessonId;
@@ -304,3 +305,70 @@ describe("CheckContextLoader", () => {
     });
   });
 });
+
+describe("tagged_codes_are_always_looked_up", () => {
+  const no_code_row = NormalizedRow.parse({ ...row_wp1, focus_codes: [], eld_codes: [], msls_codes: [] });
+  const versions = { v1: [rec(V1, no_code_row)] };
+  // reading_lesson tags one Pulse Check RL.6.1; a code-less row has none.
+  const untagged = () => JSON.parse(JSON.stringify(reading_lesson({ lesson_id: L4 })).replace("Pulse Check (RL.6.1)", "Pulse Check")) as ReturnType<typeof reading_lesson>;
+  const tagged = (code: string, record?: { code: string }) => {
+    const l = untagged();
+    l.sections = l.sections.map((s) =>
+      s.name === "Learning in Action"
+        ? { ...s, content: { ...s.content, content: [...(s.content.content ?? []), routine("notes_section", `Extra (${code})`), p("text"), ...cfu_item({ code })] } }
+        : s,
+    );
+    if (record !== undefined) {
+      l.front_matter.standards = [{ code: record.code, role: "focus", origin: "added", official_text: "", asserted_by: "generator", confirmation: "open" }] as never;
+    }
+    return l;
+  };
+  const check = async (code: string, stds: StandardRow[], record?: { code: string }) => {
+    const { loader, calls } = build({ versions, standards: stds });
+    const ctx = await loader.load(L4, tagged(code, record), HASH);
+    const result = run_checks(ctx, CHECK_RULES, CHECK_POLICY);
+    return { ctx, calls, result };
+  };
+
+  it("loads_official_rows_for_tagged_codes", async () => {
+    const { ctx, calls } = await check("RL.6.1", [std("RL.6.1")]);
+    expect(calls.some((c) => c.startsWith("texts:") && c.includes("RL.6.1"))).toBe(true);
+    expect(ctx.standards.map((s) => s.code)).toContain("RL.6.1");
+  });
+
+  it("bogus_tag_on_a_no_code_row_blocks_submit_and_approve", async () => {
+    const { result } = await check("RL.9.99", [std("RL.6.1")]);
+    const bad = result.findings.filter((f) => f.kind === "code_not_allowed" && f.code === "RL.9.99");
+    expect(bad).toHaveLength(1);
+    expect(bad[0]?.level).toBe("blocking");
+    const issues = merge_resolutions(result.findings, []);
+    for (const gate of [submit_gate, approve_gate]) {
+      const d = gate(gate_state({ action: gate === submit_gate ? "submit" : "approve", issues }));
+      expect(d.refusals).toContain("BLOCKED");
+      expect(JSON.stringify(d.details)).toContain("RL.9.99");
+    }
+  });
+
+  it("real_unlisted_code_typed_on_a_no_code_row_is_blocked", async () => {
+    const { result } = await check("RL.6.7", [std("RL.6.7")]);
+    expect(result.findings.some((f) => f.kind === "code_not_allowed" && f.code === "RL.6.7" && f.level === "blocking")).toBe(true);
+  });
+
+  it("recorded_added_code_on_a_no_code_row_passes_the_code_check_and_waits_for_confirmation", async () => {
+    const { result } = await check("RL.6.7", [std("RL.6.7")], { code: "RL.6.7" });
+    expect(result.findings.filter((f) => f.kind === "code_not_allowed")).toEqual([]);
+    const conf = result.findings.filter((f) => f.kind === "standard_confirmation");
+    expect(conf).toHaveLength(1);
+    const d = submit_gate(gate_state({ issues: merge_resolutions(result.findings, []), open_confirmations: conf.length }));
+    expect(d.refusals).toContain("CONFIRMATION_OPEN");
+  });
+
+  it("no_code_row_with_null_cfu_code_is_clean", async () => {
+    const { loader } = build({ versions, standards: [] });
+    const l = untagged();
+    const ctx = await loader.load(L4, l, HASH);
+    const result = run_checks(ctx, CHECK_RULES, CHECK_POLICY);
+    expect(result.findings.filter((f) => f.kind === "code_not_allowed" || f.kind.startsWith("standard_"))).toEqual([]);
+  });
+});
+
