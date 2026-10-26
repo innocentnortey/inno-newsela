@@ -57,3 +57,45 @@ Rows read back with `psql`: `probe_run` `pr_01M5VD8MK0FYZW3E26YSKVTP4E` (http) a
 For the demo and the defence: lesson open, the board and polling stay far inside their budgets at 200 users on the demo
 stack with a stubbed provider, with zero lost acknowledged edits. It does **not** show the 3 s store target is met, a
 generation run under load, or real-content sizes. Re-run after NL-112 and after the store path is diagnosed.
+
+## Re-run after PD-38
+
+Run 2026-10-26 09:38 to 09:57 UTC on main `c46f4ef` (PD-38: store debounce defaults 1 s, ceiling 2 s; were 2 s / 4 s). Same command and load as the first run (200 users, 2/15/2 min, 140 socket editors, stub provider, no provider key, no real model call). Nothing was tuned. Record: `evals/reports/load-2026-10-26-rerun.md`; rows `pr_01M5VS62RT0YMN6X40Q26YGCRA` (http) and `pr_01M5VT5EA2SA8WTZAERR8GBADH` (yjs). All values below are **[M] measured** with *n*.
+
+**This was a native run, not Compose** (no image builds, disk): `next build` + `next start`, `tsx` collab and worker, on a throwaway database `ls_nl127b` in the shared test Postgres container (the first run had a dedicated Compose Postgres). The HTTP unit `G6.U1` was recreated (40 lessons, about 3,200 words each, now with outline rows); the Yjs load unit now has an outline per follow-up F-B. **Contention was heavy and worse than the first run:** load average 13.2 before the run started, 26.8 to 27.9 during the plateau (first run: about 8), from other agents' orphaned `next-server` processes, `dockerd` and a ClickHouse container. Not a quiet-machine figure.
+
+### Before and after
+
+| Metric | Target | First run (NL-127) | Re-run after PD-38 | Result now |
+|---|---|---|---|---|
+| **Stored p95** | < 3 s | 6,008 ms (n = 22,533, all samples) | **1,124 ms** (n = 22,517 clean; p50 1,063 ms) | **met** |
+| Stored p95 across a socket drop | reported separately | 15 samples, not split | 3,094 ms (n = 3) | informational |
+| Remote-edit p95 | < 500 ms | 6.7 ms (n = 44,612) | 6.8 ms (n = 44,588) | met |
+| Lost acknowledged updates | 0 | 0 | 0 (0 duplicate tokens, 0 unacknowledged) | met |
+| Socket reconnect p95 (M-24) | <= 10 s | 9.95 s | 8.39 s | met |
+| Lesson open p95 (M-18) | < 1.5 s | 23 ms (n = 4,902) | **7,188 ms** (n = 4,902 requests incl. 337 busy) | **MISSED** |
+| Board and poll p95 (M-20, M-21) | < 1 s, < 300 ms | 20 ms (n = 20,402) | **4,032 ms** (board only) | **MISSED** |
+| Heartbeat p95 (informational, CON-20 < 200 ms) | < 200 ms | 27 ms | 7,232 ms | missed |
+| Page load p95 | informational | 21 ms | 44 ms (n = 2,036) | n/a |
+| Error rate (M-22) | < 0.5% | 0.00% of 38,909 | **4.33%** of 38,909 (1,684 `SERVICE_BUSY` 503s) | **MISSED** |
+| Recovery after the plateau (M-23) | <= 120 s | 100 s | not recovered | **MISSED** |
+| Max DB connections | informational | 21 | 20 | n/a |
+| Load-script event-loop lag p95 | informational | 12.1 ms | 14.6 ms | n/a |
+| Yjs socket errors | 0 | 0 | 0 of 22,520 | met |
+| `check.failed` lines | 0 expected | 1,310 | **0** (worker and collab logs); `check.done` 3,327 | met |
+
+### Stored-wait split (from `collab.stored` logs, n = 22,520)
+
+| Part | p50 | p95 |
+|---|---|---|
+| Debounce wait (`store_wait_ms`) | 1,002 ms | 1,007 ms |
+| Database write (`db_write_ms`) | 58 ms | 117 ms |
+| Wait + write | n/a | 1,121 ms |
+
+The stored p95 is now almost entirely the 1 s debounce; the database write is about 0.1 s even under this load. The first run's 6 s was the 4 s ceiling plus the cycle (GEN-4 smoke: wait p95 5,999 ms, db p95 65 ms). The 3 s stored target is met with about 1.9 s of headroom; the lower debounce roughly sets the floor (about 1 s) and there is no longer a gap between the wait and the target.
+
+### Misses, stated plainly
+
+- **The HTTP half missed four targets in this run** (lesson open 7.2 s, board and poll 4.0 s, error rate 4.33%, recovery), where the first run met all of them by a wide margin. 1,684 of the 38,909 requests were `SERVICE_BUSY` (the 2 s database pool wait ran out): board 716, heartbeat 551, lesson open 337, act read 62, act write 18.
+- **I did not diagnose this and did not tune anything.** The run differs from the first in three ways that are not separated here: much heavier machine contention (load average 27 against 8), a database that is a shared container with other agents' test traffic and Docker's port proxy (dockerd was at 100% CPU) rather than a dedicated one, and a native `next start` web process rather than the Compose image. PD-38 changes only the collab store debounce, so it does not obviously explain the HTTP numbers, but this run cannot rule out an effect (the lower debounce raises the store write rate against the same database). A quiet-machine re-run, ideally on the Compose stack, is needed before these HTTP numbers are read as a capacity result in either direction.
+- Qualifiers 1, 2 and 6 of the first report still apply (synthetic padded unit, no generation load, single instance not Render). Qualifier 4 (check failures) is closed by this run: 0 `check.failed`.
