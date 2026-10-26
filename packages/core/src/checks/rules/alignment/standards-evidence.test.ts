@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PMNode, StoredLesson } from "@ls/schema/lesson";
 import { merge_resolutions, submit_gate } from "../../gates.ts";
-import { DEFAULT_POLICY, LESSON_ID, cfu_item, gate_state, make_ctx, p, reading_lesson, routine, section } from "../../test-helpers.ts";
+import { DEFAULT_POLICY, LESSON_ID, callout, cfu_item, gate_state, make_ctx, p, reading_lesson, routine, section } from "../../test-helpers.ts";
 import type { CheckContext } from "../../types.ts";
 import { derive_alignment } from "./derive.ts";
 import { standard_confirmation_rule } from "./standard_confirmation.ts";
@@ -110,4 +110,49 @@ describe("per-code standards evidence", () => {
     expect(focus_obligations(live)).toEqual([{ code: "L.6.4.b", parent: "L.6.4" }]);
   });
 
+
+  const say_only = (code: string): PMNode[] => [
+    routine("notes_section", `Teach (${code})`),
+    {
+      type: "collapsible",
+      attrs: { label: "Integrated ELD Instructions" },
+      content: [callout("purpose", "Purpose note"), callout("say", "Say: look at the word."), callout("watch", "Watch note")],
+    },
+    ...cfu_item({ code }),
+  ];
+
+  it("say_callout_under_a_tagged_routine_is_teaching", () => {
+    expect(run(ctx_with(["RL.6.1"], say_only("RL.6.1"))).taught).toEqual([]);
+  });
+
+  it("purpose_and_watch_callouts_are_not_teaching", () => {
+    const lia: PMNode[] = [
+      routine("notes_section", "Teach (RL.6.1)"),
+      { type: "collapsible", attrs: { label: "Integrated ELD Instructions" }, content: [callout("purpose", "Purpose"), callout("watch", "Watch")] },
+      ...cfu_item({ code: "RL.6.1" }),
+    ];
+    expect(run(ctx_with(["RL.6.1"], lia)).taught).toEqual(["RL.6.1"]);
+  });
+
+  it("a_code_with_no_tagged_teaching_still_blocks_even_with_say_callouts", () => {
+    const lia: PMNode[] = [...say_only("RL.6.1").slice(1)];
+    expect(run(ctx_with(["RL.6.1"], lia)).taught).toEqual(["RL.6.1"]);
+  });
+
+  it("eld_codes_do_not_count_toward_the_two_code_limit", () => {
+    const eld = [rec("ELD.PI.6.10", { role: "eld" }), rec("ELD.PI.6.7", { role: "eld" })];
+    const lia: PMNode[] = [routine("notes_section", "Teach (W.6.2)"), p("Teach."), ...cfu_item({ code: "W.6.2, ELD.PI.6.10, ELD.PI.6.7" })];
+    const c = ctx_with(["W.6.2"], lia, [rec("W.6.2"), ...eld]);
+    expect(run(c).checked).toEqual([]);
+    const three = ctx_with(["RL.6.1", "RL.6.2"], [p("Teach."), ...cfu_item({ code: "RL.6.1, RL.6.2, L.6.4.b" })]);
+    expect(run(three).checked).toEqual(["RL.6.1", "RL.6.2"]);
+  });
+
+  it("a_row_with_no_codes_has_nothing_to_check", () => {
+    const c = ctx_with([], [p("Teach."), ...cfu_item({ code: "RL.6.1" }).map((n) => n)], []);
+    const lia = [p("Teach."), routine("cfu", "Pulse Check"), p("Which?")];
+    const none = ctx_with([], lia, []);
+    expect(run(none)).toEqual({ taught: [], checked: [] });
+    expect(c.row.focus_codes).toEqual([]);
+  });
 });

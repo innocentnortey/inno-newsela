@@ -15,7 +15,8 @@ export const CfuItemDraft = z
     options: z.array(z.string()).min(2),
     key_index: z.int().min(0),
     rationales: z.array(z.string()),
-    standard_code: z.string(),
+    // null on a row that lists no standard codes (Flex Day): there is nothing to name, and N/A or an id would be an invalid code.
+    standard_code: z.string().nullable(),
   })
   .superRefine((c, ctx) => {
     if (c.key_index >= c.options.length) {

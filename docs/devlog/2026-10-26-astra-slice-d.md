@@ -15,3 +15,13 @@
 **Why.** The WP-3 outline row lists no focus codes, so the cited RL.6.7 is recorded `added`. The new contract (`docs/delivery/2026-10-26-astra-fix-handoff.md`, "Align production lesson structure") requires per-code teaching evidence: an `added` code needs a tagged teaching routine. The stub good draft had only a tagged CFU item, so `stub_wp3_passes_all_assertions` failed with `standard_not_taught`. The fixture is a hand-written stub good draft, so aligning it with the contract does not weaken any check.
 
 **Checked.** `git diff --stat -- evals/cases` shows only this fixture; the `expected.json` hashes the S3 int test compares are unchanged. S3 tests re-run after commit (see the replay devlog).
+
+## Follow-up (PD-39 rulings, 2026-10-26)
+
+**Changed.** (1) `CfuItemDraft.standard_code` is nullable (schema, regenerated `lesson-draft.schema.json`); an item with no code compiles to an untagged `Pulse Check`, which `find_cfu_items` now recognises; the prompt says to set it to null on rows with no codes and never write N/A or the lesson id. (2) `callout_say` text counts as teaching text for `standard_not_taught` (purpose and watch callouts and the support table do not); `teaching_parts`, used by S3, is unchanged. (3) ELD codes do not count toward the two-code limit (`tag_covers`). A code with no tagged teaching, a Pulse Check with more than two content codes, missing excerpt slots and the narrowed leaf's open confirmation are unchanged. `lesson-shape.md` also now says a code on a teacher_talk block alone is not teaching.
+
+**Contract correction: S6 stub draft generator.** `evals/src/suites/s6-drafts.ts` only: it now strips the WP-2 fixture's foreign code tags, tags a Learning in Action teaching routine with the row's own focus codes, gives a code-less row's CFU item a null code, and removes single quotes around titles (slice A stopped trusting model cards, so a quoted title tripped `quote_unmatched` and the circuit breaker stopped the run). No S6 expectation, assertion, threshold or floor changed.
+
+**Known limit.** `code_not_allowed` skips its unrecorded-tagged-code branch when `ctx.standards` is empty (frozen S2 `clean_reading` depends on it). The production loader loads the leaves of the row's listed codes plus recorded codes, so it only matters for a row with no listed codes and no valid recorded codes where a reviewer hand-types a bogus tag.
+
+**Checked.** Replay numbers are in `docs/testing/error-analysis/replay-2026-10-26.md` (generation gate: initial 3 to 4 of 47, final 4 to 5 of 47). Whole `npx vitest run evals` passes (48 files, 299 tests, 1 expected fail); S1 12/12, S2 28/28. Nothing was run with a model.

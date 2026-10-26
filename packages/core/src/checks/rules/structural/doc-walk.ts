@@ -55,7 +55,7 @@ export function visit_with_parts(
 
 export type CfuItem = { address: string; heading: PMNode; blocks: PMNode[] };
 
-const PULSE_RE = /^Pulse Check \(.+\)$/;
+const PULSE_RE = /^Pulse Check(?: \(.+\))?$/;
 
 /** A CFU item runs from its cfu routine_heading to the next routine_heading or heading sibling. */
 export function find_cfu_items(section: Section): CfuItem[] {

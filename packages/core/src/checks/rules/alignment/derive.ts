@@ -1,6 +1,5 @@
 import type { AlignmentLinkRow, CheckContext } from "../../types.ts";
-import { MAX_CODES_PER_CHECK } from "../../../compile/standard-tags.ts";
-import { doc_tags, focus_obligations, recorded, teaching_addresses } from "./standards-view.ts";
+import { doc_tags, focus_obligations, recorded, tag_covers, teaching_addresses } from "./standards-view.ts";
 
 /** Links come only from tags on headings. They are the generator's or outline's claim; none is confirmed here. */
 export function derive_alignment(ctx: CheckContext): AlignmentLinkRow[] {
@@ -35,7 +34,7 @@ export function derive_alignment(ctx: CheckContext): AlignmentLinkRow[] {
       first = false;
     }
     for (const t of tags) {
-      if (t.code === code && t.kind === "assess" && t.codes_in_tag <= MAX_CODES_PER_CHECK) {
+      if (t.code === code && t.kind === "assess" && tag_covers(ctx, t)) {
         push({ ...base, address: t.address, role: "A" });
       }
     }

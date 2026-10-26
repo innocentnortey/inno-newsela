@@ -30,7 +30,10 @@
                     "type": "array"
                   },
                   "standard_code": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "stem": {
                     "type": "string"

@@ -98,7 +98,7 @@ export function cfu_item(block: DraftBlock): PMJson[] {
   const c = block.cfu;
   if (c === null) return [];
   const out: PMJson[] = [
-    { type: "routine_heading", attrs: { icon: "cfu" }, content: [text(`${PULSE_CHECK} (${c.standard_code})`)] },
+    { type: "routine_heading", attrs: { icon: "cfu" }, content: [text(c.standard_code === null || c.standard_code.trim() === "" ? PULSE_CHECK : `${PULSE_CHECK} (${c.standard_code.trim()})`)] },
     para(c.stem),
     {
       type: "ordered_list",

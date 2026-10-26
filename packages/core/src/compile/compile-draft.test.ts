@@ -279,4 +279,13 @@ describe("part labels and code tags", () => {
     expect(heads).toContain("Quick Write (RL.6.1)");
     expect(heads.some((h) => /^Pulse Check \(.+\)$/.test(h))).toBe(true);
   });
+
+  it("cfu_without_standard_code_compiles_to_an_untagged_pulse_check", () => {
+    const d = draft("wp3");
+    const blocks = d.blocks.map((b) => (b.cfu !== null ? { ...b, standard_codes: [], code_origins: [], cfu: { ...b.cfu, standard_code: null } } : b));
+    const c = compile_draft({ ...d, blocks }, ctx(row("wp3"), "Flex Day"));
+    const heads = c.lesson.sections.flatMap((s) => find(s.content as PMNode, "routine_heading").map((h) => texts(h).join("")));
+    expect(heads).toContain("Pulse Check");
+    expect(heads.some((h) => /^Pulse Check \(/.test(h))).toBe(false);
+  });
 });

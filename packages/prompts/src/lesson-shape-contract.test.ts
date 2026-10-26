@@ -12,6 +12,11 @@ describe("lesson-shape contract text", () => {
       "teacher_tip",
       "one entry for each entry of standard_codes",
       "up to two codes",
+      "set standard_code to null",
+      "never write N/A",
+      "does not count toward that limit of two",
+      "does not count as teaching",
+      "callout_say",
     ]) expect(shape, phrase).toContain(phrase);
   });
   it("no longer points at text cards as a source of names or quotations", () => {

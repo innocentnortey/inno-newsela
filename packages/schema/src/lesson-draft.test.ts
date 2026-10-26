@@ -31,6 +31,13 @@ describe("no_quote_role", () => {
 });
 
 describe("cfu_rules", () => {
+  it("accepts a null standard_code (a row that lists no codes) but not an absent or numeric one", () => {
+    const ok = (c: Record<string, unknown>) => LessonDraft.safeParse(draft([block({ role: "cfu_item", cfu: c })])).success;
+    expect(ok(cfu({ standard_code: null }))).toBe(true);
+    const { standard_code: _omit, ...without } = cfu();
+    expect(ok(without)).toBe(false);
+    expect(ok(cfu({ standard_code: 6 }))).toBe(false);
+  });
   it("passes the control", () => {
     expect(LessonDraft.safeParse(draft([block({ role: "cfu_item", cfu: cfu() })])).success).toBe(true);
   });

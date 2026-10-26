@@ -59,4 +59,10 @@ describe("code_not_allowed", () => {
     const ctx = { ...base, row: { ...base.row, focus_codes: ["RL.6.1"] } };
     expect(code_not_allowed_rule.run(ctx, DEFAULT_POLICY)).toEqual([]);
   });
+
+  it("an_item_with_no_code_on_a_row_with_no_codes_is_not_flagged", () => {
+    const base = wp1_ctx({ lesson: lesson_with([], null, null), allowed_codes: [] });
+    const ctx = { ...base, row: { ...base.row, focus_codes: [] } };
+    expect(code_not_allowed_rule.run(ctx, DEFAULT_POLICY)).toEqual([]);
+  });
 });

@@ -1,5 +1,6 @@
 import type { PMNode, StoredLesson } from "@ls/schema/lesson";
 import type { CheckContext } from "../../types.ts";
+import { ELD_LABEL } from "../../../compile/labels.ts";
 import { MAX_CODES_PER_CHECK, parse_tag } from "../../../compile/standard-tags.ts";
 import { find_cfu_items, node_text, visit_with_parts, walk } from "../structural/doc-walk.ts";
 
@@ -54,7 +55,7 @@ export function covered(f: string, tags: CfuTag[], recorded_codes: Set<string>):
 }
 
 /** Addresses (part or section) with at least one teaching paragraph, in the named sections. */
-function teaching_text_addresses(lesson: StoredLesson, names: readonly string[]): string[] {
+function teaching_text_addresses(lesson: StoredLesson, names: readonly string[], say_callouts = false): string[] {
   const found: string[] = [];
   for (const section of lesson.sections) {
     if (!names.includes(section.name)) continue;
@@ -64,8 +65,13 @@ function teaching_text_addresses(lesson: StoredLesson, names: readonly string[])
       for (const b of item.blocks) walk(b, (n) => excluded.add(n));
     }
     visit_with_parts(section, ({ node }) => {
-      if (node.type === "teacher_tip" || node.type === "collapsible") {
-        walk(node, (n) => excluded.add(n));
+      if (node.type === "teacher_tip") walk(node, (n) => excluded.add(n));
+      else if (node.type === "collapsible") {
+        // A "Say:" callout is what the teacher says aloud, so it is teaching text; purpose and watch notes and the
+        // support table are not.
+        if (say_callouts && node.attrs?.label === ELD_LABEL) {
+          for (const k of node.content ?? []) if (k.attrs?.variant !== "say") walk(k, (n) => excluded.add(n));
+        } else walk(node, (n) => excluded.add(n));
       }
     });
     visit_with_parts(section, ({ node, address }) => {
@@ -87,9 +93,9 @@ export function teaching_parts(lesson: StoredLesson): string[] {
   return teaching_text_addresses(lesson, ["Literacy Lab", "Learning in Action"]);
 }
 
-/** Addresses with teaching text in Launch, Literacy Lab or Learning in Action. */
+/** Addresses with teaching text (paragraphs and Say callouts) in Launch, Literacy Lab or Learning in Action. */
 export function teaching_addresses(lesson: StoredLesson): Set<string> {
-  return new Set(teaching_text_addresses(lesson, ["Launch", "Literacy Lab", "Learning in Action"]));
+  return new Set(teaching_text_addresses(lesson, ["Launch", "Literacy Lab", "Learning in Action"], true));
 }
 
 export type DocTag = {
@@ -98,6 +104,8 @@ export type DocTag = {
   code: string;
   address: string;
   codes_in_tag: number;
+  /** Every code the same heading names (this one included). */
+  tag_codes: readonly string[];
 };
 
 /** Per-code evidence written on headings by the compiler (compile/standard-tags.ts). */
@@ -125,7 +133,7 @@ export function doc_tags(lesson: StoredLesson): DocTag[] {
       }
       if (parsed === null) return;
       for (const code of parsed.codes) {
-        out.push({ kind, source, code, address, codes_in_tag: parsed.codes.length });
+        out.push({ kind, source, code, address, codes_in_tag: parsed.codes.length, tag_codes: parsed.codes });
       }
     });
   }
@@ -154,11 +162,25 @@ export function focus_obligations(ctx: CheckContext): Obligation[] {
   return out.filter((o, i) => out.findIndex((x) => x.code === o.code) === i);
 }
 
-/** Codes an assessment tag covers; an item naming more than MAX_CODES_PER_CHECK codes covers none. */
+function is_eld(ctx: CheckContext, code: string): boolean {
+  return (
+    code.startsWith("ELD.") ||
+    ctx.row.eld_codes.includes(code) ||
+    recorded(ctx).some((s) => s.code === code && s.role === "eld") ||
+    ctx.standards.some((s) => s.code === code && s.set === "CA_ELD_6")
+  );
+}
+
+/** An assessment tag covers its codes unless it names more than MAX_CODES_PER_CHECK content standards; ELD codes do not count. */
+export function tag_covers(ctx: CheckContext, tag: DocTag): boolean {
+  return tag.kind === "assess" && tag.tag_codes.filter((c) => !is_eld(ctx, c)).length <= MAX_CODES_PER_CHECK;
+}
+
+/** Codes an assessment tag covers; an item naming more than MAX_CODES_PER_CHECK content codes covers none. */
 export function assessment_codes(ctx: CheckContext, sources: readonly DocTag["source"][]): Set<string> {
   return new Set(
     doc_tags(ctx.lesson)
-      .filter((t) => t.kind === "assess" && sources.includes(t.source) && t.codes_in_tag <= MAX_CODES_PER_CHECK)
+      .filter((t) => sources.includes(t.source) && tag_covers(ctx, t))
       .map((t) => t.code),
   );
 }
