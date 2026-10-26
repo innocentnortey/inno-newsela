@@ -59,12 +59,18 @@ export function make_s3(provider_mode: ProviderMode, deps: S3Deps = {}): EvalSui
       spent = spent.plus(cost);
       const sum = (f: (x: (typeof observed.calls)[number]) => number | null): number => observed.calls.reduce((a, x) => a + (f(x) ?? 0), 0);
       const uniq = (xs: (string | null)[]): string[] => [...new Set(xs.filter((x): x is string => x !== null))].sort();
+      const pv = observed.provenance;
+      const prompt_label = pv.prompt_version_id === null ? null
+        : pv.prompt_number === null || pv.locked_hash === null ? pv.prompt_version_id : `v${pv.prompt_number} locked ${pv.locked_hash.slice(0, 12)}`;
       const actual: S3Actual = {
         pair: entry.expected.pair,
         assertions: results,
         trajectory,
         counts: { placeholders: (observed.node_types["excerpt_slot"] ?? 0) + (observed.node_types["quote_placeholder"] ?? 0), minutes_total: observed.minutes_total, sections: observed.sections.length },
         schema_valid_first_pass: observed.schema_valid_first_pass,
+        initial_stage: observed.initial_stage,
+        prompt_versions: prompt_label === null ? [] : [prompt_label],
+        calls_completed: observed.calls.filter((x) => x.status === "completed").length,
         repairs_used: observed.repairs_used,
         tokens: { input: sum((x) => x.input_tokens), output: sum((x) => x.output_tokens) },
         served_models: uniq(observed.calls.map((x) => x.served_model)),

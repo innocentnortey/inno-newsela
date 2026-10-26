@@ -8,6 +8,10 @@ export interface S3Actual {
   trajectory: Trajectory;
   counts: { placeholders: number; minutes_total: number | null; sections: number };
   schema_valid_first_pass: boolean | null;
+  initial_stage: "no_output" | "unparseable" | "schema_invalid" | "compile_error" | "compiled" | null;
+  /** Recorded from the run's prompt_version row (empty when the run recorded none). */
+  prompt_versions: string[];
+  calls_completed: number;
   repairs_used: number;
   tokens: { input: number; output: number };
   served_models: string[];
@@ -39,21 +43,28 @@ export function render_drafts_report(r: S3ReportInput): string {
   const all = r.history;
   const served = uniq(all.flatMap((h) => h.actual.served_models));
   const requested = uniq(all.flatMap((h) => h.actual.requested_models));
-  const first_ok = all.filter((h) => h.actual.schema_valid_first_pass === true).length;
+  const recorded = uniq(all.flatMap((h) => h.actual.prompt_versions));
+  const compiled = all.filter((h) => h.actual.initial_stage === "compiled").length;
+  const parsed = all.filter((h) => h.actual.initial_stage === "compile_error" || h.actual.initial_stage === "compiled").length;
+  const none = all.filter((h) => h.actual.initial_stage === "no_output" || h.actual.initial_stage === null).length;
+  const completed = all.reduce((a, h) => a + h.actual.calls_completed, 0);
+  const total_calls = all.reduce((a, h) => a + (Array.isArray(h.actual["calls"]) ? (h.actual["calls"] as unknown[]).length : 0), 0);
   const repairs = all.reduce((a, h) => a + h.actual.repairs_used, 0);
   const case_ids = uniq(all.map((h) => h.case_id));
   const lines = [
     "## Detail S3",
     `- git_sha: ${r.git_sha}`,
-    `- prompt_version: ${r.prompt_version ?? "none (stub)"}`,
+    `- prompt_version: ${recorded.length > 0 ? recorded.join(", ") : (r.prompt_version ?? "none recorded")}`,
+    "- provenance: recorded from the run rows of each case-repeat (prompt_version table, model_call rows). The \"Suite S3\" section above shows the runner's configured prompt_version and models, not what this run used.",
     `- served_models: [${served.join(", ")}]`,
     `- requested_models: [${requested.join(", ")}]`,
     `- effort: ${r.effort}`,
     `- max_tokens: ${r.max_tokens}`,
     `- n: ${all.length} (${case_ids.length} cases x ${r.repeat} repeats)`,
-    `- provider_mode: ${r.provider_mode}${r.provider_mode === "stub" ? " (no model was called)" : ""}`,
+    `- calls_recorded: ${completed} completed of ${total_calls} (served_models above come from them)`,
+    `- provider_mode: ${r.provider_mode}${r.provider_mode === "stub" ? " (no model was called)" : completed === 0 ? " (WARNING: no completed model call was recorded)" : ""}`,
     `- cost_total_usd: ${r.cost_total}${r.guard_line === null ? "" : `   (${r.guard_line})`}`,
-    `- M-31 first-pass schema-valid: ${first_ok}/${all.length} (repairs used: ${repairs} of ${all.length})`,
+    `- M-31 initial draft parses and compiles: ${compiled}/${all.length} (parse ${parsed}/${all.length}, no output ${none}; repairs used: ${repairs} of ${all.length})`,
     "",
   ];
   for (const id of case_ids) {

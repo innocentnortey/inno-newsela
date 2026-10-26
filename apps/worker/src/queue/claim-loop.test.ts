@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { describe, expect, it } from "vitest";
 import { FakeClock } from "@ls/core/ports/clock";
 import { InvariantViolation, LeaseLost } from "@ls/core/errors";
@@ -143,6 +144,32 @@ describe("ClaimLoop", () => {
       expect(w.queue.log.filter((x) => x === "finish" || x === "cancel_run")).toEqual(["finish", "cancel_run"]);
       expect(w.queue.cancel_calls[0]).toMatchObject({ run_id: "run_a", reason: "capped" });
       expect(w.tx.commits).toBe(1);
+    });
+  });
+
+  describe("unit_plan_cost_rollup", () => {
+    async function drive_costed(costs: boolean) {
+      const w = world(1, "unit_plan");
+      w.plans.next = { run_id: "run_a", entries: 0, model_call_id: null, stored: true, failure: null };
+      if (costs) {
+        w.calls.completed_for = (async (_job: unknown, purpose: string) =>
+          ({ cost_usd: new Decimal(purpose === "unit_plan" ? "0.4" : "0.1") })) as never;
+      }
+      const exit = w.loop.run_until(w.stop);
+      await flush();
+      w.stop.set();
+      w.clock.advance(1000);
+      await flush();
+      await exit;
+      return w;
+    }
+    it("unit_plan_cost_rollup: the plan call and its repair land on the job row", async () => {
+      const w = await drive_costed(true);
+      expect(w.queue.jobs[0]?.cost_usd.toString()).toBe("0.5");
+    });
+    it("unit_plan_cost_rollup_zero_when_no_completed_call", async () => {
+      const w = await drive_costed(false);
+      expect(w.queue.jobs[0]?.cost_usd.toString()).toBe("0");
     });
   });
 

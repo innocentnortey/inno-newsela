@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import type { Clock } from "@ls/core/ports/clock";
-import type { JobId, RunId } from "@ls/core/ports/common";
+import type { JobId, RunId, Usd } from "@ls/core/ports/common";
 import { InvariantViolation, LeaseLost } from "@ls/core/errors";
 import type { ClaimedJob, JobOutcome, JobQueue } from "@ls/core/ports/job-queue";
 import type { ModelCallLog } from "@ls/core/ports/model-call-log";
@@ -55,7 +55,7 @@ type LoopSettings = Pick<
   "worker_id" | "generation_concurrency" | "max_active_runs" | "job_lease_ms" | "job_poll_ms"
 >;
 
-function plan_outcome(job: ClaimedJob, out: UnitPlanOutcomeView): JobOutcome {
+function plan_outcome(job: ClaimedJob, out: UnitPlanOutcomeView, cost: Usd): JobOutcome {
   const common = {
     job_id: job.job_id,
     brakes_fired: [],
@@ -63,7 +63,7 @@ function plan_outcome(job: ClaimedJob, out: UnitPlanOutcomeView): JobOutcome {
     truncation_retries: 0,
     retries: 0,
     calls_lost: 0,
-    cost_usd: new Decimal(0),
+    cost_usd: cost,
     version_id: null,
   };
   if (out.stored) return { ...common, status: "ready", tile_state: "ready", failure_reasons: [] };
@@ -85,6 +85,16 @@ export class ClaimLoop {
     private readonly settings: LoopSettings,
     private readonly tx: TxRunner,
   ) {}
+
+  // The unit-plan call (and its one repair) bill to the run, not a lesson; roll them onto the plan job's own row.
+  private async plan_cost(job: ClaimedJob): Promise<Usd> {
+    let total: Usd = new Decimal(0);
+    for (const purpose of ["unit_plan", "repair"] as const) {
+      const call = await this.calls.completed_for(job.job_id, purpose, 1);
+      if (call?.cost_usd) total = total.plus(call.cost_usd);
+    }
+    return total;
+  }
 
   // Clean up orphaned work before any claim (G-9). Never claims.
   async start(): Promise<TickReport> {
@@ -150,7 +160,7 @@ export class ClaimLoop {
             abandoned += 1;
             return;
           }
-          await this.queue.finish(plan_outcome(job, out));
+          await this.queue.finish(plan_outcome(job, out, await this.plan_cost(job)));
           if (out.failure?.check === "capped") {
             await this.tx.with_tx((t) => this.queue.cancel_run(job.run_id, "capped", t));
           }

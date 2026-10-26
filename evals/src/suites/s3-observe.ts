@@ -6,8 +6,10 @@ import { cross_lesson_link_rule } from "@ls/core/checks/rules/links/cross_lesson
 import { cfu_tags, teaching_parts } from "@ls/core/checks/rules/alignment/standards-view";
 import { gate_state, make_ctx } from "@ls/core/checks/test-helpers";
 import type { LessonLinkRecord } from "@ls/core/checks/types";
+import type { UnitId } from "@ls/schema/ids";
 import { LessonDraft } from "@ls/schema/lesson-draft";
 import type { StoredLesson } from "@ls/schema/lesson";
+import { assess_initial_draft } from "../full-run-initial.ts";
 import type { S3Call, S3Observed } from "./s3-assertions.ts";
 import type { World } from "./s6-world.ts";
 
@@ -34,11 +36,17 @@ export async function observe(w: World, run_id: string, lesson_id: string): Prom
   const lesson = version?.lesson_json ?? null;
   const draft = version === undefined ? null : LessonDraft.safeParse(version.draft_json);
 
+  const run = (await w.query<{ unit_id: string }>("select unit_id from run where id=$1", [run_id]))[0];
+  const prov = (await w.query<{ prompt_version_id: string; prompt_number: number; locked_hash: string }>(
+    "select p.id as prompt_version_id, p.number as prompt_number, p.locked_hash from run r join prompt_version p on p.id = r.prompt_version_id where r.id = $1", [run_id]))[0];
   const first_draft = calls.find((c) => c.purpose === "lesson_draft" && c.attempt === 1);
-  let first_pass: boolean | null = null;
-  if (first_draft !== undefined) {
-    try { first_pass = first_draft.raw_output !== null && LessonDraft.safeParse(JSON.parse(first_draft.raw_output)).success; } catch { first_pass = false; }
-  }
+  // M-31: the original output must parse AND compile (the same classifier the full-run report uses).
+  const initial = first_draft === undefined
+    ? null
+    : assess_initial_draft(first_draft.status === "completed" ? first_draft.raw_output : null, {
+      row: w.rows.find((r) => r.lesson_id === lesson_id) ?? null, unit_id: (run?.unit_id ?? "") as UnitId, schema_version: lesson?.schema_version ?? 1,
+    });
+  const first_pass: boolean | null = initial === null || initial.stage === "no_output" ? null : initial.stage === "compiled";
 
   const node_types: Record<string, number> = {};
   if (lesson !== null) count_nodes(lesson.sections, node_types);
@@ -71,6 +79,8 @@ export async function observe(w: World, run_id: string, lesson_id: string): Prom
     lesson_stored: version !== undefined && job?.status === "ready",
     draft: draft?.success ? { blocks: draft.data.blocks.map((b) => ({ role: b.role, section: b.section, part: b.part, standard_codes: b.standard_codes, code_origins: b.code_origins })) } : null,
     schema_valid_first_pass: first_pass,
+    initial_stage: initial?.stage ?? null,
+    provenance: { prompt_version_id: prov?.prompt_version_id ?? null, prompt_number: prov?.prompt_number ?? null, locked_hash: prov?.locked_hash ?? null },
     repairs_used: job?.repairs ?? 0,
     truncation_retries: job?.truncation_retries ?? 0,
     sections,

@@ -13,6 +13,7 @@ import { UnitPlanDraft } from "@ls/schema/unit-plan";
 import type { PgDatabase } from "../pool.ts";
 import { Tx as DbTx } from "../tx.ts";
 import type { PgRepoDeps } from "./audit.ts";
+import { placeholders_left, read_report_facts, type RunReportFacts } from "./runs-report.ts";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- pg rows are untyped; every field is read through a mapper
 type Row = Record<string, any>;
@@ -207,14 +208,7 @@ export class PgRunRepo implements RunRepo {
           [run_id],
         )
       ).rows[0] as Row;
-      const placeholders = (
-        await tx.query(
-          `SELECT count(*)::int AS n FROM issue
-           WHERE kind IN ('quote_placeholder_open','excerpt_slot_open') AND resolved_at IS NULL AND cleared_by IS NULL
-             AND lesson_id IN (SELECT lesson_id FROM lesson_job WHERE run_id = $1 AND lesson_id IS NOT NULL)`,
-          [run_id],
-        )
-      ).rows[0] as Row;
+      const placeholders = await placeholders_left(tx, run_id);
       const report = (
         await tx.query(`SELECT report_path FROM eval_run WHERE id = (SELECT eval_run_id FROM run WHERE id = $1)`, [run_id])
       ).rows[0] as Row | undefined;
@@ -226,10 +220,15 @@ export class PgRunRepo implements RunRepo {
           truncation_retries: c["truncation_retries"], repairs: c["repairs"], cost_usd: new Decimal(c["cost_usd"]),
           input_tokens: Number(c["input_tokens"]), output_tokens: Number(c["output_tokens"]),
         },
-        placeholders_left: placeholders["n"],
+        placeholders_left: placeholders,
         report_path: (report?.["report_path"] as string | null | undefined) ?? null,
       };
     });
+  }
+
+  /** Per-lesson facts pinned to this run's generated versions (not on the RunRepo port; see runs-report.ts). */
+  async report_facts(run_id: RunId): Promise<RunReportFacts> {
+    return read_report_facts(this.db, run_id);
   }
 
   async active_runs(): Promise<RunRow[]> {

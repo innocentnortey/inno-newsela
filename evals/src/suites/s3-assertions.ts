@@ -35,7 +35,10 @@ export interface S3Observed {
   run_state: string; // lesson_job.status; "missing" when no job row exists
   lesson_stored: boolean;
   draft: { blocks: { role: string; section: string; part: string | null; standard_codes: string[]; code_origins: string[] }[] } | null;
+  /** M-31: the ORIGINAL draft parses AND compiles. null when there is no output to judge. */
   schema_valid_first_pass: boolean | null;
+  initial_stage: "no_output" | "unparseable" | "schema_invalid" | "compile_error" | "compiled" | null;
+  provenance: { prompt_version_id: string | null; prompt_number: number | null; locked_hash: string | null };
   repairs_used: number;
   truncation_retries: number;
   sections: { name: string; minutes: number }[];
@@ -177,9 +180,10 @@ export function derive_trajectory(o: S3Observed, results: AssertionResult[]): Tr
   const draft_calls = o.calls.filter((c) => c.purpose === "lesson_draft");
   const first_draft = draft_calls[0];
   const reasons = o.failure_reasons.map((r) => r.check);
-  const draft_ok = first_draft !== undefined && first_draft.status === "completed" && first_draft.stop_reason !== "max_tokens" && o.schema_valid_first_pass !== false
+  const draft_ok = first_draft !== undefined && first_draft.status === "completed" && first_draft.stop_reason !== "max_tokens"
+    && o.initial_stage !== "unparseable" && o.initial_stage !== "schema_invalid" && o.initial_stage !== "no_output"
     && !reasons.some((r) => r === "schema_invalid" || r === "truncated");
-  const compile_ok = !reasons.includes("compile_error");
+  const compile_ok = o.initial_stage !== "compile_error" && !reasons.includes("compile_error");
   const failed_final = !o.lesson_stored;
   const steps: Trajectory["steps"] = [
     { step: "normalize", ok: o.run_state !== "missing" },

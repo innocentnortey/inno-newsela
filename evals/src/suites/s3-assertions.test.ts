@@ -24,7 +24,9 @@ function good(e: S3Expected): S3Observed {
   return {
     run_state: "ready", lesson_stored: true,
     draft: { blocks: blocks_for(e) },
-    schema_valid_first_pass: true, repairs_used: 0, truncation_retries: 0,
+    schema_valid_first_pass: true, initial_stage: "compiled",
+    provenance: { prompt_version_id: "pv_1", prompt_number: 1, locked_hash: "a".repeat(64) },
+    repairs_used: 0, truncation_retries: 0,
     sections: e.sections.map((s) => ({ name: s.name, minutes: s.minutes })),
     minutes_total: 50,
     node_types: { excerpt_slot: placeholders, quote_placeholder: 0 },
@@ -127,6 +129,18 @@ describe("derive_trajectory", () => {
   it("trajectory_first_failing_step_normalize and plan", () => {
     expect(traj({ ...good(wp2), run_state: "missing", lesson_stored: false, draft: null })).toMatchObject({ first_failing_step: "normalize" });
     expect(traj({ ...good(wp2), calls: calls().slice(1) }).first_failing_step).toBe("plan");
+  });
+  it("trajectory_names_compile_when_initial_draft_does_not_compile", () => {
+    const o = { ...good(wp2), initial_stage: "compile_error", schema_valid_first_pass: false, repairs_used: 1, calls: calls([{}]) } as S3Observed;
+    expect(traj(o)).toMatchObject({ first_failing_step: "compile" });
+  });
+  it("trajectory_names_draft_when_initial_output_unparseable", () => {
+    const o = { ...good(wp2), initial_stage: "unparseable", schema_valid_first_pass: false, repairs_used: 1, calls: calls([{}]) } as S3Observed;
+    expect(traj(o)).toMatchObject({ first_failing_step: "draft" });
+  });
+  it("trajectory_unchanged_for_compiled_initial_draft", () => {
+    const o = { ...good(wp2), initial_stage: "compiled", repairs_used: 1, calls: calls([{}]) } as S3Observed;
+    expect(traj(o)).toMatchObject({ first_failing_step: "checks", repair_recovered: true });
   });
   it("a clean run has no failing step", () => {
     expect(traj(good(wp2))).toMatchObject({ first_failing_step: null, fc: null, repair_recovered: false });

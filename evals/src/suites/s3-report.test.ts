@@ -7,7 +7,7 @@ const actual = (pair: string, over: Partial<S3Actual> = {}): S3Actual => ({
   assertions: [{ name: "draft_stored", passed: true, fc: null, detail: "" }, { name: "required_blocks", passed: true, fc: null, detail: "" }],
   trajectory: { first_failing_step: null, fc: null, steps: [], repair_recovered: false },
   counts: { placeholders: 2, minutes_total: 50, sections: 5 },
-  schema_valid_first_pass: true, repairs_used: 0, tokens: { input: 100, output: 3000 },
+  schema_valid_first_pass: true, initial_stage: "compiled", prompt_versions: [], calls_completed: 2, repairs_used: 0, tokens: { input: 100, output: 3000 },
   served_models: ["claude-sonnet-5-5"], requested_models: ["claude-sonnet-5-5"], cost_usd: "0.2", ...over,
 });
 const input = (over: Partial<S3ReportInput> = {}): S3ReportInput => ({
@@ -23,9 +23,23 @@ describe("render_drafts_report", () => {
     const head = render_drafts_report(input()).split("\n").slice(0, 40).join("\n");
     for (const f of ["git_sha: abc123def456", "prompt_version: pv_1", "served_models: [claude-sonnet-5-5]", "requested_models: [claude-sonnet-5-5]", "effort: low", "max_tokens: 32000 (retry 48000)"]) expect(head).toContain(f);
   });
-  it("shows the M-31 first-pass count as a/b", () => {
-    const h = input().history.map((x, i) => (i === 0 ? { ...x, actual: actual("WP-1", { schema_valid_first_pass: false, repairs_used: 1 }) } : x));
-    expect(render_drafts_report(input({ history: h }))).toContain("M-31 first-pass schema-valid: 3/4 (repairs used: 1 of 4)");
+  it("shows the M-31 count as parse and compile", () => {
+    const h = input().history.map((x, i) => (i === 0 ? { ...x, actual: actual("WP-1", { schema_valid_first_pass: false, initial_stage: "compile_error", repairs_used: 1 }) } : x));
+    expect(render_drafts_report(input({ history: h }))).toContain("M-31 initial draft parses and compiles: 3/4 (parse 4/4, no output 0; repairs used: 1 of 4)");
+  });
+  it("recorded provenance replaces none (stub)", () => {
+    const h = input().history.map((x) => ({ ...x, actual: actual("WP-1", { prompt_versions: ["v1 locked abcdef012345"] }) }));
+    const text = render_drafts_report(input({ prompt_version: null, provider_mode: "real", history: h }));
+    expect(text).toContain("prompt_version: v1 locked abcdef012345");
+    expect(text).not.toContain("none (stub)");
+    expect(text).toContain("calls_recorded: 8 completed of 0");
+  });
+  it("real mode with no completed call warns", () => {
+    const h = input().history.map((x) => ({ ...x, actual: actual("WP-1", { calls_completed: 0 }) }));
+    expect(render_drafts_report(input({ history: h }))).toContain("provider_mode: real (WARNING: no completed model call was recorded)");
+  });
+  it("falls back to the runner value when no run recorded one", () => {
+    expect(render_drafts_report(input({ prompt_version: "pv_1" }))).toContain("prompt_version: pv_1");
   });
   it("lists the spread per case and names the first failing step and FC", () => {
     const bad = actual("WP-1", {
