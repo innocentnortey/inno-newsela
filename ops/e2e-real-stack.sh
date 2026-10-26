@@ -230,7 +230,8 @@ node -e 'try{console.log(JSON.stringify({version:require(process.argv[1]+"/node_
 FIRST=1
 FAILED=0
 for f in "${FOLDERS[@]}"; do
-  cmd=(npx playwright test -c playwright.real.config.ts "integration/$f" --reporter=list,json)
+  # Trailing slash: a Playwright path filter is a substring match, so "integration/con-1" would also run con-10..con-19.
+  cmd=(npx playwright test -c playwright.real.config.ts "integration/$f/" --reporter=list,json)
   # env(1) takes its -u options only before the first NAME=VALUE, so the unsets come first.
   envs=(-u ANTHROPIC_API_KEY -u OPENROUTER_API_KEY)
   if [ "$FIRST" = 1 ]; then envs+=(-u E2E_SKIP_BUILD "E2E_PORT=$E2E_PORT_V"); else envs+=("E2E_PORT=$E2E_PORT_V" "E2E_SKIP_BUILD=1"); fi

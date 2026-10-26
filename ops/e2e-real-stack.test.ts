@@ -36,7 +36,7 @@ function fake_npx(log_dir: string, mutate_file?: string): string {
   const bin = tmp();
   const f = path.join(bin, "npx");
   writeFileSync(f, `#!/usr/bin/env bash
-folder="\${@: -2:1}"; folder="\${folder##*/}"
+folder="\${@: -2:1}"; folder="\${folder%/}"; folder="\${folder##*/}"
 env | grep -E '^(E2E_|ANTHROPIC|OPENROUTER|PLAYWRIGHT_JSON)' | sort > "${log_dir}/env-$folder.txt"
 mkdir -p .next; [ -f .next/BUILD_ID ] || echo fake-build-id > .next/BUILD_ID
 ${mutate_file ? `echo changed >> "${mutate_file}"` : ":"}
