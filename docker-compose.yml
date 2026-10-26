@@ -50,6 +50,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  # Local demo only (profile "seed", never started by `up`): loads standards, prompt v1 and the three documented demo
+  # accounts the sign-in box shows. SEED_ALLOW_DEMO_ACCOUNTS is set here and nowhere else (never on Render).
+  # Run: docker compose --profile seed run --rm seed
+  seed:
+    <<: *node
+    profiles: [seed]
+    command: ["node_modules/.bin/tsx", "ops/seed.ts"]
+    restart: "no"
+    environment:
+      DATABASE_URL: ${MIGRATE_DATABASE_URL:?set MIGRATE_DATABASE_URL}
+      SEED_ALLOW_DEMO_ACCOUNTS: "1"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
   worker:
     <<: *node
     command: ["node_modules/.bin/tsx", "apps/worker/src/main.ts"]
