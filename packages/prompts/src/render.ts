@@ -44,7 +44,8 @@ function instruction_block(text: string): PromptBlock {
 function template_block(t: PromptSectionTemplate): PromptBlock {
   const lines = t.sections.map(
     (s, i) =>
-      `section ${i + 1}: ${s.name}, ${s.minutes} minutes, roles: ${s.required_roles.join(", ")}`,
+      `section ${i + 1}: ${s.name}, ${s.minutes} minutes, roles: ${s.required_roles.join(", ")}` +
+      (s.parts !== undefined && s.parts.length > 0 ? `; parts: ${s.parts.join(", ")}` : ""),
   );
   return data_block({ kind: "template" }, lines.join("\n"));
 }

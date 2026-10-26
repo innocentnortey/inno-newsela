@@ -13,15 +13,17 @@ export const standard_not_taught_rule: CheckRule = {
         .filter((t) => t.kind === "teach" && where.has(t.address))
         .map((t) => t.code),
     );
-    return focus_obligations(ctx)
+    // A narrowed leaf is reported under the card's listed parent, the code the reviewer sees; one finding per code.
+    const missing = focus_obligations(ctx)
       .filter((o) => !taught.has(o.code))
-      .map(({ code }) =>
-        make_finding(
-          "standard_not_taught",
-          "blocking",
-          `Standard ${code} has no teaching routine tagged with it at ${address} (standard_not_taught)`,
-          { address, code },
-        ),
-      );
+      .map((o) => ({ code: o.parent ?? o.code, leaf: o.code }));
+    return [...new Map(missing.map((m) => [m.code, m])).values()].map(({ code, leaf }) =>
+      make_finding(
+        "standard_not_taught",
+        "blocking",
+        `Standard ${leaf} has no teaching routine tagged with it at ${address} (standard_not_taught)`,
+        { address, code },
+      ),
+    );
   },
 };

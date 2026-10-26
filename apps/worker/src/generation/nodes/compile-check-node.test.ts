@@ -68,4 +68,25 @@ describe("CompileCheckNode", () => {
     expect(s.compile_error).not.toContain("SECRET-LESSON-TEXT");
     expect(s.compiled).toBeNull();
   });
+
+  it("tagged_leaf_is_recorded_as_narrowed_and_asks_for_confirmation", async () => {
+    const row = { ...load_row("wp1"), focus_codes: ["RL.6.1", "RL.6.2", "L.6.4"] };
+    const d = good_wp1_draft();
+    const blocks = d.blocks.map((b) =>
+      b.cfu?.standard_code === "L.6.4.b" ? { ...b, standard_codes: ["L.6.4.b"], cfu: { ...b.cfu, standard_code: "L.6.4.b" } } : b,
+    );
+    const rows = [...standard_rows(row), { code: "L.6.4", set: "CA_CCSS_ELA_6" as const, text: "parent", parent_code: null, is_leaf: false, eld_strand: null }];
+    const leaf_row = { code: "L.6.4.b", set: "CA_CCSS_ELA_6" as const, text: "leaf text", parent_code: "L.6.4", is_leaf: true, eld_strand: null };
+    const context: JobContext = {
+      row_context: row_context_of(row), standards: rows, calls: [], draft_call: null,
+      draft_max_output_tokens: 32000, effort: "high", raw_output: JSON.stringify({ ...d, blocks }), provider_error: null,
+    };
+    const st = { ...(initial_state(make_job(), 0) as JobState), context };
+    const standards = { texts: async (codes: readonly string[]) => (codes.includes("L.6.4.b") ? [leaf_row] : []) };
+    const n = new CompileCheckNode(make_loader(row), CHECK_RULES, CHECK_POLICY, standards);
+    const out = await n.run(st);
+    const std = out.compiled!.lesson.front_matter.standards;
+    expect(std.find((x) => x.code === "L.6.4.b")).toMatchObject({ origin: "narrowed", confirmation: "open", asserted_by: "generator" });
+    expect(std.some((x) => x.code === "L.6.4")).toBe(false);
+  });
 });

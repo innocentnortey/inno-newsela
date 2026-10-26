@@ -70,10 +70,24 @@
     "section": "Literacy Lab",
     "part": null,
     "text": "Model an Explanatory Paragraph",
+    "standard_codes": [
+     "W.6.2.a"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": null,
+    "minutes": 10
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Say: Read the model paragraph and point to the sentence that names the topic.",
     "standard_codes": [],
     "code_origins": [],
     "cfu": null,
-    "minutes": 10
+    "minutes": null
    },
    {
     "role": "cfu_item",
@@ -146,6 +160,20 @@
     "minutes": null
    },
    {
+    "role": "routine_heading",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Introducing the Topic",
+    "standard_codes": [
+     "W.6.2.b"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": null,
+    "minutes": null
+   },
+   {
     "role": "teacher_talk",
     "section": "Learning in Action",
     "part": "Part A",
@@ -200,6 +228,30 @@
     "section": "Learning in Action",
     "part": "Part A",
     "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "routine_heading",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Developing Details",
+    "standard_codes": [
+     "W.6.2"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Say: Show how each detail supports the topic you introduced.",
     "standard_codes": [],
     "code_origins": [],
     "cfu": null,

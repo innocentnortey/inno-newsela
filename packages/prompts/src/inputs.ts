@@ -24,6 +24,8 @@ export interface PromptSection {
   name: string;
   minutes: number;
   required_roles: readonly string[];
+  /** Exact part labels the section's blocks carry (for example Part A, Part B). */
+  parts?: readonly string[];
 }
 export interface PromptSectionTemplate {
   sections: readonly PromptSection[];

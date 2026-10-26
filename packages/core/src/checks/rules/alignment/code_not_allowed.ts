@@ -14,6 +14,7 @@ export const code_not_allowed_rule: CheckRule = {
   level: "blocking",
   run: (ctx) => {
     const listed = listed_codes(ctx);
+    const row_listed = new Set([...ctx.row.focus_codes, ...ctx.row.eld_codes, ...ctx.row.msls_codes]);
     const address = FRONT(ctx);
     const out = [];
     const recorded_codes = new Set<string>();
@@ -38,8 +39,12 @@ export const code_not_allowed_rule: CheckRule = {
         );
       }
     }
-    for (const code of tagged_codes(ctx.lesson)) {
+    // With no catalogue rows loaded there is nothing to judge a tagged code against.
+    for (const code of ctx.standards.length === 0 ? [] : tagged_codes(ctx.lesson)) {
       if (recorded_codes.has(code)) continue;
+      // A code the row itself lists is valid even when the catalogue slice loaded for the check omits it
+      // (a narrowed parent is replaced in the front matter, so its text is not loaded).
+      if (row_listed.has(code)) continue;
       const std = ctx.standards.find((x) => x.code === code);
       if (std !== undefined && listed.has(code)) continue;
       // An unrecorded leaf of a listed parent is the advisory standard_add_suggestion case, not a block.

@@ -43,7 +43,7 @@ export function demo_plan_json(req: Req): string {
 // Flex Day and Assessment templates hold only these roles per section; keep the WP-2 blocks that fit.
 const FLEX_ROLES: Record<string, readonly string[]> = {
   Launch: ["routine_heading", "teacher_talk"],
-  "Learning in Action": ["teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch"],
+  "Learning in Action": ["routine_heading", "teacher_talk", "cfu_item", "callout_purpose", "callout_say", "callout_watch"],
   "Look Back": ["quick_write"],
 };
 const FLEX_MINUTES: Record<string, number> = { Launch: 5, "Learning in Action": 40, "Look Back": 5 };

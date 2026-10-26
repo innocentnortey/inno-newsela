@@ -22,7 +22,7 @@ const arc = NormalizedRow.parse({ ...(read("row-wp1") as object), row_number: 6,
 const LESSON_ID = row.lesson_id as string;
 const V1 = "v1";
 const rec = (r: NormalizedRow) => ({ outline_version_id: V1, row: r, row_hash: "r".repeat(64) });
-const SUPPRESSED = ["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link", "code_not_allowed"];
+const SUPPRESSED = ["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link"];
 
 function make_loader(): CheckContextLoader {
   const outlines = {

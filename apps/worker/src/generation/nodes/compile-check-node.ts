@@ -1,6 +1,8 @@
 import { CompileError as CoreCompileError, InvariantViolation } from "@ls/core/errors";
 import { CompileError, compile_draft } from "@ls/core/compile/compile-draft";
 import { template_for } from "@ls/core/compile/templates";
+import { tagged_codes } from "@ls/core/checks/rules/alignment/standards-view";
+import type { StandardRow } from "@ls/core/ports/standards";
 import { run_checks } from "@ls/core/checks/registry";
 import type { CheckPolicy, CheckRule } from "@ls/core/checks/types";
 import { LessonDraft } from "@ls/schema/lesson-draft";
@@ -14,6 +16,7 @@ export class CompileCheckNode {
     private readonly loader: CheckContextLoaderPort,
     private readonly rules: readonly CheckRule[],
     private readonly policy: CheckPolicy,
+    private readonly standards?: { texts(codes: readonly string[]): Promise<StandardRow[]> },
   ) {}
 
   async run(state: JobState): Promise<JobState> {
@@ -48,9 +51,16 @@ export class CompileCheckNode {
       throw e;
     }
     // NL-18 carry-in: the compiler leaves front_matter.standards empty. The hash covers front matter, so recompute it.
+    // Tags on the compiled headings decide which unlisted codes (narrowed leaves, added codes) the lesson records.
+    const tagged = tagged_codes(compiled.lesson);
+    const unknown = tagged.filter((c) => !ctx.standards.some((s) => s.code === c));
+    const extra = unknown.length > 0 && this.standards !== undefined ? await this.standards.texts(unknown) : [];
     const lesson = {
       ...compiled.lesson,
-      front_matter: { ...compiled.lesson.front_matter, standards: build_front_matter_standards(row, ctx.standards) },
+      front_matter: {
+        ...compiled.lesson.front_matter,
+        standards: build_front_matter_standards(row, [...ctx.standards, ...extra], tagged),
+      },
     };
     compiled = { ...compiled, lesson, content_hash: content_hash(lesson) };
 

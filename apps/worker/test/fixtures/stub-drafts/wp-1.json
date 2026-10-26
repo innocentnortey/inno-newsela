@@ -388,10 +388,24 @@
     "section": "Literacy Lab",
     "part": null,
     "text": "Introduce New Words Using Morphemes",
+    "standard_codes": [
+     "L.6.4"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": null,
+    "minutes": 10
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Literacy Lab",
+    "part": null,
+    "text": "Say: Look at the word parts together and decide what each part adds to the meaning.",
     "standard_codes": [],
     "code_origins": [],
     "cfu": null,
-    "minutes": 10
+    "minutes": null
    },
    {
     "role": "cfu_item",
@@ -460,6 +474,20 @@
     "text": "Student stuck | Reread the sentence aloud\nStudent unsure | Offer a sentence starter",
     "standard_codes": [],
     "code_origins": [],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "routine_heading",
+    "section": "Learning in Action",
+    "part": "Part A",
+    "text": "Percy's Voice",
+    "standard_codes": [
+     "RL.6.1"
+    ],
+    "code_origins": [
+     "outline"
+    ],
     "cfu": null,
     "minutes": null
    },
@@ -551,6 +579,30 @@
      ],
      "standard_code": "RL.6.1"
     },
+    "minutes": null
+   },
+   {
+    "role": "routine_heading",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Central Idea",
+    "standard_codes": [
+     "RL.6.2"
+    ],
+    "code_origins": [
+     "outline"
+    ],
+    "cfu": null,
+    "minutes": null
+   },
+   {
+    "role": "teacher_talk",
+    "section": "Learning in Action",
+    "part": "Part B",
+    "text": "Say: Compare what the narrator says with what the narrator seems to mean.",
+    "standard_codes": [],
+    "code_origins": [],
+    "cfu": null,
     "minutes": null
    },
    {

@@ -44,10 +44,7 @@ export const FILLER = "NL-79" as const;
 // check lane still raises all of them.
 //   quote_placeholder_open, excerpt_slot_open, cross_lesson_link: open slots are generated on purpose (WP-1, WP-2);
 //     the reviewer fills them, and L4's homework waits on L5's slot.
-//   code_not_allowed: the worker derives front-matter codes from the row, parent codes included, and the rule accepts
-//     leaves only (NL-29 front matter vs NL-22 rule). Stays until the standards slice (E) resolves parent and leaf
-//     treatment.
-const NOT_ACTIONABLE_KINDS: ReadonlySet<string> = new Set(["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link", "code_not_allowed"]);
+const NOT_ACTIONABLE_KINDS: ReadonlySet<string> = new Set(["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link"]);
 
 export function generation_rules(rules: readonly CheckRule[]): CheckRule[] {
   return rules.filter((r) => !NOT_ACTIONABLE_KINDS.has(r.kind));
@@ -94,7 +91,7 @@ export function wire_generation(d: WorkerDeps, opts: GenerationOptions = {}): Ge
   const loader = new CheckContextLoader(outlines, standards, lessons, reader, suggestions, flags, alignment, d.clock);
 
   const draft = new DraftNode(paid, renderer, outlines, runs, standards, prompts, d.settings, recorder);
-  const compile_check = new CompileCheckNode(loader, generation_rules(opts.rules ?? CHECK_RULES), CHECK_POLICY);
+  const compile_check = new CompileCheckNode(loader, generation_rules(opts.rules ?? CHECK_RULES), CHECK_POLICY, standards);
   const repair = new RepairNode(paid, renderer, prompts, d.settings, recorder);
   const store = new StoreNode(lessons, lessons, docs, flags, d.db);
   const fail = new FailNode(lessons, lessons, d.db);

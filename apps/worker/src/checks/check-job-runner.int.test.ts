@@ -112,6 +112,13 @@ const throwing = (fail: (lesson_id: string) => boolean): CheckRuleList =>
   );
 const issue_rows = (id: string) => sql("SELECT * FROM issue WHERE lesson_id=$1", [id]);
 const job_rows = (id: string) => sql("SELECT * FROM check_job WHERE lesson_id=$1 ORDER BY id", [id]);
+// Alignment links come only from per-code tags on headings; the shared stored WP-1 fixture carries none.
+const with_teaching_tag = (l: StoredLesson): void => {
+  l.sections[0]!.content.content!.push(
+    { type: "routine_heading", attrs: { icon: "notes_section" }, content: [{ type: "text", text: "Voice (RL.6.1)" }] },
+    { type: "paragraph", content: [{ type: "text", text: "Teach the voice." }] },
+  );
+};
 const drop_section = (l: StoredLesson): void => {
   l.sections = l.sections.slice(0, -1);
 };
@@ -150,7 +157,7 @@ describe("CheckJobRunner", () => {
   it("test_checks_after_store_capture", async () => {
     const id = new_id();
     await seed_lesson(id);
-    const stored = await put(lesson_for(id, drop_section));
+    const stored = await put(lesson_for(id, (l) => { drop_section(l); with_teaching_tag(l); }));
     clock.advance(1500);
     const report = await runner().run_once();
     expect(report).not.toBeNull();
