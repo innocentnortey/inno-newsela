@@ -15,6 +15,22 @@ export const PULSE_CHECK = "Pulse Check";
 export const QUICK_WRITE = "Quick Write";
 export const CORRECT = "Correct:";
 export const INCORRECT = "Incorrect:";
+
+export type RationaleLabel = { letter: string | null; correct: boolean; body: string };
+
+/** "B. Incorrect:" for option index 1; "A. Correct:" for index 0 when correct. The only writer of the label. */
+export function rationale_label(index: number, correct: boolean): string {
+  return `${String.fromCharCode(65 + index)}. ${correct ? CORRECT : INCORRECT}`;
+}
+
+/** Reads a CFU rationale paragraph's text. Returns null when the paragraph does not start with a rationale label. */
+export function parse_rationale_label(paragraph_text: string): RationaleLabel | null {
+  const m = /^\s*(?:([A-Za-z])[.)]\s*)?(Correct|Incorrect)\b/.exec(paragraph_text);
+  if (m === null) return null;
+  const body = paragraph_text.slice(m[0].length).replace(/^\s*[:.\-–—]?\s*/, "").trim();
+  return { letter: m[1] ? m[1].toUpperCase() : null, correct: m[2] === "Correct", body };
+}
+
 /** Longest first, so "Say these Directions:" wins over "Say:". */
 export const TEACHER_LABELS: readonly string[] = ["Say these Directions:", "Say:", "Ask:"];
 

@@ -104,8 +104,24 @@ function merge_and_dedupe(text: string, cands: Cand[]): string[] {
   return [...new Set(merged.map((m) => text.slice(m.start, m.end)))];
 }
 
+/**
+ * A rationale or option label ("B. Incorrect: ") is a label, not part of the sentence. Left in place it makes the
+ * tagger read the capitalised first word after the colon ("Switching", "Nothing", "Too") as a proper noun. Blank it
+ * with spaces (offsets stay the same) so that word is an ordinary sentence start. A name later in the sentence,
+ * mid-sentence and capitalised, is still scanned as before.
+ *
+ * Known limit (D-1): a name that is the first word after a label is flagged only when the tagger knows it as a
+ * person, place or organisation ("Grover", "Athena"), exactly as for any sentence-initial word. An unknown invented
+ * name ("Medusa", "Zeus") in that position is not tagged. No word list is added for it.
+ */
+const OPTION_LABEL = /(^|\n)(\s*(?:[A-Za-z][.)]\s+)?(?:Correct|Incorrect)\s*[:.\-–—]\s*)/g;
+export function blank_option_labels(text: string): string {
+  return text.replace(OPTION_LABEL, (_m, lead: string, label: string) => lead + " ".repeat(label.length));
+}
+
 /** Distinct capitalised names in `text` that no source (or lowercase use) accounts for. */
-export function scan_names(text: string, index: NameIndex): string[] {
+export function scan_names(raw_text: string, index: NameIndex): string[] {
+  const text = blank_option_labels(raw_text);
   const kept = candidates(text, index);
   const sentences = nlp(text).json({ offset: true }) as Array<{ terms: Term[] }>;
   const terms = sentences.flatMap((s) => s.terms);

@@ -10,6 +10,9 @@ import {
   table,
 } from "../../test-helpers.ts";
 import type { PMNode } from "@ls/schema/lesson";
+import { build_ctx, type Fixture } from "../grounding/fixtures/build.ts";
+import { proper_noun_unsourced_rule } from "../grounding/proper_noun_unsourced.ts";
+import type { CheckContext } from "../../types.ts";
 import { schema_invalid_rule } from "./schema_invalid.ts";
 
 function with_lia(nodes: PMNode[]) {
@@ -65,5 +68,88 @@ describe("schema_invalid", () => {
         ...cfu_item({ correct: [2] }),
       ]),
     ).toEqual([]);
+  });
+});
+
+const MISSING = "CFU item is missing a rationale for each option";
+const run = (ctx: CheckContext) => schema_invalid_rule.run(ctx, DEFAULT_POLICY).map((f) => f.message);
+
+/** Deep copy of the compiled WP-1 lesson with every text node starting `from` rewritten to start `to`. */
+function relabel(from: string, to: string): CheckContext {
+  const ctx = build_ctx("wp1");
+  const lesson = structuredClone(ctx.lesson);
+  let hits = 0;
+  const walk = (n: PMNode): void => {
+    if (hits === 0 && n.type === "text" && n.text === from) {
+      n.text = to;
+      hits += 1;
+    }
+    for (const c of n.content ?? []) walk(c);
+  };
+  for (const sec of lesson.sections) walk(sec.content as PMNode);
+  expect(hits).toBe(1);
+  return { ...ctx, lesson };
+}
+
+describe("compiled rationales", () => {
+  it("compiled_wp1_has_no_findings", () => {
+    for (const name of ["wp1", "wp2", "wp3", "wp4"] as Fixture[]) {
+      expect(run(build_ctx(name))).toEqual([]);
+    }
+  });
+  it("compiled_missing_rationale_text_is_flagged", () => {
+    const ctx = build_ctx("wp1", { mutate: (d) => { d.blocks[16]!.cfu!.rationales[2] = ""; } });
+    expect(run(ctx)).toEqual([MISSING]);
+  });
+  it("compiled_deleted_rationale_paragraph_is_flagged", () => {
+    const ctx = build_ctx("wp1");
+    const lesson = structuredClone(ctx.lesson);
+    let removed = 0;
+    const walk = (n: PMNode): void => {
+      if (n.content === undefined) return;
+      const keep = n.content.filter((c) => {
+        const gone =
+          removed === 0 && c.type === "paragraph" && c.content?.[0]?.type === "text" && c.content[0].text === "C. Incorrect:";
+        if (gone) removed += 1;
+        return !gone;
+      });
+      n.content = keep;
+      keep.forEach(walk);
+    };
+    for (const sec of lesson.sections) walk(sec.content as PMNode);
+    expect(removed).toBe(1);
+    expect(run({ ...ctx, lesson })).toEqual([MISSING]);
+  });
+  it("compiled_duplicate_correct_is_flagged", () => {
+    expect(run(relabel("B. Incorrect:", "B. Correct:"))).toEqual([
+      "CFU item must have exactly one Correct option (found 2)",
+    ]);
+  });
+  it("compiled_zero_correct_is_flagged", () => {
+    expect(run(relabel("A. Correct:", "A. Incorrect:"))).toEqual([
+      "CFU item must have exactly one Correct option (found 0)",
+    ]);
+  });
+  it("duplicate_letter_is_flagged", () => {
+    expect(run(relabel("C. Incorrect:", "B. Incorrect:"))).toEqual([MISSING]);
+  });
+  it("more_than_four_options_pass", () => {
+    const ctx = build_ctx("wp1", {
+      mutate: (d) => {
+        d.blocks[16]!.cfu!.options.push("E option");
+        d.blocks[16]!.cfu!.rationales.push("fifth reason");
+      },
+    });
+    expect(run(ctx)).toEqual([]);
+  });
+  it("genuine_name_in_compiled_rationale_still_fails", () => {
+    for (const [text, name] of [
+      ["Grover would not follow this.", "Grover"],
+      ["The story never mentions Medusa here.", "Medusa"],
+    ] as const) {
+      const ctx = build_ctx("wp1", { mutate: (d) => { d.blocks[16]!.cfu!.rationales[3] = text; } });
+      const f = proper_noun_unsourced_rule.run(ctx, DEFAULT_POLICY);
+      expect(f.some((x) => x.level === "blocking" && x.matched === name)).toBe(true);
+    }
   });
 });

@@ -13,7 +13,8 @@ describe("grounding finding shape", () => {
       const ctx = build_planted(plant);
       for (const f of RULES.flatMap((r) => r.run(ctx, CHECK_POLICY))) {
         seen += 1;
-        expect(Object.keys(f).sort()).toEqual([...KEYS].sort());
+        // `matched` is the one optional in-memory key (the repair prompt reads it); every other key is fixed.
+        expect(Object.keys(f).filter((k) => k !== "matched").sort()).toEqual([...KEYS].sort());
         for (const k of KEYS) expect((f as Record<string, unknown>)[k]).not.toBeUndefined();
         expect(f.message.length).toBeGreaterThan(0);
         expect(f.span_anchor).toBeNull();

@@ -38,26 +38,19 @@ import { ClaimLoop } from "../queue/claim-loop.ts";
 
 export const FILLER = "NL-79" as const;
 
-// Findings the generation gate must not act on. A draft that fails the gate gets one repair and then fails the lesson,
-// so a finding the model can neither cause nor clear would fail every lesson. Each entry is a seam defect found by
-// the end-to-end run (NL-79 devlog), not a relaxed policy; the background check lane still raises all of them.
+// Rule kinds the generation gate drops whole; the filter never touches any rule's findings. A draft that fails the
+// gate gets one repair and then fails the lesson, so a finding the model can neither cause nor clear would fail every
+// lesson. Each entry is a seam defect found by the end-to-end run (NL-79 devlog), not a relaxed policy; the background
+// check lane still raises all of them.
 //   quote_placeholder_open, excerpt_slot_open, cross_lesson_link: open slots are generated on purpose (WP-1, WP-2);
 //     the reviewer fills them, and L4's homework waits on L5's slot.
 //   code_not_allowed: the worker derives front-matter codes from the row, parent codes included, and the rule accepts
-//     leaves only (NL-29 front matter vs NL-22 rule).
-//   schema_invalid, the two CFU rationale messages only: the compiler writes "A. Correct <why>" and the rule expects the
-//     paragraph to start with "Correct" (NL-18 compile vs NL-20 rule).
+//     leaves only (NL-29 front matter vs NL-22 rule). Stays until the standards slice (E) resolves parent and leaf
+//     treatment.
 const NOT_ACTIONABLE_KINDS: ReadonlySet<string> = new Set(["quote_placeholder_open", "excerpt_slot_open", "cross_lesson_link", "code_not_allowed"]);
-const CFU_RATIONALE_MESSAGES = /^CFU item (must have exactly one Correct option|is missing a rationale for each option)/;
 
 export function generation_rules(rules: readonly CheckRule[]): CheckRule[] {
-  return rules
-    .filter((r) => !NOT_ACTIONABLE_KINDS.has(r.kind))
-    .map((r) =>
-      r.kind === "schema_invalid"
-        ? { ...r, run: (ctx, policy) => r.run(ctx, policy).filter((f) => !CFU_RATIONALE_MESSAGES.test(f.message)) }
-        : r,
-    );
+  return rules.filter((r) => !NOT_ACTIONABLE_KINDS.has(r.kind));
 }
 
 export interface GenerationOptions {

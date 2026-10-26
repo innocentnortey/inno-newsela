@@ -20,7 +20,7 @@ export const quote_unmatched_rule: CheckRule = {
           make_finding(
             "quote_unmatched",
             "blocking",
-            `Quoted passage of ${words} words is not in this lesson's outline row, arc header, text cards or standards`,
+            `Quoted passage of ${words} words is not in this lesson's outline row, arc header or standards`,
             field.address,
           ),
         );

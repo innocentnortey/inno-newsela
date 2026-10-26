@@ -19,6 +19,7 @@ export const page_out_of_range_rule: CheckRule = {
             "blocking",
             "Page or chapter reference is outside the range the outline row gives",
             field.address,
+            ref.match.trim(),
           ),
         );
       }

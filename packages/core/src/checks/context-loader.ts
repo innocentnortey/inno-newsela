@@ -113,6 +113,7 @@ export class CheckContextLoader {
       arc_header: rc.arc_header,
       allowed_codes,
       standards,
+      // Model-proposed and untrusted: grounding rules must not read them.
       text_cards: lesson.text_cards,
       links: rc.links,
       linked_lessons,

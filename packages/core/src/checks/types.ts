@@ -144,6 +144,7 @@ export type CheckContext = {
   arc_header: string | null;
   allowed_codes: string[];
   standards: StandardRow[];
+  /** Model-proposed records stored with the lesson (reader display, rights status). Untrusted: grounding rules must not read them. */
   text_cards: TextCardRecord[];
   links: LessonLinkRecord[];
   linked_lessons: DerivedRow[];
@@ -166,6 +167,8 @@ export type CheckFinding = {
   span_anchor: string | null;
   related_lesson_id: LessonId | null;
   code: string | null;
+  /** The name or page reference that tripped a grounding check. In memory only: not written to issue or finding rows, logs or error text. The repair prompt reads it, and that rendered prompt is stored in model_call.rendered_prompt like every prompt (docs/design/observability.md, Content and redaction, R-48). */
+  matched?: string;
 };
 
 export type CheckResult = {

@@ -1,8 +1,8 @@
 import type { ProseMirrorDoc as PMJson } from "@ls/editor-schema/schema";
 import type { DraftBlock } from "@ls/schema/lesson-draft";
 import {
-  CORRECT, ELD_LABEL, INCORRECT, PULSE_CHECK, QUICK_WRITE, SUPPORT_HEADERS, SUPPORT_LABEL,
-  TEACHER_LABELS, routine_icon,
+  ELD_LABEL, PULSE_CHECK, QUICK_WRITE, SUPPORT_HEADERS, SUPPORT_LABEL,
+  TEACHER_LABELS, rationale_label, routine_icon,
 } from "./labels.ts";
 import { normalise_part_label } from "./addresses.ts";
 
@@ -106,11 +106,9 @@ export function cfu_item(block: DraftBlock): PMJson[] {
     },
   ];
   c.options.forEach((_, i) => {
-    const letter = String.fromCharCode(65 + i);
-    const label = i === c.key_index ? CORRECT : INCORRECT;
     out.push({
       type: "paragraph",
-      content: [text(`${letter}. ${label}`, ["strong"]), text(` ${c.rationales[i] ?? ""}`)],
+      content: [text(rationale_label(i, i === c.key_index), ["strong"]), text(` ${c.rationales[i] ?? ""}`)],
     });
   });
   return out;

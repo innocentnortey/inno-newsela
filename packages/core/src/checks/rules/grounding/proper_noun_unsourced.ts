@@ -19,13 +19,14 @@ export const proper_noun_unsourced_rule: CheckRule = {
         policy.name_scan_scope === "blocking_everywhere" || field.in_cfu_choice
           ? "blocking"
           : "advisory";
-      for (const _name of scan_names(field.text, index)) {
+      for (const name of scan_names(field.text, index)) {
         out.push(
           make_finding(
             "proper_noun_unsourced",
             level,
-            "Proper name is not in this lesson's outline row, arc header, text cards or standards",
+            "Proper name is not in this lesson's outline row, arc header or standards",
             field.address,
+            name,
           ),
         );
       }

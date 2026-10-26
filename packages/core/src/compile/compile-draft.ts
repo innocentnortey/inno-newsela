@@ -183,6 +183,7 @@ export function compile_draft(draft: LessonDraft, ctx: CompileContext): Compiled
         vocabulary: [...ctx.row.vocabulary],
       },
       sections,
+      // Model-proposed record for the reviewer; not a grounding source (see checks/rules/grounding/sources.ts).
       text_cards: draft.text_cards,
     },
     ctx.unit_id,
