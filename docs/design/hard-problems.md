@@ -487,7 +487,7 @@ they drift apart. Then the checks, the approver and the export can each read a d
 
 **Where this comes up in the project:** Journey steps 7–9 (PRD §5.1). Two reviewers are in Lesson 4. At 14:02:01 one of
 them types a sentence from her class copy into the "Reviewer to insert" slot in Part A (WP-1). The Y.Doc in the collaboration
-server's memory has it at once. Postgres gets it up to 2 s later (R-26 debounce). Within 5 s the check suite must see it and
+server's memory has it at once. Postgres gets it up to 2 s later (R-26 debounce: 1 s debounce, 2 s ceiling by PD-38). Within 5 s the check suite must see it and
 clear the "quote placeholder open" block (R-28). Later the approver approves and the export ships that version (R-33, R-42).
 Each of those readers must read the same text. Surfaced by N-3 and N-4 (engineering audit) and PD-7's first half.
 

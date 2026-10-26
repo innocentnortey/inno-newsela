@@ -54,8 +54,8 @@ describe("NL-01 AC-5 defaults [table]", () => {
     ["trunc cap", worker.truncation_retry_token_cap, 48000],
     ["breaker", worker.circuit_breaker_same_check, 3],
     ["port", collab.collab_port, 1234],
-    ["debounce", collab.store_debounce_ms, 2000],
-    ["max debounce", collab.store_max_debounce_ms, 4000],
+    ["debounce", collab.store_debounce_ms, 1000],
+    ["max debounce", collab.store_max_debounce_ms, 2000],
   ];
   it.each(shared_rows)("%s", (_n, actual, expected) => {
     expect(actual).toBe(expected);

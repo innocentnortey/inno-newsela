@@ -231,7 +231,7 @@ export function load_collab_settings(env: Env): CollabSettings {
     collab_port: read_int(env, "COLLAB_PORT", { default: 1234, min: 1 }),
     collab_internal_token: read_secret(env, "COLLAB_INTERNAL_TOKEN"),
     session_cookie_name: read_string(env, "SESSION_COOKIE_NAME", { default: "ls_session" }),
-    store_debounce_ms: read_int(env, "STORE_DEBOUNCE_MS", { default: 2000, min: 1 }),
-    store_max_debounce_ms: read_int(env, "STORE_MAX_DEBOUNCE_MS", { default: 4000, min: 1 }),
+    store_debounce_ms: read_int(env, "STORE_DEBOUNCE_MS", { default: 1000, min: 1 }),
+    store_max_debounce_ms: read_int(env, "STORE_MAX_DEBOUNCE_MS", { default: 2000, min: 1 }),
   };
 }

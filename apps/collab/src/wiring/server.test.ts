@@ -32,8 +32,8 @@ describe("wire_server_builds_all_parts [invariant, AC-12]", () => {
     expect(typeof w.close).toBe("function");
     expect(hocus.configuration.extensions).toHaveLength(1);
     expect(hocus.configuration.extensions[0]).toBe(w.extension);
-    expect(hocus.configuration.debounce).toBe(2000);
-    expect(hocus.configuration.maxDebounce).toBe(4000);
+    expect(hocus.configuration.debounce).toBe(1000);
+    expect(hocus.configuration.maxDebounce).toBe(2000);
   });
 
   it("the extension exposes onChange, and onChange then onStoreDocument logs collab.stored with a store_wait_ms [GEN-4]", async () => {
