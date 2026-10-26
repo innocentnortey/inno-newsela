@@ -1,13 +1,13 @@
 # Resume checkpoint
 
-Updated 2026-10-26 (VPS, wrap-up at main 05ff31f). Full account: [docs/delivery/2026-10-26-final-status.md](../../docs/delivery/2026-10-26-final-status.md). Replace at each handoff; history in the [dev log](../../docs/devlog/README.md).
+Updated 2026-10-26 (VPS, relaunch after the checkpoint; main 2bd24db plus this commit, pushed to GitLab; the GitHub push mirror was lagging at 05ff31f when last checked). Full account: [docs/delivery/2026-10-26-final-status.md](../../docs/delivery/2026-10-26-final-status.md). Replace at each handoff; history in the [dev log](../../docs/devlog/README.md).
 
 ## State at wrap-up
-- Astra fix slices A-D, F1-F4, template edit, F3 fixes and review follow-ups are on main (HEAD 05ff31f, **not pushed** unless the next session finds otherwise). Vitest at 3bbe94f: 569/572 files, 4130 tests; 2 load-timeout failures pass in isolation. No real-model measurement of the final candidate exists; the replay of old drafts (1/47 pass) is a reanalysis, not a forecast. No GitLab issue was closed.
+- Astra fix slices A-D, F1-F4, template edit, F3 fixes and review follow-ups are on main (pushed to GitLab origin/main through 2bd24db; the `/` redirect to `/units` is 2bd24db; whether Render serves it is unconfirmed because the mirror had not caught up). Vitest at 3bbe94f: 569/572 files, 4130 tests; 2 load-timeout failures pass in isolation. No real-model measurement of the final candidate exists; the replay of old drafts (1/47 pass) is a reanalysis, not a forecast. No GitLab issue was closed.
 - Session spend about $10.1 of $20.
 
 ## Next actions, in order
-1. Push done? Check `git status` / `git log origin/main..` (private GitLab; factory mode may push).
+1. Check the GitHub mirror shows the same SHA as GitLab main (`git ls-remote https://github.com/innocentnortey/inno-newsela.git refs/heads/main`); if it is stuck, sync the push mirror in GitLab settings. Then confirm in a signed-in browser that ls-web `/` lands on the units list (a signed-out curl cannot tell old from new: middleware redirects to sign-in first).
 2. Run the two paid commands (fresh migrated DB, `with-provider-env`): S3 `npm run eval:golden -- --suite drafts --repeat 3 --provider real --max-usd 3`; whole unit via `evals/src/full-run-main.ts --max-usd 5` (see docs/devlog/2026-10-26-nl112-full-run-3.md). NL-134 rerun rule fires (new locked hash f1d29f98868a...).
 3. Run `ops/e2e-real-stack.sh` on the final commit (filter bug fixed in 05ff31f; con-6 first-poll gap unresolved).
 4. Re-review the commits after 3bbe94f.

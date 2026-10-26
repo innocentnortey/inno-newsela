@@ -12,3 +12,6 @@ test-results/
 evals/local/
 backups/
 .demo/
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
