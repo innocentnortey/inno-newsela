@@ -1,8 +1,8 @@
 # Error analysis — the protocol for zero-to-hero §9
 
-> **NOT YET RUN.** This file is the plan. No traces have been read, no `FT-N` exists, and no result is claimed here.
-> It is written now so the round can start the moment a full run (NL-112) and the frozen set exist.
-> Status: **proposed**. It follows [`docs/design/eval-plan.md`](../../design/eval-plan.md) → *Failure categories*, which is the source.
+> **RUN 2026-10-26 (NL-120), not human-reviewed.** 20 traces were read to their first failure: [`traces.md`](traces.md); the observed `FT-N`
+> taxonomy, models x failures table and candidate experiments: [`taxonomy.md`](taxonomy.md). This file stays as the protocol.
+> Status: **adopted under PD-32 fallback, not reviewed by Innocent** (the issue stays open). It follows [`docs/design/eval-plan.md`](../../design/eval-plan.md) → *Failure categories*, which is the source.
 
 ## What this is, in plain words
 
@@ -40,8 +40,8 @@ before and after. The §9 gate says the same thing: **no tuning change without a
 
 | Artifact | Path | Notes |
 |---|---|---|
-| Per-trace first-failure notes | `docs/testing/error-analysis/traces.md` (planned) | one row per trace: trace ID, lesson, first failure, `FT-N`, who read it |
-| The taxonomy and the models x failures table | `docs/testing/error-analysis/taxonomy.md` (planned) | `FT-N` ids are stable once Innocent reviews them |
+| Per-trace first-failure notes | `docs/testing/error-analysis/traces.md` (exists, [traces.md](traces.md)) | one row per trace: trace ID, lesson, first failure, `FT-N`, who read it |
+| The taxonomy and the models x failures table | `docs/testing/error-analysis/taxonomy.md` (exists, [taxonomy.md](taxonomy.md)) | `FT-N` ids are stable once Innocent reviews them |
 | Eval reports | `evals/reports/<kind>-<git sha>.md` (S11 held-out: `evals/local/reports/`, git-ignored) | written by `npm run eval:*` via `evals/src/runner.ts` |
 | Experiments | `docs/testing/experiments/` (planned) | one file per `XP-N` |
 
@@ -57,9 +57,9 @@ as a synthetic one per the `synthetic-test-data` rule (declared dimension, label
 
 ## What this plan does not claim
 
-No failure rate, taxonomy, model comparison or improvement exists yet. Anything quoted from this folder before the
-round is run would be invented.
+The round has been run once (NL-120, `taxonomy.md`). It still makes no failure rate for the product, no model comparison, no
+human-reviewed taxonomy and no measured improvement.
 
 ## Audit 2026-10-26 (offline)
 
-[`astra-audit-2026-10-26.json`](astra-audit-2026-10-26.json) is an offline, read-only replay of the two kept NL-112 databases (no paid calls). It corrects the run facts (attempt 3: 44/47 original drafts parse and compile, 19/47 no repair, 30/47 stored-ready; the 17 blocks replay clean with the checker fixes). It is not the protocol's human review: no `FT-N` taxonomy, no `XP-N` score and no seeded-error result exist. Narrative: [`docs/delivery/2026-10-26-astra-fix-handoff.md`](../../delivery/2026-10-26-astra-fix-handoff.md).
+[`astra-audit-2026-10-26.json`](astra-audit-2026-10-26.json) is an offline, read-only replay of the two kept NL-112 databases (no paid calls). It corrects the run facts (attempt 3: 44/47 original drafts parse and compile, 19/47 no repair, 30/47 stored-ready; the 17 blocks replay clean with the checker fixes). It is not the protocol's human review. The `FT-N` taxonomy now exists in `taxonomy.md` (NL-120, PD-32 fallback, not reviewed by Innocent); no `XP-N` score and no seeded-error result exist. Narrative: [`docs/delivery/2026-10-26-astra-fix-handoff.md`](../../delivery/2026-10-26-astra-fix-handoff.md).

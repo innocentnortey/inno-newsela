@@ -1,0 +1,9 @@
+# NL-120 error-analysis round
+
+**Changed:** Added `docs/testing/error-analysis/traces.md` (20 traces, each read to its first failure) and `taxonomy.md` (seven observed failure types `FT-1` to `FT-7`, a models x failures table, operational failures, what was measured and what was replayed, and two candidate experiments with the third slot closed unused). Updated the protocol `README.md` status, the router row in `.claude/README.md`, and the resume file. No code, test, prompt, check or eval case was touched.
+
+**Why:** No tuning change lands without a named failure type (GP-21, GP-51); NL-128 to NL-130 need one `FT-N` each. The earlier prose in `docs/delivery/error-analysis-real-run.md` had no trace selection, no taxonomy and some claims the audit contradicted.
+
+**Checked:** Read-only reads of `ls_nl112_dev` (attempt 2) and `ls_nl112c` (attempt 3). The schema was run on every stored first draft: 11/47 and 44/47 parse, matching the audit. 20 trace rows (13 from attempt 3, 7 from attempt 2) counted by the AC-1 grep; per-type counts 4+2+3+6+1+2+2 = 20. Seed 20261026. Every model call in both runs is `claude-sonnet-5-5`, completed, `end_turn`: no operational failure. Six of 20 traces are checker/compiler failures (the checker was wrong), 14 are model behaviour. The ticket's selection rule could not be applied literally to two runs inside 18 to 22 rows; the departure is written in `traces.md` (8 of attempt 3's 17 blocks were read, the rest are covered by the audit's replay only).
+
+**Remaining:** Human gate. Innocent has not reviewed the taxonomy or the candidates; the file records "adopted under PD-32 fallback, not reviewed by Innocent" and the issue stays open. Measured size of FT-1 and FT-2 after the checker fixes needs a fresh run (NL-134). Candidates: NL-128 on FT-3 (`code_origins`), NL-129 on FT-6 (minutes), NL-130 closed unused.

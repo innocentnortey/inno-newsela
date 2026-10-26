@@ -33,3 +33,5 @@ Merge GEN-7 after review; read the A/B verdict; tick gate 8 if the verdict shows
 - **NL-135:** stays open for the blind human review; the audit did not open the seed key.
 
 Next action after the in-flight slices merge: handoff execution order step 3 onward (trusted repair context done in 42f6989; production structure contract, slot obligations and standards provenance with slice D), replay stored drafts to isolate each change, then the frozen S3 run and one whole-unit run on the fixed candidate. Correction work log: `docs/devlog/2026-10-26-astra-audit-corrections.md`.
+
+- **NL-120 done 2026-10-26 (issue open, PD-32 fallback, not reviewed by Innocent):** `docs/testing/error-analysis/traces.md` and `taxonomy.md`; next: NL-128 on FT-3 and NL-129 on FT-6 (NL-130 closed unused); log `docs/devlog/2026-10-26-nl120-error-analysis.md`.
