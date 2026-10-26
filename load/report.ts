@@ -103,7 +103,7 @@ export function render_load_report(i: LoadReportInput): string {
     "- The only write class is the approver heartbeat, stored as synthetic data and excluded from review minutes.",
     "- Latency counts successful responses only; 5xx, SERVICE_BUSY and socket errors are errors, never slow successes.",
   );
-  if ((i.socket_editors_ignored ?? 0) > 0) lines.push(`- ${i.socket_editors_ignored} socket editors requested; this HTTP half ignores them (NL-119).`);
+  if ((i.socket_editors_ignored ?? 0) > 0) lines.push(`- ${i.socket_editors_ignored} socket editors requested; their Yjs figures are in the separate kind=yjs probe_run row (NL-119), not in this report.`);
   for (const n of i.notes) lines.push(`- ${n}`);
   lines.push("");
   return lines.join("\n");

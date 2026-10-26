@@ -58,6 +58,7 @@ export interface WebSettings {
   outline_max_rows: number;
   outline_max_bytes: number;
   sheets_fetch_timeout_ms: number;
+  sheets_base_url: string;
   idempotency_window_h: number;
   undo_window_s: number;
   assist_call_timeout_ms: number;
@@ -99,6 +100,22 @@ const DB = ["postgres:", "postgresql:"] as const;
 
 function nonempty(v: string | undefined): string | undefined {
   return v === undefined || v === "" ? undefined : v;
+}
+
+const DEFAULT_SHEETS_BASE_URL = "https://docs.google.com";
+function load_sheets_base_url(env: Env, mode: "real" | "stub"): string {
+  const raw = read_url(env, "SHEETS_BASE_URL", ["https:", "http:"], { default: DEFAULT_SHEETS_BASE_URL });
+  const origin = new URL(raw).origin; // keeps scheme, host, port; drops any path
+  if (origin === DEFAULT_SHEETS_BASE_URL) return origin;
+  const host = new URL(origin).hostname;
+  const loopback = host === "127.0.0.1" || host === "localhost" || host === "[::1]";
+  if (mode !== "stub" || !loopback) {
+    throw new ConfigError(
+      "SHEETS_BASE_URL",
+      "only the default Google origin is allowed unless MODEL_PROVIDER_MODE=stub and the host is loopback",
+    );
+  }
+  return origin;
 }
 
 function load_shared_settings(env: Env, default_pool_max: number): SharedSettings {
@@ -167,6 +184,7 @@ export function load_web_settings(env: Env): WebSettings {
     outline_max_rows: read_int(env, "OUTLINE_MAX_ROWS", { default: 200, min: 1 }),
     outline_max_bytes: read_int(env, "OUTLINE_MAX_BYTES", { default: 5242880, min: 1 }),
     sheets_fetch_timeout_ms: read_int(env, "SHEETS_FETCH_TIMEOUT_MS", { default: 10000, min: 1 }),
+    sheets_base_url: load_sheets_base_url(env, model.model_provider_mode),
     idempotency_window_h: read_int(env, "IDEMPOTENCY_WINDOW_H", { default: 24, min: 1 }),
     undo_window_s: read_int(env, "UNDO_WINDOW_S", { default: 60, min: 1 }),
     assist_call_timeout_ms: read_int(env, "ASSIST_CALL_TIMEOUT_MS", { default: 20000, min: 1 }),

@@ -64,3 +64,30 @@ export async function rowsFor(
     [versionId],
   );
 }
+
+/** Switch SCR-3 to the link source, fill the sheet link, press Import. */
+export async function importLink(page: Page, sheetUrl: string): Promise<void> {
+  await page.getByText("Sheet link", { exact: true }).click();
+  await page.getByLabel("Google Sheet link").fill(sheetUrl);
+  await page.getByRole("button", { name: "Import" }).click();
+}
+
+export async function postImport(
+  page: Page,
+  baseURL: string,
+  sheet_url: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- response bodies are asserted field by field in specs
+): Promise<{ status: number; body: any }> {
+  const res = await page.request.post("/api/outline-versions/import", {
+    data: { sheet_url },
+    headers: { Origin: baseURL },
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see above
+  let body: any = null;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+  return { status: res.status(), body };
+}

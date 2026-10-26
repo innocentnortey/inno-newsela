@@ -1,0 +1,20 @@
+{
+  "note": "NL-117 hand count, typed by hand from the plan's alignment_link table (docs/plans/fanout/2026-10-26-w9/NL-117.md section 3) and re-derived from the semantics: the approve snapshot hash wins over the working hash; a pair reads person only if every role row is person, else judge_only if any role row is judge_only, else generator_only. Lessons are numbered 3, 4, 5 inside one fresh unit. Never imported by seed.ts.",
+  "standards": [
+    { "code": "L.6.4.b", "never_assessed": false },
+    { "code": "RL.6.1", "never_assessed": false },
+    { "code": "RL.6.2", "never_assessed": false },
+    { "code": "W.6.2.a", "never_assessed": true }
+  ],
+  "lessons": [{ "number": 3 }, { "number": 4 }, { "number": 5 }],
+  "cells": [
+    { "code": "L.6.4.b", "lesson": 3, "roles": ["I", "P"], "confirmed_by": "judge_only", "source": "working" },
+    { "code": "L.6.4.b", "lesson": 4, "roles": ["I", "A"], "confirmed_by": "generator_only", "source": "approved" },
+    { "code": "L.6.4.b", "lesson": 5, "roles": ["P"], "confirmed_by": "generator_only", "source": "working" },
+    { "code": "RL.6.1", "lesson": 3, "roles": ["I"], "confirmed_by": "generator_only", "source": "working" },
+    { "code": "RL.6.1", "lesson": 4, "roles": ["I", "A"], "confirmed_by": "person", "source": "approved" },
+    { "code": "RL.6.2", "lesson": 4, "roles": ["I", "A"], "confirmed_by": "judge_only", "source": "approved" },
+    { "code": "RL.6.2", "lesson": 5, "roles": ["P"], "confirmed_by": "person", "source": "working" },
+    { "code": "W.6.2.a", "lesson": 5, "roles": ["I", "P"], "confirmed_by": "generator_only", "source": "working" }
+  ]
+}

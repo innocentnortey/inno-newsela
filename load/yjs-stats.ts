@@ -35,3 +35,17 @@ export function error_rate(failures: number, sockets_opened: number): number {
 }
 
 export const make_token = (editor: string, seq: number): string => `[${editor}-${seq}]`;
+
+export interface LinkView {
+  sender_up: boolean;
+  peer_up: boolean;
+  sender_epoch: number;
+  peer_epoch: number;
+}
+/** A remote-edit sample is clean only if both ends were up when the edit was made and neither dropped before it was seen. */
+export function is_clean_sample(at_send: LinkView, at_seen: LinkView): boolean {
+  return (
+    at_send.sender_up && at_send.peer_up && at_seen.sender_up && at_seen.peer_up &&
+    at_send.sender_epoch === at_seen.sender_epoch && at_send.peer_epoch === at_seen.peer_epoch
+  );
+}

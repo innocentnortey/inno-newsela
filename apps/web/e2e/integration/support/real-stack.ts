@@ -146,6 +146,7 @@ export async function startStack(opts: { web?: boolean; worker?: boolean; collab
     ["ASSIST_CALL_TIMEOUT_MS", "E2E_ASSIST_TIMEOUT_MS"],
     ["ASSIST_STUB_FILE", "E2E_ASSIST_STUB_FILE"],
     ["SUGGESTION_TTL_MIN", "E2E_SUGGESTION_TTL_MIN"],
+    ["SHEETS_BASE_URL", "E2E_SHEETS_BASE_URL"],
   ] as const) {
     const v = process.env[from];
     if (v !== undefined && v !== "") env[name] = v;

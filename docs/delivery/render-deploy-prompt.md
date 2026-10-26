@@ -1,1 +1,24 @@
-24
+# Prompt for the local Claude: set up the Render deployment of Newsela Lesson Studio
+
+Written 2026-10-26 on the VPS at Innocent's instruction (PD-37). Paste everything below the line into a Claude Code session on the Mac that has Render access (Render MCP or `render` CLI). No secret value belongs in this file or in the chat.
+
+---
+
+You are setting up the Render deployment of **Newsela Lesson Studio**. Source of truth is Gauntlet GitLab (`innocentnortey/inno-newsela`, private); a **GitLab push mirror already feeds** `https://github.com/innocentnortey/inno-newsela` (all branches). Render builds from that GitHub repo's `main`. **Never commit to the GitHub copy**; any repo change is made in GitLab (on the VPS working copy) and flows out through the mirror. If you need a repo change, write it as a precise patch request in your report instead of editing.
+
+Rules: `.claude/rules/gauntlet-hosting-default.md` (in the repo) governs: Render workspace `tea-dbclmj0m7kps73c58b8g`, region **Ohio**, Docker services, secrets only in a Render **environment group**, never in files or `ENV`/`ARG`, auto-deploy follows the mirror once live. Innocent has approved hosting this project on Render (PD-37, 2026-10-26); the blueprint's cost is 3 Starter services ($7 each) + Postgres Basic-256mb ($6 + $0.30/GB-month), about $27/month. Before creating anything, list the existing services in the workspace, add up the current monthly total, and **stop and tell Innocent if the new total exceeds the $40/month Render cap** he set on 2026-10-21 (he approved this project, not an unlimited cap raise).
+
+Do this, in order, reporting after each step:
+
+1. **Read** `render.yaml`, `Dockerfile.web`, `Dockerfile.node`, `docker-compose.yml` (the reference for env names), `packages/config/src/settings.ts` (every required env var), `docs/devlog/2026-10-25-nl23-accepted-risk.md` (AR-1) and `.claude/reference/` only as needed. The committed `render.yaml` defines `ls-web` (web), `ls-worker` (worker), `ls-collab` (web service for the Hocuspocus websocket) and the Postgres `ls-db`; all `autoDeploy: false` and `MODEL_PROVIDER_MODE: stub`.
+2. **Check what the blueprint is missing** and list it before provisioning. Known items to verify:
+   - `NEXT_PUBLIC_COLLAB_URL` is read by the browser bundle at **build** time (`apps/web/src/editor/collab-url.ts`); `ls-web` needs it as a Docker build arg pointing at the public `wss://` URL of `ls-collab` (or rely on a same-origin `/collab` route only if the code supports it).
+   - `COLLAB_INTERNAL_URL` (web to collab, server side) and `COLLAB_INTERNAL_TOKEN` (shared secret), `AUDIT_HASH_SALT`, `APP_ORIGIN` (the web service's public https URL), `BUILD_ID` (use `RENDER_GIT_COMMIT`), `WORKER_HEALTH_PORT`.
+   - Migrations: the blueprint runs them from the worker (`RUN_MIGRATIONS=1`); confirm the order (worker must migrate before web/collab serve traffic) and that append-only triggers exist after the first boot. Compose splits an owner role and a non-owner runtime role; Render uses one owner URL (accepted risk AR-1), so do not claim append-only rests on grants.
+   - Health checks: web `/`, collab `/healthz`, worker has none on Render (a worker type); confirm.
+3. **Create the environment group `ls-secrets`** in the Render dashboard/API with *names only* for the values Innocent must type himself: `COLLAB_INTERNAL_TOKEN`, `AUDIT_HASH_SALT`, and (only when real generation is turned on) `ANTHROPIC_API_KEY` and `OPENROUTER_API_KEY`. Generate random values for the token and salt **inside Render or with a local command whose output you do not print**, and tell Innocent which keys remain for him to paste. Do not echo, log or write any secret.
+4. **Provision from the blueprint** pointing at the GitHub repo `innocentnortey/inno-newsela`, branch `main` (New > Blueprint, or the API). Keep `ipAllowList: []` on the database. Keep `MODEL_PROVIDER_MODE=stub` for the first deploy. Auto-deploy: leave off until the first manual deploy is healthy, then set `autoDeploy` on `commit` for `main`.
+5. **Verify the live deploy** against the public URL: sign-in page loads; `GET /api/healthz` is 200 on web; collab `/healthz` is 200; sign in with a seeded staff account (use `docs` / seed instructions in the README, never real data), upload the outline, confirm validation choices, open a lesson in the editor and confirm two browser tabs co-edit (the websocket works through Render's proxy). Record each check with the URL and status; screenshots go in your report only.
+6. **Report** (under 40 lines): the three service URLs, the monthly cost line items and new workspace total, what Innocent still must paste (secret names only), every blueprint gap you found with a proposed patch, whether auto-deploy is on, and anything that failed with the exact error text (no secrets). Do not switch `MODEL_PROVIDER_MODE` to `real` unless Innocent says so; real generation spends from the $75 product model ceiling (PD-29).
+
+Do not: touch the Render services of other projects (HouseAccount, Riverside, AEA); change workspace billing or plan; add a GitHub `origin` or push; put keys in `render.yaml`, Dockerfiles or build args.
