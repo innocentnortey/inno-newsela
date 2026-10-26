@@ -71,6 +71,8 @@ All run from the repository root. The WF-n numbers are the workflows in `docs/de
 | `npm run eval:judge-calibrate` | judge calibration (WF-31) |
 | `npm run load:spike` | HTTP load probe at the 200-user spike (WF-29) |
 | `npm run ops:backup` | one `pg_dump` backup (WF-40) |
+| `npm run ops:import-spike` | import a committed spike report into the experiment tables (WF-32, WF-33, WF-34) |
+| `npm run eval:kickoff` | write the experiment kickoff page from the code (WF-46) |
 | `npm run dev` | the Compose stack described above |
 
 Some targets are placeholders until their owning ticket lands; `scripts/script-targets.json` lists each target and owner.
@@ -79,6 +81,11 @@ Some targets are placeholders until their owning ticket lands; `scripts/script-t
 
 The demo runs locally under Docker Compose (PD-15, option D: no new hosting spend). `render.yaml` is committed for
 Render, the Gauntlet default host, and is not provisioned until Innocent approves the spend.
+
+Render note (PD-37, 2026-10-26): Innocent has since approved hosting on Render, built from the GitHub mirror of this
+repository's `main`. The step-by-step setup (blueprint gaps to check, the `ls-secrets` environment group, provisioning
+and live verification) is in [`docs/delivery/render-deploy-prompt.md`](docs/delivery/render-deploy-prompt.md). Keys live
+only in the Render environment group, never in `render.yaml` or this repository.
 
 ## Docs map
 
