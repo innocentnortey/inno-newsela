@@ -56,7 +56,7 @@ export interface RunCallTotals {
   cost_usd: Usd;
   input_tokens: number;
   output_tokens: number;
-  /** Completed calls with no lesson job (the unit-plan call); jobs_cost + this equals cost_usd. */
+  /** Completed calls of non-lesson jobs or no job (the unit-plan call, whose job row keeps cost 0); lesson jobs_cost + this equals cost_usd. */
   unattributed_cost_usd?: Usd;
   /** Distinct purpose / requested / served model triples of the run's completed calls. */
   models_used?: { purpose: string; requested: string; served: string | null }[];

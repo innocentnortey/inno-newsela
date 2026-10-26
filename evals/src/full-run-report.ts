@@ -111,6 +111,8 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
   const rows = await ports.runs.summary_rows(run_id);
   const totals = await ports.calls.totals_for_run(run_id);
   const jobs = rows.jobs.filter((j) => j.kind === "lesson" && j.lesson_id !== null);
+  // The unit-plan job is a job too: its call cost counts toward the job total (NL-112 run 2 defect).
+  const other_jobs_cost = rows.jobs.filter((j) => !(j.kind === "lesson" && j.lesson_id !== null)).reduce((acc, j) => acc.plus(j.cost_usd), new Decimal(0));
   const failures = new Map<string, number>();
   const grounding = new Map<string, number>();
   const lessons: LessonFact[] = [];
@@ -121,7 +123,7 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
   let rt_ok = 0;
   let rt_total = 0;
   let all_terminal = true;
-  let jobs_cost = new Decimal(0);
+  let jobs_cost = other_jobs_cost;
   let per_lesson_max = new Decimal(0);
   const minutes: number[] = [];
 
@@ -191,14 +193,14 @@ export function evaluate_s9_thresholds(facts: FullRunFacts, api_summary: ApiRunS
   return [
     { id: "first_pass_schema_valid_rate_ge_0.90", passed: facts.n > 0 && facts.lessons_run > 0 && rate >= 0.9, detail: facts.lessons_run === 0 ? `not evaluated: 0 of ${facts.n} lessons ran` : `${facts.first_pass_schema_valid}/${facts.n} = ${rate.toFixed(3)}, ${facts.lessons_run} ran (M-31; M-5 is not computed here, the first-pass rate and repair count stand in)` },
     { id: "all_terminal_with_reasons", passed: facts.all_terminal, detail: facts.all_terminal ? "every job ready or failed with a reason" : "a job is not terminal or has no failure reason" },
-    { id: "round_trip_hash_all", passed: facts.round_trip_total === facts.n_ready && facts.round_trip_ok === facts.round_trip_total && facts.n_ready > 0, detail: `${facts.round_trip_ok}/${expected_n} ready lessons match their derived hash (${facts.n_ready} ready)` },
+    { id: "round_trip_hash_all", passed: facts.round_trip_total === facts.n_ready && facts.round_trip_ok === facts.round_trip_total && facts.n_ready > 0, detail: `${facts.round_trip_ok}/${facts.n_ready} ready lessons match their derived hash (${facts.n_ready} ready)` },
     { id: "median_confirmations_le_4", passed: facts.confirmations <= 4, detail: `median ${facts.confirmations} (M-41)` },
     { id: "spend_le_run_cap", passed: facts.cost_usd.lte(facts.cap_usd), detail: `${facts.cost_usd.toString()} of cap ${facts.cap_usd.toString()}` },
     { id: "per_lesson_cost_le_1usd", passed: facts.per_lesson_max.lte(1), detail: `max ${facts.per_lesson_max.toString()}` },
     { id: "p95_minutes_le_5", passed: facts.p95_minutes !== null && facts.p95_minutes <= 5, detail: `p95 ${facts.p95_minutes === null ? "n/a" : facts.p95_minutes.toFixed(2)} min` },
     { id: "wall_le_2h", passed: facts.wall_s <= 7200, detail: `${Math.round(facts.wall_s)} s` },
     { id: "disclosure_prompts_l31_l32_zero", passed: facts.disclosure_prompts_l31_l32 === 0, detail: `${facts.disclosure_prompts_l31_l32} open` },
-    { id: "totals_equal_call_sums", passed: sums_equal && api_equal, detail: `calls ${facts.cost_usd.toString()}, jobs ${facts.jobs_cost.toString()} + unit plan ${facts.unattributed_cost.toString()}${api_summary === null ? "" : `, api ${String(api_summary.cost_usd)}`}` },
+    { id: "totals_equal_call_sums", passed: sums_equal && api_equal, detail: `calls ${facts.cost_usd.toString()}, jobs ${facts.jobs_cost.toString()} + unit-plan call ${facts.unattributed_cost.toString()}${api_summary === null ? "" : `, api ${String(api_summary.cost_usd)}`}` },
     { id: "n_is_47", passed: facts.n === expected_n, detail: `n = ${facts.n}, expected ${expected_n}` },
   ];
 }

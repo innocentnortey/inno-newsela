@@ -117,7 +117,7 @@ export class PgModelCallLog implements ModelCallLog {
     const r = rows[0]!;
     const extra = await this.db.with_tx(async (tx) => ({
       unattributed: (await tx.query<{ c: string }>(
-        "SELECT coalesce(sum(cost_usd),0)::text AS c FROM model_call WHERE run_id=$1 AND job_id IS NULL AND status='completed'", [run_id])).rows[0]!.c,
+        "SELECT coalesce(sum(cost_usd),0)::text AS c FROM model_call WHERE run_id=$1 AND status='completed' AND (job_id IS NULL OR job_id IN (SELECT id FROM lesson_job WHERE kind<>'lesson'))", [run_id])).rows[0]!.c,
       models: (await tx.query<{ purpose: string; requested_model: string; served_model: string | null }>(
         "SELECT DISTINCT purpose, requested_model, served_model FROM model_call WHERE run_id=$1 AND status='completed' ORDER BY purpose, requested_model", [run_id])).rows,
     }));
