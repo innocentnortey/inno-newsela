@@ -34,12 +34,12 @@ export function BreadcrumbTrail() {
   if (crumbs.length === 0) return null;
   return (
     <nav aria-label="Breadcrumb" className="min-w-0">
-      <ol className="flex items-center gap-2 overflow-hidden text-small text-ink2">
+      <ol className="flex items-center gap-2 overflow-x-clip overflow-y-visible px-1 text-small text-ink2 [overflow-clip-margin:4px]">
         {crumbs.map((c, i) => {
           const last = i === crumbs.length - 1;
           return (
-            <li key={`${i}-${c.label}`} className={last ? "flex min-w-0 items-center gap-2 truncate" : "flex shrink-0 items-center gap-2"}>
-              {!last && c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current={last ? "page" : undefined}>{c.label}</span>}
+            <li key={`${i}-${c.label}`} className={last ? "flex min-w-0 items-center gap-2" : "flex shrink-0 items-center gap-2"}>
+              {!last && c.href ? <Link href={c.href}>{c.label}</Link> : <span className={last ? "truncate" : undefined} aria-current={last ? "page" : undefined}>{c.label}</span>}
               {!last ? <span aria-hidden="true">/</span> : null}
             </li>
           );
