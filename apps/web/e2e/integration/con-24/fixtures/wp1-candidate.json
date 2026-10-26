@@ -1,0 +1,5 @@
+{
+  "_synthetic": true,
+  "_note": "NL-103: the WP-1 (G6.U4.L4) candidate script. driver24 replaces the first sample_response block of the WP-1 draft with this sentence, so the candidate's content_hash differs from v1.",
+  "sample_response_text": "A synthetic candidate sentence about how a calm voice and a steady rhythm can change the tone of a scene."
+}

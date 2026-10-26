@@ -77,3 +77,6 @@ Found by NL-125's lock-boundary `no_silent_loss` case (`evals/reports/integrity-
 - S-117-1 (Low, owner A18 route `apps/web/app/api/units/[unitId]/coverage/handlers.ts`): `INTERFACE.md` says `{unitId}` accepts the unit key, but `GET /api/units/g8-u74/coverage` returns 400 (`params_schema` is the id form only). The screen already sends the id form. Fix: accept the key in the handler, or amend the contract.
 - S-117-2 (Info, SCR-9 opener ticket): nothing links to `/units/{key}/coverage?standard=<code>`; the SCR-9 spec (Standards tab) names no Coverage link, so this is a missing opener only if one is wanted. Only entry today is the board's "Related pages" link; `?standard=` is URL-only.
 - S-117-3 (Low, service `coverage-service.ts`): a stored link whose code is not in `standard` returns a standards row with `official_text: ""` (and `never_assessed: true` when no A link), so the screen shows a code chip with no text. Probe row removed after the test.
+
+## S-103 (open, from NL-103): seam defects found on the real stack
+(1) An author needs a `usr_<ULID>` display name or the unit-plan job fails with a ZodError. (2) `audit_event.version_hash` is null on a guidance save. (3) A candidate's `derived_from_version_id` is null. (4) No `check_job` rows exist for a candidate hash, so M-5 is not computable yet. Owner: integrator / NL-113 follow-ups.

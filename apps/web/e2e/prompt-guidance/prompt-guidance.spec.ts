@@ -131,7 +131,7 @@ test("trial: starts one-lesson trial and links to SCR-12", async ({ page }) => {
     page.getByRole("link", { name: "Compare the candidate" }),
   ).toHaveAttribute(
     "href",
-    /\/units\/g6-u4\/lessons\/L4\/candidates\/cand-4-2$/,
+    /\/units\/g6-u4\/lessons\/L4\/candidates\/run-trial-1$/,
   );
 });
 
