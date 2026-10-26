@@ -22,5 +22,9 @@ ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 BUILD_ID=$BUILD_ID RENDER_GIT
 WORKDIR /app
 COPY --from=build --chown=node:node /app/apps/web/.next/standalone /app
 COPY --from=build --chown=node:node /app/apps/web/.next/static /app/apps/web/.next/static
+# Runtime data the server reads from disk. Turbopack resolves import.meta.url against /app, and standalone tracing does not copy these.
+COPY --from=build --chown=node:node /app/packages/prompts/locked /app/packages/prompts/locked
+COPY --from=build --chown=node:node /app/packages/core/data/standards /app/packages/core/data/standards
+COPY --from=build --chown=node:node /app/packages/llm/src/fixtures /app/packages/llm/src/fixtures
 USER node
 CMD ["node", "apps/web/server.js"]
