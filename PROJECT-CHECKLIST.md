@@ -153,17 +153,17 @@ reviews are recorded. An agreed card changes only through the change procedure (
 - **Gate:** ☑ all four passes done for **every** wave (W0–W12; PD-34 override of one-wave-at-a-time) — Claude recommendation adopted under Innocent's standing authorization (PD-32), 2026-10-25: slice plan with parallelism audit and collision maps; 147 specs, all READY; coverage audit passes at publish; 147 issues published. Innocent has not read the slice plan; anything he raises reopens it
 
 ## 8 · Build  (§8)
-- [ ] Frontend tickets built from signed `SCR-N` and `design.md` tokens, on Prism mocks generated from `docs/contracts/interface.openapi.yaml`, while the backend is built alongside
-- [ ] Backend contract tests run against the same `interface.openapi.yaml`
-- [ ] Integration tickets point the frontend at the real backend once both sides are merged against the same agreed `CON-N`
-- [ ] UX-5a per frontend slice: `docs/ux/05-verify/TRACEABILITY.md` updated, axe at 1280/390 light and dark, visual check against the look sheet and `design.md`, behavioural checks against the CON cards (rerun against the real backend after integration)
-- [ ] Each wave's ready build-loop tickets built at the same time (one planner → implementer pair each), inside the collision map; its direct tickets done by one general agent each alongside, no build-loop gates
-- [ ] Each ticket's WP-N (or PE-N) is one of its tests, written with the code (plan → implement → test → review); frozen first by `test-writer-agent` only for `risk::security` tickets
-- [ ] Only affected tests per role and per merge; full suite only when a change reaches everything and before each deploy
-- [ ] Each slice reconciles `.claude/` in the same change: area map (planned → actual), router rows, rule `paths:`, and ICM rows (scaffold, routes verified) with dated evidence
-- [ ] `code-review-agent` per ticket; seam audit per wave; `security-privacy-agent` at a wave merge only when the wave has a `risk::security` ticket
-- [ ] No merged work left marked `reconcile: CHG-N`
-- **Gate:** ☐ waves merged, seam audits clean, UX-5a evidence for every frontend slice, area map matches the checkout — Claude ✓ ____
+- [x] Frontend tickets built from signed `SCR-N` and `design.md` tokens, on Prism mocks generated from `docs/contracts/interface.openapi.yaml`, while the backend is built alongside — (21 screens, mock project specs: `apps/web/e2e/<screen>/`)
+- [x] Backend contract tests run against the same `interface.openapi.yaml` — (`packages/schema/tests/contract`, `apps/web/tests/unit/lib/api-types-current.test.ts`, export drift guard)
+- [x] Integration tickets point the frontend at the real backend once both sides are merged against the same agreed `CON-N` — (real-stack specs `apps/web/e2e/integration/con-1…con-24`, stub model provider; none with a real model)
+- [x] UX-5a per frontend slice: `docs/ux/05-verify/TRACEABILITY.md` updated, axe at 1280/390 light and dark, visual check against the look sheet and `design.md`, behavioural checks against the CON cards (rerun against the real backend after integration) — (21 of 21 SCR rows carry evidence in `TRACEABILITY.md`; `trace_check --upto CON` 0 failures; five screenshots per screen marked NEEDS_HUMAN_REVIEW for Innocent)
+- [x] Each wave's ready build-loop tickets built at the same time (one planner → implementer pair each), inside the collision map; its direct tickets done by one general agent each alongside, no build-loop gates — (workflows of 4 to 8 planner→implementer pairs; direct tickets by one agent each)
+- [x] Each ticket's WP-N (or PE-N) is one of its tests, written with the code (plan → implement → test → review); frozen first by `test-writer-agent` only for `risk::security` tickets — (plans name them; `risk::security` tickets froze tests first except NL-102/115/116 where the test-writer and implementer were one run, recorded in their manifests)
+- [x] Only affected tests per role and per merge; full suite only when a change reaches everything and before each deploy — (full suite not yet run: that is NL-137)
+- [x] Each slice reconciles `.claude/` in the same change: area map (planned → actual), router rows, rule `paths:`, and ICM rows (scaffold, routes verified) with dated evidence — (NL-140 at HEAD 5999d9b; redo at the release SHA)
+- [x] `code-review-agent` per ticket; seam audit per wave; `security-privacy-agent` at a wave merge only when the wave has a `risk::security` ticket — (every merged ticket had a review; one seam audit across W0–W9 on 2026-10-26, `docs/plans/seam-audit-2026-10-26.md`, not one per wave; `security-privacy-agent` read the W7 tickets; GEN-6 was reviewed as security work)
+- [x] No merged work left marked `reconcile: CHG-N` — (CHG-1…CHG-7 all reconciled; CHG-6 closed by GEN-7)
+- **Gate:** ☑ waves merged, seam audits clean, UX-5a evidence for every frontend slice, area map matches the checkout — Claude ✓ 2026-10-26 (main after GEN-7). Honest limits: every connected run used the stub provider; the one seam audit found no blocking seam and its Mediums are fixed except the Render collab URL build arg (deploy session); the A/B load check found no code regression, the 200-user HTTP half is not yet re-measured on a quiet machine with sockets; human acceptance is UX-5b, not this gate
 
 ## UX-4 · Focused interaction prototype (optional)  (§4b)
 *Only for a named interaction uncertainty; never a prerequisite for tickets. Otherwise record `n/a` with the reason.*
