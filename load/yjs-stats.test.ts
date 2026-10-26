@@ -1,6 +1,6 @@
 // NL-119 AC-2: the lost-update counter and the other pure helpers.
 import { describe, expect, it } from "vitest";
-import { count_duplicates, count_lost, error_rate, is_clean_sample, make_token, percentile } from "./yjs-stats.ts";
+import { count_duplicates, count_lost, error_rate, is_clean_sample, is_clean_stored, make_token, percentile } from "./yjs-stats.ts";
 
 describe("percentile", () => {
   it("is nearest-rank and 0 for an empty list", () => {
@@ -50,5 +50,14 @@ describe("remote_edit_excludes_drop_samples", () => {
     expect(is_clean_sample(up, { ...up, sender_epoch: 1 })).toBe(false);
     expect(is_clean_sample(up, { ...up, peer_epoch: 1 })).toBe(false);
     expect(is_clean_sample(up, { ...up, peer_up: false })).toBe(false);
+  });
+});
+
+describe("stored sample", () => {
+  it("is clean only when the sender was up at send and the socket never dropped before the ack", () => {
+    expect(is_clean_stored({ up: true, epoch: 2 }, { up: true, epoch: 2 })).toBe(true);
+    expect(is_clean_stored({ up: false, epoch: 2 }, { up: true, epoch: 2 })).toBe(false);
+    expect(is_clean_stored({ up: true, epoch: 2 }, { up: true, epoch: 3 })).toBe(false);
+    expect(is_clean_stored({ up: true, epoch: 2 }, { up: false, epoch: 2 })).toBe(false);
   });
 });

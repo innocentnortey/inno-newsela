@@ -46,6 +46,42 @@ export interface SupportDeps {
   clock: Clock;
 }
 
+const LOAD_OUTLINE_VERSION_ID = `${LOAD_UNIT_ID}.ov1`;
+
+/**
+ * NL-127 follow-up F-B: CheckContextLoader needs the unit's outline version and the lesson's outline row, or every
+ * worker check on a load lesson throws InvariantViolation and is retried forever. Writes only the load unit. Idempotent.
+ */
+async function seed_outline_row(q: DbTx, lesson_id: string, index: number): Promise<void> {
+  assert_load_lesson(lesson_id);
+  await q.query("insert into unit (id, grade, title) values ($1, 6, 'Synthetic load unit') on conflict (id) do nothing", [LOAD_UNIT_ID]);
+  await q.query(
+    `insert into outline_version (id, unit_id, number, sha256, same_as_version, source_kind, source_name, uploaded_by, confirmed_at)
+     values ($1, $2, 1, $3, null, 'synthetic', 'load-fixture', 'system', now()) on conflict (id) do nothing`,
+    [LOAD_OUTLINE_VERSION_ID, LOAD_UNIT_ID, "0".repeat(64)],
+  );
+  const insert = (row_number: number, kind: string, row_lesson_id: string | null, codes: unknown, hash: string) =>
+    q.query(
+      `insert into outline_row (outline_version_id, row_number, kind, lesson_id, segments_json, codes_json, findings_json, row_hash)
+       values ($1, $2, $3, $4, '[]'::jsonb, $5::jsonb, '[]'::jsonb, $6) on conflict do nothing`,
+      [LOAD_OUTLINE_VERSION_ID, row_number, kind, row_lesson_id, JSON.stringify(codes), hash],
+    );
+  await insert(0, "meta", null, { unit_as_written: LOAD_UNIT_ID, unit_from_filenames: null, unit_rules: [], counts: {} }, "m".repeat(64));
+  await insert(
+    900 + index + 1,
+    "lesson",
+    lesson_id,
+    {
+      focus_codes: [],
+      eld_codes: [],
+      msls_codes: [],
+      vocabulary: [],
+      meta: { number: 900 + index + 1, title: "Synthetic load lesson", lesson_type: "Reading", arc: null, homework: null, pages: null, text_set: null },
+    },
+    "r".repeat(64),
+  );
+}
+
 /** Idempotent: a lesson id that already exists is left alone. Returns the ids, in order. */
 export async function seed_load_lessons(deps: SupportDeps, count: number): Promise<string[]> {
   const store = new PgLessonDocStore({
@@ -61,6 +97,7 @@ export async function seed_load_lessons(deps: SupportDeps, count: number): Promi
     ids.push(id);
     await deps.db.with_tx(async (tx) => {
       const q = tx as DbTx;
+      await seed_outline_row(q, id, i);
       const have = await q.query("select 1 from lesson where id = $1", [id]);
       if (have.rows.length > 0) return;
       await insert_row(q, "lesson", {

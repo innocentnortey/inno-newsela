@@ -13,7 +13,7 @@ import { PgDatabase } from "@ls/db/pool";
 import { PgEvidenceRepo } from "@ls/db/repos/evidence";
 import * as Y from "yjs";
 import type { MixResult, SpikeOptions } from "./types.ts";
-import { count_duplicates, count_lost, error_rate, is_clean_sample, make_token, percentile } from "./yjs-stats.ts";
+import { count_duplicates, count_lost, error_rate, is_clean_sample, is_clean_stored, make_token, percentile } from "./yjs-stats.ts";
 import {
   append_token,
   connect_client,
@@ -79,6 +79,8 @@ interface Sent {
   t0: number;
   clock: number;
   acked: boolean;
+  up_at_send: boolean;
+  epoch_at_send: number;
 }
 interface Unseen {
   t0: number;
@@ -127,6 +129,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
   const remote_samples: number[] = [];
   const remote_drop_samples: number[] = [];
   const stored_samples: number[] = [];
+  const stored_drop_samples: number[] = [];
   const reconnect_samples: number[] = [];
   let socket_errors = 0;
   let sockets_opened = 0;
@@ -160,7 +163,7 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
     e.seq += 1;
     const t0 = now();
     const clock = Y.decodeStateVector(Y.encodeStateVector(e.client.doc)).get(e.client.doc.clientID) ?? 0;
-    e.sent.set(token, { t0, clock, acked: false });
+    e.sent.set(token, { t0, clock, acked: false, up_at_send: e.state === "up", epoch_at_send: e.epoch });
     for (const peer of by_lesson.get(e.lesson_id) ?? []) {
       if (peer === e) continue;
       peer.unseen.set(token, { t0, sender: e, sender_epoch: e.epoch, peer_epoch: peer.epoch, clean_at_send: e.state === "up" && peer.state === "up" });
@@ -200,7 +203,8 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
           for (const s of e.sent.values()) {
             if (!s.acked && s.clock <= upto) {
               s.acked = true;
-              stored_samples.push(t - s.t0);
+              const clean = is_clean_stored({ up: s.up_at_send, epoch: s.epoch_at_send }, { up: e.state === "up", epoch: e.epoch });
+              (clean ? stored_samples : stored_drop_samples).push(t - s.t0);
             }
           }
         }
@@ -358,6 +362,10 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
         remote_edit_during_drop: percentile(remote_drop_samples, 95),
         remote_edit_during_drop_n: remote_drop_samples.length,
         stored: percentile(stored_samples, 95),
+        stored_n: stored_samples.length,
+        stored_p50: percentile(stored_samples, 50),
+        stored_during_drop: percentile(stored_drop_samples, 95),
+        stored_during_drop_n: stored_drop_samples.length,
         reconnect_p95_s: percentile(reconnect_samples, 95),
         duplicate_tokens: duplicates,
         unacknowledged,
