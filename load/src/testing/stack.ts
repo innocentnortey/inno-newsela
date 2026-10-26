@@ -69,7 +69,7 @@ function kill_group(child: ChildProcess): Promise<void> {
   });
 }
 
-export async function start_probe_stack(): Promise<ProbeStack> {
+export async function start_probe_stack(opts: { unit_id?: string } = {}): Promise<ProbeStack> {
   if (!existsSync(path.join(WEB_DIR, ".next", "BUILD_ID"))) {
     throw new Error("run `npx next build` in apps/web first (shared build; the probe tests never build on a shared machine)");
   }
@@ -96,7 +96,8 @@ export async function start_probe_stack(): Promise<ProbeStack> {
 
     // One unit, three lessons. Content is the WP-1 stored fixture; the Yjs bytes are a placeholder (the reads under load use derived_json only).
     const fixture = JSON.parse(readFileSync(path.join(ROOT, "packages/ydoc/tests/fixtures/stored-wp1.json"), "utf8")) as Record<string, unknown>;
-    const unit_id = "G6.U9";
+    // default G6.U9 is the Yjs load unit id too (NL-119); a run that uses both halves passes another unit.
+    const unit_id = opts.unit_id ?? "G6.U9";
     await insert_row(q, "unit", { id: unit_id });
     const lesson_ids: string[] = [];
     for (let n = 1; n <= 3; n++) {

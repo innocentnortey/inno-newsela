@@ -44,7 +44,7 @@
 | R-53 | US-36 | FLOW-19 | SCR-14, SCR-17, SCR-19, SCR-5, SCR-6, SCR-8 | CON-1, CON-10, CON-11, CON-13, CON-18, CON-20, CON-21, CON-24, CON-5, CON-6, CON-7, CON-9 | — |
 | R-54 | US-6, US-37 | FLOW-1, FLOW-4 | SCR-1, SCR-2, SCR-4, SCR-5, SCR-6, SCR-7, SCR-8, SCR-9 | CON-1, CON-10, CON-11, CON-12, CON-13, CON-14, CON-16, CON-18, CON-2, CON-20, CON-24, CON-3, CON-4, CON-5, CON-6, CON-7, CON-8, CON-9 | — |
 | R-55 | US-32, US-36 | FLOW-16, FLOW-19 | SCR-14, SCR-16, SCR-17, SCR-18, SCR-19, SCR-5, SCR-6, SCR-8, SCR-9 | CON-1, CON-10, CON-11, CON-12, CON-13, CON-14, CON-16, CON-18, CON-19, CON-20, CON-21, CON-22, CON-24, CON-5, CON-6, CON-7, CON-9 | — |
-| R-56 | US-36 | FLOW-19 | SCR-14, SCR-17, SCR-19, SCR-5, SCR-6, SCR-8 | CON-1, CON-10, CON-11, CON-13, CON-18, CON-20, CON-21, CON-24, CON-5, CON-6, CON-7, CON-9 | NL-119 load/yjs-mix.int.test.ts, load/wf-30-obligations.int.test.ts (WF-30, S14; cut #1) |
+| R-56 | US-36 | FLOW-19 | SCR-14, SCR-17, SCR-19, SCR-5, SCR-6, SCR-8 | CON-1, CON-10, CON-11, CON-13, CON-18, CON-20, CON-21, CON-24, CON-5, CON-6, CON-7, CON-9 | NL-119 load/yjs-mix.int.test.ts, load/wf-30-obligations.int.test.ts, load/spike-yjs.int.test.ts (WF-30, S14; cut #1) |
 | R-57 | US-36 | FLOW-19 | SCR-14, SCR-17, SCR-19, SCR-5, SCR-6, SCR-8 | CON-1, CON-10, CON-11, CON-13, CON-18, CON-20, CON-21, CON-24, CON-5, CON-6, CON-7, CON-9 | — |
 | R-58 | US-4, US-14 | FLOW-3, FLOW-7 | SCR-4, SCR-5, SCR-8, SCR-9 | CON-1, CON-10, CON-11, CON-12, CON-13, CON-14, CON-16, CON-18, CON-20, CON-24, CON-3, CON-4, CON-5, CON-6, CON-9 | — |
 | R-60 | US-31 | FLOW-12 | SCR-1, SCR-14, SCR-8 | CON-1, CON-10, CON-11, CON-13, CON-18, CON-20, CON-9 | — |
@@ -77,7 +77,7 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-15 | US-26, US-28 | CON-18 | NL-69 | NL-115 | apps/web/e2e/send-back/send-back.spec.ts | axe + screenshots: e2e/__screenshots__/send-back/ | planned |
 | SCR-16 | US-29 | CON-11, CON-19 | NL-70 | NL-100 | apps/web/e2e/history/history.spec.ts | axe + screenshots: e2e/__screenshots__/history/ | planned |
 | SCR-17 | US-32, US-36 | CON-21 | NL-71 | NL-97 | apps/web/e2e/run-summary/run-summary.spec.ts; apps/web/e2e/integration/con-21/ | axe + screenshots: e2e/__screenshots__/run-summary/; real stack: NL-97 apps/web/e2e/integration/con-21/ | planned |
-| SCR-18 | US-33 | CON-22 | NL-73 (cut #4) | NL-117 | apps/web/e2e/coverage/coverage.spec.ts | axe + screenshots: e2e/__screenshots__/coverage/ | planned |
+| SCR-18 | US-33 | CON-22 | NL-73 (cut #4) | NL-117 | apps/web/e2e/coverage/coverage.spec.ts; apps/web/e2e/integration/con-22/coverage.spec.ts | axe + screenshots: e2e/__screenshots__/coverage/; real stack: NL-117 apps/web/e2e/integration/con-22/ (screenshots e2e/__screenshots__/integration/con-22/) | planned |
 | SCR-19 | US-34, US-36 | CON-10 | NL-74 (cut #6) | NL-104 | apps/web/e2e/quality/quality.spec.ts | axe + screenshots: e2e/__screenshots__/quality/ | planned |
 | SCR-20 | US-28, US-35 | CON-23 | NL-75 (cut #5) | NL-102 | apps/web/e2e/export/export.spec.ts | axe + screenshots: e2e/__screenshots__/export/ | planned |
 | SCR-21 | US-10 | CON-5, CON-24 | NL-76 (cut #7) | NL-103 | apps/web/e2e/prompt-guidance/prompt-guidance.spec.ts | axe + screenshots: e2e/__screenshots__/prompt-guidance/ | planned |

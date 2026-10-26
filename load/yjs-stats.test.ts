@@ -1,6 +1,6 @@
 // NL-119 AC-2: the lost-update counter and the other pure helpers.
 import { describe, expect, it } from "vitest";
-import { count_duplicates, count_lost, error_rate, make_token, percentile } from "./yjs-stats.ts";
+import { count_duplicates, count_lost, error_rate, is_clean_sample, make_token, percentile } from "./yjs-stats.ts";
 
 describe("percentile", () => {
   it("is nearest-rank and 0 for an empty list", () => {
@@ -38,5 +38,17 @@ describe("count_duplicates and error_rate", () => {
     expect(error_rate(3, 0)).toBe(1);
     expect(error_rate(1, 4)).toBe(0.25);
     expect(error_rate(9, 3)).toBe(1);
+  });
+});
+
+describe("remote_edit_excludes_drop_samples", () => {
+  const up = { sender_up: true, peer_up: true, sender_epoch: 0, peer_epoch: 0 };
+  it("is clean only when both ends stayed up and no epoch changed", () => {
+    expect(is_clean_sample(up, up)).toBe(true);
+    expect(is_clean_sample({ ...up, sender_up: false }, up)).toBe(false);
+    expect(is_clean_sample({ ...up, peer_up: false }, up)).toBe(false);
+    expect(is_clean_sample(up, { ...up, sender_epoch: 1 })).toBe(false);
+    expect(is_clean_sample(up, { ...up, peer_epoch: 1 })).toBe(false);
+    expect(is_clean_sample(up, { ...up, peer_up: false })).toBe(false);
   });
 });

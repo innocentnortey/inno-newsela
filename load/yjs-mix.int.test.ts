@@ -1,9 +1,7 @@
 // NL-119 AC-1, AC-3, AC-4, AC-5: the Yjs socket load script against the real stack
 // (real Postgres via scripts/test-db.sh up, the real Hocuspocus server and lesson_doc store path in this process).
 // The server start-up is duplicated on purpose from apps/collab tests: tools do not import each other.
-import { Server } from "@hocuspocus/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { load_collab_settings } from "@ls/config/settings";
 import { SystemClock } from "@ls/core/ports/clock";
 import { PrefixedIdGenerator } from "@ls/core/ports/ids";
 import { PgAuditLog } from "@ls/db/repos/audit";
@@ -13,14 +11,13 @@ import { PgLessonDocStore } from "@ls/db/repos/lesson-docs";
 import { PgLessonRepo } from "@ls/db/repos/lessons";
 import { SYSTEM_ACTOR, rows, wp1 } from "@ls/db/repos/lesson-docs.test-support";
 import { insert_row } from "@ls/db/testing/insert-row";
-import { create_test_db, settings_for, type TestDb } from "@ls/db/testing/test-db";
-import { create_logger } from "@ls/obs/logger";
-import { wire_collab_server } from "../apps/collab/src/wiring/server.ts";
+import { create_test_db, type TestDb } from "@ls/db/testing/test-db";
+import { start_collab } from "./src/testing/collab.ts";
 import type { SpikeOptions } from "./types.ts";
-import { run_yjs_probe, type YjsDeps } from "./yjs-mix.ts";
+import { run_yjs_mix_detailed, run_yjs_probe, DEFAULT_TUNING, type YjsDeps } from "./yjs-mix.ts";
 import { NotLoadLesson, assert_load_lesson, stored_text } from "./yjs-support.ts";
 
-type P95 = Record<string, number | boolean>;
+type P95 = Record<string, number | boolean | string | null>;
 const ids = new PrefixedIdGenerator();
 const clock = new SystemClock();
 let t: TestDb;
@@ -32,30 +29,7 @@ afterAll(async () => {
   await t.drop();
 });
 
-export interface Harness {
-  url: string;
-  server: Server;
-  stop(): Promise<void>;
-}
-async function start_server(): Promise<Harness> {
-  const logger = create_logger({ service: "collab", build_id: "test", write: () => undefined });
-  const base = load_collab_settings({ DATABASE_URL: t.url, COLLAB_INTERNAL_TOKEN: "t-collab", SESSION_COOKIE_NAME: "ls_session" });
-  const settings = { ...base, shared: settings_for(t.url, 4), store_debounce_ms: 500, store_max_debounce_ms: 1000 };
-  const server = new Server({ port: 0, quiet: true, stopOnSignals: false, extensions: [] });
-  const wiring = wire_collab_server({ settings, logger, db: t.db as never, ids, clock }, { hocuspocus: server.hocuspocus });
-  await server.listen();
-  let stopped = false;
-  return {
-    url: `ws://127.0.0.1:${server.address.port}`,
-    server,
-    async stop() {
-      if (stopped) return;
-      stopped = true;
-      await server.destroy().catch(() => undefined);
-      await wiring.close();
-    },
-  };
-}
+const start_server = () => start_collab(t);
 
 function deps_with(log: string[]): YjsDeps {
   return { db: t.db, evidence: new PgEvidenceRepo({ db: t.db, ids, clock }), ids, clock, log: (l) => void log.push(l), git_sha: "test-sha", machine: "test-box 1cpu" };
@@ -85,6 +59,9 @@ describe("test_yjs_probe_writes_run (AC-1)", () => {
       expect(p["remote_edit"]).toBeGreaterThan(0);
       expect(p["stored"]).toBeGreaterThan(0);
       expect(p["incomplete"]).toBe(false);
+      expect(p["remote_edit_n"]).toBeGreaterThan(0);
+      expect(p["remote_edit_during_drop_n"]).toBe(0);
+      expect(p["incomplete_reason"]).toBeNull();
       expect(out.exit_code).toBe(0);
       expect(log.some((l) => l.startsWith(`wf=WF-30 probe_run_id=${out.record.probe_run_id} `))).toBe(true);
     } finally {
@@ -164,6 +141,43 @@ describe("server_down (AC-5)", () => {
     expect(out.exit_code).toBe(1);
     const row = await probe_row(out.record.probe_run_id);
     expect((row["p95_json"] as P95)["incomplete"]).toBe(true);
+    expect((row["p95_json"] as P95)["incomplete_reason"]).toBeTruthy();
     expect(Number(row["error_rate"])).toBeGreaterThan(0);
+  }, 60000);
+});
+
+describe("remote_edit_p95_excludes_drop (F-1)", () => {
+  it("samples across a dropped socket are counted apart, none lost", async () => {
+    const h = await start_server();
+    try {
+      const d = await run_yjs_mix_detailed(
+        opts(h.url, { plateau_s: 12 }),
+        { ...DEFAULT_TUNING, typing_share: 1, interval_ms: 200, drop_share: 0.34, drain_ms: 5000 },
+        deps_with([]),
+      );
+      const p = d.result.p95_ms as P95;
+      expect(p["remote_edit_during_drop_n"]).toBeGreaterThanOrEqual(1);
+      expect(p["remote_edit_n"]).toBeGreaterThanOrEqual(1);
+      expect((p["remote_edit_n"] as number) + (p["remote_edit_during_drop_n"] as number)).toBe(d.remote_samples_total);
+    } finally {
+      await h.stop();
+    }
+  }, 90000);
+});
+
+describe("unacknowledged_after_drain (F-2)", () => {
+  it("tokens never acknowledged make the run incomplete with exit code 1", async () => {
+    const h = await start_server();
+    try {
+      const out = await run_yjs_probe(opts(h.url, { plateau_s: 4 }), deps_with([]), { typing_share: 1, interval_ms: 100, drop_share: 0, drain_ms: 0 });
+      const p = (await probe_row(out.record.probe_run_id))["p95_json"] as P95;
+      expect(out.exit_code).toBe(1);
+      expect(p["incomplete"]).toBe(true);
+      expect(p["incomplete_reason"]).toBe("unacknowledged_after_drain");
+      expect(p["unacknowledged"]).toBeGreaterThan(0);
+      expect(out.record.lost_updates).toBe(0);
+    } finally {
+      await h.stop();
+    }
   }, 60000);
 });
