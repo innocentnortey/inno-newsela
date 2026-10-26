@@ -42,6 +42,8 @@ stub model output and spends nothing. `real` calls the providers and costs money
 | `collab` | collaborative editing | `127.0.0.1:1234` (`COLLAB_PORT`) |
 | `web` | the app | `127.0.0.1:3000` (`WEB_PORT`) |
 
+The web image bakes the browser's collab URL at build time (`NEXT_PUBLIC_COLLAB_URL`, default `ws://localhost:${COLLAB_PORT}`), so changing `COLLAB_PORT` needs `--build`. In stub mode the worker ships a built-in demo script, so a run plans and drafts without any script file.
+
 Open <http://localhost:3000>. Stop with `docker compose -p ls down` (add `-v` only if you mean to delete the database volume).
 
 ## Run it without Compose (dev scripts)

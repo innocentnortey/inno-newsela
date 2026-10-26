@@ -84,6 +84,17 @@ export function wp1_lesson_draft_text(): string {
   return JSON.stringify(JSON.parse(raw));
 }
 
+/** WP-1 after the repair round (the repaired L4 draft). draft-wp1.json above is the first, defective draft. */
+export function wp1_repaired_draft_text(): string {
+  const raw = readFileSync(new URL("./fixtures/draft-wp1-repaired.json", import.meta.url), "utf8");
+  return JSON.stringify(JSON.parse(raw));
+}
+
+export function wp2_lesson_draft_text(): string {
+  const raw = readFileSync(new URL("./fixtures/draft-wp2.json", import.meta.url), "utf8");
+  return JSON.stringify(JSON.parse(raw));
+}
+
 type JudgeScript = { verdict: "yes" | "no"; rationale?: string } | ProviderError;
 
 export class StubJudgeClient implements JudgeClient {

@@ -36,6 +36,7 @@ Services (see `docker-compose.yml`):
 
 Open <http://localhost:3000>. Compose stops and names any required variable that is unset (`DATABASE_URL`,
 `MIGRATE_DATABASE_URL`, `COLLAB_INTERNAL_TOKEN`, `AUDIT_HASH_SALT`).
+The web image bakes the browser's collab URL at build time (`NEXT_PUBLIC_COLLAB_URL`, default `ws://localhost:${COLLAB_PORT}`), so changing `COLLAB_PORT` needs `--build`.
 
 `npm run db:migrate` and `npm run db:seed` run from the host and need a Postgres your shell can reach. The `migrate`
 service already applies migrations when the stack starts, and Postgres is not published, so point `DATABASE_URL` and
