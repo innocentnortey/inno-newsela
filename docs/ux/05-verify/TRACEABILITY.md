@@ -80,4 +80,4 @@ US and CON come from the slice plan's *Ticket list* ([`docs/plans/slice-plan.md`
 | SCR-18 | US-33 | CON-22 | NL-73 (cut #4) | NL-117 | planned | planned | planned |
 | SCR-19 | US-34, US-36 | CON-10 | NL-74 (cut #6) | NL-104 | planned | planned | planned |
 | SCR-20 | US-28, US-35 | CON-23 | NL-75 (cut #5) | NL-102 | apps/web/e2e/export/export.spec.ts | axe + screenshots: e2e/__screenshots__/export/ | planned |
-| SCR-21 | US-10 | CON-5, CON-24 | NL-76 (cut #7) | NL-103 | planned | planned | planned |
+| SCR-21 | US-10 | CON-5, CON-24 | NL-76 (cut #7) | NL-103 | apps/web/e2e/prompt-guidance/prompt-guidance.spec.ts | axe + screenshots: e2e/__screenshots__/prompt-guidance/ | planned |
