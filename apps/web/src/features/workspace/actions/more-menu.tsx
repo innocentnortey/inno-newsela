@@ -29,7 +29,7 @@ export function MoreMenu({ children }: { children: ReactNode }) {
 
   return (
     <div ref={root} className="relative">
-      <Button ref={trigger} variant="secondary" size="lg" aria-haspopup="true" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((o) => !o)}>
+      <Button ref={trigger} variant="secondary" aria-haspopup="true" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((o) => !o)}>
         More
       </Button>
       {open ? (

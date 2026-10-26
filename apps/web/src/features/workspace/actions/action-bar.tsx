@@ -8,6 +8,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
+import { Glyph } from "@/components/ui/glyph";
 import { Link } from "@/components/ui/link";
 import { useSession } from "@/features/frame/session-context";
 import { isApiError } from "@/lib/api-client";
@@ -131,20 +132,33 @@ function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, 
     </Link>
   ) : null;
 
+  const blockingLine = blocking === 0 ? "No blocking issues" : `${blocking} blocking issue${blocking === 1 ? "" : "s"}`;
+
+  // Look sheet M3 / SCR-9: one footer bar under the page. Disclosure at the left; the blocking count and the actions at
+  // the right. A reason that only repeats the count line stays in the list (Submit's description) but is not shown twice.
   return (
     <footer
       aria-label="Lesson actions"
       data-testid="action-bar"
       data-client-state={stateOf(clientState)}
-      className="bg-panel border-hair sticky bottom-0 mt-6 flex flex-col gap-3 border-t py-3"
+      className="bg-panel border-hair shadow-e1 flex flex-col gap-3 rounded-xl border px-4 py-2.5"
     >
       {refusal ? <Banner level="blocking" title={refusal} /> : null}
       {withdrawError ? <Banner level="blocking" title={withdrawError} /> : null}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <p className="text-small text-ink2 max-w-md">{DISCLOSURE}</p>
-        <div className="flex flex-wrap items-center justify-end gap-3">
-          <div role="status" aria-live="polite" className="text-small text-ink2">
-            <p>{blocking === 0 ? "No blocking issues" : `${blocking} blocking issue${blocking === 1 ? "" : "s"}`}</p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <p className="text-small text-ink2 flex min-w-0 flex-1 basis-64 items-center gap-2">
+          <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+            <circle cx="12" cy="12" r="8.5" />
+            <path d="M12 7.5V12l3 2" />
+          </svg>
+          <span>{DISCLOSURE}</span>
+        </p>
+        <div className="flex flex-wrap items-center justify-end gap-2.5">
+          <div role="status" aria-live="polite" className="text-small">
+            <p className={blocking > 0 ? "text-danger inline-flex items-center gap-1.5 font-semibold" : "text-ink2"}>
+              {blocking > 0 ? <Glyph shape="octagon-bar" /> : null}
+              {blockingLine}
+            </p>
             {startedNote ? (
               <p data-testid="reviewer-note" className="text-small text-ink2">
                 {REVIEWER_NOTE}
@@ -152,11 +166,17 @@ function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, 
             ) : null}
           </div>
           {canEdit ? (
-            <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2">
+              <ul id={reasonsId} data-testid="submit-reasons" className="text-small text-ink2 text-right">
+                {reasons.map((r) => (
+                  <li key={r} className={r === blockingLine ? "sr-only" : undefined}>
+                    {r}
+                  </li>
+                ))}
+              </ul>
               <span onClick={() => reasons.length > 0 && focusFirst()}>
                 <Button
                   variant="primary"
-                  size="lg"
                   disabled={reasons.length > 0}
                   aria-describedby={reasonsId}
                   loading={submitting}
@@ -165,17 +185,12 @@ function Bar({ lesson, issues, clientState, onLessonChanged, onFocusFirstIssue, 
                   Submit for approval
                 </Button>
               </span>
-              <ul id={reasonsId} data-testid="submit-reasons" className="text-small text-ink2 text-right">
-                {reasons.map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
             </div>
           ) : null}
           {failed ? regen("primary") : null}
           {canEdit ? regen("secondary") : null}
           {frozen ? (
-            <Button variant="secondary" size="lg" loading={withdrawing} onClick={() => void withdraw()}>
+            <Button variant="secondary" loading={withdrawing} onClick={() => void withdraw()}>
               Withdraw
             </Button>
           ) : null}

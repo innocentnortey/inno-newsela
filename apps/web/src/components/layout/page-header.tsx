@@ -49,9 +49,9 @@ export function PageHeader({ eyebrow, title, meta, breadcrumb, actions }: PageHe
     <header className="mb-4 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         {breadcrumb && breadcrumb.length > 0 ? <Breadcrumb items={breadcrumb} /> : null}
-        {eyebrow ? <p className="text-ink3 text-xs uppercase">{eyebrow}</p> : null}
-        <h1 className="text-ink text-2xl font-semibold">{title}</h1>
-        {meta ? <div className="text-ink2 text-sm">{meta}</div> : null}
+        {eyebrow ? <p className="text-label text-ink3 mb-1 font-semibold">{eyebrow}</p> : null}
+        <h1 className="text-page text-ink font-semibold tracking-tight">{title}</h1>
+        {meta ? <div className="text-small text-ink2 mt-2">{meta}</div> : null}
       </div>
       {actions ? (
         <div data-slot="actions" className="flex items-center gap-2">

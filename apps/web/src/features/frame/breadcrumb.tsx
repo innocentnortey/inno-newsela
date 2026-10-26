@@ -39,8 +39,12 @@ export function BreadcrumbTrail() {
           const last = i === crumbs.length - 1;
           return (
             <li key={`${i}-${c.label}`} className={last ? "flex min-w-0 items-center gap-2" : "flex shrink-0 items-center gap-2"}>
-              {!last && c.href ? <Link href={c.href}>{c.label}</Link> : <span className={last ? "truncate" : undefined} aria-current={last ? "page" : undefined}>{c.label}</span>}
-              {!last ? <span aria-hidden="true">/</span> : null}
+              {!last && c.href ? <Link href={c.href} className="text-ink2 hover:text-ink font-medium">{c.label}</Link> : <span className={last ? "text-ink truncate font-semibold" : undefined} aria-current={last ? "page" : undefined}>{c.label}</span>}
+              {!last ? (
+                <svg aria-hidden="true" focusable="false" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="text-edge shrink-0">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
+              ) : null}
             </li>
           );
         })}

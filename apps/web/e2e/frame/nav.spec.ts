@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { SESSIONS } from "../../src/test-utils/fixtures";
+import { COLLAB_COOKIE, SESSIONS } from "../../src/test-utils/fixtures";
+import { mockOperation } from "../../src/test-utils/mock-operation";
 import { respondWithError } from "../../src/test-utils/respond-with-error";
 import { apiGlob, signInAs } from "../../src/test-utils/sign-in-as";
 
@@ -14,13 +15,27 @@ for (const role of ["author", "reviewer", "approver"] as const) {
     if (role === "author") await expect(guidance).toBeVisible();
     else await expect(guidance).toHaveCount(0);
     await expect(nav).toBeVisible();
-    await expect(page.getByText(SESSIONS[role].user.name)).toBeVisible();
+    // design.md §4: the top bar shows the account as an avatar; the name is its accessible name and sits in its menu.
+    await expect(page.getByRole("button", { name: `Account: ${SESSIONS[role].user.name}` })).toBeVisible();
     await expect(page.getByText(role[0]!.toUpperCase() + role.slice(1), { exact: true })).toBeVisible();
   });
 }
 
 test("nav skip link focuses the main region, and sign out returns to sign-in", async ({ page }) => {
   await signInAs(page, "reviewer");
+  // Without these, Prism answers GET /units and the run's progress with 401 (no cookie), the frame redirects to sign-in and back in a loop, and
+  // the account menu is torn down mid-click (2026-10-26). Same API-origin stub as e2e/units-home.
+  await page.route(
+    (url) => url.port === "4010" && url.pathname === "/units",
+    async (route) => {
+      if (route.request().method() !== "GET") return route.fallback();
+      const response = await route.fetch({
+        headers: { ...route.request().headers(), cookie: `${COLLAB_COOKIE.name}=${COLLAB_COOKIE.value}`, prefer: "example=oneUnit" },
+      });
+      await route.fulfill({ response, headers: { ...response.headers(), "access-control-allow-origin": "*" } });
+    },
+  );
+  await mockOperation(page, "getRunProgress", { example: "lesson4Ready" });
   await page.goto("/units");
   await expect(page.getByRole("heading", { name: "Units" })).toBeVisible();
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -34,6 +49,8 @@ test("nav skip link focuses the main region, and sign out returns to sign-in", a
     if (m === "DELETE") return route.fulfill({ status: 204, headers: { "access-control-allow-origin": "*" } });
     return route.fallback();
   });
+  // Sign out lives in the account menu (design.md §4 top bar).
+  await page.getByRole("button", { name: /^Account:/ }).click();
   await page.getByRole("button", { name: "Sign out" }).click();
   // after sign out the session is gone
   await page.unroute(apiGlob("/session"));

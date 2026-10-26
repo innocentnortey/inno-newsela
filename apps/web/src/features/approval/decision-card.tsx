@@ -82,10 +82,11 @@ export function DecisionCard(p: DecisionCardProps) {
         {ratingMissing ? (
           <p id="rating-error" className="text-small text-danger">{COPY.ratingError}</p>
         ) : null}
-        <div className="flex flex-col items-start gap-2">
+        <div className="flex flex-col items-stretch gap-2">
           <Button
             variant="primary"
             size="lg"
+            className="w-full"
             disabled={p.disabledReason !== null || p.stale}
             disabledReason={p.disabledReason ?? undefined}
             loading={action.submitting}
@@ -93,7 +94,7 @@ export function DecisionCard(p: DecisionCardProps) {
           >
             {COPY.approve}
           </Button>
-          <Button variant="secondary" size="lg" disabled={p.stale} onClick={p.onRequestChanges}>
+          <Button variant="secondary" size="lg" className="w-full" disabled={p.stale} onClick={p.onRequestChanges}>
             {COPY.requestChanges}
           </Button>
         </div>

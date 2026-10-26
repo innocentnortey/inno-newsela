@@ -8,8 +8,8 @@ import { StatusPill } from "@/components/ui/status-pill";
 import { Stepper } from "@/components/ui/stepper";
 import { Toast, ToastRegion } from "@/components/ui/toast";
 import { PageHeader } from "@/components/layout/page-header";
-import { PageSheet } from "@/components/layout/page-sheet";
 import { TwoPane } from "@/components/layout/two-pane";
+import { useSetBreadcrumb } from "@/features/frame/breadcrumb";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { useSession } from "@/features/frame/session-context";
 import { SendBackDialog } from "@/features/send-back/send-back-dialog";
@@ -68,6 +68,7 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
 }) {
   const { role, user } = useSession();
   const announce = useAnnounce();
+  useSetBreadcrumb([{ label: unitLabel(lesson.unit_id), href: board }, { label: "Approvals", href: board }, { label: `Lesson ${n}` }]);
   const [toast, setToast] = useState(false);
   const [dialog, setDialog] = useState<null | "request_changes" | "reopen">(null);
   const onApproved = useCallback(() => {
@@ -119,51 +120,56 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
     </>
   );
 
+  const header = (
+    <>
+      <PageHeader eyebrow={COPY.eyebrow} title={lesson.title} meta={meta} />
+      <div className="flex flex-col gap-3 empty:hidden">
+        {!action.result ? waitingOnThis(lesson).map((d) => (
+          <Banner key={d.lessonId} level="info" title={COPY.waitingOnYou(lessonNumberLabel(d.lessonId))} />
+        )) : null}
+        {stale ? (
+          <Banner
+            level="blocking"
+            title={COPY.stale}
+            action={<Button ref={reloadRef} variant="secondary" onClick={() => void reloadAndClear()}>{COPY.reload}</Button>}
+          />
+        ) : null}
+        {view?.kind === "blocked" ? <Banner level="blocking" title={COPY.blocked(view.message)} /> : null}
+        {action.result ? (
+          <Banner level="success" title={COPY.approvedBanner(action.result.name, action.result.short, action.result.ratingLabel)}>
+            {action.result.thanks.map((id) => (
+              <p key={id}>
+                {COPY.nowApprovable(lessonNumberLabel(id))}{" "}
+                <Link href={lessonHref(id)}>{COPY.openLesson(lessonNumberLabel(id))}</Link>
+              </p>
+            ))}
+          </Banner>
+        ) : null}
+      </div>
+    </>
+  );
+  // Look sheet M4 (SCR-14): the stepper above; one page sheet holding the header, banners, checklist and the frozen
+  // text; the decision card in the rail beside it.
+  const sheet = "bg-panel border-hair shadow-e2 flex min-w-0 flex-col gap-4 rounded-xl border px-7 py-6 max-sm:px-4";
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader
-        eyebrow={COPY.eyebrow}
-        title={lesson.title}
-        meta={meta}
-        breadcrumb={[
-          { label: unitLabel(lesson.unit_id), href: board },
-          { label: "Approvals", href: board },
-          { label: `Lesson ${n}` },
-        ]}
-      />
-      <Stepper
-        current={stepperStep(effectiveState)}
-        offPath={lesson.state === "changes_requested" ? <StatusPill status="lesson.changes_requested" /> : undefined}
-      />
-      {!action.result ? waitingOnThis(lesson).map((d) => (
-        <Banner key={d.lessonId} level="info" title={COPY.waitingOnYou(lessonNumberLabel(d.lessonId))} />
-      )) : null}
-      {stale ? (
-        <Banner
-          level="blocking"
-          title={COPY.stale}
-          action={<Button ref={reloadRef} variant="secondary" onClick={() => void reloadAndClear()}>{COPY.reload}</Button>}
+      <div className="flex justify-center">
+        <Stepper
+          current={stepperStep(effectiveState)}
+          offPath={lesson.state === "changes_requested" ? <StatusPill status="lesson.changes_requested" /> : undefined}
         />
-      ) : null}
-      {view?.kind === "blocked" ? <Banner level="blocking" title={COPY.blocked(view.message)} /> : null}
-      {action.result ? (
-        <Banner level="success" title={COPY.approvedBanner(action.result.name, action.result.short, action.result.ratingLabel)}>
-          {action.result.thanks.map((id) => (
-            <p key={id}>
-              {COPY.nowApprovable(lessonNumberLabel(id))}{" "}
-              <Link href={lessonHref(id)}>{COPY.openLesson(lessonNumberLabel(id))}</Link>
-            </p>
-          ))}
-        </Banner>
-      ) : null}
+      </div>
       {shownMode === "not_submitted" ? (
-        <div className="text-body text-ink flex flex-col items-start gap-2">
-          <p>{COPY.notSubmitted(n, lesson.state, lesson.reviewer)}</p>
-          {lesson.state === "changes_requested" && lesson.send_back ? (
-            <p className="text-ink2">Changes requested by {lesson.send_back.by} · {SEND_BACK_TAG_LABEL[lesson.send_back.tag]}: {lesson.send_back.note}</p>
-          ) : null}
-          <Link href={`/units/${unitKey}/lessons/${lessonKey}`}>{COPY.openReadOnly(n)}</Link>
-        </div>
+        <section className={sheet}>
+          {header}
+          <div className="text-body text-ink flex flex-col items-start gap-2">
+            <p>{COPY.notSubmitted(n, lesson.state, lesson.reviewer)}</p>
+            {lesson.state === "changes_requested" && lesson.send_back ? (
+              <p className="text-ink2">Changes requested by {lesson.send_back.by} · {SEND_BACK_TAG_LABEL[lesson.send_back.tag]}: {lesson.send_back.note}</p>
+            ) : null}
+            <Link href={`/units/${unitKey}/lessons/${lessonKey}`}>{COPY.openReadOnly(n)}</Link>
+          </div>
+        </section>
       ) : (
         <TwoPane
           rail={
@@ -180,10 +186,13 @@ function Ready({ unitKey, lessonKey, n, board, client, data, lesson }: {
             />
           }
         >
-          <Checklist rows={rows} />
-          <hr className="border-hair my-4" />
-          <h2 className="text-ink mb-2 text-sm font-semibold">{COPY.textHeading(short)}</h2>
-          <PageSheet>{data.issuesSettled ? <FrozenText sections={lesson.sections} /> : <TextSkeleton />}</PageSheet>
+          <section className={sheet}>
+            {header}
+            <Checklist rows={rows} />
+            <hr className="border-hair" />
+            <h2 className="text-ink text-sm font-semibold">{COPY.textHeading(short)}</h2>
+            <div className="max-w-[68ch]">{data.issuesSettled ? <FrozenText sections={lesson.sections} /> : <TextSkeleton />}</div>
+          </section>
         </TwoPane>
       )}
       {toast ? (

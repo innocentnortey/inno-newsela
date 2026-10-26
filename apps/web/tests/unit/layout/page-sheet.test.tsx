@@ -18,6 +18,13 @@ describe("PageSheet", () => {
     expect(screen.getByText("Tools")).toBeInTheDocument();
   });
 
+  it("full measure drops the 68ch column for report and table pages", () => {
+    const { container } = render(<PageSheet measure="full">x</PageSheet>);
+    const col = container.querySelector('[data-slot="reading-column"]') as HTMLElement;
+    expect(col.className).not.toContain("max-w-[68ch]");
+    expect(col.dataset.measure).toBe("full");
+  });
+
   it("omits the toolbar when absent", () => {
     const { container } = render(<PageSheet>x</PageSheet>);
     expect(container.querySelector('[data-slot="toolbar"]')).toBeNull();

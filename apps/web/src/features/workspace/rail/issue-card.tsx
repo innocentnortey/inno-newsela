@@ -33,8 +33,16 @@ export function IssueCard({ issue, number, sectionLabel, selected, stale, onGo, 
     .filter(Boolean)
     .join(" ");
   const name = `Go to issue ${number}: ${kindLabel(issue.kind)}${sectionLabel ? ` in ${sectionLabel}` : ""}. ${visible}`;
+  // Look sheet M3: one compact card per issue, tag + title + number on the first line, the address chip, then any
+  // actions inside the same card (they stay outside the "go to issue" button, which is the card's main control).
   return (
-    <li className="flex flex-col gap-2" data-issue-id={issue.issue_id}>
+    <li
+      data-issue-id={issue.issue_id}
+      className={cn(
+        "border-hair flex flex-col gap-2 rounded-lg border px-2.5 py-2",
+        selected ? "bg-selected border-primary/40" : "bg-panel",
+      )}
+    >
       <button
         type="button"
         data-issue-card
@@ -42,20 +50,20 @@ export function IssueCard({ issue, number, sectionLabel, selected, stale, onGo, 
         aria-label={name}
         aria-current={selected ? "true" : undefined}
         onClick={() => onGo(issue)}
-        className={cn(
-          "border-hair flex w-full flex-col items-start gap-1 rounded-lg border p-3 text-left",
-          selected ? "bg-selected" : "bg-panel",
-          stale && "text-ink2",
-        )}
+        className={cn("flex w-full flex-col items-start gap-1 rounded-md text-left", stale && "text-ink2")}
       >
-        <span className="flex flex-wrap items-center gap-2">
+        <span className="flex w-full items-start gap-2">
           <StatusPill status={issueStatusKey(issue)} />
-          <span className="text-label">{kindSentence(issue.kind)}</span>
-          {issue.address ? <CodeChip>{issue.address}</CodeChip> : null}
+          <span className="text-small flex-1 pt-px font-semibold">{kindSentence(issue.kind)}</span>
+          {/* The number is already the start of the accessible name ("Go to issue N"). */}
+          <small aria-hidden="true" className="text-label text-ink3 tabular-nums pt-0.5">
+            {number}
+          </small>
         </span>
-        <span className="text-small">{issue.message}</span>
+        {issue.address ? <CodeChip>{issue.address}</CodeChip> : null}
+        <span className="text-small text-ink2">{issue.message}</span>
       </button>
-      {actions}
+      {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </li>
   );
 }

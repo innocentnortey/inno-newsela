@@ -1,0 +1,68 @@
+{
+  "lookSheet": "docs/artifacts/2026-10-25-d1-clear-ledger-look-sheet.html",
+  "mockupSelector": ".fr",
+  "viewport": 1440,
+  "colorScheme": "light",
+  "pairs": [
+    {
+      "id": "M1",
+      "title": "SCR-4 Validation report",
+      "mockup": 0,
+      "shot": "apps/web/e2e/__screenshots__/validation-report/validation-report-main-1280-light.png",
+      "checks": [
+        "The left nav is a narrow (about 60 px) icon rail with the blue product mark, not a text sidebar",
+        "The top bar holds the breadcrumb (chevron separators, current page bold) and the account at the right",
+        "Rendered in the light theme (cool grey desk, white sheets), design.md's default",
+        "Two columns: the report sheet on the left and a narrow summary rail on the right",
+        "Errors are numbered rows, each with its Confirm and Edit actions at the right of the row",
+        "Generate sits in the rail and is locked while errors remain"
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "SCR-8 Unit board",
+      "mockup": 1,
+      "shot": "apps/web/e2e/__screenshots__/board/board-main-1280-light.png",
+      "checks": [
+        "The left nav is a narrow (about 60 px) icon rail with the blue product mark, not a text sidebar",
+        "The top bar holds the breadcrumb (chevron separators, current page bold) and the account at the right",
+        "Rendered in the light theme (cool grey desk, white sheets), design.md's default",
+        "Page header: the eyebrow 'Unit board', the unit title and the lesson count",
+        "Top row: the roll-up sheet (five state cells over a track bar) beside a narrower north-star tile",
+        "Queue sheet: a segmented state filter at the left, 'Sorted by blocking issues' at the right, the table below"
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "SCR-9 Lesson workspace",
+      "mockup": 2,
+      "shot": "docs/ux/05-verify/look-compare/shots/M3-reviewer-1280-light.png",
+      "checks": [
+        "The left nav is a narrow (about 60 px) icon rail with the blue product mark, not a text sidebar",
+        "The top bar holds the breadcrumb and the page status (presence or save state), with the account at the right",
+        "Rendered in the light theme (cool grey desk, white sheets), design.md's default",
+        "The stepper is centred above the page, all five steps on one line",
+        "Three columns: the section outline (about 160 px), the page sheet, the evidence rail (about 360 px)",
+        "The formatting toolbar is one compact strip across the top of the page sheet",
+        "The lesson reads as one document: section label rows over hairlines, no boxed text fields",
+        "Issue cards are compact, and each card's actions sit inside the card",
+        "One footer bar under the outline and the page: disclosure at the left, the blocking count once and Submit at the right"
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "SCR-14 Approval review",
+      "mockup": 3,
+      "shot": "apps/web/e2e/__screenshots__/approval/approval-main-1280-light.png",
+      "checks": [
+        "The left nav is a narrow (about 60 px) icon rail with the blue product mark, not a text sidebar",
+        "The top bar holds the breadcrumb (Unit 4 › Approvals › Lesson 5) and the account at the right",
+        "Rendered in the light theme (cool grey desk, white sheets), design.md's default",
+        "The stepper is centred above, step 3 (Submitted) current",
+        "One page sheet holds the eyebrow, title, meta line, the info banner and the checklist",
+        "Checklist rows are divided by hairlines, each led by a green check glyph",
+        "The decision card is in the right rail: four-eyes banner, three quality radio cards, full-width Approve and Request changes"
+      ]
+    }
+  ]
+}

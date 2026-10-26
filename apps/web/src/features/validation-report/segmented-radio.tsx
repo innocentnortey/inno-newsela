@@ -18,7 +18,7 @@ export function SegmentedRadio({ legend, value, options, onChange }: SegmentedRa
         {options.map((o) => (
           <label
             key={o.value}
-            className="text-small text-ink has-[:checked]:bg-selected has-[:checked]:border-primary has-[:focus-visible]:outline-primary flex min-h-7 cursor-pointer items-center rounded-sm border border-transparent px-2 has-[:checked]:font-semibold has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1"
+            className="text-label text-ink has-[:checked]:bg-selected whitespace-nowrap has-[:checked]:border-primary has-[:focus-visible]:outline-primary flex min-h-7 cursor-pointer items-center rounded-sm border border-transparent px-1.5 has-[:checked]:font-semibold has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1"
           >
             <input
               type="radio"

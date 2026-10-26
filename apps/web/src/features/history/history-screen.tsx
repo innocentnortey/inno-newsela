@@ -3,6 +3,7 @@ import { placeLabel } from "@/features/workspace/state-model";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { SideRail, TwoPane } from "@/components/layout/two-pane";
+import { useSetBreadcrumb } from "@/features/frame/breadcrumb";
 import { CantLoad, NotFound } from "@/features/frame/conventions";
 import { api } from "@/lib/api-client";
 import { AuditLog } from "./audit-log";
@@ -37,6 +38,11 @@ export function HistoryScreen({
   const router = useRouter();
   const n = lessonNumber(lessonId);
   const board = `/units/${unitKey}/board`;
+  useSetBreadcrumb([
+    { label: unitLabelFromKey(unitKey), href: board },
+    { label: `Lesson ${n}`, href: `/units/${unitKey}/lessons/${lessonKey}` },
+    { label: "History" },
+  ]);
 
   if (data.status === "error") {
     return data.error?.code === "NOT_FOUND" ? (
@@ -61,14 +67,6 @@ export function HistoryScreen({
       <PageHeader
         eyebrow={COPY.eyebrow}
         title={COPY.title(n)}
-        breadcrumb={[
-          { label: unitLabelFromKey(unitKey), href: board },
-          {
-            label: `Lesson ${n}`,
-            href: `/units/${unitKey}/lessons/${lessonKey}`,
-          },
-          { label: "History" },
-        ]}
       />
       <TwoPane
         rail={

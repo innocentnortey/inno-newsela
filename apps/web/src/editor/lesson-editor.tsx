@@ -3,11 +3,13 @@
 // React state holds section addresses and names, never text.
 import type { EditorView } from "prosemirror-view";
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, useSyncExternalStore, type Ref } from "react";
+import { createPortal } from "react-dom";
 import type * as Y from "yjs";
 import { useAnnounce } from "@/lib/announce";
 import type { components } from "@/lib/api-types";
 import { can, type Role } from "@/lib/roles";
 import { DisconnectedBanner, RefusedNotice, SignedOutNotice, refused_reason_phrase } from "@/features/workspace/live/notices";
+import { InTopBar } from "@/features/frame/top-bar-slot";
 import { PresenceSentence } from "@/features/workspace/live/presence-sentence";
 import { save_state_text } from "@/features/workspace/live/save-state";
 import type { EditorClientState, StoredAck } from "./client-state";
@@ -37,6 +39,9 @@ export interface LessonEditorProps {
   /** Who is typing and in which role. Without it the editor shows "Reviewer" and skips the role check. */
   viewer?: { user_id: string; name: string; role: Role };
   onPresence?: (entries: PresenceEntry[]) => void;
+  /** SCR-9 (look sheet M3): the page sheet's toolbar strip. `undefined`: render above the text; `null`: the strip is
+   * not mounted yet, render nothing. */
+  toolbarHost?: HTMLElement | null;
   ref?: Ref<LessonEditorHandle>;
 }
 
@@ -61,7 +66,7 @@ function read_sections(doc: Y.Doc): SectionInfo[] {
 }
 
 export function LessonEditor(props: LessonEditorProps) {
-  const { lessonId, lesson, readOnly, viewer, onClientState, onPresence, ref } = props;
+  const { lessonId, lesson, readOnly, viewer, onClientState, onPresence, toolbarHost, ref } = props;
   const announce = useAnnounce();
   const [session, setSession] = useState<CollabSession | null>(null);
   const identity = useRef({ viewer, readOnly });
@@ -232,26 +237,39 @@ export function LessonEditor(props: LessonEditorProps) {
     else report_cb.current({ state, state_vector: snap.state_vector, stored: snap.stored });
   }, [state, snap.state_vector, snap.stored, snap.signed_out]);
 
+  // Callers may pass a partial lesson (the editor harness has no sections); minutes are then simply not shown.
+  const minutes_of = (address: string): number | null => (lesson.sections ?? []).find((x) => x.address === address)?.minutes ?? null;
   const lesson_label = lesson.number !== null && lesson.number !== undefined ? `Lesson ${lesson.number}` : (lesson.title ?? "Lesson");
   const sign_in_href = () =>
     `/sign-in?next=${encodeURIComponent(typeof window === "undefined" ? "/" : window.location.pathname + window.location.search)}`;
 
   return (
     <div ref={root_ref} data-testid="lesson-editor" data-lesson-id={lessonId} data-client-state={state} className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <PresenceSentence entries={entries} />
-        <span data-testid="save-state" data-state={state} data-stored-at={stored_at ?? ""} className="text-small text-ink2">
-          {text}
-        </span>
-      </div>
+      {/* Presence and the save state belong in the top bar (SCR-9); outside the app frame they render here. */}
+      <InTopBar>
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0 truncate max-sm:hidden">
+            <PresenceSentence entries={entries} />
+          </div>
+          <span data-testid="save-state" data-state={state} data-stored-at={stored_at ?? ""} className="text-small text-ink2">
+            {text}
+          </span>
+        </div>
+      </InTopBar>
       {state === "DISCONNECTED" && !snap.signed_out ? <DisconnectedBanner /> : null}
       {snap.refusal ? (
         <RefusedNotice lesson_label={lesson_label} reason_phrase={refused_reason_phrase(snap.mode_state)} removed_text={snap.refusal.text} />
       ) : null}
       {snap.signed_out ? <SignedOutNotice signInHref={sign_in_href()} /> : null}
-      {!snap.signed_out && !read_only && active ? <Toolbar view={active} tick={tick} /> : null}
+      {!snap.signed_out && !read_only && active
+        ? toolbarHost
+          ? createPortal(<Toolbar view={active} tick={tick} />, toolbarHost)
+          : toolbarHost === undefined
+            ? <Toolbar view={active} tick={tick} />
+            : null
+        : null}
       {!snap.signed_out ? (
-        <div role="group" aria-label={`${lesson_label} text`} className="flex flex-col gap-4">
+        <div role="group" aria-label={`${lesson_label} text`} className="flex flex-col">
           {sections.length === 0 && state === "connecting" ? (
             <p className="text-small text-ink2" aria-busy="true">
               Opening the lesson…
@@ -259,8 +277,12 @@ export function LessonEditor(props: LessonEditorProps) {
           ) : null}
           {doc
             ? sections.map((s) => (
-                <div key={`${doc.guid}:${s.address}`} id={`sec-${s.address}`} data-address={s.address} className="flex flex-col gap-1">
-                  <h3 className="text-label text-ink2">{s.name}</h3>
+                <div key={`${doc.guid}:${s.address}`} id={`sec-${s.address}`} data-address={s.address} className="mt-6 flex flex-col first:mt-0">
+                  {/* Look sheet M3: one flowing document; each section opens with a label row (name · minutes) over a hairline. */}
+                  <h3 className="text-label text-ink3 border-hair mb-2 flex justify-between gap-3 border-b pb-1.5 font-semibold">
+                    <span>{s.name}</span>
+                    {minutes_of(s.address) ? <span className="tabular-nums whitespace-nowrap">{`${minutes_of(s.address)} min`}</span> : null}
+                  </h3>
                   <SectionEditor
                     address={s.address}
                     label={`${lesson_label} text · ${s.name}`}

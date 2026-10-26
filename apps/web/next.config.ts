@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The dev-only "N" indicator floats over the nav rail's bottom item (the settings gear) and swallows clicks in e2e.
+  devIndicators: false,
   transpilePackages: ["@ls/config", "@ls/obs", "@ls/db"],
   serverExternalPackages: ["pg"],
   output: "standalone",

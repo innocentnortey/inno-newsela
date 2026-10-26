@@ -108,7 +108,7 @@ export function RegenerateButton({ lesson, unitKey, lessonKey, variant = "second
 
   return (
     <>
-      <Button variant={variant} size="lg" onClick={() => setOpen(true)}>
+      <Button variant={variant} onClick={() => setOpen(true)}>
         Regenerate…
       </Button>
       <DialogShell

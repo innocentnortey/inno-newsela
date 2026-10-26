@@ -1,9 +1,8 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PageSheet, TwoPane } from "@/components/layout";
+import { PageSheet } from "@/components/layout";
 import { StatusPill } from "@/components/ui/status-pill";
-import { STATUS_SPECS } from "@/components/ui/status";
 import { Stepper } from "@/components/ui/stepper";
 import type { PresenceEntry } from "@/editor/presence";
 import { LessonEditor, type EditorClientState, type LessonEditorHandle } from "@/editor/lesson-editor";
@@ -83,6 +82,7 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
     setAssistOpen(true);
   }, []);
   const [clientState, setClientState] = useState<EditorClientState>("connecting");
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
   const shownClientState: EditorClientState = readOnly ? "read_only" : clientState;
 
   const writeUrl = useCallback((patch: { tab?: RailTab; issue?: string | null }) => {
@@ -155,52 +155,71 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
 
   const off = offPathStatus(lesson.state);
   const canAssist = assistEnabled() && !readOnly;
+  const rail =
+    assistOpen && canAssist ? (
+      <AssistHost
+        lessonId={lesson.lesson_id}
+        selection={assistSelection}
+        onClose={() => setAssistOpen(false)}
+        onPendingChange={setAssistPending}
+        onLessonChanged={reread}
+      />
+    ) : (
+      <EvidenceRail
+        lesson={lesson}
+        issues={issues}
+        issuesFailed={issuesPoll.error !== undefined && !issues}
+        onRetryIssues={issuesPoll.retry}
+        tab={tab}
+        onTab={(t) => {
+          setTab(t);
+          writeUrl({ tab: t });
+        }}
+        selectedIssueId={selectedId}
+        onGo={(issue) => {
+          setSelectedId(issue.issue_id);
+          goToIssue(issue);
+        }}
+        selectedCode={selectedCode}
+        onSelectCode={setSelectedCode}
+        renderIssueActions={issues ? (issue) => <IssueActions issue={issue} lesson={lesson} issues={issues} onChanged={reread} /> : undefined}
+        renderStandardActions={(s) => (
+          <StandardDecisionButtons lessonId={lesson.lesson_id} code={s.code} origin={s.origin} confirmation={s.confirmation ?? null} onChanged={reread} />
+        )}
+      />
+    );
+  // Look sheet M3 (SCR-9): the stepper centred above; outline · page sheet · evidence rail; the footer action bar under
+  // the outline and the page, with the rail running beside both. Below xl the outline sits above the page; on phones
+  // everything stacks and the rail comes last.
+  const outline = <OutlineColumn sections={lesson.sections} issues={issues?.issues ?? []} textRootRef={textRef} />;
   return (
-    <TwoPane
-      rail={
-        assistOpen && canAssist ? (
-          <AssistHost
-            lessonId={lesson.lesson_id}
-            selection={assistSelection}
-            onClose={() => setAssistOpen(false)}
-            onPendingChange={setAssistPending}
-            onLessonChanged={reread}
-          />
-        ) : (
-        <EvidenceRail
-          lesson={lesson}
-          issues={issues}
-          issuesFailed={issuesPoll.error !== undefined && !issues}
-          onRetryIssues={issuesPoll.retry}
-          tab={tab}
-          onTab={(t) => {
-            setTab(t);
-            writeUrl({ tab: t });
-          }}
-          selectedIssueId={selectedId}
-          onGo={(issue) => {
-            setSelectedId(issue.issue_id);
-            goToIssue(issue);
-          }}
-          selectedCode={selectedCode}
-          onSelectCode={setSelectedCode}
-          renderIssueActions={issues ? (issue) => <IssueActions issue={issue} lesson={lesson} issues={issues} onChanged={reread} /> : undefined}
-          renderStandardActions={(s) => (
-            <StandardDecisionButtons lessonId={lesson.lesson_id} code={s.code} origin={s.origin} confirmation={s.confirmation ?? null} onChanged={reread} />
-          )}
-        />
-        )
-      }
+    <div
+      data-layout="workspace"
+      className="grid grid-cols-1 gap-x-[18px] gap-y-3 lg:grid-cols-[minmax(0,1fr)_var(--layout-rail)]"
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex justify-center lg:col-span-2">
         <Stepper current={stepFor(lesson.state)} offPath={off ? <StatusPill status={off} /> : undefined} />
-        <StateBanners lesson={lesson} role={role} issues={issues} />
-        <div className="grid gap-6 lg:grid-cols-[var(--layout-outline)_minmax(0,1fr)]">
-          <OutlineColumn sections={lesson.sections} issues={issues?.issues ?? []} textRootRef={textRef} />
-          <PageSheet>
+      </div>
+      {/* Outline, page and footer share one grid, so the sticky footer has the whole document to travel along
+          (a sticky item alone in its own grid row cannot move). */}
+      <div className="grid min-w-0 grid-cols-1 gap-x-[18px] gap-y-3 self-start xl:grid-cols-[var(--layout-outline)_minmax(0,1fr)]">
+        <div className="hidden min-w-0 xl:sticky xl:top-[calc(var(--layout-top-bar)+16px)] xl:block xl:self-start">{outline}</div>
+        {/* design.md: below xl the outline becomes a "Sections" menu above the page. */}
+        <details className="bg-panel border-hair rounded-lg border px-3 py-2 xl:hidden">
+          <summary className="text-small text-ink2 cursor-pointer font-semibold">{`Sections · ${totalMinutes(lesson.sections)} min`}</summary>
+          <div className="pt-2">{outline}</div>
+        </details>
+        <div className="min-w-0">
+          <PageSheet toolbar={readOnly ? undefined : <div ref={setToolbarHost} />}>
+            <StateBanners lesson={lesson} role={role} issues={issues} />
             <h1 className="text-page text-ink">{lesson.title}</h1>
-            <p className="text-small text-ink2 mb-4">
-              {`${lesson.type} · ${totalMinutes(lesson.sections)} min · ${STATUS_SPECS[`lesson.${lesson.state}`].label} · v${lesson.version_number}`}
+            <p className="text-small text-ink2 mt-2 mb-5 flex flex-wrap items-center gap-2">
+              <span>{lesson.type}</span>
+              <span aria-hidden="true" className="bg-edge size-[3px] rounded-full" />
+              <span>{`${totalMinutes(lesson.sections)} min`}</span>
+              <span aria-hidden="true" className="bg-edge size-[3px] rounded-full" />
+              <StatusPill status={`lesson.${lesson.state}`} />
+              <span className="bg-well text-ink2 font-code rounded-xs px-1.5 py-0.5 text-[11.5px] font-semibold">{`v${lesson.version_number}`}</span>
             </p>
             {readOnly ? (
               <LessonText ref={textRef} lesson={lesson} />
@@ -216,13 +235,22 @@ function WorkspaceBody({ unitKey, lessonKey }: { unitKey: string; lessonKey: str
                   viewer={{ user_id: user.user_id, name: user.name, role }}
                   onPresence={setPresence}
                   onClientState={(r) => setClientState(r.state)}
+                  toolbarHost={toolbarHost}
                 />
               </div>
             )}
-            {issues ? <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} onOpenAssist={canAssist ? openAssist : undefined} /> : null}
           </PageSheet>
         </div>
+        {issues ? (
+          <div className="sticky bottom-3 z-[var(--z-sticky)] min-w-0 xl:col-span-2">
+            <WorkspaceActionBar lesson={lesson} issues={issues} clientState={shownClientState} onLessonChanged={reread} onOpenAssist={canAssist ? openAssist : undefined} />
+          </div>
+        ) : null}
       </div>
-    </TwoPane>
+      {/* Inner padding keeps the cards' focus rings inside the scrolling rail. */}
+      <div className="min-w-0 lg:sticky lg:top-[calc(var(--layout-top-bar)+16px)] lg:max-h-[calc(100dvh-var(--layout-top-bar)-32px)] lg:self-start lg:overflow-y-auto lg:rounded-xl lg:p-0.5">
+        {rail}
+      </div>
+    </div>
   );
 }

@@ -1,10 +1,10 @@
 /* Tokens only: no colour literals (NL-63 AC-9). Presence colours come from the slot number, never from awareness. */
 .ls-editor {
-  min-height: 6rem;
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
-  border: 1px solid var(--color-hair);
-  border-radius: var(--radius-md, 8px);
-  background: var(--color-panel);
+  /* Look sheet M3: the lesson reads as one document on the page sheet, not a stack of input boxes. */
+  min-height: 1.6em;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--color-ink);
   font-size: var(--text-reading);
   line-height: 1.6;
@@ -14,10 +14,8 @@
 }
 .ls-editor:focus-visible {
   outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
-.ls-editor[aria-readonly="true"] {
-  background: var(--color-well);
+  outline-offset: 6px;
+  border-radius: var(--radius-xs, 4px);
 }
 .ls-editor p {
   margin: 0 0 0.5rem;
@@ -28,10 +26,16 @@
   padding-left: 1.5rem;
 }
 .ls-editor [data-role="teacher_talk"] {
-  background: var(--color-selected);
+  background: color-mix(in srgb, var(--color-selected) 55%, transparent);
+  border-radius: 3px;
 }
 .ls-editor [data-role="sample_response"] {
-  background: var(--color-warn-tint);
+  /* The look sheet's sample-response block: an inset well, not a highlighter. */
+  background: var(--color-well);
+  border-radius: 4px;
+  padding: 1px 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .ls-caret {

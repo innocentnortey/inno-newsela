@@ -17,8 +17,10 @@ test("session-round-trip: read, sign out, expire, sign in again lands on next", 
   expect(Object.keys(body.user).sort()).toEqual(["email", "name", "role", "synthetic", "user_id"]);
   expect(body.user).toEqual({ user_id: user.user_id, name: user.name, email: user.email, role: "reviewer", synthetic: true });
 
-  await expect(page.getByText(user.name, { exact: true })).toBeVisible();
-  await expect(page.getByText("Reviewer", { exact: true })).toBeVisible();
+  await expect(page.getByText("Reviewer", { exact: true }).first()).toBeVisible();
+  // The name and Sign out live in the account menu (design.md §4 top bar).
+  await page.getByRole("button", { name: `Account: ${user.name}` }).click();
+  await expect(page.getByRole("group", { name: "Account" }).getByText(user.name, { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/sign-in/);

@@ -111,7 +111,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       data-size={size}
       onClick={handleClick}
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 rounded-md px-(--space-4) select-none",
+        "relative inline-flex items-center justify-center gap-1.5 rounded-md px-(--space-4) select-none",
         SIZES[size],
         disabled ? "bg-disabled text-ink3 border-0 shadow-none" : VARIANTS[variant],
         inert && "cursor-not-allowed",
@@ -119,8 +119,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       )}
       {...rest}
     >
-      {disabled ? <Lock /> : <span className="inline-flex size-4 items-center justify-center">{loading && showSpinner ? <Spinner /> : null}</span>}
-      {children}
+      {/* No blank leading slot on idle buttons. While loading, the spinner is laid over the label (which fades but keeps
+          its place and its accessible name), so the button never changes width (insert-quote "stable Insert width"). */}
+      {disabled ? <Lock /> : null}
+      {loading && showSpinner ? (
+        <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center">
+          <Spinner />
+        </span>
+      ) : null}
+      <span className={cn("inline-flex items-center gap-1.5", loading && showSpinner && "opacity-0")}>{children}</span>
     </button>
   );
 

@@ -50,7 +50,7 @@ export function UnitPlanScreen({
       railWidth="rail-narrow"
       rail={<LinksRail links={data.lesson_links} unitKey={unitKey} />}
     >
-      <PageSheet>
+      <PageSheet measure="full">
         <h1 className="text-ink text-2xl font-semibold">
           {planHeading(unitKey)}
         </h1>

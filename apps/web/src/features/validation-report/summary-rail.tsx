@@ -32,11 +32,12 @@ export function SummaryRail({
   return (
     <div className="flex flex-col gap-4">
       <Card title="Summary">
-        <dl className="text-small grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
+        {/* Look sheet M1: a stat list, each figure large and right-aligned, rows split by hairlines. */}
+        <dl className="text-small flex flex-col">
           {rows.map(([k, v]) => (
-            <div key={k} className="contents">
+            <div key={k} className="border-hair flex items-center justify-between gap-4 border-t py-2 first:border-t-0">
               <dt className="text-ink2">{k}</dt>
-              <dd className="text-ink text-right tabular-nums">{v}</dd>
+              <dd className="text-ink text-title font-semibold tracking-tight tabular-nums">{v}</dd>
             </div>
           ))}
         </dl>

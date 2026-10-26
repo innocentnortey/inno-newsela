@@ -38,7 +38,7 @@ export function ReportView(p: ReportViewProps) {
       railWidth="rail-narrow"
       rail={<SummaryRail report={report} canEdit={p.canEdit} generating={p.generating} onGenerate={() => void p.actions.generate()} />}
     >
-      <PageSheet>
+      <PageSheet measure="full">
         <PageHeader
           eyebrow={`Outline v${n} · validation report`}
           title={p.unit.title}

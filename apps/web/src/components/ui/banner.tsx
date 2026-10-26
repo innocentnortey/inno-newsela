@@ -3,11 +3,53 @@ import { cn } from "@/lib/cn";
 
 export type BannerLevel = "blocking" | "advisory" | "info" | "success";
 
-const LEVELS: Record<BannerLevel, { word: string; fill: string; tile: string; icon: string }> = {
-  blocking: { word: "Blocking", fill: "bg-danger-tint", tile: "bg-danger text-on-danger", icon: "M4 1h4l3 3v4l-3 3H4L1 8V4zM3.5 6h5" },
-  advisory: { word: "Advisory", fill: "bg-warn-tint", tile: "bg-warn text-on-warn", icon: "M6 3v3.5M6 8.6v.1" },
-  info: { word: "Info", fill: "bg-selected", tile: "bg-primary text-on-primary", icon: "M6 5.4v3M6 3.5v.1" },
-  success: { word: "Success", fill: "bg-success-tint", tile: "bg-success text-on-success", icon: "m3.5 6.2 1.7 1.7 3.3-3.6" },
+// Look sheet banners: a 34 px icon tile whose shape differs by level (the non-colour cue), then the title and detail.
+// The level word stays in the text for screen readers.
+const LEVELS: Record<BannerLevel, { word: string; fill: string; tile: string; icon: ReactNode }> = {
+  blocking: {
+    word: "Blocking",
+    fill: "bg-danger-tint",
+    tile: "bg-danger text-on-danger",
+    icon: (
+      <>
+        <path d="M8.5 3.5h7l5 5v7l-5 5h-7l-5-5v-7z" />
+        <path d="M8 12h8" />
+      </>
+    ),
+  },
+  advisory: {
+    word: "Advisory",
+    fill: "bg-warn-tint",
+    tile: "bg-warn text-on-warn",
+    icon: (
+      <>
+        <path d="M12 4 3 19.5h18z" />
+        <path d="M12 10v4M12 16.8v.2" />
+      </>
+    ),
+  },
+  info: {
+    word: "Info",
+    fill: "bg-selected",
+    tile: "bg-primary text-on-primary",
+    icon: (
+      <>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 11v5M12 8v.2" />
+      </>
+    ),
+  },
+  success: {
+    word: "Success",
+    fill: "bg-success-tint",
+    tile: "bg-success text-on-success",
+    icon: (
+      <>
+        <path d="M12 3.5 19.5 6v5.5c0 4.5-3.2 7.8-7.5 9-4.3-1.2-7.5-4.5-7.5-9V6z" />
+        <path d="m8.8 12 2.3 2.3 4.2-4.6" />
+      </>
+    ),
+  },
 };
 
 export interface BannerProps {
@@ -22,19 +64,18 @@ export function Banner({ level, title, children, action }: BannerProps) {
   return (
     <div
       role={level === "blocking" ? "alert" : "status"}
-      className={cn("flex items-start gap-3 rounded-lg px-4 py-3", l.fill)}
+      className={cn("flex items-center gap-3 rounded-lg px-3.5 py-2.5", l.fill)}
     >
-      <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md", l.tile)}>
-        <svg aria-hidden="true" focusable="false" viewBox="0 0 12 12" className="size-4">
-          <path d={l.icon} fill="none" stroke="currentColor" strokeWidth="1.3" />
+      <span className={cn("flex size-[34px] shrink-0 items-center justify-center rounded-md", l.tile)}>
+        <svg aria-hidden="true" focusable="false" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {l.icon}
         </svg>
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-body text-ink font-semibold">
-          <span className="text-caps mr-2 uppercase">{l.word}</span>
-          {title}
+        <p className="text-small text-ink font-semibold">
+          <span className="sr-only">{l.word}</span> {title}
         </p>
-        {children ? <div className="text-small text-ink2">{children}</div> : null}
+        {children ? <div className="text-small text-ink2 mt-px">{children}</div> : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>

@@ -10,14 +10,16 @@ function focusSection(href: string) {
 export function Checklist({ rows }: { rows: Row[] }) {
   return (
     <section aria-labelledby="checklist-h">
-      <h2 id="checklist-h" className="text-ink text-sm font-semibold">
-        {COPY.checklistHeading}
-      </h2>
-      <p className="text-small text-ink2 mb-2">{COPY.checklistSub}</p>
-      <ul className="flex flex-col gap-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="checklist-h" className="text-ink text-sm font-semibold">
+          {COPY.checklistHeading}
+        </h2>
+        <p className="text-label text-ink3">{COPY.checklistSub}</p>
+      </div>
+      <ul className="mt-1 flex flex-col">
         {rows.map((r, i) => (
-          <li key={`${r.key}-${i}`} data-state={r.state} className="bg-panel border-hair flex items-start gap-3 rounded-lg border px-3 py-2">
-            <Glyph shape={r.state === "ok" ? "circle-check" : "octagon-bar"} className={`mt-1 shrink-0 ${r.state === "ok" ? "text-success" : "text-danger"}`} />
+          <li key={`${r.key}-${i}`} data-state={r.state} className="border-hair flex items-start gap-3 border-t py-3 first:border-t-0">
+            <Glyph shape={r.state === "ok" ? "circle-check" : "octagon-bar"} className={`mt-1 size-4 shrink-0 ${r.state === "ok" ? "text-success" : "text-danger"}`} />
             <div className="min-w-0 flex-1">
               <p className="text-body text-ink">
                 <span className={`text-label mr-2 ${r.state === "ok" ? "text-success" : "text-danger"}`}>{r.stateWord}</span>

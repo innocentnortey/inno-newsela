@@ -42,7 +42,16 @@ test("390 has no horizontal scroll and the rail sits under the content", async (
   expect(rail!.y).toBeGreaterThanOrEqual(content!.y + content!.height - 1);
 });
 
-test("system theme follows the OS and reduced motion zeroes transitions", async ({ page }) => {
+test("light is the default theme even when the OS is dark (design.md, Design tokens)", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await open(page, 1280, 900);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(244, 245, 247)");
+});
+
+test("'Match system' follows the OS and reduced motion zeroes transitions", async ({ page }) => {
+  // DQ-4: following the OS is a stored choice from the account menu, applied before first paint.
+  await page.addInitScript(() => window.localStorage.setItem("ls-theme", "system"));
   await page.emulateMedia({ colorScheme: "light" });
   await open(page, 1280, 900);
   const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
