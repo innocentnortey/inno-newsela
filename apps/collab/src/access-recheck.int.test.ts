@@ -176,8 +176,15 @@ describe("S-29 role recheck on open sockets [AC-1, AC-3]", () => {
       expect(a.closes.filter(session_ended)).toEqual([]); // limited, not closed
 
       // positive control: the other reviewer still writes
+      // b already received the "stored" broadcast for a's first edit, so wait for b's OWN edit
+      // to land: poll the row count up to the expected value (bounded), then assert it exactly.
       b.edit("STILL-A-REVIEWER");
-      await until(() => of_type(b, "stored").length > 0, 8000, "u-rev-2 edit stored");
+      const stored_end = Date.now() + 8000;
+      while ((await count("lesson_doc", "lesson_id", L)) < docs1 + 1) {
+        if (Date.now() > stored_end) throw new Error("timeout waiting for u-rev-2 edit stored");
+        await sleep(25);
+      }
+      await until(() => of_type(b, "stored").length > 1, 8000, "u-rev-2 own stored broadcast");
       expect(await count("lesson_doc", "lesson_id", L)).toBe(docs1 + 1);
       expect(of_type(b, "refused")).toEqual([]);
       expect(h.log.join("\n")).toContain("collab.role_downgraded");
