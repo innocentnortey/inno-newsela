@@ -153,6 +153,8 @@ export async function run_yjs_mix_detailed(opts: SpikeOptions, tuning: YjsTuning
 
   const type_once = (e: Editor) => {
     if (stop_typing || e.client === null) return;
+    // wait until every editor of the lesson has synced once: a token typed before a peer joined is not a clean latency sample
+    if ((by_lesson.get(e.lesson_id) ?? []).some((p) => !p.ever_synced)) return;
     const token = make_token(e.id, e.seq);
     if (!append_token(e.client.doc, token)) return;
     e.seq += 1;
