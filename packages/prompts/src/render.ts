@@ -8,6 +8,7 @@ import { data_block, sort_keys } from "./data-block.ts";
 import type {
   AssistPromptInput,
   DraftPromptInput,
+  GenerationPromptContext,
   JudgePromptInput,
   PromptBlock,
   PromptSectionTemplate,
@@ -16,12 +17,13 @@ import type {
   RepairPromptInput,
   UnitPlanPromptInput,
 } from "./inputs.ts";
+import { format_finding_line } from "./repair-findings.ts";
 import { schema_text, type SchemaRegistry } from "./schemas.ts";
 
 const INSTR_UNIT_PLAN =
   "Produce the unit plan JSON for the lesson rows in the data blocks above. Output JSON only.";
 const INSTR_REPAIR =
-  "Correct the draft in the data blocks, fixing only the listed findings and schema issues. Output the full corrected draft as JSON only.";
+  "Correct the draft in the data blocks, fixing only the listed findings and schema issues. The lesson data blocks above are the only source for names, pages, chapters and standards. Output the full corrected draft as JSON only.";
 const INSTR_ASSIST =
   "Rewrite the selected text following the note. Return suggested_text only.";
 const INSTR_JUDGE: Record<JudgePromptInput["question"], string> = {
@@ -153,25 +155,17 @@ export class PromptRenderer {
     return this.finish(i.prompt.prompt_version_id, hash, system, user);
   }
 
-  render_lesson_draft(i: DraftPromptInput): RenderedPrompt {
-    const hash = this.assert_locked(i.prompt.locked_hash);
-    if (i.example_set_id !== null)
-      throw new Error("example sets are not supported");
-    const { row, arc_header, neighbours, unit_rules, links } = i.context;
-    const system = [
-      this.locked_block("lesson-draft.md"),
-      this.guidance_block(i.prompt),
-      this.schema_block("LessonDraft"),
-    ];
+  private pinned_blocks(g: GenerationPromptContext, template: PromptSectionTemplate): PromptBlock[] {
+    const { row, arc_header, neighbours, unit_rules, links } = g.context;
     const user: PromptBlock[] = [
       context_block([`row: ${row.row_number}`]),
       data_block(
         { kind: "lesson_meta" },
         `lesson: ${row.lesson_id ?? ""}\nlesson type: ${row.lesson_type}`,
       ),
-      template_block(i.template),
+      template_block(template),
     ];
-    for (const s of i.standards)
+    for (const s of g.standards)
       user.push(data_block({ kind: "standard" }, `${s.code}: ${s.text}`));
     if (row.title !== "") user.push(data_block({ kind: "title" }, row.title));
     row.segments.forEach((s, idx) => {
@@ -224,7 +218,7 @@ export class PromptRenderer {
         ),
       );
     }
-    for (const e of i.plan_entries) {
+    for (const e of g.plan_entries) {
       user.push(
         data_block(
           { kind: "plan_entry", lesson: e.lesson_id },
@@ -232,7 +226,28 @@ export class PromptRenderer {
         ),
       );
     }
-    opt("reviewer_note", i.reviewer_note);
+    opt("reviewer_note", g.reviewer_note);
+    return user;
+  }
+
+  render_lesson_draft(i: DraftPromptInput): RenderedPrompt {
+    const hash = this.assert_locked(i.prompt.locked_hash);
+    if (i.example_set_id !== null)
+      throw new Error("example sets are not supported");
+    const system = [
+      this.locked_block("lesson-draft.md"),
+      this.guidance_block(i.prompt),
+      this.schema_block("LessonDraft"),
+    ];
+    const user = this.pinned_blocks(
+      {
+        context: i.context,
+        plan_entries: i.plan_entries,
+        standards: i.standards,
+        reviewer_note: i.reviewer_note,
+      },
+      i.template,
+    );
     user.push(
       instruction_block(
         "Write the lesson draft JSON for the lesson in the data blocks above using the template sections. Output JSON only.",
@@ -248,18 +263,15 @@ export class PromptRenderer {
       this.guidance_block(i.prompt),
       this.schema_block("LessonDraft"),
     ];
-    const user: PromptBlock[] = [
-      template_block(i.template),
-      data_block({ kind: "repair_draft" }, i.draft_raw),
-    ];
-    const findings = i.failing
-      .map(
-        (f) =>
-          `${f.kind}: ${f.message}` +
-          (f.address !== null ? ` @ ${f.address}` : ""),
-      )
-      .join("\n");
-    user.push(data_block({ kind: "repair_findings" }, findings));
+    const user: PromptBlock[] =
+      i.pinned !== undefined
+        ? this.pinned_blocks(i.pinned, i.template)
+        : [template_block(i.template)];
+    user.push(data_block({ kind: "repair_draft" }, i.draft_raw));
+    // Storage boundary: a finding's matched span is lesson text or a page/chapter reference that the draft already contains. It is written into this prompt, and every rendered prompt is stored raw in model_call.rendered_prompt (docs/design/observability.md, Content and redaction, R-48). It is never written to issue rows, logs, error messages or traces beyond that stored prompt.
+    user.push(
+      data_block({ kind: "repair_findings" }, i.failing.map(format_finding_line).join("\n")),
+    );
     if (i.schema_issues.length > 0)
       user.push(
         data_block(

@@ -15,6 +15,10 @@ export interface PromptFinding {
   kind: string;
   message: string;
   address: string | null;
+  /** the exact flagged name or page/chapter reference, when a check supplies one */
+  matched?: string;
+  /** the standard code, when the finding is about one */
+  code?: string;
 }
 export interface PromptSection {
   name: string;
@@ -60,12 +64,21 @@ export interface DraftPromptInput {
   example_set_id: string | null;
   reviewer_note: string | null;
 }
+/** The authoritative blocks a generation request is built from; a repair request is built from the same ones. */
+export interface GenerationPromptContext {
+  context: PromptRowContext;
+  plan_entries: readonly UnitPlanEntryDraft[];
+  standards: readonly PromptStandard[];
+  reviewer_note: string | null;
+}
 export interface RepairPromptInput {
   prompt: PromptVersionRow;
   draft_raw: string;
   failing: readonly PromptFinding[];
   schema_issues: readonly string[];
   template: PromptSectionTemplate;
+  /** Optional in the type only because the frozen fixture omits it; the production caller always passes it. Absent: no pinned blocks. */
+  pinned?: GenerationPromptContext;
 }
 export interface AssistPromptInput {
   prompt: PromptVersionRow;

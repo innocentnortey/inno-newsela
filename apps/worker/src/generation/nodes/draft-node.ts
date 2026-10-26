@@ -11,6 +11,7 @@ import type { PromptRenderer } from "@ls/prompts/render";
 import type { RenderedPrompt } from "@ls/prompts/inputs";
 import type { WorkerSettings } from "@ls/config/settings";
 import type { CheckpointPort, PaidCallerPort } from "./collaborators.ts";
+import { pinned_prompt_context } from "../generation-context.ts";
 import { brake_for, with_call, type JobContext, type JobState } from "./job-state.ts";
 
 type CallResult = { kind: "ok"; state: JobState; call: RecordedCall } | { kind: "stop"; state: JobState };
@@ -50,19 +51,10 @@ export class DraftNode {
     const template = template_for(row.lesson_type);
     if (template === undefined) throw new InvariantViolation("template_missing", { lesson_type: row.lesson_type });
 
-    const rendered = this.renderer.render_lesson_draft({
-      prompt,
-      context: row_context,
-      plan_entries,
-      standards,
-      template,
-      example_set_id: null,
-      reviewer_note: job.reviewer_note,
-    });
-
     const context: JobContext = {
       row_context,
       standards,
+      plan_entries,
       calls: [],
       draft_call: null,
       draft_max_output_tokens: this.settings.draft_output_token_cap,
@@ -70,6 +62,16 @@ export class DraftNode {
       raw_output: null,
       provider_error: null,
     };
+    const pinned_ctx = pinned_prompt_context(context, job.reviewer_note);
+    const rendered = this.renderer.render_lesson_draft({
+      prompt,
+      context: pinned_ctx.context,
+      plan_entries: pinned_ctx.plan_entries,
+      standards: pinned_ctx.standards,
+      template,
+      example_set_id: null,
+      reviewer_note: pinned_ctx.reviewer_note,
+    });
     let s: JobState = { ...state, context };
 
     const first = await this.call(s, rendered, "lesson_draft", this.settings.draft_output_token_cap, signal);

@@ -6,6 +6,7 @@ import type { PromptRenderer } from "@ls/prompts/render";
 import type { PromptFinding } from "@ls/prompts/inputs";
 import type { WorkerSettings } from "@ls/config/settings";
 import type { CheckpointPort, PaidCallerPort } from "./collaborators.ts";
+import { pinned_prompt_context } from "../generation-context.ts";
 import { brake_for, with_call, type JobState } from "./job-state.ts";
 
 export class RepairNode {
@@ -30,7 +31,13 @@ export class RepairNode {
         if (template === undefined) throw new InvariantViolation("template_missing");
         const failing: PromptFinding[] = (state.check_result?.findings ?? [])
           .filter((f) => f.level === "blocking")
-          .map((f) => ({ kind: f.kind, message: f.message, address: f.address }));
+          .map((f) => ({
+            kind: f.kind,
+            message: f.message,
+            address: f.address,
+            ...(f.matched !== undefined ? { matched: f.matched } : {}),
+            ...(f.code !== null ? { code: f.code } : {}),
+          }));
         if (state.compile_error !== null) failing.push({ kind: "compile_error", message: state.compile_error, address: null });
         const rendered = this.renderer.render_repair({
           prompt,
@@ -38,6 +45,7 @@ export class RepairNode {
           failing,
           schema_issues: state.schema_issues,
           template,
+          pinned: pinned_prompt_context(ctx, job.reviewer_note),
         });
         call = await this.paid.call({
           ctx: { run_id: job.run_id, lesson_id: job.lesson_id, job_id: job.job_id, attempt: 1, purpose: "repair", request_id: null, experiment_id: null, reservation_id: null },

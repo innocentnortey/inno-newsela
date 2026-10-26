@@ -7,11 +7,14 @@ import type { ClaimedJob, JobOutcome } from "@ls/core/ports/job-queue";
 import type { RecordedCall } from "@ls/core/ports/model-call-log";
 import type { RowContext } from "@ls/core/ports/outlines";
 import type { StandardRow } from "@ls/core/ports/standards";
+import type { UnitPlanEntryDraft } from "@ls/schema/unit-plan";
 import type { Actor, Usd } from "@ls/core/ports/common";
 
 export interface JobContext {
   readonly row_context: RowContext;
   readonly standards: readonly StandardRow[];
+  /** the unit-plan entries near this lesson that the draft prompt used; repair reuses them */
+  readonly plan_entries?: readonly UnitPlanEntryDraft[];
   /** every call of the job, in order (including checkpoint hits) */
   readonly calls: readonly RecordedCall[];
   /** the call whose output became the first full draft (draft, or the truncation retry) */
