@@ -197,9 +197,12 @@ test("keyboard opens the file picker", async ({ page }) => {
   const choose = page.getByRole("button", { name: "Choose file" });
   for (let i = 0; i < 12 && !(await choose.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press("Tab");
   await expect(choose).toBeFocused();
-  const chooser = page.waitForEvent("filechooser");
-  await page.keyboard.press("Enter");
-  await chooser;
+  // On a cold dev server the first Enter can land before React hydrates the button and does nothing; press again until it opens.
+  await expect(async () => {
+    const chooser = page.waitForEvent("filechooser", { timeout: 2000 });
+    await page.keyboard.press("Enter");
+    await chooser;
+  }).toPass({ timeout: 30_000 });
 });
 
 const STATES = ["file-main", "link-main", "error", "success", "same-hash", "forbidden"] as const;

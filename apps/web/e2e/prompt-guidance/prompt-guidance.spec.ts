@@ -201,14 +201,14 @@ test("errors: network failure keeps the text", async ({ page }) => {
 
 test("errors: can't load shows Retry", async ({ page }) => {
   await signInAs(page, "author");
+  // The frame's nav loads /units and the board too; unmocked they hit Prism's 401 and the app bounces to sign-in mid-test.
+  await serveBoard(page);
+  await serveUnits(page);
   await respondWithError(page, "listPromptVersions", "SERVICE_BUSY");
   await page.goto(PG_URL);
   await expect(page.getByText(/Couldn't load prompt guidance/)).toBeVisible();
-  await page.unrouteAll({ behavior: "ignoreErrors" });
-  await signInAs(page, "author");
+  // Later routes win, so re-serving on top of the error needs no unrouteAll (which leaves a gap with no /session answer).
   await servePromptVersions(page);
-  await serveBoard(page);
-  await serveUnits(page);
   await page.getByRole("button", { name: "Retry" }).click();
   await expect(h1(page)).toBeVisible();
   await expect(saveBtn(page)).toBeVisible();
@@ -341,6 +341,8 @@ type State = "main" | "stale" | "cantload" | "reviewer";
 async function arrange(page: Page, state: State) {
   await signInAs(page, state === "reviewer" ? "reviewer" : "author");
   if (state === "cantload") {
+    await serveBoard(page);
+    await serveUnits(page);
     await respondWithError(page, "listPromptVersions", "SERVICE_BUSY");
     await page.goto(PG_URL);
     await expect(page.getByText(/Couldn't load prompt guidance/)).toBeVisible();
@@ -375,12 +377,20 @@ for (const state of ["main", "stale", "cantload", "reviewer"] as const) {
           theme,
         );
         await page.evaluate(() => document.fonts.ready);
-        const results = await new AxeBuilder({ page: page as AxePage })
-          .withTags(TAGS)
-          .analyze();
-        const bad = results.violations.filter(
-          (v) => v.impact === "serious" || v.impact === "critical",
-        );
+        // Next 16 streams the <title> in after first paint and swaps it on a soft navigation, so axe's document-title rule can
+        // catch the gap. Re-run when that is the only complaint; any other violation fails on the first pass.
+        let bad: { id: string; impact?: string | null; nodes: { target: unknown }[] }[] = [];
+        for (let attempt = 0; attempt < 4; attempt++) {
+          await expect(page).toHaveTitle(/.+/);
+          const results = await new AxeBuilder({ page: page as AxePage })
+            .withTags(TAGS)
+            .analyze();
+          bad = results.violations.filter(
+            (v) => v.impact === "serious" || v.impact === "critical",
+          );
+          if (!(bad.length > 0 && bad.every((v) => v.id === "document-title"))) break;
+          await page.waitForTimeout(500);
+        }
         console.log(
           `axe ${state} ${w}x ${theme}: ${bad.length} serious/critical`,
         );

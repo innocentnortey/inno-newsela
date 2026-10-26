@@ -184,6 +184,7 @@ const STATES: { name: string; shot: boolean; run: (p: Page) => Promise<void> }[]
       await respondWithError(p, "fillSlot", "QUOTE_TOO_LONG", { word_count: 13 });
       await open(p);
       await text(p).fill(THIRTEEN_WORDS);
+      await bookField(p).fill("Synthetic Reader");
       await insert(p).click();
       await expect(p.getByText(/13 of 12 words: a short-quote/)).toBeVisible();
     },

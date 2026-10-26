@@ -144,8 +144,9 @@ test("states: makes no repeated requests", async ({ page }) => {
   await open(page);
   await expect(page.getByRole("link", { name: "Grade 6 · Unit 4" })).toBeVisible();
   const settled = { units, progress };
-  // Dev-mode React strict mode runs the load effect twice, so the count after load may be 2; polling would grow it.
-  expect(settled.units).toBeLessThanOrEqual(2);
+  // Dev-mode React strict mode runs each load effect twice, and two callers load /units (the page and the frame's nav-unit hook, GEN-5),
+  // so the count after load may be 4; polling would grow it.
+  expect(settled.units).toBeLessThanOrEqual(4);
   expect(settled.progress).toBeLessThanOrEqual(2);
   await page.waitForTimeout(4500);
   expect({ units, progress }).toEqual(settled);

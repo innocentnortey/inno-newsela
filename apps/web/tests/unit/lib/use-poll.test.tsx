@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { act, render, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { usePoll, type UsePollResult } from "@/lib/use-poll";
@@ -65,5 +65,28 @@ describe("usePoll", () => {
     const before = fetcher.mock.calls.length;
     await act(async () => { last.retry(); await vi.advanceTimersByTimeAsync(0); });
     expect(fetcher.mock.calls.length).toBe(before + 1);
+  });
+
+  it("still delivers data when the fetch itself turns polling off before it resolves", async () => {
+    // A fetcher that flips `enabled` to false (a terminal run state) and returns: the data must not be dropped.
+    function Toggling() {
+      const [enabled, set] = useState(true);
+      const result = usePoll(
+        async () => {
+          set(false);
+          await Promise.resolve();
+          await Promise.resolve();
+          return 7;
+        },
+        { enabled },
+      );
+      useEffect(() => {
+        last = result;
+      });
+      return null;
+    }
+    render(<Toggling />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+    expect(last.data).toBe(7);
   });
 });

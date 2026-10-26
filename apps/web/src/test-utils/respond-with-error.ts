@@ -15,6 +15,7 @@ export async function respondWithError(
   };
   await page.route(apiGlob(path.replace(/\{[^}]+\}/g, "*")), (route) => {
     if (route.request().method().toLowerCase() !== method) return route.fallback();
+    if (route.request().resourceType() === "document") return route.fallback();
     return route.fulfill({
       status: errorStatus(code),
       contentType: "application/json",

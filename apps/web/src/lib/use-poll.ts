@@ -26,6 +26,15 @@ export function usePoll<T>(fetcher: () => Promise<T>, opts: UsePollOptions = {})
     fetcherRef.current = fetcher;
   });
   const runNow = useRef<() => void>(() => {});
+  // True while the component is mounted. A fetch that finishes after `enabled` turned false (e.g. the fetcher just saw a terminal
+  // state) still delivers its data; only an unmount drops it. Without this the data that disabled polling could be thrown away.
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -40,14 +49,14 @@ export function usePoll<T>(fetcher: () => Promise<T>, opts: UsePollOptions = {})
       if (timer) clearTimeout(timer);
       try {
         const value = await fetcherRef.current();
-        if (!alive) return;
+        if (!mounted.current) return;
         lastSuccess = Date.now();
         setData(value);
         setDataAt(new Date());
         setError(undefined);
         setStale(false);
       } catch (e) {
-        if (!alive) return;
+        if (!mounted.current) return;
         setError(e);
         if (Date.now() - lastSuccess > staleAfterMs) setStale(true);
       } finally {
