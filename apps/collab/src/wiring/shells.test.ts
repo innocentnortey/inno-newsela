@@ -22,6 +22,10 @@ const FORBIDDEN = /from\s+"(@ls\/llm|@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
 // write the process.start ops_event, and (NL-83) the health files open their own one-connection pool for GET /healthz, so
 // these four files, by exact path, may import @ls/db. Nothing else may.
 const DB_EXEMPT = new Set(["collab/src/start-event.ts", "worker/src/start-event.ts", "collab/src/health.ts", "worker/src/health.ts"]);
+// Type-only imports are erased at compile time, so they pull no runtime module into the entry; the guard is about runtime imports.
+function runtime_text(t: string): string {
+  return t.replace(/^import type\b[^;]*;/gm, "");
+}
 function forbidden_for(root: string, f: string): RegExp {
   const rel = f.slice(root.length + 1);
   // Composition roots under wiring/ build the Pg repositories and the PaidCaller, so they may import @ls/db and @ls/llm; a driver or provider SDK stays forbidden everywhere.
@@ -29,6 +33,8 @@ function forbidden_for(root: string, f: string): RegExp {
   // NL-89: the worker's judge client factory is the one place outside wiring/ that builds the OpenRouter adapter from @ls/llm.
   // RT-1: the worker composition root builds the Pg database and the model client.
   if (rel === "worker/src/deps.ts") return /from\s+"(pg|@anthropic-ai\/sdk|openai)["/]/;
+  // NL-110: the default judge is the offline stub; it may import only the @ls/llm/stub test double, never the provider adapter.
+  if (rel === "worker/src/judge/stub-default-judge.ts") return /from\s+"(@ls\/llm(?!\/stub["])|@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
   if (rel === "worker/src/judge/judge-client-factory.ts") return /from\s+"(@ls\/db|pg|@anthropic-ai\/sdk|openai)["/]/;
   return DB_EXEMPT.has(rel) ? /from\s+"(@ls\/llm|pg|@anthropic-ai\/sdk|openai)["/]/ : FORBIDDEN;
 }
@@ -60,12 +66,12 @@ describe("collab shells", () => {
   it("neither entry imports forbidden modules", () => {
     const here = join(import.meta.dirname, "..", "..", "..");
     for (const f of sources(join(here, "collab", "src"))) {
-      const t = readFileSync(f, "utf8");
+      const t = runtime_text(readFileSync(f, "utf8"));
       expect(t, f).not.toMatch(forbidden_for(here, f));
       expect(t, f).not.toMatch(/apps\/worker|ANTHROPIC_API_KEY/);
     }
     for (const f of sources(join(here, "worker", "src"))) {
-      const t = readFileSync(f, "utf8");
+      const t = runtime_text(readFileSync(f, "utf8"));
       expect(t, f).not.toMatch(forbidden_for(here, f));
       expect(t, f).not.toMatch(/apps\/collab/);
     }
