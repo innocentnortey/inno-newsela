@@ -3,7 +3,7 @@
 import type { PMNode } from "@ls/schema/lesson";
 import type { CheckContext, SuggestionRow } from "@ls/core/checks/types";
 import { cfu_item, eld_block, h, make_ctx, reading_lesson, section } from "@ls/core/checks/test-helpers";
-import { lesson_with, rec, wp1_ctx } from "@ls/core/checks/rules/alignment/test-support";
+import { clean_reading_ctx, lesson_with, rec, wp1_ctx } from "@ls/core/checks/rules/alignment/test-support";
 import { ctx_with_link, l5 } from "@ls/core/checks/rules/links/test-support";
 import { ctx_with, flag, lesson_with_tip, note_segment } from "@ls/core/checks/rules/safety/test-support";
 import { build_ctx, build_planted, load_plants } from "@ls/core/checks/rules/grounding/fixtures/build";
@@ -77,7 +77,7 @@ export const RECIPES: Record<string, () => CheckContext> = {
     ctx_with_link(l5({ rights: "cleared", source_ref: "ref" }), { recorded_link_hashes: { lk1: "a".repeat(64) } }),
   vocabulary_word_missing: () => make_ctx(reading_lesson(), ["defiance"]),
   standard_confirmation: () => wp1_ctx({ lesson: lesson_with([rec("L.6.4.b", { origin: "narrowed" })]) }),
-  clean_reading: () => make_ctx(reading_lesson()),
+  clean_reading: () => clean_reading_ctx(),
   wp1: () => build_ctx("wp1"),
   wp2: () => build_ctx("wp2"),
   wp3: () => build_ctx("wp3"),
