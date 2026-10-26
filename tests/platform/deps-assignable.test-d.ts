@@ -10,6 +10,6 @@ import type { PgDatabase as WebPgDatabase } from "../../apps/web/src/server/deps
 expectTypeOf<PgDatabase>().toExtend<TxRunner>();
 expectTypeOf<WebPgDatabase>().toEqualTypeOf<PgDatabase>();
 expectTypeOf<WorkerDeps["db"]>().toEqualTypeOf<TxRunner>();
-expectTypeOf<CollabDeps["db"]>().toEqualTypeOf<TxRunner>();
+expectTypeOf<NonNullable<CollabDeps["db"]>>().toEqualTypeOf<TxRunner>(); // GEN-6: optional, collab builds its own pools
 expectTypeOf<PgDatabase>().toExtend<WorkerDeps["db"]>();
-expectTypeOf<PgDatabase>().toExtend<CollabDeps["db"]>();
+expectTypeOf<PgDatabase>().toExtend<NonNullable<CollabDeps["db"]>>();

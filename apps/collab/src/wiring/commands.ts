@@ -18,6 +18,8 @@ import type { CollabServerWiring, HocuspocusServerRef } from "./server.ts";
 
 export interface CollabCommandWiring {
   handler: CollabCommandHandler;
+  /** Uninstall the handler and close this wiring's pool. Safe to call twice. */
+  close(): Promise<void>;
 }
 
 export function wire_collab_commands(
@@ -55,5 +57,15 @@ export function wire_collab_commands(
   };
   const handler = new CollabCommandHandler({ ...built, ...given });
   install_command_handler(handler);
-  return { handler };
+  let closing: Promise<void> | null = null;
+  return {
+    handler,
+    close: () => {
+      closing ??= (async () => {
+        install_command_handler(null);
+        await db.close();
+      })();
+      return closing;
+    },
+  };
 }

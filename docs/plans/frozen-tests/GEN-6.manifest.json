@@ -1,0 +1,36 @@
+{
+  "ticket": "GEN-6",
+  "risk": "security",
+  "frozen": {
+    "apps/collab/src/access-recheck.test.ts": "569d5e54c1e33699afb24f4f0f413e9c05baf1e4f20306be2f147f5212328985",
+    "apps/collab/src/access-recheck.int.test.ts": "efc7d493f2db6e9768f6afec1ea610e9a78cb1ab205fcac64afb2060eb4f3eb5",
+    "apps/collab/src/gen6-lows.test.ts": "f3ee0fa72b42ed1578cbacb1ae3fca98f04e845fffa71ad151022cfd6238ff56"
+  },
+  "criteria": {
+    "AC-1": [
+      "apps/collab/src/access-recheck.test.ts",
+      "apps/collab/src/access-recheck.int.test.ts"
+    ],
+    "AC-2": [
+      "apps/collab/src/access-recheck.test.ts"
+    ],
+    "AC-3": [
+      "apps/collab/src/access-recheck.int.test.ts"
+    ],
+    "AC-4": [
+      "apps/collab/src/gen6-lows.test.ts"
+    ]
+  },
+  "not_frozen": [
+    "apps/collab/src/session-recheck.ts",
+    "apps/collab/src/wiring/**",
+    "apps/collab/src/main.ts",
+    "apps/collab/src/deps.ts",
+    "apps/collab/src/deps-types.ts",
+    "packages/db/src/repos/sessions.ts",
+    "packages/db/src/repos/lessons.ts"
+  ],
+  "refreeze_notes": {
+    "apps/collab/src/access-recheck.int.test.ts": "2026-10-26 narrow refreeze: test race in I-1 (wait on of_type(b,\"stored\") returned at once because b had already received a's stored broadcast). Now polls the lesson_doc count for b's own edit (bounded 8 s) and waits for b's second stored message. Assertions unchanged; counts still exact. No product change."
+  }
+}

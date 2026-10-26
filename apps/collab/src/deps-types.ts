@@ -9,7 +9,7 @@ export type { TxRunner, IdGenerator, Clock };
 export interface CollabDeps {
   settings: CollabSettings;
   logger: Logger;
-  db: TxRunner;
+  db?: TxRunner;
   ids: IdGenerator;
   clock: Clock;
 }
