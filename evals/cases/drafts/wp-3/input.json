@@ -1,0 +1,8 @@
+{
+  "pair": "WP-3",
+  "unit_id": "G6.U4",
+  "sheet_row": 25,
+  "lesson_id": "G6.U4.FLEX-1a",
+  "outline_fixture": "packages/core/tests/fixtures/outline/issued.csv",
+  "note": "Row 25 of the issued outline fixture. The cell text is read from the fixture at run time; none is copied here."
+}

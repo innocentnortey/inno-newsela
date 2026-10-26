@@ -1,0 +1,36 @@
+{
+  "_source": "docs/analysis/spikes/SP-1-one-call-draft.md, Results, Comparison table (option A rows); mean per lesson including repairs, Result and recommendation (PD-14)",
+  "mean_usd_per_lesson": {
+    "value": 0.182,
+    "from": "SP-1 Result and recommendation, PD-14"
+  },
+  "rows": {
+    "wp-1": {
+      "sheet_row": 8,
+      "schema_valid": "yes / yes",
+      "wall_s": 83.1,
+      "cost_usd": 0.1445,
+      "words": 3476,
+      "required_blocks": "10/12",
+      "from": "SP-1 Comparison table, A row 8"
+    },
+    "wp-2": {
+      "sheet_row": 9,
+      "schema_valid": "no / yes (1 repair)",
+      "wall_s": 119.7,
+      "cost_usd": 0.2573,
+      "words": 3281,
+      "required_blocks": "9/11",
+      "from": "SP-1 Comparison table, A row 9"
+    },
+    "wp-3": {
+      "sheet_row": 25,
+      "schema_valid": "no / yes (1 repair)",
+      "wall_s": 56.6,
+      "cost_usd": 0.1444,
+      "words": 1603,
+      "required_blocks": "6/9",
+      "from": "SP-1 Comparison table, A row 25"
+    }
+  }
+}

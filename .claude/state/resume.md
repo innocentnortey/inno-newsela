@@ -10,7 +10,7 @@ Updated 2026-10-26 (VPS, Phase B, Sonnet). Replace at each handoff; history in t
 
 ## Blocked on Innocent (exact action)
 1. **NL-02:** confirm the Anthropic account limit is at least $75 (keys are set and probed 200/200 via `bin/with-provider-env --check`).
-2. **Say yes to spend** for the `gate::paid` runs NL-109 (S3 draft golden, ~WP-1..3 x3) and NL-112 (full run of the issued unit, n = 47), within the PD-29 $75 ceiling. Then NL-120 (error analysis), NL-128..130 (experiments), NL-132, NL-134, NL-135, NL-139 final numbers run.
+2. **Say yes to spend** for the `gate::paid` runs NL-109 (S3 draft golden, ~WP-1..3 x3; built and stub-verified on branch `ticket/NL-109`, real-run command in `docs/devlog/2026-10-26-nl109-build.md`) and NL-112 (full run of the issued unit, n = 47), within the PD-29 $75 ceiling. Then NL-120 (error analysis), NL-128..130 (experiments), NL-132, NL-134, NL-135, NL-139 final numbers run.
 3. **Human tickets:** NL-122 (label ~30 judge pairs), NL-123 (measured review sessions), NL-124 (review seeded errors), NL-133 (UX-5b final acceptance: includes looking at the NEEDS_HUMAN_REVIEW screenshots and the look-sheet comparisons), NL-03 (voice key), NL-138 (record the video), NL-143 (submit on the portal).
 4. **Decisions waiting:** PD-38 debounce (adopted under PD-32; revert if you prefer the 3 s target relaxed instead); PD-36 PRD wording ("7 ELD mismatches" vs computed 16 findings over 9 codes); S-23/S-27 ratifications; repo visibility for reviewers (private now; do not change without your call); NL-125 `no_silent_loss` fix option A was your choice and is merged.
 5. **Render:** the deploy prompt is `docs/delivery/render-deploy-prompt.md`; the other session owns Render. Dockerfile.web runtime-data COPY fix landed on main (afa5ad8).

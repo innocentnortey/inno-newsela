@@ -1,0 +1,129 @@
+{
+  "pair": "WP-1",
+  "authority": "docs/data/worked-pairs.md WP-1 Required output B",
+  "lesson_type": "Reading",
+  "lesson_id": "G6.U4.L4",
+  "minutes_total": {
+    "target": 50,
+    "tolerance": 5
+  },
+  "no_quote_node": true,
+  "sections": [
+    {
+      "name": "Launch",
+      "minutes": 5,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "routine_heading",
+            "teacher_talk",
+            "sample_response"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Literacy Lab",
+      "minutes": 10,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "routine_heading",
+            "cfu_item",
+            "support_table"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Learning in Action",
+      "minutes": 30,
+      "required_roles": [
+        {
+          "part": "Part A",
+          "roles": [
+            "teacher_talk",
+            "text_evidence_needed",
+            "support_table"
+          ]
+        },
+        {
+          "part": "Part B",
+          "roles": [
+            "cfu_item",
+            "support_table"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Look Back",
+      "minutes": 5,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "quick_write",
+            "sample_response"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Homework",
+      "minutes": 0,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "homework"
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": {
+    "exact": 2,
+    "roles": [
+      "text_evidence_needed",
+      "excerpt_slot"
+    ]
+  },
+  "focus_codes": [
+    {
+      "code": "RL.6.1",
+      "origin_expected": "outline",
+      "parent": null,
+      "taught_in": "Learning in Action Part A",
+      "checked_in": "Look Back"
+    },
+    {
+      "code": "RL.6.2",
+      "origin_expected": "outline",
+      "parent": null,
+      "taught_in": "Learning in Action Part B",
+      "checked_in": "Learning in Action Part B"
+    },
+    {
+      "code": "L.6.4.b",
+      "origin_expected": "narrowed",
+      "parent": "L.6.4",
+      "taught_in": "Literacy Lab",
+      "checked_in": "Literacy Lab"
+    }
+  ],
+  "optional_added": [],
+  "lesson_links": [
+    {
+      "from": "G6.U4.L4",
+      "to": "G6.U4.L5",
+      "blocks": [
+        "submit",
+        "approve"
+      ],
+      "slot": "excerpt"
+    }
+  ]
+}

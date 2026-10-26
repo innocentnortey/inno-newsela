@@ -18,6 +18,12 @@ export interface RunnerConfig {
   env?: Record<string, string | undefined>;
 }
 
+/** Drops a trailing `## Detail ...` block (written by a suite's `report_text`) so `merge_section` only sees suite sections. */
+function strip_detail(text: string): string {
+  const i = text.search(/^## Detail /m);
+  return i < 0 ? text : text.slice(0, i);
+}
+
 export class EvalRunner {
   private readonly guard: (where: string, value: unknown) => void;
 
@@ -38,6 +44,7 @@ export class EvalRunner {
     if (cases.length === 0) throw new EmptySuiteError(suite); // before any evidence call
     if (!Number.isInteger(opts.repeat) || opts.repeat < 1) throw new InvariantViolation("repeat must be a positive integer", { repeat: opts.repeat });
 
+    s.preflight?.(opts); // NL-109: the S3 cost guard refuses here, before any evidence row or model call
     const row = await this.evidence.start_eval_run({
       suite, git_sha: opts.git_sha, prompt_version_id: this.config.prompt_version_id, models: this.config.models,
       provider_mode: opts.provider_mode, case_set: `cases=${cases.length};repeat=${opts.repeat}`, run_id: null,
@@ -66,12 +73,18 @@ export class EvalRunner {
     const kind = REPORT_KIND[suite];
     const dir = this.config.reports_dir ?? path.join(this.config.repo_root, suite === "S11" ? "evals/local/reports" : "evals/reports");
     const abs = path.join(dir, report_file_name(suite, opts.git_sha));
-    const existing = await fs.readFile(abs, "utf8").catch(() => null);
-    const text = merge_section(existing, opts.git_sha, kind, {
+    const on_disk = await fs.readFile(abs, "utf8").catch(() => null);
+    const existing = on_disk === null ? null : strip_detail(on_disk); // a `## Detail` block is replaced, never merged
+    const merged = merge_section(existing, opts.git_sha, kind, {
       suite, eval_run_id: row.eval_run_id, git_sha: opts.git_sha, prompt_version: this.config.prompt_version_id,
       models: this.config.models, provider_mode: opts.provider_mode, n: total, repeat: opts.repeat, passed, total,
       cost_usd: total_cost.toString(), rows,
     });
+    const detail = s.report_text?.({
+      eval_run_id: row.eval_run_id, git_sha: opts.git_sha, prompt_version: this.config.prompt_version_id, provider_mode: opts.provider_mode,
+      repeat: opts.repeat, passed, total, cost_usd: total_cost.toString(),
+    }) ?? null;
+    const text = detail === null ? merged : `${merged.replace(/\s+$/, "")}\n\n${detail.replace(/\s+$/, "")}\n`;
     this.guard("report", text);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(abs, text, "utf8");
