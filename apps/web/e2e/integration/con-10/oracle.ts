@@ -105,7 +105,7 @@ export async function expectedQuality(unit_id: string): Promise<Expected> {
     tiles: [
       t("V-1", pct(clean, lessonsWithV1.length), lessonsWithV1.length),
       t("V-2", pct(confirmed.size, codes.size), codes.size),
-      t("V-3", null, 0),
+      t("V-3", null, 0), // AC-1 deviation (S-45): matched inline quotes are not stored, so no denominator can be derived
       t("V-4", v4, dist.length),
       t("V-5", pct(sentBack, submitted.size), submitted.size),
       t("V-6", pct(sg.filter((s) => s.status === "accepted").length, sg.length), sg.length),
