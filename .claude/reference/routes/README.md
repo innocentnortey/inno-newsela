@@ -22,9 +22,9 @@ each route lists the checks to make there.
 
 ## Routes
 
-| Route | Serves (upcoming at `9951739`) |
+| Route | Served (all built) |
 |---|---|
-| [`a14-web-ui-screens.md`](a14-web-ui-screens.md) | NL-65, 66, 67, 69, 70, 71 (planned at `b5034cf`, being built), NL-72, 73–76 (not yet planned) |
+| [`a14-web-ui-screens.md`](a14-web-ui-screens.md) | NL-65 to NL-76 |
 | [`integration-real-stack.md`](integration-real-stack.md) | NL-93–99, NL-100–104, NL-113–117 (pattern set by NL-90, merged) |
 | [`a11-collab-commands.md`](a11-collab-commands.md) | NL-105, NL-106 |
 | [`backend-w4-leftovers.md`](backend-w4-leftovers.md) | NL-87 (spike import), NL-88 (guidance save), NL-89 (judge), NL-91 (coverage) |

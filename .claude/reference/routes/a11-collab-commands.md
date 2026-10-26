@@ -1,6 +1,6 @@
 # Route: A11 collab commands (NL-105 internal command routes, NL-106 submit freeze)
 
-As of main `9951739` (2026-10-25). Status words: [routes/README](README.md). Owner of paths: [area map](../area-map.md)
+As of main `5999d9b` (2026-10-26; HEAD, the NL-137 release SHA is not cut), reconciled by NL-140. Every ticket this route served is built; rows below say what exists. Status words: [routes/README](README.md). Owner of paths: [area map](../area-map.md)
 row A11 (`apps/collab/**` except `main.ts`, `health.ts`).
 
 ## Responsibility and governing sources

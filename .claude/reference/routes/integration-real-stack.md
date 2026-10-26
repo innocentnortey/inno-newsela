@@ -1,6 +1,6 @@
 # Route: integration tickets (a screen on the real backend, end to end)
 
-As of main `9951739` (2026-10-25). Status words: [routes/README](README.md). Serves NL-93…99 (wave 5), NL-100…104 and
+As of main `5999d9b` (2026-10-26; HEAD, the NL-137 release SHA is not cut), reconciled by NL-140. Every ticket this route served is built; rows below say what exists. Status words: [routes/README](README.md). Serves NL-93…99 (wave 5), NL-100…104 and
 NL-113…117 (waves 5–6). The pattern was set by **NL-90** (CON-1 sign-in), merged in W4 batch 13.
 
 ## Responsibility and governing sources
@@ -33,22 +33,21 @@ server, proving the agreed `CON-N` end to end. It owns its specs and support fil
 | `prompts.ts` `wire_prompts` | real (seeds v1) | NL-95, NL-103 |
 | `metrics.ts` `wire_metrics` | real (`BoardService`, `HeartbeatService`) | NL-98, NL-99, NL-104 |
 | `review.ts` | real (all six review services) | NL-99, NL-100, NL-113–115 |
-| `coverage.ts`, `exports.ts`, `assist.ts` | **stub** ("Wiring stub", every service unset); fillers NL-91, NL-102, NL-116 | NL-117, NL-102, NL-116 |
-| worker `apps/worker/src/wiring/{generation,checks}.ts` | real; `judge.ts` stub (NL-110) | NL-96, NL-97 |
-| collab `apps/collab/src/wiring/commands.ts` | stub (NL-105) | NL-113–116 |
+| `coverage.ts`, `exports.ts`, `assist.ts` | real (NL-91, NL-102, NL-116) | NL-117, NL-102, NL-116 |
+| worker `apps/worker/src/wiring/{generation,checks}.ts` | real, including `judge.ts` (NL-110) and `demo-stub.ts` | NL-96, NL-97 |
+| collab `apps/collab/src/wiring/commands.ts` | real (NL-105, NL-106) | NL-113–116 |
 
 ## Check before planning (in the work system, not here)
 
 - NL-90 found that the web container did not build the real db, ids and clock (`apps/web/src/server/container.ts`,
   commit `4804a90`): an integration ticket that hits a new service checks that its wiring is real (table above).
 - Is every screen and service ticket in the ticket's *Blocked by* list in `merged.txt`?
-- Does the ticket need the worker to *run* jobs? At `9951739` the worker's `main.ts` builds its wiring but never starts
-  the claim loop or the check lane (**S-8**). NL-96 and NL-97 need that fixed or a scripted stand-in the ticket names.
+- Does the ticket need the worker to *run* jobs? Since RT-1 the worker's `loops.ts` starts the claim loop, the check lane and the judge lane (S-8 closed); NL-96 and NL-97 used a scripted stand-in before that.
 - Open seam rows for the contract: S-11 (TRACEABILITY ids), S-12 (sign-in helper workaround), S-13 (NL-94), S-15
   (NL-98), S-16 (timing-sensitive generation test, NL-96/97), S-17 (NL-99).
 
 ## Stale when
 
 - the support files under `apps/web/e2e/integration/support/` change;
-- a wiring file changes state (stub → real);
-- S-8 is fixed, or `playwright.real.config.ts` changes how the stack starts.
+- a wiring file changes state;
+- `playwright.real.config.ts` changes how the stack starts.
