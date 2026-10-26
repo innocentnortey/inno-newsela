@@ -48,12 +48,14 @@ export interface CliArgs {
   fixture: boolean;
   plan: string | null;
   score: string | null;
+  max_usd: number | null;
+  stub_draft: string | null;
 }
 
 const FIXED: Record<string, SuiteName> = {
   grounding: "S4", faults: "S6", "full-run": "S9", seed: "S10", heldout: "S11", "judge-calibrate": "S12",
 };
-const USAGE = "usage: cli.ts golden --suite <name[,name]> | grounding | faults | full-run | seed | heldout | judge-calibrate [--repeat n] [--provider stub|real] [--unit G6-U4] [--fixture] [--plan key | --score run_id (seed only)]";
+const USAGE = "usage: cli.ts golden --suite <name[,name]> | grounding | faults | full-run | seed | heldout | judge-calibrate [--repeat n] [--provider stub|real] [--unit G6-U4] [--fixture] [--plan key | --score run_id (seed only)] [--max-usd n] [--stub-draft path (stub provider only)]";
 
 export function parse_args(argv: string[]): CliArgs | string {
   const [sub, ...rest] = argv;
@@ -65,6 +67,8 @@ export function parse_args(argv: string[]): CliArgs | string {
   let fixture = false;
   let plan: string | null = null;
   let score: string | null = null;
+  let max_usd: number | null = null;
+  let stub_draft: string | null = null;
   for (let i = 0; i < rest.length; i++) {
     const flag = rest[i] as string;
     const value = (): string | undefined => rest[++i];
@@ -86,7 +90,15 @@ export function parse_args(argv: string[]): CliArgs | string {
       unit = norm;
     } else if (flag === "--plan") plan = value() ?? "";
     else if (flag === "--score") score = value() ?? "";
-    else return USAGE;
+    else if (flag === "--max-usd") {
+      const v = value();
+      if (v === undefined || !/^\d+(\.\d+)?$/.test(v) || Number(v) <= 0) return USAGE;
+      max_usd = Number(v);
+    } else if (flag === "--stub-draft") {
+      const v = value();
+      if (v === undefined || v === "") return USAGE;
+      stub_draft = v;
+    } else return USAGE;
   }
   let suites: SuiteName[];
   if (sub === "golden") {
@@ -101,7 +113,8 @@ export function parse_args(argv: string[]): CliArgs | string {
   }
   if (plan === "" || score === "" || (plan !== null && score !== null)) return USAGE;
   if (score !== null && sub !== "seed") return USAGE;
-  return { suites, repeat, provider_mode, unit, fixture, plan, score };
+  if (stub_draft !== null && provider_mode !== "stub") return USAGE;
+  return { suites, repeat, provider_mode, unit, fixture, plan, score, max_usd, stub_draft };
 }
 
 export async function run_cli(argv: string[], deps: CliDeps): Promise<number> {
@@ -121,7 +134,7 @@ export async function run_cli(argv: string[], deps: CliDeps): Promise<number> {
   let code = 0;
   try {
     for (const suite of args.suites) {
-      const summary = await runner.run(suite, { repeat: args.repeat, provider_mode: args.provider_mode, git_sha: deps.git_sha, unit: args.unit });
+      const summary = await runner.run(suite, { repeat: args.repeat, provider_mode: args.provider_mode, git_sha: deps.git_sha, unit: args.unit, max_usd: args.max_usd, stub_draft: args.stub_draft });
       deps.out(`${suite} ${summary.passed}/${summary.total} report=${summary.report_path}`);
       if (!floor_met(suite, summary.passed, summary.total)) code = Math.max(code, 1);
     }

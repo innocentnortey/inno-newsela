@@ -3,7 +3,7 @@ import type { JsonValue } from "@ls/core/ports/common";
 import type { ProviderMode, SuiteName } from "./types.ts";
 
 export const REPORT_KIND: Record<SuiteName, string> = {
-  S1: "golden", S2: "golden", S3: "golden", S7: "golden", S4: "grounding", S5: "integrity", S6: "faults",
+  S1: "golden", S2: "golden", S3: "drafts", S7: "golden", S4: "grounding", S5: "integrity", S6: "faults",
   S8: "heartbeat", S9: "full-run", S10: "seeded", S11: "heldout", S12: "judge-calibration", S13: "rating", S14: "load",
 };
 

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { FakeClock } from "@ls/core/ports/clock";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { run_cli, type CliDeps } from "./cli.ts";
+import { parse_args, run_cli, type CliDeps } from "./cli.ts";
 import { make_fixture_suite } from "./fixture-suite.ts";
 import { default_suite_factory } from "./registry.ts";
 import { MemoryEvidenceRepo } from "./testing/memory-evidence.ts";
@@ -29,7 +29,7 @@ afterEach(() => fs.rmSync(root, { recursive: true, force: true }));
 
 describe("cli", () => {
   it.each([
-    ["drafts", "S3"], ["load", "S14"], // S5 was filled by NL-125
+    ["heartbeat", "S8"], ["load", "S14"], // S3 was filled by NL-109, S5 by NL-125
   ])("empty_suite_never_green: %s", async (alias, suite) => {
     expect(await run_cli(["golden", "--suite", alias], deps(default_suite_factory))).toBe(2);
     expect(errs).toContain(`suite has no cases: ${suite}`);
@@ -46,8 +46,10 @@ describe("cli", () => {
   it("failed_floor_case_exits_nonzero: floor-1.00 suite fails, floor-0 suite does not", async () => {
     const f1: SuiteFactory = () => [make_fixture_suite({ fail: ["fx-2"] })];
     expect(await run_cli(["golden", "--suite", "intake"], deps(f1))).toBe(1);
-    const f3: SuiteFactory = () => [make_fixture_suite({ name: "S3", fail: ["fx-2"] })];
-    expect(await run_cli(["golden", "--suite", "drafts"], deps(f3))).toBe(0);
+    const f3: SuiteFactory = () => [make_fixture_suite({ name: "S8", fail: ["fx-2"] })]; // S3 now has floor 1.0 (NL-109 R2)
+    expect(await run_cli(["golden", "--suite", "heartbeat"], deps(f3))).toBe(0);
+    const f4: SuiteFactory = () => [make_fixture_suite({ name: "S3", fail: ["fx-2"] })];
+    expect(await run_cli(["golden", "--suite", "drafts"], deps(f4))).toBe(1);
   });
 
   it("suite_names_repeat_and_stub_default", async () => {
@@ -88,5 +90,23 @@ describe("cli", () => {
     expect(await run_cli(["golden", "--suite", "intake", "--fixture"], deps(default_suite_factory))).toBe(0);
     expect(repo.cases).toHaveLength(2);
     expect(repo.cases.every((c) => c.source !== "")).toBe(true);
+  });
+
+  // NL-109: --max-usd and --stub-draft
+  it("max_usd_and_stub_draft_flags", () => {
+    expect(parse_args(["golden", "--suite", "drafts", "--max-usd", "0.01"])).toMatchObject({ max_usd: 0.01, stub_draft: null });
+    expect(parse_args(["golden", "--suite", "drafts"])).toMatchObject({ max_usd: null, stub_draft: null });
+    expect(parse_args(["golden", "--suite", "drafts", "--stub-draft", "x.json"])).toMatchObject({ stub_draft: "x.json", provider_mode: "stub" });
+    for (const bad of [["--max-usd", "abc"], ["--max-usd", "0"], ["--max-usd"], ["--stub-draft"], ["--provider", "real", "--stub-draft", "x"], ["--stub-draft", "x", "--provider", "real"]]) {
+      expect(typeof parse_args(["golden", "--suite", "drafts", ...bad]), bad.join(" ")).toBe("string");
+    }
+  });
+
+  it("max_usd_and_stub_draft_reach_the_suite", async () => {
+    const seen: EvalOptions[] = [];
+    const base = make_fixture_suite();
+    const f: SuiteFactory = () => [{ ...base, score: (c, o) => { seen.push(o); return base.score(c, o); } }];
+    expect(await run_cli(["golden", "--suite", "intake", "--max-usd", "2.5", "--stub-draft", "d.json"], deps(f))).toBe(0);
+    expect(seen[0]).toMatchObject({ max_usd: 2.5, stub_draft: "d.json" });
   });
 });

@@ -148,3 +148,30 @@ describe("S2/S4 records", () => {
     expect(s.report_path).toBe("evals/reports/grounding-abc123def456.md");
   }, 60_000);
 });
+
+// NL-109: the optional `preflight` and `report_text` hooks of EvalSuite
+describe("suite hooks", () => {
+  it("preflight_refusal_starts_no_run: a throwing preflight means start_eval_run is never called", async () => {
+    const base = make_fixture_suite();
+    const refusing: EvalSuite = { ...base, preflight: () => { throw new InvariantViolation("S3 cost guard: test"); } };
+    await expect(runner([refusing]).run("S1", OPTS)).rejects.toBeInstanceOf(InvariantViolation);
+    expect(repo.runs).toHaveLength(0);
+    expect(repo.cases).toHaveLength(0);
+  });
+
+  it("report_text_is_appended_and_replaced: a second run replaces the Detail block, never duplicates it", async () => {
+    let n = 0;
+    const base = make_fixture_suite();
+    const detailed: EvalSuite = { ...base, report_text: (s) => `## Detail S1\n- run ${++n} of ${s.total}\n` };
+    const r = runner([detailed]);
+    const s = await r.run("S1", OPTS);
+    await r.run("S1", OPTS);
+    const text = fs.readFileSync(path.join(root, s.report_path), "utf8");
+    expect(text.match(/## Detail S1/g)).toHaveLength(1);
+    expect(text.match(/## Suite S1/g)).toHaveLength(1);
+    expect(text).toContain("- run 2 of 2");
+    expect(text).not.toContain("- run 1 of 2");
+    expect(text.indexOf("## Suite S1")).toBeLessThan(text.indexOf("## Detail S1"));
+  });
+});
+

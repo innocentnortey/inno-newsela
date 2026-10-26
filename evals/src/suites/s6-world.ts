@@ -67,6 +67,8 @@ export interface WorldOptions {
   prices?: PriceLookup;
   /** Wraps the stub (e.g. a counting client). Default: the stub itself. */
   wrap?: (inner: StubModelClient) => ModelClient;
+  /** NL-109 (S3 real mode): a client used instead of the stub; the stub is still created. */
+  client?: ModelClient;
   /** Called on every model request before it is answered (e.g. to sample the database at that instant). */
   on_enter?: (req: StructuredCallRequest) => void | Promise<void>;
 }
@@ -184,7 +186,7 @@ export async function make_world(opts: WorldOptions = {}): Promise<World> {
   const lines: string[] = [];
   const logger = create_logger({ service: "worker", build_id: "test", level: "info", write: (l) => void lines.push(l) });
   const stub = new StubModelClient({ clock, ...(opts.on_enter ? { on_enter: opts.on_enter } : {}) });
-  const deps: WorkerDeps = { settings, logger, db: db as never, ids, clock, model_client: opts.wrap ? opts.wrap(stub) : stub };
+  const deps: WorkerDeps = { settings, logger, db: db as never, ids, clock, model_client: opts.client ?? (opts.wrap ? opts.wrap(stub) : stub) };
   const wiring = wire_generation(deps, { ...(opts.prices ? { prices: opts.prices } : { prices: stub_prices() }), ...(opts.rules ? { rules: opts.rules as never } : {}) });
 
   // NL-77 (intake choices and the generate gate) is not on main: gate inputs come from the stored outline with no findings.

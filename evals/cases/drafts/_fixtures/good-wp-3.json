@@ -1,0 +1,149 @@
+{
+  "_synthetic": true,
+  "_note": "Hand-written Flex Day stub draft for WP-3 (Launch 5, Learning in Action 40, Look Back 5, zero placeholders). Hand-written, no model text; used by the S3 stub provider only.",
+  "lesson_id": "G6.U4.FLEX-1a",
+  "title": "Flex Day: Meaning-Making Huddle",
+  "text_cards": [
+    {
+      "title": "The Lightning Thief",
+      "author": "Rick Riordan",
+      "edition": null,
+      "chapter": null,
+      "pages": null,
+      "kind": "off-platform-text",
+      "content_available": false
+    }
+  ],
+  "blocks": [
+    {
+      "role": "routine_heading",
+      "section": "Launch",
+      "part": null,
+      "text": "Turn and talk",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Launch",
+      "part": null,
+      "text": "Ask: What questions emerged from the texts you have read so far?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "sample_response",
+      "section": "Launch",
+      "part": null,
+      "text": "I wonder why the narrator sounds so sarcastic.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "routine_heading",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Meaning-Making Huddle",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 40
+    },
+    {
+      "role": "teacher_talk",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Say: Choose a small group or whole group format based on what your formative data shows.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "teacher_tip",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Students use their own copies; they pick their own key events, so no passage needs to be supplied.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "cfu_item",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Check for understanding.",
+      "standard_codes": [
+        "RL.6.7"
+      ],
+      "code_origins": [
+        "added"
+      ],
+      "cfu": {
+        "stem": "Which choice best shows how a retelling can change what a story means?",
+        "options": [
+          "telling the same events from a different point of view",
+          "counting the pages in the book",
+          "naming the author of the book",
+          "saying the first sentence again"
+        ],
+        "key_index": 0,
+        "rationales": [
+          "Correct: a new point of view changes what the events seem to mean",
+          "Incorrect: page counts do not change meaning",
+          "Incorrect: the author's name does not change meaning",
+          "Incorrect: saying the same words again adds no new meaning"
+        ],
+        "standard_code": "RL.6.7"
+      },
+      "minutes": null
+    },
+    {
+      "role": "callout_purpose",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Purpose: Help students connect events across the text.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_say",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Say: Tell your partner what you notice.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "callout_watch",
+      "section": "Learning in Action",
+      "part": null,
+      "text": "Watch for: students who need a sentence starter.",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": null
+    },
+    {
+      "role": "quick_write",
+      "section": "Look Back",
+      "part": null,
+      "text": "Based on what you have read so far, how do you feel retellings change across cultures and generations?",
+      "standard_codes": [],
+      "code_origins": [],
+      "cfu": null,
+      "minutes": 5
+    }
+  ]
+}

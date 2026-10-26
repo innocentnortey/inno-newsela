@@ -1,0 +1,61 @@
+{
+  "pair": "WP-3",
+  "authority": "docs/data/worked-pairs.md WP-3 Required output B",
+  "lesson_type": "Flex Day",
+  "lesson_id": "G6.U4.FLEX-1a",
+  "minutes_total": {
+    "target": 50,
+    "tolerance": 5
+  },
+  "no_quote_node": true,
+  "sections": [
+    {
+      "name": "Launch",
+      "minutes": 5,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "teacher_talk",
+            "sample_response"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Learning in Action",
+      "minutes": 40,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "teacher_tip",
+            "routine_heading",
+            "cfu_item"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Look Back",
+      "minutes": 5,
+      "required_roles": [
+        {
+          "part": null,
+          "roles": [
+            "quick_write"
+          ]
+        }
+      ]
+    }
+  ],
+  "placeholders": {
+    "exact": 0,
+    "roles": []
+  },
+  "focus_codes": [],
+  "optional_added": [
+    "RL.6.7"
+  ],
+  "lesson_links": []
+}
