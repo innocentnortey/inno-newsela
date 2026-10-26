@@ -29,4 +29,17 @@ describe("section_missing required roles", () => {
     expect(f[0]?.message).toContain("cfu");
     expect(f[0]?.address).toBe("G6.U4.L4.LearninginAction");
   });
+
+  it("missing_required_slot_names_the_section_address", () => {
+    const l = reading_lesson();
+    const c = make_ctx(l);
+    const ctx = {
+      ...c,
+      row: { ...c.row, segments: [{ kind: "writer_task" as const, text: "Write.", instruction_shaped: true, applies: "apply" as const }] },
+    };
+    const f = section_missing_rule.run(ctx, DEFAULT_POLICY);
+    expect(f).toHaveLength(1);
+    expect(f[0]?.address).toBe(l.sections.find((s) => s.name === "Learning in Action")?.address);
+    expect(f[0]?.message).toContain("excerpt slot");
+  });
 });

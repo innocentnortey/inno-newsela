@@ -20,6 +20,24 @@ function is_slot_node(n: PMNode): boolean {
   );
 }
 
+// Only excerpt_slot nodes, or quotes that replaced one (attrs.origin), are counted: filling a quote placeholder must not shift N.
+function is_excerpt_node(n: PMNode): boolean {
+  return n.type === "excerpt_slot" || (n.type === "quote" && n.attrs?.origin === "excerpt_slot");
+}
+
+/** How many excerpt slots (open or filled) a lesson holds. */
+export function count_excerpt_slots(sections: Sections): number {
+  let count = 0;
+  for (const s of sections) {
+    for (const top of s.content.content ?? []) {
+      walk(top, (n) => {
+        if (is_excerpt_node(n)) count += 1;
+      });
+    }
+  }
+  return count;
+}
+
 /** The one id-matching rule: exact slot_id first, then the `<lesson>.excerpt-N` ordinal over excerpt_slot nodes. */
 export function find_slot_node(sections: Sections, slot_id: string): PMNode | undefined {
   const slots: PMNode[] = [];
@@ -34,8 +52,7 @@ export function find_slot_node(sections: Sections, slot_id: string): PMNode | un
   if (exact !== undefined) return exact;
   // lesson-links names slots `<lesson>.excerpt-N`, compile names them `<lesson>.slot<n>`; ordinal fallback until NL-46 reconciles.
   const m = /\.excerpt-(\d+)$/.exec(slot_id);
-  // Only excerpt_slot nodes, or quotes that replaced one (attrs.origin), are counted: filling a quote placeholder must not shift N.
-  const excerpts = slots.filter((n) => n.type === "excerpt_slot" || (n.type === "quote" && n.attrs?.origin === "excerpt_slot"));
+  const excerpts = slots.filter(is_excerpt_node);
   return m === null ? undefined : excerpts[Number(m[1]) - 1];
 }
 

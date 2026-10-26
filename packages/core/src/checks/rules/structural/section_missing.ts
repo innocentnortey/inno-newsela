@@ -2,6 +2,8 @@ import type { PMNode } from "@ls/schema/lesson";
 import type { CheckFinding, CheckRule } from "../../types.ts";
 import { EXPECTED_SECTIONS, section_name_to_address } from "./expected.ts";
 import { section_nodes, walk } from "./doc-walk.ts";
+import { excerpt_obligation } from "../links/slot-obligations.ts";
+import { count_excerpt_slots } from "../links/slots.ts";
 
 function has_role(nodes: PMNode[], role: string): boolean {
   let found = false;
@@ -61,6 +63,15 @@ export const section_missing_rule: CheckRule = {
           );
         }
       }
+    }
+    // A required excerpt slot that was never created is blocking; an open slot is a different rule's work.
+    const ob = excerpt_obligation(ctx);
+    if (ob.needed && count_excerpt_slots(ctx.lesson.sections) === 0) {
+      const where =
+        ctx.lesson.sections.find((s) => s.name === "Learning in Action")?.address ??
+        ctx.lesson.sections[0]?.address ??
+        ctx.lesson.lesson_id;
+      out.push(finding(`Lesson is missing a required excerpt slot (${ob.reasons.join("; ")})`, where));
     }
     return out;
   },

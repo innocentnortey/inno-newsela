@@ -11,6 +11,17 @@ export const cross_lesson_link_rule: CheckRule = {
       if (link.from_lesson_id !== ctx.lesson_id || link.kind === "page_continuation") continue;
       const src = ctx.linked_lessons.find((d) => d.lesson_id === link.to_lesson_id);
       const state = src === undefined ? "open" : slot_state(src.lesson, link.to_slot_id);
+      if (src !== undefined && state === "absent") {
+        out.push(
+          make_finding(
+            "cross_lesson_link",
+            "blocking",
+            `Homework at ${link.from_address} waits on ${link.to_lesson_id}, which has no excerpt slot to fill (cross_lesson_link)`,
+            { address: link.from_address, related_lesson_id: link.to_lesson_id },
+          ),
+        );
+        continue;
+      }
       if (state === "open") {
         out.push(
           make_finding(

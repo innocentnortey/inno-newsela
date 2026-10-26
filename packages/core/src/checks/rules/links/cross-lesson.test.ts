@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_POLICY } from "../../test-helpers.ts";
+import { merge_resolutions, submit_gate } from "../../gates.ts";
+import { DEFAULT_POLICY, gate_state } from "../../test-helpers.ts";
 import { cross_lesson_link_rule } from "./cross_lesson_link.ts";
 import { linked_text_changed_rule } from "./linked_text_changed.ts";
 import { ctx_with_link, l5, link } from "./test-support.ts";
@@ -9,6 +10,24 @@ describe("cross-lesson links", () => {
     const out = cross_lesson_link_rule.run(ctx_with_link(l5({ rights: "unset", source_ref: null })), DEFAULT_POLICY);
     expect(out).toHaveLength(1);
     expect(out[0]).toMatchObject({ level: "blocking", related_lesson_id: "G6.U4.L5", address: link.from_address });
+  });
+
+  it("absent_slot_blocks_homework", () => {
+    const base = l5({ rights: "unset", source_ref: null });
+    const lesson = {
+      ...base.lesson,
+      sections: base.lesson.sections.map((s) => ({
+        ...s,
+        content: { ...s.content, content: (s.content.content ?? []).filter((n) => n.type !== "excerpt_slot") },
+      })),
+    };
+    const ctx = ctx_with_link({ ...base, lesson });
+    const out = cross_lesson_link_rule.run(ctx, DEFAULT_POLICY);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ level: "blocking", related_lesson_id: "G6.U4.L5", address: link.from_address });
+    expect(out[0]!.message).toContain("has no excerpt slot to fill");
+    const state = gate_state({ issues: merge_resolutions(out, []) });
+    expect(submit_gate(state).refusals).toContain("BLOCKED");
   });
 
   it("a filled slot does not", () => {
