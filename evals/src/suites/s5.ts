@@ -15,7 +15,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const case_for = (token: Token): EvalCase => ({
   case_id: token,
   provenance: "synthetic",
-  source: "DO-5 S5 / WP-1 Lesson 4 stub",
+  source: "DO-5 S5 / WP-3 flex-day compiled draft (WP-1 Lesson 4 is flawed on purpose and can never be approved)",
   guards: "S5",
   input_path: "n/a",
   expected: { passed: true },

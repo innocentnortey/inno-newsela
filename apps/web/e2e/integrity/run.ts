@@ -5,7 +5,7 @@
 // 3. appends the report notes (contexts, n, models, store p95 verdict, failing trials, not-built rows);
 // 4. exits non-zero when Playwright failed, a floor-1.00 assertion is below 20 of 20, or anything above went wrong.
 // `npm run test:e2e -- integrity --trials n` cannot reach this (scripts/script-targets.json routes test:e2e to the mock config and is not
-// owned by NL-125): see seam-followups S-23. Use this form until then.
+// owned by NL-125): see seam-followups S-125-1. Use this form until then.
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";

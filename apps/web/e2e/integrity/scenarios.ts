@@ -183,14 +183,21 @@ export async function zero_edits_after_lock(w: World, rec: Rec): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-/** AC-3 no silent keystroke loss: every token typed either lands in the submit snapshot or is in the refused notice. */
+/**
+ * AC-3 no silent keystroke loss: every token typed either lands in the submit snapshot or is in the refused notice.
+ * The lock lands in the middle of two typists. A's socket frames are held (as in zero_edits_after_lock) so A keeps typing in an editor
+ * that has not heard about the lock; B is live and its editor turns read-only under its fingers. The lock is the real transitions route
+ * (so neither page swaps to the read view). A token counts as typed whenever the editor was editable and focused when its first key went
+ * in, including tokens whose keys straddled the read-only switch: a token in neither the snapshot nor a refused notice is lost.
+ */
 export async function no_silent_loss(w: World, rec: Rec): Promise<void> {
   const id = lessonId(w);
+  const hold = w.hold!;
   const t = w.trial;
   const tok = (who: string, i: number) => `n${pad(t)}${who}${pad(i)}`;
-  const a: string[] = []; // tokens whose every keystroke went into an editable, focused editor
+  const a: string[] = [];
   const b: string[] = [];
-  let ambiguous = 0; // tokens typed while the editor turned read-only under the typist: not counted, reported
+  const boundary: string[] = []; // tokens whose keystrokes ended with the editor no longer editable (still counted as typed)
   const editable = (page: Page, idx: number) =>
     page.evaluate((i) => {
       const el = document.querySelectorAll('[data-testid^="section-"] [role="textbox"]')[i];
@@ -198,59 +205,81 @@ export async function no_silent_loss(w: World, rec: Rec): Promise<void> {
     }, idx).catch(() => false);
   const typeTokens = async (s: Seat, idx: number, who: string, into: string[], from: number, to: number, delay: number) => {
     for (let i = from; i <= to; i++) {
-      const before = await editable(s.page, idx);
-      if (!before) break; // the page already shows the read view: nothing can be typed
+      if (!(await editable(s.page, idx))) break; // the page already shows the read view: nothing can be typed
+      into.push(tok(who, i)); // typed: the first key went into a live editor
       await s.page.keyboard.type(`${tok(who, i)} `, { delay }).catch(() => {});
-      if (await editable(s.page, idx)) into.push(tok(who, i));
-      else ambiguous += 1;
+      if (!(await editable(s.page, idx))) boundary.push(tok(who, i));
     }
   };
   await openEditor(w, w.A);
   await openEditor(w, w.B);
   await box(w.A.page, 0).click();
   await box(w.B.page, 1).click();
-  // Before the lock: A and B type; A waits until its edits are stored (Submit is off until then).
+  // Before the lock: A and B type; their edits are stored (Submit is refused until then).
   await Promise.all([typeTokens(w.A, 0, "a", a, 1, 4, 8), typeTokens(w.B, 1, "b", b, 1, 4, 8)]);
   expect(a.length).toBe(4);
+  expect(b.length).toBe(4);
   await stored(w, a[3]!);
+  await stored(w, b[3]!);
   await expect(savedState(w.A.page, "stored")).toBeVisible({ timeout: 15_000 });
-  // B keeps typing across the lock (about 1.5 s of keystrokes); A presses the real Submit button 250 ms in, without moving focus
-  // (a DOM click). A retries when the server says the edits are not stored yet (B's keystrokes are still arriving).
+
+  // Boundary: A (frames held) and B (live) keep typing for about 2 s; B submits through the route 250 ms in, retrying while the
+  // keystrokes still arriving are not yet stored.
+  hold.on = true;
+  const aTyping = typeTokens(w.A, 0, "a", a, 5, 12, 25);
   const bTyping = typeTokens(w.B, 1, "b", b, 5, 12, 25);
   await sleep(250);
-  const btn = w.A.page.getByRole("button", { name: "Submit for approval" });
-  let res: Awaited<ReturnType<Page["waitForResponse"]>> | undefined;
+  const apiB = await apiAs(w.stack, w.B.user);
+  let status = 0;
   let attempts = 0;
   for (; attempts < 8; attempts++) {
-    await expect(btn).toBeEnabled({ timeout: 30_000 });
-    const reply = w.A.page.waitForResponse((r) => r.url().includes(`/api/lessons/${id}/transitions`) && r.request().method() === "POST");
-    await btn.evaluate((el) => (el as HTMLButtonElement).click());
-    res = await reply;
-    rec.request_ids.push(res.headers()["x-request-id"] ?? "");
-    if (res.status() === 200) break;
-    expect(res.status(), await res.text()).toBe(409);
+    const res = await transition(apiB, id, { action: "submit", client_state_vector: await storedVector(id) });
+    rec.request_ids.push(res.requestId ?? "");
+    status = res.status;
+    if (status === 200) break;
+    expect(status, res.text).toBe(409);
     await sleep(300);
   }
-  expect(res?.status(), "Submit succeeded within 8 attempts").toBe(200);
-  await bTyping;
+  expect(status, "Submit succeeded within 8 attempts").toBe(200);
+  await Promise.all([aTyping, bTyping]);
+  await sleep(400);
+  hold.release();
   await expect.poll(async () => (await snapshot(id)).state, { timeout: 15_000 }).toBe("submitted");
+  // A hears about the lock only now; its late tokens must come back as a notice, not vanish.
+  await expect(firstTextbox(w.A.page)).toHaveAttribute("aria-readonly", "true", { timeout: 15_000 });
   await sleep(2500);
 
   const snap = (await db().query<{ lesson_json: unknown }>("select lesson_json from lesson_version where lesson_id = $1 and kind = 'submit' order by number desc limit 1", [id]))[0]!;
   const snapText = JSON.stringify(snap.lesson_json);
   const notice = async (s: Seat): Promise<string> => {
     const loc = s.page.getByText(/Removed text: “/);
-    return (await loc.count()) > 0 ? await loc.first().innerText() : "";
+    return (await loc.count()) > 0 ? (await loc.allInnerTexts()).join(" ") : "";
   };
   const noticeA = await notice(w.A);
   const noticeB = await notice(w.B);
   const typed = [...a, ...b];
   const inSnapshot = typed.filter((x) => snapText.includes(x));
-  const refused = typed.filter((x) => !snapText.includes(x) && ((a.includes(x) && noticeA.includes(x)) || (b.includes(x) && noticeB.includes(x))));
-  const lost = typed.filter((x) => !inSnapshot.includes(x) && !refused.includes(x));
-  rec.detail = { submit_attempts: attempts + 1, ambiguous, typed: typed.length, in_snapshot: inSnapshot.length, refused: refused.length, union: inSnapshot.length + refused.length, lost: lost };
-  expect(lost, `tokens in neither the snapshot nor the refused notice (typed ${typed.length}, snapshot ${inSnapshot.length}, refused ${refused.length})`).toEqual([]);
-  expect(inSnapshot.length + refused.length).toBe(typed.length);
+  const noticeOf = (x: string) => (a.includes(x) ? noticeA : noticeB);
+  const refused = typed.filter((x) => !inSnapshot.includes(x) && noticeOf(x).includes(x));
+  // A token whose keys straddle the lock is split: its head is in the snapshot, its tail (what was typed after the lock) opens the
+  // refused notice. Every key is still accounted for. The head must be an occurrence not explained by an earlier whole token.
+  const count = (hay: string, needle: string) => hay.split(needle).length - 1;
+  const split = typed.filter((x) => {
+    if (inSnapshot.includes(x) || refused.includes(x)) return false;
+    for (let k = x.length - 1; k >= 1; k--) {
+      const head = x.slice(0, k);
+      const whole = inSnapshot.filter((y) => y.startsWith(head)).length;
+      if (count(snapText, head) > whole && noticeOf(x).replace(/^Removed text: “\s*/, "").startsWith(x.slice(k))) return true;
+    }
+    return false;
+  });
+  const lost = typed.filter((x) => !inSnapshot.includes(x) && !refused.includes(x) && !split.includes(x));
+  rec.detail = {
+    submit_attempts: attempts + 1, boundary_tokens: boundary.length, typed: typed.length, in_snapshot: inSnapshot.length, refused: refused.length,
+    split: split.length, union: inSnapshot.length + refused.length + split.length, lost, lost_at_boundary: lost.filter((x) => boundary.includes(x)).length,
+  };
+  expect(lost, `tokens in neither the snapshot nor the refused notice (typed ${typed.length}, snapshot ${inSnapshot.length}, refused ${refused.length}, split ${split.length})`).toEqual([]);
+  expect(inSnapshot.length + refused.length + split.length).toBe(typed.length);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

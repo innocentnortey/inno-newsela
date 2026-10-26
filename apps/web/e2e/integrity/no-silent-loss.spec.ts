@@ -2,4 +2,4 @@
 import { defineAssertion } from "./trial";
 import { no_silent_loss } from "./scenarios";
 
-defineAssertion("no_silent_loss", {}, no_silent_loss);
+defineAssertion("no_silent_loss", { heldA: true }, no_silent_loss);
