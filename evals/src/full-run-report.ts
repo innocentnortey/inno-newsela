@@ -80,6 +80,10 @@ export interface FullRunFacts {
   round_trip_total: number;
   cost_usd: Usd;
   jobs_cost: Usd;
+  /** Completed calls with no job (the unit-plan call). */
+  unattributed_cost: Usd;
+  prompt_version_id: string | null;
+  models_used: { purpose: string; requested: string; served: string | null }[];
   per_lesson_max: Usd;
   wall_s: number;
   p95_minutes: number | null;
@@ -173,7 +177,8 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
     run_id, cap_usd: rows.run.cap_usd, n: jobs.length, n_ready: jobs.filter((j) => j.tile_state === "ready").length,
     first_pass_schema_valid: first_pass, lessons_run, repairs: totals.repairs, failures_by_reason: sorted_counts(failures),
     placeholders: rows.placeholders_left, grounding_flags_by_kind: sorted_counts(grounding), disclosure_prompts_l31_l32: disclosure,
-    confirmations, round_trip_ok: rt_ok, round_trip_total: rt_total, cost_usd: totals.cost_usd, jobs_cost, per_lesson_max,
+    confirmations, round_trip_ok: rt_ok, round_trip_total: rt_total, cost_usd: totals.cost_usd, jobs_cost, unattributed_cost: totals.unattributed_cost_usd ?? new Decimal(0),
+    prompt_version_id: rows.run.prompt_version_id, models_used: totals.models_used ?? [], per_lesson_max,
     wall_s: (end.getTime() - rows.run.created_at.getTime()) / 1000, p95_minutes, all_terminal, lessons,
   };
 }
@@ -181,7 +186,7 @@ export async function collect_full_run_facts(run_id: RunId, ports: FullRunReadPo
 // eval-plan.md S9 thresholds (line 195). Money compares on Decimal.
 export function evaluate_s9_thresholds(facts: FullRunFacts, api_summary: ApiRunSummary | null, expected_n = 47): ThresholdResult[] {
   const rate = facts.n === 0 ? 0 : facts.first_pass_schema_valid / facts.n;
-  const sums_equal = facts.jobs_cost.eq(facts.cost_usd);
+  const sums_equal = facts.jobs_cost.plus(facts.unattributed_cost).eq(facts.cost_usd);
   const api_equal = api_summary === null || new Decimal(api_summary.cost_usd).eq(facts.cost_usd);
   return [
     { id: "first_pass_schema_valid_rate_ge_0.90", passed: facts.n > 0 && facts.lessons_run > 0 && rate >= 0.9, detail: facts.lessons_run === 0 ? `not evaluated: 0 of ${facts.n} lessons ran` : `${facts.first_pass_schema_valid}/${facts.n} = ${rate.toFixed(3)}, ${facts.lessons_run} ran (M-31; M-5 is not computed here, the first-pass rate and repair count stand in)` },
@@ -193,7 +198,7 @@ export function evaluate_s9_thresholds(facts: FullRunFacts, api_summary: ApiRunS
     { id: "p95_minutes_le_5", passed: facts.p95_minutes !== null && facts.p95_minutes <= 5, detail: `p95 ${facts.p95_minutes === null ? "n/a" : facts.p95_minutes.toFixed(2)} min` },
     { id: "wall_le_2h", passed: facts.wall_s <= 7200, detail: `${Math.round(facts.wall_s)} s` },
     { id: "disclosure_prompts_l31_l32_zero", passed: facts.disclosure_prompts_l31_l32 === 0, detail: `${facts.disclosure_prompts_l31_l32} open` },
-    { id: "totals_equal_call_sums", passed: sums_equal && api_equal, detail: `calls ${facts.cost_usd.toString()}, jobs ${facts.jobs_cost.toString()}${api_summary === null ? "" : `, api ${String(api_summary.cost_usd)}`}` },
+    { id: "totals_equal_call_sums", passed: sums_equal && api_equal, detail: `calls ${facts.cost_usd.toString()}, jobs ${facts.jobs_cost.toString()} + unit plan ${facts.unattributed_cost.toString()}${api_summary === null ? "" : `, api ${String(api_summary.cost_usd)}`}` },
     { id: "n_is_47", passed: facts.n === expected_n, detail: `n = ${facts.n}, expected ${expected_n}` },
   ];
 }
@@ -212,8 +217,8 @@ export function render_full_run_markdown(facts: FullRunFacts, thresholds: Thresh
     `# Full-run report: ${facts.run_id}`,
     "",
     `- git_sha: ${header.git_sha}`,
-    `- prompt_version: ${header.prompt_version_id ?? "n/a"}`,
-    `- models: ${JSON.stringify(header.models)}`,
+    `- prompt_version: ${header.prompt_version_id ?? facts.prompt_version_id ?? "n/a"}`,
+    `- models: ${facts.models_used.length > 0 ? facts.models_used.map((m) => `${m.purpose}=${m.requested}${m.served !== null && m.served !== m.requested ? ` (served ${m.served})` : ""}`).join(", ") : JSON.stringify(header.models)}`,
     `- provider_mode: ${header.provider_mode}`,
     `- n: ${facts.n}`,
     `single run, n = ${facts.n}`,

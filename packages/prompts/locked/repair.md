@@ -6,4 +6,4 @@ Fix only the listed findings and schema issues. Keep every other part of the dra
 
 Output the full corrected draft as JSON only, conforming to the schema in the schema block, with no prose around it.
 
-The corrected draft is checked again with every rule in the lesson shape, and there is no second repair. While you fix the listed items, also make sure the draft meets the lesson shape: each cfu_item has its cfu field filled, every focus code is the standard_code of some cfu_item, and the minutes of each section add up to the template.
+The corrected draft is checked again with every rule in the lesson shape, and there is no second repair. While you fix the listed items, also make sure the draft meets the lesson shape: each cfu_item has its cfu field filled, every focus code is the standard_code of some cfu_item, and the minutes of each section add up to the template. Also remove any name that is not on the lesson card or text cards and any page or chapter number outside the card's stated range; when unsure, omit it.

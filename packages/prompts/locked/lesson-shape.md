@@ -14,6 +14,8 @@ Minutes go in the minutes field of the blocks. Within each section the minutes o
 
 Every Learning in Action section needs a callout_purpose, a callout_say, a callout_watch and a cfu_item, and its first teaching block comes before the check.
 
-Use quotation marks only around words copied from a text card or the lesson card. Write teacher prompts, questions and student sentence frames without quotation marks. Name only people, characters, authors and works that appear on the lesson card or in the text cards; leave out any others. Cite only the chapters and pages the lesson card names.
+Use quotation marks only around words copied from a text card or the lesson card. Write teacher prompts, questions and student sentence frames without quotation marks. Name only people, characters, authors, places, organizations and works that appear on the lesson card or in the text cards, spelled as there. A name from your own knowledge (a myth figure, an author, a historical person, a place) is checked against the cards and blocks the lesson even when it is correct; if you are not sure a name is on the cards, leave it out and write the character, the author or the text instead. Do not add example names for students or teachers.
+
+Mention a page or chapter only when the lesson card gives a page or chapter range, and keep every number you write inside that stated range (for example p. 233 only if 233 falls within the pages given). If the card gives no pages or chapters, write none. If you are unsure of a page or chapter number, leave the number out.
 
 Use only the allowed roles. Output must match the schema exactly.
