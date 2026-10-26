@@ -14,6 +14,7 @@ export function wire_outlines(d: WebDeps): OutlineWiring {
     timeout_ms: d.settings.sheets_fetch_timeout_ms,
     max_bytes: d.settings.outline_max_bytes,
     clock: d.clock,
+    base_url: d.settings.sheets_base_url,
   });
   return {
     outlines: new OutlineService(

@@ -33,6 +33,7 @@ describe("NL-01 AC-5 defaults [table]", () => {
     ["rows", web.outline_max_rows, 200],
     ["bytes", web.outline_max_bytes, 5242880],
     ["sheets", web.sheets_fetch_timeout_ms, 10000],
+    ["sheets base", web.sheets_base_url, "https://docs.google.com"],
     ["idem", web.idempotency_window_h, 24],
     ["undo", web.undo_window_s, 60],
     ["assist timeout", web.assist_call_timeout_ms, 20000],

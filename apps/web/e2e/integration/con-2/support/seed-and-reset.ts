@@ -16,6 +16,7 @@ export async function resetIntake(): Promise<void> {
     "outline_version",
     "lesson_link",
     "intake_choice",
+    "run", // no FKs; a leftover run of G6.U4 would show on SCR-2 as the latest run
     "unit",
   ]) {
     await db().query(`delete from ${t}`);
