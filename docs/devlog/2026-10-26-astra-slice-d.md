@@ -7,3 +7,11 @@
 **Checked.** Unit tests, S1/S2 golden 100%, worker int tests; no model calls. Nothing was re-measured with a model, and no alignment is verified by a person or a judge (links stay `confirmed_by: null`). Editing `lesson-shape.md` changes `locked_hash`: a new prompt version at next start (NL-134 rerun rule applies).
 
 **Remaining.** `evals/cases/drafts/_fixtures/good-wp-3.json` needs a tagged Learning in Action routine (RL.6.7, added) or the stub WP-3 case fails `standard_not_taught`; narrowing is not offered by the prompt yet (R-D4); proposed S3 changes (location checks, WP-1 `checked_in` Look Back) need a recorded contract correction.
+
+## Follow-up: stub WP-3 fixture tagged (2026-10-26, replay session)
+
+**Changed.** `evals/cases/drafts/_fixtures/good-wp-3.json` only: the Learning in Action `routine_heading` ("Meaning-Making Huddle") now carries `standard_codes: ["RL.6.7"]`, `code_origins: ["added"]`. Not touched: any `expected.json`, `bad-draft.json`, the 1.0 floor, any assertion.
+
+**Why.** The WP-3 outline row lists no focus codes, so the cited RL.6.7 is recorded `added`. The new contract (`docs/delivery/2026-10-26-astra-fix-handoff.md`, "Align production lesson structure") requires per-code teaching evidence: an `added` code needs a tagged teaching routine. The stub good draft had only a tagged CFU item, so `stub_wp3_passes_all_assertions` failed with `standard_not_taught`. The fixture is a hand-written stub good draft, so aligning it with the contract does not weaken any check.
+
+**Checked.** `git diff --stat -- evals/cases` shows only this fixture; the `expected.json` hashes the S3 int test compares are unchanged. S3 tests re-run after commit (see the replay devlog).

@@ -50,8 +50,12 @@
       "section": "Learning in Action",
       "part": null,
       "text": "Meaning-Making Huddle",
-      "standard_codes": [],
-      "code_origins": [],
+      "standard_codes": [
+        "RL.6.7"
+      ],
+      "code_origins": [
+        "added"
+      ],
       "cfu": null,
       "minutes": 40
     },
