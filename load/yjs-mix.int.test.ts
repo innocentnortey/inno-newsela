@@ -84,6 +84,9 @@ describe("reconnect (AC-3)", () => {
       expect(p["reconnect_p95_s"]).toBeLessThanOrEqual(10); // capacity target: recorded, not tuned
       expect(p["duplicate_tokens"]).toBe(0);
       expect(p["incomplete"]).toBe(false);
+      expect(typeof p["stored_n"]).toBe("number");
+      expect(typeof p["stored_during_drop_n"]).toBe("number");
+      expect(Number(p["stored_n"]) + Number(p["stored_during_drop_n"])).toBe(out.record.n - Number(p["unacknowledged"]));
       const text = await stored_text(t.db, "G6.U9.L901");
       const tokens = text.match(token_re) ?? [];
       expect(new Set(tokens).size).toBe(tokens.length); // each token at most once

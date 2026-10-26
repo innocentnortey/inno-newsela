@@ -49,3 +49,15 @@ export function is_clean_sample(at_send: LinkView, at_seen: LinkView): boolean {
     at_send.sender_epoch === at_seen.sender_epoch && at_send.peer_epoch === at_seen.peer_epoch
   );
 }
+
+export interface SendView {
+  up: boolean;
+  epoch: number;
+}
+/** A stored sample is clean only if the sender's socket was up at send and never dropped before the ack. */
+export function is_clean_stored(at_send: SendView, at_ack: SendView): boolean {
+  return is_clean_sample(
+    { sender_up: at_send.up, peer_up: true, sender_epoch: at_send.epoch, peer_epoch: 0 },
+    { sender_up: at_ack.up, peer_up: true, sender_epoch: at_ack.epoch, peer_epoch: 0 },
+  );
+}
