@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  TAGS, buildReopen, buildRequestChanges, dependantsSentence, dialogTitle, lessonLabel, reopenedToast, sentBackToast,
+  TAGS, buildReopen, buildRequestChanges, dependantsSentence, dialogTitle, lessonLabel, reopenedToast, sentBackToast, whoSeesIt,
 } from "@/features/send-back/copy";
 
 describe("send-back copy", () => {
@@ -39,5 +39,11 @@ describe("send-back copy", () => {
   it("request bodies carry no extra keys", () => {
     expect(buildRequestChanges("standards", "  x ")).toEqual({ action: "request_changes", tag: "standards", note: "x" });
     expect(buildReopen(" y ")).toEqual({ action: "reopen", reason: "y" });
+  });
+
+  it("whoSeesIt prefers the reviewer name", () => {
+    expect(whoSeesIt({ reviewer: "J. Rivera", last_editor: "A. Other" })).toBe("J. Rivera");
+    expect(whoSeesIt({ reviewer: null, last_editor: "A. Other" })).toBe("A. Other");
+    expect(whoSeesIt(null)).toBe("the reviewer");
   });
 });

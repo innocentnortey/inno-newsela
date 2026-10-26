@@ -103,6 +103,8 @@ export function lesson_row(over: Partial<LessonRow> = {}): LessonRow {
     current_version_id: V_GEN,
     reviewer_id: U_REV,
     last_editor_id: U_REV,
+    reviewer_name: "J. Rivera",
+    last_editor_name: "J. Rivera",
     schema_version: 1,
     ...over,
   };

@@ -259,12 +259,12 @@ SCR-9 was audited without the editor socket (Compose as committed), so the read 
 | F-2 | blocking | Compose sets COLLAB_INTERNAL_URL without /internal: every web-to-collab command returns 503 COLLAB_UNAVAILABLE | #None |
 | F-3 | blocking | Compose: the browser editor never connects (no /collab route, NEXT_PUBLIC_COLLAB_URL unset), so SCR-9 cannot edit or submit | #None |
 | F-4 | blocking | Compose stub mode cannot generate: every model call throws 'unscripted stub call'; the run sits in Planning forever with no message | #None |
-| F-5 | major | SCR-14: Approve refused with BLOCKED (422) crashes the page to 'This page couldn't load' | #None |
-| F-6 | major | SCR-14/15: raw user ids shown instead of names (header, send-back dialog, toast) | #None |
-| F-7 | major | SCR-14/SCR-9: after Send back the banner shows tag 'Other:' and no note (board shows Content safety) | #None |
+| F-5 | major | SCR-14: Approve refused with BLOCKED (422) crashes the page to 'This page couldn't load' | #None (fixed on fix/nl126-G3) |
+| F-6 | major | SCR-14/15: raw user ids shown instead of names (header, send-back dialog, toast) | #None (fixed on fix/nl126-G3) |
+| F-7 | major | SCR-14/SCR-9: after Send back the banner shows tag 'Other:' and no note (board shows Content safety) | #None (fixed on fix/nl126-G3) |
 | F-8 | major | SCR-4: 'Confirm fix' proposes a single code (`RL.6.9`) for a Focus cell that lists 5 to 16 codes | #None |
 | F-9 | major | Pages scroll sideways: SCR-4/SCR-5 overflow by 1350 px at 1280 and 1953 px at 390; SCR-18, SCR-9/10/11 and SCR-3 also overflow at 390 | #None |
-| F-10 | major | SCR-14: checklist row 'Standards confirmed' shows status Done while its text says 'not all confirmed' | #None |
+| F-10 | major | SCR-14: checklist row 'Standards confirmed' shows status Done while its text says 'not all confirmed' | #None (fixed on fix/nl126-G3) |
 | F-11 | minor | SCR-10: empty Insert shows the generic 'The request is not valid.' instead of the field messages | #None |
 | F-12 | minor | SCR-3: choosing an unsupported file shows 'Choose a file first.' and 'This file type isn't supported' together | #None |
 | F-13 | minor | SCR-8: board for a unit with no outline says 'There is no unit "g6-u4"' with a 'Back to the board' link to itself | #None |

@@ -100,8 +100,9 @@ export class PgAuditLog implements AuditLog {
           await tx.query<{
             at: Date; source: HistoryRow["source"]; actor_name: string | null; action: string;
             from_state: HistoryRow["from_state"]; to_state: HistoryRow["to_state"]; version_hash: string | null; reason: string | null;
+            reason_tag: string | null; note: string | null;
           }>(
-            `SELECT at, source, actor_name, action, from_state, to_state, version_hash, reason
+            `SELECT at, source, actor_name, action, from_state, to_state, version_hash, reason, reason_tag, note
              FROM audit_log_v WHERE lesson_id = $1 ORDER BY at ASC, source ASC`,
             [lesson_id],
           )
@@ -110,6 +111,7 @@ export class PgAuditLog implements AuditLog {
     return rows.map((r) => ({
       at: r.at, source: r.source, actor_name: r.actor_name, action: r.action,
       from_state: r.from_state, to_state: r.to_state, version_hash: r.version_hash, reason: r.reason,
+      reason_tag: r.reason_tag, note: r.note,
     }));
   }
 

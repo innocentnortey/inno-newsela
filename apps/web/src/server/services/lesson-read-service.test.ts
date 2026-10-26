@@ -161,4 +161,33 @@ describe("LessonReadService", () => {
     const e = await make_service(make_world({ row: null })).history(user("reviewer"), LID).catch((x: unknown) => x);
     expect((e as DomainRefusal).code).toBe("NOT_FOUND");
   });
+
+  it("reviewer and last_editor are names not user ids", async () => {
+    const w = make_world({ row: lesson_row({ reviewer_id: "usr_01X" as never, last_editor_id: "usr_01X" as never, reviewer_name: "J. Rivera", last_editor_name: "J. Rivera" }) });
+    const { lesson } = await make_service(w).get_lesson_traced(user("reviewer"), LID);
+    expect(lesson.reviewer).toBe("J. Rivera");
+    expect(lesson.last_editor).toBe("J. Rivera");
+    expect(JSON.stringify(lesson)).not.toContain("usr_");
+  });
+
+  const sent_back = (reason_tag: string | null) => {
+    const w = make_world({
+      row: lesson_row({ state: "changes_requested" }),
+      history: [{
+        at: new Date(Date.UTC(2026, 9, 2, 10, 5)), source: "review_event", actor_name: "Rae", action: "lesson.transition",
+        from_state: "submitted", to_state: "changes_requested", version_hash: null, reason: null,
+        reason_tag, note: "Check the safety note before resubmitting.",
+      }],
+    });
+    return make_service(w).get_lesson(user("reviewer"), LID);
+  };
+
+  it("send_back carries the stored tag and note", async () => {
+    const l = await sent_back("content_safety");
+    expect(l.send_back).toMatchObject({ tag: "content_safety", note: "Check the safety note before resubmitting.", by: "Rae" });
+  });
+
+  it("send_back falls back to other for an unknown tag", async () => {
+    expect((await sent_back("nonsense")).send_back?.tag).toBe("other");
+  });
 });

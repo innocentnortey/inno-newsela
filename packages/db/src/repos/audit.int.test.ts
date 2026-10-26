@@ -100,6 +100,20 @@ describe("PgAuditLog", () => {
     expect(await audit.history("G6.U4.L9")).toEqual([]);
   });
 
+  it("history exposes reason_tag and note for a send-back", async () => {
+    await t.db.with_tx(async (tx) => {
+      await insert_row(tx, "review_event", {
+        lesson_id: "G6.U4.L2", actor_id: USER, from_state: "submitted", to_state: "changes_requested",
+        content_hash: "h2", reason_tag: "content_safety", note: "Check the safety note before resubmitting.", at: "2026-10-01T09:30:00Z",
+      });
+    });
+    const rows = await audit.history("G6.U4.L2");
+    expect(rows[0]).toMatchObject({ reason_tag: "content_safety", note: "Check the safety note before resubmitting." });
+    clock.advance(60_000);
+    await t.db.with_tx((tx) => audit.append(event({ target_id: "G6.U4.L2", action: "lesson.store" }), tx));
+    expect((await audit.history("G6.U4.L2")).at(-1)).toMatchObject({ source: "audit_event", reason_tag: null, note: null });
+  });
+
   it("standard_decisions_newest_first: only this lesson and code, newest first, details parsed", async () => {
     const entry = { code: "RL.6.1", role: "focus", origin: "outline", official_text: "Cite textual evidence.", asserted_by: "outline", confirmation: "open" } as const;
     const link = { lesson_id: "G6.U4.L1", content_hash: "a".repeat(64), code: "RL.6.1", address: "s1", role: "I", origin: "outline", asserted_by: "outline", confirmed_by: null } as const;

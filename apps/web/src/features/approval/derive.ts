@@ -101,12 +101,19 @@ const KIND_TO_KEY: Record<Issue["kind"], Row["key"]> = {
   judge_no: "other",
 };
 
+/** Focus standards (not removed) that are not yet confirmed; the row status and its sentence both read this. */
+export function standardsUnconfirmed(lesson: Lesson): string[] {
+  return lesson.front_matter.standards
+    .filter((s) => s.role === "focus" && s.confirmation !== "removed" && s.confirmation !== "confirmed")
+    .map((s) => s.code);
+}
+
 function evidenceFor(item: ChecklistItem, lesson: Lesson): string {
   if (item.key === "standards") {
     const focus = lesson.front_matter.standards.filter((s) => s.role === "focus" && s.confirmation !== "removed");
     if (focus.length > 0) {
-      const all = focus.every((s) => s.confirmation === "confirmed");
-      return `${focus.map((s) => s.code).join(", ")} ${all ? "confirmed" : "not all confirmed"}`;
+      const open = standardsUnconfirmed(lesson);
+      return open.length > 0 ? `Not all confirmed: ${open.join(", ")}` : `${focus.map((s) => s.code).join(", ")} confirmed`;
     }
   }
   if (item.key === "quotes_and_rights") {
@@ -127,13 +134,18 @@ function jumpFor(item: ChecklistItem, lesson: Lesson): Row["jump"] {
 
 export function checklistRows(a: { lesson: Lesson; issues: Issue[] | null; blockedIssues: Issue[]; unitKey: string }): Row[] {
   const { lesson } = a;
-  const blocking = [...(a.issues ?? []), ...a.blockedIssues].filter((i) => i.level === "blocking" && i.blocks.includes("approve"));
+  // blockedIssues: the server said BLOCKED, so every one of them blocks. Listed issues keep the level/blocks test.
+  const blocking = [
+    ...(a.issues ?? []).filter((i) => i.level === "blocking" && i.blocks?.includes("approve")),
+    ...a.blockedIssues,
+  ];
   const byKey = new Map<Row["key"], Issue[]>();
   for (const i of blocking) byKey.set(KIND_TO_KEY[i.kind], [...(byKey.get(KIND_TO_KEY[i.kind]) ?? []), i]);
 
   const rows: Row[] = lesson.checklist.map((item) => {
     const mine = byKey.get(item.key) ?? [];
-    const isBlocking = item.status === "open" || mine.length > 0;
+    const unconfirmed = item.key === "standards" && item.status === "ok" && mine.length === 0 ? standardsUnconfirmed(lesson) : [];
+    const isBlocking = item.status === "open" || mine.length > 0 || unconfirmed.length > 0;
     return {
       key: item.key,
       title: item.label,
@@ -174,6 +186,31 @@ export type ApproveView =
   | { kind: "stale" } | { kind: "rating" } | { kind: "four_eyes" } | { kind: "network" } | { kind: "forbidden" }
   | { kind: "dependency"; lessonIds: string[] } | { kind: "blocked"; issues: Issue[]; message: string } | { kind: "other"; message: string };
 
+/** The BLOCKED reply carries issues without `blocks`/`issue_id` (gates.ts issue_json); fill them so nothing downstream throws. */
+export function normalizeBlockedIssues(raw: unknown): Issue[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Issue[] = [];
+  for (const x of raw) {
+    if (typeof x !== "object" || x === null) continue;
+    const o = x as Record<string, unknown>;
+    if (typeof o.kind !== "string" || typeof o.message !== "string") continue;
+    const level = o.level === "blocking" || o.level === "confirmation" || o.level === "advisory" ? o.level : "blocking";
+    out.push({
+      issue_id: `blocked-${out.length}`,
+      level,
+      blocks: Array.isArray(o.blocks) ? (o.blocks as Issue["blocks"]) : ["submit", "approve"],
+      resolvable: false,
+      kind: o.kind as Issue["kind"],
+      message: o.message,
+      address: typeof o.address === "string" ? o.address : null,
+      span_anchor: null,
+      related_lesson_id: typeof o.related_lesson_id === "string" ? o.related_lesson_id : null,
+      resolution: null,
+    });
+  }
+  return out;
+}
+
 export function viewFromError(e: unknown): ApproveView {
   if (!(e instanceof ApiError)) return { kind: "network" };
   switch (e.code) {
@@ -191,8 +228,7 @@ export function viewFromError(e: unknown): ApproveView {
       return { kind: "dependency", lessonIds: typeof one === "string" ? [one] : [] };
     }
     case "BLOCKED": {
-      const raw = e.details.issues;
-      const issues = (Array.isArray(raw) ? raw : []) as Issue[];
+      const issues = normalizeBlockedIssues(e.details.issues);
       return { kind: "blocked", issues, message: issues[0]?.message ?? e.message };
     }
     default: return { kind: "other", message: e.message };

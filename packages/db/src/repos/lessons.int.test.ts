@@ -82,6 +82,15 @@ describe("PgLessonRepo", () => {
     expect((await q("SELECT state FROM lesson WHERE id='G6.U5.L9'"))[0]?.["state"]).toBe("draft");
   });
 
+  it("get returns reviewer_name and last_editor_name from app_user", async () => {
+    await t.db.with_tx(async (tx) => {
+      await insert_row(tx, "app_user", { id: "usr_names_1", name: "J. Rivera" });
+      await tx.query("UPDATE lesson SET reviewer_id='usr_names_1', last_editor_id='usr_names_1' WHERE id='G6.U4.L2'");
+    });
+    expect(await repo.get("G6.U4.L2")).toMatchObject({ reviewer_id: "usr_names_1", reviewer_name: "J. Rivera", last_editor_name: "J. Rivera" });
+    expect(await repo.get("G6.U4.L3")).toMatchObject({ reviewer_name: null, last_editor_name: null });
+  });
+
   it("lock_for_update_serializes", async () => {
     const id = "G6.U4.L1";
     let locked!: () => void;

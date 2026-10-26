@@ -119,6 +119,21 @@ test.describe("refusals", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Submitted" }).first()).toHaveAttribute("aria-current", "step");
   });
 
+  test("blocked approve keeps SCR-14 (F-5)", async ({ page }) => {
+    await signInAs(page, "approver");
+    await stubApproval(page);
+    // The server's issue_json carries no `blocks` and no issue_id: the screen must not throw on it.
+    const issue = { kind: "standard_confirmation", level: "confirmation", message: "L.6.4.b is AI-proposed: confirm or remove", address: null, code: "L.6.4.b", related_lesson_id: null, resolved: false };
+    await respondWithError(page, "transitionLesson", "BLOCKED", { issues: [issue] });
+    await page.goto(URL5);
+    await page.getByLabel("Usable with edits").check();
+    await approveBtn(page).click();
+    await expect(page.getByText("Approve refused: L.6.4.b is AI-proposed: confirm or remove.")).toBeVisible();
+    await expect(page.getByText("This page couldn't load")).toHaveCount(0);
+    await expect(page.getByLabel("Usable with edits")).toBeChecked();
+    await expect(page.getByRole("heading", { name: "Checklist" })).toBeVisible();
+  });
+
   test("BLOCKED flips the standards row", async ({ page }) => {
     await signInAs(page, "approver");
     await stubApproval(page);

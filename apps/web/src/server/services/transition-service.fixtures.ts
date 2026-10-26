@@ -87,7 +87,7 @@ export class World {
         ? null
         : {
             lesson_id: LID, unit_id: "G6.U4" as never, number: 5, type: "Reading", title: "Lesson 5",
-            state, current_version_id: null, reviewer_id: REVIEWER_ID, last_editor_id: REVIEWER_ID, schema_version: 1,
+            state, current_version_id: null, reviewer_id: REVIEWER_ID, last_editor_id: REVIEWER_ID, reviewer_name: null, last_editor_name: null, schema_version: 1,
           };
   }
   next(p: string): string { this.n += 1; return `${p}_${String(this.n).padStart(26, "0")}`; }
