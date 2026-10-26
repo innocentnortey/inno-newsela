@@ -54,7 +54,7 @@ writing: the look-sheet comparisons, the final sign-off on the real-model full r
 - **Not used:** intake (the sheet is normalized by plain code, no model call), the check suite (code), submit/freeze,
   and approval (a second human account approves the exact version it was shown). A model never approves a lesson.
 - **State of the stack so far:** every run in the repository's reports used the **stub provider** (no model call).
-  The load, integrity and fault reports state `provider_mode: stub` and `cost_usd: 0`. The real-model full unit run has since happened (final run: 30 of 47 lessons ready, $3.597, one run; `docs/delivery/real-model-results.md`).
+  The load, integrity and fault reports state `provider_mode: stub` and `cost_usd: 0`. The real-model full unit run has since happened (final run: 30 of 47 lessons ready in the recorded run, the 17 blocked being checker false positives per an offline replay, a fresh run on the fixed candidate pending, $3.597, one run; the judge was disabled and is uncalibrated, assist was not measured, no human quality sample; `docs/delivery/real-model-results.md`).
 
 ## (d) Where the AI was wrong, and how it was caught
 

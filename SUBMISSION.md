@@ -18,11 +18,8 @@ Only changes to this file were made; findings are filed below, not patched.
 2. **Technical contact.** andrew.parker@newsela.com is named in the brief for questions and link-access problems. **Not emailed**;
    nothing is sent without Innocent's say-so.
 3. **Due time.** "Monday night at 3 am" is read as Tue 2026-10-27 03:00 CT. If he meant Mon 2026-10-26 03:00 CT it has passed.
-4. **Real-model results now exist for generation only** (`docs/delivery/real-model-results.md`): after two prompt rounds, 30 of 47 lessons are ready on the issued
-   unit and 17 are blocked with recorded reasons; the **90% first-pass target is NOT met** (19 of 47, 40%, clean first pass);
-   $3.597, p95 57.1 s per lesson, one run. Not run: AI assist and the judge on a real model, the S3 golden after the fix (0 of 9
-   before it), reviewer sessions (NL-123), seeded errors (NL-124/135). His decision: a second repair round, a looser name rule,
-   or checker page parsing (two `page_out_of_range` cases may be a checker that is too strict).
+4. **Real-model results now exist for generation only** (`docs/delivery/real-model-results.md`): in the recorded run, 30 of 47 lessons ready after two prompt rounds in the recorded run (one run, n = 47); the 17 blocked were checker false positives per an offline replay (replay only: not a fresh run, the stored 30/17 is unchanged); a fresh measurement on the fixed candidate is pending. Stage figures: 44 of 47 original drafts parse and compile (meets the 90% M-31 target), 19 of 47 needed no repair, 30 of 47 ended stored-ready (Audit note 2026-10-26; `docs/testing/error-analysis/astra-audit-2026-10-26.json`).
+   $3.597, p95 57.1 s per lesson, one run. Not proven: reviewer minutes per approved lesson (NL-123, no measured sessions), lesson quality (no human sample), the judge (disabled, uncalibrated), AI assist on a real model, the seeded-error catch rate (NL-135 needs the blind human review); the S3 golden's 0 of 9 predates both prompt rounds and is not the current score. The checker fixes are committed; his decision is the spend for the fresh run on the fixed candidate.
 5. **M-24 stored p95 missed** (6,008 ms against < 3 s, n = 22,533, stub provider; `docs/delivery/capacity-report.md`).
    His call: lower the store debounce and re-run (recommended in `.claude/state/resume.md`), relax the target, or accept
    and say so in the video.

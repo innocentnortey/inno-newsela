@@ -96,3 +96,5 @@ labelled, and no metric is ever shown per named person (E-4, GR-15).
   M-9 and M-10 are leading. Review cadence follows framing §3 (per run, per unit, before each deploy).
 - **PD-33 changes to the framing figures.** M-18 and M-19 are now measured at the 200-concurrent-user spike, and
   M-19's visible-edit target is < 500 ms there (capacity doc), replacing < 300 ms at 25 sessions.
+
+- **Clarification 2026-10-26 (M-31, audit):** M-31 is measured on the ORIGINAL draft output (parse and compile); repairs do not change it. The registry row is left as agreed; attempt 3 measured 44/47 (see `docs/delivery/real-model-results.md`, Audit note).

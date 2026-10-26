@@ -3,8 +3,7 @@
 **Status:** NL-139 pass of 2026-10-26. Written from the design outputs DO-1…DO-7 (NL-04); the capacity numbers are now
 filled from the NL-127 report. It is a reader's map: it links to the documents that own each fact and does not copy
 them. Where a number comes from a design target it carries `[T]` (target), `[A]` (assumption), `[C]` (calculation) or
-`[M]` (measured, with *n* and a report path). The real-model full run has now been measured (30 of 47 lessons ready on the issued unit after two
-prompt rounds; 17 blocked with recorded reasons; the 90% first-pass target is **not** met, 40% clean first pass; one run,
+`[M]` (measured, with *n* and a report path). The real-model full run has now been measured (30 of 47 lessons ready after two prompt rounds in the recorded run (one run, n = 47); the 17 blocked were checker false positives per an offline replay (replay only: not a fresh run, the stored 30/17 is unchanged); a fresh measurement on the fixed candidate is pending; 44 of 47 original drafts parse and compile (meets the 90% M-31 target), 19 of 47 needed no repair, 30 of 47 ended stored-ready; one run,
 $3.60; [`delivery/real-model-results.md`](delivery/real-model-results.md)). Experiment scoring keeps its marker,
 `pending: NL-134`, and no result is claimed for it. Section 10 says what that means. Contracts are never restated here
 ([`contracts/INTERFACE.md`](contracts/INTERFACE.md) owns them).
@@ -124,9 +123,9 @@ Each card, its options and its evidence are in [`design/hard-problems.md`](desig
 
 - **Evaluation** ([`design/eval-plan.md`](design/eval-plan.md), DO-5): fourteen suites S1–S14, from the intake golden
   suite (S1) to the capacity spike (S14), each with its grader, case provenance and held-out separation. Results:
-  the full run (S9) ran once on the real model: 30 of 47 ready, 19 of 47 clean first pass, $3.597, p50 36.3 s and p95 57.1 s
+  the full run (S9) ran once on the real model: 30 of 47 stored-ready, 44 of 47 original drafts parse and compile, 19 of 47 needed no repair, $3.597, p50 36.3 s and p95 57.1 s
   per lesson, 347 s wall (`evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, n = 47, single run); the draft
-  golden (S3) was 0 of 9 before the prompt fix and is not re-measured; metrics scoring and reruns pending: NL-134. The capacity spike (S14) ran:
+  golden (S3) was 0 of 9 before both prompt rounds and is not the current score (not re-measured); metrics scoring and reruns pending: NL-134. The capacity spike (S14) ran:
   see section 8. The stub-provider fault suite S6 passed 4 of 4 (`evals/reports/faults-05b70004372e.md`, n = 4, stub,
   cost $0).
 - **Observability** ([`design/observability.md`](design/observability.md), DO-6): every entry point that does work has a
@@ -195,12 +194,18 @@ data** or **cut**, and the cut or unbuilt ones carry PRD §6.4's "what we say in
 
 **Not measured, and why**
 
-- **Real-model full run (NL-112): measured once, target not met.** After two prompt rounds, 30 of 47 lessons were ready on
-  the issued unit and 17 were blocked with recorded reasons (15 `proper_noun_unsourced`, 2 `page_out_of_range`). Clean first
-  pass was 19 of 47 (40%), so the 90% first-pass target is not met. Spend $3.597 (cap $6.00); per lesson p50 36.3 s, p95
-  57.1 s; 347 s wall; n = 47, one run, one unit, one model (`docs/delivery/real-model-results.md`). The two
-  `page_out_of_range` cases may be a checker that is too strict (Innocent's decision). Not measured: AI assist and the judge on
-  a real model; the S3 draft golden after the fix (0 of 9 before it); quality as a teacher would judge it. The spike figures in
+- **Real-model full run (NL-112): measured once; audited 2026-10-26.** After two prompt rounds, 30 of 47 lessons were ready on
+  the issued unit and 17 were blocked with recorded reasons (15 `proper_noun_unsourced`, 2 `page_out_of_range`). The stage
+  figures are separate: 44 of 47 original drafts parse and compile (the 90% M-31 target is met), 19 of 47 needed no repair, 30 of 47
+  ended stored-ready (28 repairs, 11 recovered). **Audit note (2026-10-26):** an offline replay of the stored final drafts shows
+  the 17 blocks were checker false positives (label words such as Nothing, Switching, Copying after compiler answer labels; `pp. 219-233`;
+  `Chapter 15 and one`); with the checker fixes now committed (d727537) 47 of 47 finals have no generation blockers in that replay.
+  The replay is not a fresh run and does not change the stored 30/17; a fresh measurement on the fixed candidate is pending. The same
+  audit found that generated source cards could make unsupported claims look sourced (closed in d727537) and that the repair got no
+  pinned context (closed in 42f6989). Under full-rule replay 27 of 30 stored-ready lessons raise `schema_invalid` and 23 of 30
+  `code_not_allowed` (compiler/checker label mismatch, fixed for rationale labels; `code_not_allowed` is slice D), and the 30
+  carry 13 quote placeholders and 7 excerpt slots across 16 lessons. Spend $3.597 (cap $6.00); per lesson p50 36.3 s, p95
+  57.1 s; 347 s wall; n = 47, one run, one unit, one model (`docs/delivery/real-model-results.md`). Not proven: reviewer minutes per approved lesson (no measured review sessions); lesson quality (no human sample); the judge (disabled, uncalibrated); AI assist on a real model; the seeded-error catch rate (NL-135 needs the blind human review); the S3 draft golden on the current candidate (0 of 9 predates both prompt rounds). The spike figures in
   section 6 (SP-1: 3 of 3 drafts valid) are a separate, smaller sample.
 - **Experiments and the north star (NL-134) are unscored; `pending: NL-134`.** An error-analysis round on the real run was done (NL-120,
   `docs/delivery/error-analysis-real-run.md`), but no `FT-N` taxonomy was signed and no `XP-N` experiment was scored on the

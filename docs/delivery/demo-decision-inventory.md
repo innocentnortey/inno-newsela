@@ -82,8 +82,8 @@ joins the table above as a result row.
 
 | Reserved for | Result that will exist | Source it will cite | Status |
 |---|---|---|---|
-| NL-112 | Full 47-lesson run report (generation success, retries, time per lesson, spend against the cap, checks that fired) | `evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, summary `docs/delivery/real-model-results.md` | **ran 2026-10-26**: 30 of 47 ready, 19 of 47 clean first pass (90% target not met), $3.597, p95 57.1 s; one run. Rows still carry no numbers until re-walked |
-| NL-120 | Error analysis of that run (what the checks caught, what a reviewer would still find, seeded-error catch rate) | `docs/delivery/error-analysis-real-run.md` (replay of the real run; no `FT-N` taxonomy signed) | ran on the real run; seeded-error catch rate not run |
+| NL-112 | Full 47-lesson run report (generation success, retries, time per lesson, spend against the cap, checks that fired) | `evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, summary `docs/delivery/real-model-results.md` | **ran 2026-10-26, audited**: 30 of 47 stored-ready, 44 of 47 original drafts parse and compile (meets the 90% M-31 target), 19 of 47 needed no repair, the 17 blocked were checker false positives per an offline replay (fresh run pending), $3.597, p95 57.1 s; one run. Rows still carry no numbers until re-walked |
+| NL-120 | Error analysis of that run (what the checks caught, what a reviewer would still find, seeded-error catch rate) | `docs/delivery/error-analysis-real-run.md` (replay of the real run; no `FT-N` taxonomy signed) | ran on the real run; Audit note 2026-10-26 corrects its facts (`astra-audit-2026-10-26.json`); seeded-error catch rate not run (NL-135 needs the blind human review) |
 | NL-127 | Capacity measurement against the PD-33 figures (500 users per day, 200-concurrent-user spike, at most 6 generation jobs) | `docs/design/capacity-and-workload.md` (targets only) | not run in this record |
 
 ## Not decided (do not narrate as decisions)

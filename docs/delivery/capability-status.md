@@ -7,8 +7,7 @@ Updated 2026-10-26 (main 3e5d55a and later). A ticket merging is **implementatio
 **Read this honestly:** "Connected" below means the ticket's real-stack Playwright specs (`playwright.real.config.ts`, folder
 `apps/web/e2e/integration/con-N`) passed when the ticket merged, as reported in its dev log. They were **not all re-run at
 HEAD**. Every connected (Playwright) run used the **stub model provider**. Real-model generation was measured separately
-on 2026-10-26 (`docs/delivery/real-model-results.md`): 30 of 47 lessons ready on the issued unit after two prompt rounds, the
-90% first-pass target not met. **AI assist and the judge have not been run on a real model.** Human acceptance
+on 2026-10-26 (`docs/delivery/real-model-results.md`): 30 of 47 lessons ready on the issued unit after two prompt rounds in the recorded run (44 of 47 original drafts parse and compile; 19 of 47 needed no repair); the 17 blocked were checker false positives per an offline replay, and a fresh run on the fixed candidate is pending (Audit note 2026-10-26). **AI assist and the judge have not been run on a real model.** Human acceptance
 (UX-5b, NL-133) has not happened; the walkthrough in `QA_REPORT.md` is an automated agent walkthrough.
 
 Columns: **Built** · **Tested on mock** (Playwright + axe against Prism) · **Reachable** (a user action leads to it) ·
@@ -32,7 +31,7 @@ Columns: **Built** · **Tested on mock** (Playwright + axe against Prism) · **R
 | Heartbeats and review minutes; run summary | CON-20 NL-99, SCR-17 NL-97 | yes | yes | yes | **yes** at merge (`con-20`, `con-21`); `reopen-new-row` body written in GEN-3; version id in heartbeat made real in GEN-5 (S-18) | – |
 | An approver exports approved lessons | SCR-20, CON-23 NL-102 | yes | yes | yes (board link) | **yes** at merge (`con-23`); CHG-6 contract drift still open (S-39) | – |
 | A staff member reads coverage, unit quality; edits prompt guidance and trials it | SCR-18/19/21 NL-73/74/76 → NL-117/104/103 | yes | yes | yes | **yes** at merge (`con-22`, `con-10`, `con-24`), screenshots need Innocent's eyes | – |
-| Generation with a **real model** (plan, draft, repair, checks) | worker, NL-79..NL-89, NL-110 | yes | – | – | stub only at merge | **measured, target not met**: 30 of 47 ready on the issued unit, 19 of 47 clean first pass, 17 blocked with reasons, $3.60, p95 57.1 s per lesson, one run (`real-model-results.md`) |
+| Generation with a **real model** (plan, draft, repair, checks) | worker, NL-79..NL-89, NL-110 | yes | – | – | stub only at merge | **measured once, then audited**: 30 of 47 stored-ready, 44 of 47 original drafts parse and compile, 19 of 47 needed no repair, 17 blocked with reasons that an offline replay shows were checker false positives (fresh run pending), $3.60, p95 57.1 s per lesson, one run (`real-model-results.md`) |
 | AI assist on a selection, and the alignment judge, with a real model | NL-116, NL-110 | yes | – | – | stub only | **not measured** (judge disabled in the full run; no calibration) |
 | Capacity at 200 users | NL-118/119/127 | yes | – | – | **partly**: reads met their targets; stored p95 **missed** (6.0 s vs 3 s) — `docs/delivery/capacity-report.md` | – |
 

@@ -3,6 +3,16 @@
 Synthetic data only. Source: stored rows in `ls_nl112_dev` (47 lessons, 8 ready, 39 failed), read-only. The S3 real run
 (`evals/reports/drafts-975600f9564c-dirty.md`, 0/9) is a second sample and agrees with this one.
 
+## Audit note (2026-10-26)
+
+The sentence in the next section that says "first-pass schema-valid was 0/47" and the 47/47 row in the cause table are **earlier claims, contradicted**.
+They treated `repairs === 0` as validity. Direct validation of the original draft outputs of `run_01M5W6JK5XJQ7VE0WMR7HR1Z11` shows
+**11/47 parse and compile** (initial issue rows: 71 on `cfu`, 30 on `code_origins`); attempt 3 (`run_01M5W7VQFD6AEVPMPZA2Z4S9ZK`) is **44/47**, with 19/47 needing no repair
+and 30/47 stored-ready. Wherever this file says "first pass valid" or "clean first pass 19 of 47", read it as "no repair needed", not "schema-valid first pass".
+The 17 failures of attempt 3 (15 `proper_noun_unsourced`, 2 `page_out_of_range`) are checker false positives per an offline replay, not a fresh run
+(`docs/testing/error-analysis/astra-audit-2026-10-26.json`). This analysis has no signed `FT-N` taxonomy and no human review (NL-120 still needs corrected facts, the taxonomy and the PD-32 fallback label).
+The original text below is kept as historical evidence.
+
 ## How this was measured
 
 The job row stores only the first failing kind (`check_failed` + one `check_kind`), so the report undercounts: a lesson that
@@ -71,6 +81,5 @@ Prompt round 2 (`64fe0e9`) told the model that a name from its own knowledge blo
 pages and chapters are cited only inside the range the card gives. The final full run
 (`evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`, devlog `docs/devlog/2026-10-26-nl112-full-run-3.md`) then gave
 30 of 47 ready and 17 blocked: first failing check `proper_noun_unsourced` 15, `page_out_of_range` 2. `standard_not_checked`,
-`section_missing`, `minutes_out_of_range` and `quote_unmatched` did not appear. Clean first pass 19 of 47 (40%); the 90% target is
-not met. These counts are the first failing check per job; the per-lesson replay was not repeated for this run. Checker rules
+`section_missing`, `minutes_out_of_range` and `quote_unmatched` did not appear. No repair needed 19 of 47 (40%); this is not the M-31 parse-and-compile figure (44 of 47, which meets the 90% target; Audit note above). These counts are the first failing check per job; the per-lesson replay was not repeated for this run. Checker rules
 and the repair limit (1) are unchanged; the next options are in `docs/delivery/real-model-results.md`.

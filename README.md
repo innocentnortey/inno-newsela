@@ -10,9 +10,8 @@ programs of four units with about 40 lessons each, and the bottleneck is staff r
 Lesson Studio takes an uploaded unit-outline sheet, bulk-generates standards-aligned ~50-minute lessons with an LLM,
 stores them, and gives reviewers a collaborative editor with AI assists and an approval workflow.
 All test, eval and demo data is synthetic.
-Real-model status (one run, n = 47): after two prompt rounds, 30 of 47 lessons of the issued unit are ready and 17 are blocked with
-recorded reasons; the 90% first-pass target is not met (40% clean first pass). See
-[`docs/delivery/real-model-results.md`](docs/delivery/real-model-results.md).
+Real-model status (one run, n = 47): 30 of 47 lessons ready after two prompt rounds in the recorded run (one run, n = 47); the 17 blocked were checker false positives per an offline replay (replay only: not a fresh run, the stored 30/17 is unchanged); a fresh measurement on the fixed candidate is pending. Stage figures of that run: 44 of 47 original drafts parse and compile (meets the 90% M-31 target), 19 of 47 needed no repair, 30 of 47 ended stored-ready. Not proven: reviewer minutes per approved lesson, lesson quality (no human sample), the judge (disabled, uncalibrated), AI assist on a real model, the seeded-error catch rate (NL-135 needs the blind human review). See
+[`docs/delivery/real-model-results.md`](docs/delivery/real-model-results.md) (Audit note 2026-10-26).
 
 ## Prerequisites
 
@@ -103,8 +102,7 @@ All run from the repository root. The WF-n numbers are the workflows in `docs/de
 | `npm run dev` | the Compose stack described above |
 
 `scripts/script-targets.json` lists each script's target file and owning ticket; a target whose file is missing exits 2
-with `NOT BUILT`. At the time of writing every listed target file exists, and `eval:full-run` has been run on a real key (30 of 47 lessons ready on the issued unit after two prompt rounds; the 90%
-first-pass target is not met; see `docs/delivery/real-model-results.md`). `eval:judge-calibrate` and the experiment scoring
+with `NOT BUILT`. At the time of writing every listed target file exists, and `eval:full-run` has been run on a real key (30 of 47 lessons ready on the issued unit after two prompt rounds in the recorded run; the 17 blocked were checker false positives per an offline replay; a fresh run on the fixed candidate is pending; see `docs/delivery/real-model-results.md`). `eval:judge-calibrate` and the experiment scoring
 have not been run on a real key.
 
 ## Deploy

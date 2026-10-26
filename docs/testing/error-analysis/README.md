@@ -59,3 +59,7 @@ as a synthetic one per the `synthetic-test-data` rule (declared dimension, label
 
 No failure rate, taxonomy, model comparison or improvement exists yet. Anything quoted from this folder before the
 round is run would be invented.
+
+## Audit 2026-10-26 (offline)
+
+[`astra-audit-2026-10-26.json`](astra-audit-2026-10-26.json) is an offline, read-only replay of the two kept NL-112 databases (no paid calls). It corrects the run facts (attempt 3: 44/47 original drafts parse and compile, 19/47 no repair, 30/47 stored-ready; the 17 blocks replay clean with the checker fixes). It is not the protocol's human review: no `FT-N` taxonomy, no `XP-N` score and no seeded-error result exist. Narrative: [`docs/delivery/2026-10-26-astra-fix-handoff.md`](../../delivery/2026-10-26-astra-fix-handoff.md).

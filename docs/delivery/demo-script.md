@@ -15,7 +15,7 @@ full run now exists (see the first row); it is a partial result and the narratio
 
 | Missing result | Ticket | What it blocks in this script | State on 2026-10-26 |
 |---|---|---|---|
-| Full real-model 47-lesson run (the unit the random lesson is picked from; spend; retries) | NL-112 | Flow rows F-2 to F-6, caught-error row C-2, success row F-6 | **Measured 2026-10-26, target not met**: final run 30 of 47 lessons ready, 17 blocked with reasons, 19 of 47 clean first pass (40% against a 90% target), $3.597, p50 36.3 s / p95 57.1 s per lesson, 347 s wall, n = 47, one run (`docs/delivery/real-model-results.md`; `evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`). The QA walk (NL-126) predates it and used the stub stack |
+| Full real-model 47-lesson run (the unit the random lesson is picked from; spend; retries) | NL-112 | Flow rows F-2 to F-6, caught-error row C-2, success row F-6 | **Measured 2026-10-26, audited**: final run 30 of 47 lessons stored-ready, 17 blocked with reasons (checker false positives per an offline replay; a fresh run on the fixed candidate is pending), 44 of 47 original drafts parse and compile (meets the 90% M-31 target), 19 of 47 needed no repair, $3.597, p50 36.3 s / p95 57.1 s per lesson, 347 s wall, n = 47, one run (`docs/delivery/real-model-results.md`; `evals/reports/full-run-run_01M5W7VQFD6AEVPMPZA2Z4S9ZK.md`). The QA walk (NL-126) predates it and used the stub stack |
 | Measured review sessions (reviewer minutes per approved lesson, G-2) | NL-123 | The north-star number on the success surface (S-2, F-6) | pending: NL-123 |
 | Seeded-error catch rate (M-4) | NL-135 | The M-4 line in S-2 | pending: NL-135 |
 | Judge calibration / held-out comparison | NL-132 | Nothing is shown; judge and held-out comparison are listed under "cannot be shown" | pending: NL-132 |
@@ -117,13 +117,13 @@ Each decision row cites an inventory row whose status is `decided`. Rows 8, 11, 
 | K-4 | 9:35-9:50 (15 s) | Capability table | "On the connected stack, sign-in passes 22 of 22 specs and outline upload 15 of 15; everything else on the board is still 'no'. Counts of specs, not of users or lessons." Re-read the capability table at recording time. | Inventory 11 (a result) | `docs/delivery/capability-status.md`; `docs/delivery/evidence-con-1-real-stack-2026-10-25.log` | Capability table capture |
 
 Limits to say once, plainly (GR-14): one reviewer group (us, not Newsela's LXDs), every figure "n = k"; one unit; the
-the full-run result is measured but misses its 90% first-pass target (30 of 47 ready, 40% clean first pass, one run); review-time and seeded-error results are pending (NL-123, NL-135).
+the full-run result is 30 of 47 lessons ready after two prompt rounds in the recorded run (one run, n = 47); the 17 blocked were checker false positives per an offline replay (replay only: not a fresh run, the stored 30/17 is unchanged); a fresh measurement on the fixed candidate is pending; review-time and seeded-error results are pending (NL-123, NL-135 needs the blind human review).
 
 ## Cannot be shown (so the video never implies them)
 
 | Item | Why it cannot be shown | Source |
 |---|---|---|
-| A claim that generation meets the 90% first-pass target, or that a teacher judged the quality | not true: 40% clean first pass, no human quality read | `docs/delivery/real-model-results.md` |
+| A claim that a fresh run on the fixed candidate reached any rate, that lessons are good, or that a teacher judged the quality | not proven: the 17 blocks are an offline replay, no fresh run, no human quality sample | `docs/delivery/real-model-results.md` |
 | Measured reviewer minutes per approved lesson | pending: NL-123 | inventory, "Reserved" |
 | Seeded-error catch rate (M-4, R-52) | pending: NL-135; PRD cut #6 | `docs/prd/newsela-prd.md` section 6.4 |
 | An LLM alignment judge, or a held-out comparison | pending: NL-132; PRD cut #2; "no model judge" unless a report exists | `docs/prd/newsela-prd.md` section 6.4 |
